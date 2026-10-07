@@ -1,0 +1,157 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Rating Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-5 col-sm-offset-1">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 92%;">
+                            <span ng-show="get_userEmplist.length>0">
+                                <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="search Employee here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 25.85em !important">
+                            <label>
+                                <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </label>
+                            <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="start_Date" ng-disabled="plannerflg" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="end_Date" name="endate" ng-disabled="plannerflg" md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="deviationReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="get_emp_rating_report.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button ng-show="get_deviationRemarksReport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printDeviation')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button type="button" ng-if="get_emp_rating_report.length>0" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_emp_rating_report.length>0">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Rating Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div id="printDeviation">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-4">
+                        <div class="form-group">
+                            <h4>  Employee Rating Report</h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <span class="text-left col-sm-6" style="font-size:16px;"> Taken By :<b> {{empname}}</b></span>
+                            <span class="text-right col-sm-6" style="font-size:16px;"> Department : <b>{{empdepartment}}</b></span>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Planner</b></a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('start')"><b>Start Date </b></a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('end')"><b>End Date</b></a></th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Total Effort</b>   </a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Completed Effort</b>   </a> </th>
+                            <th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b>Completed Percentage</b>   </a> </th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in employeeid">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.employeename}}</b></td>
+                        </tr>
+                        <tr ng-repeat="planner in user.plannerdetails">
+                            <td class="text-center">{{planner.ISMTCR_Title}}</td>
+                            <td class="text-center">{{planner.StartDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center">{{planner.EndDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center">{{planner.EffortInHrs}}</td>
+                            <td class="text-center">
+                                <span ng-if="planner.TimeTakenInHrs>0">
+                                    {{planner.TimeTakenInHrs}}
+                                </span>
+                                <span style="color:firebrick" ng-if="planner.TimeTakenInHrs==0 || planner.TimeTakenInHrs==null ||planner.TimeTakenInHrs==''">
+                                    0
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span >
+                                    <b>{{planner.Completed_Percentage | number :0}}%</b> 
+                                </span>
+                               
+                              
+                            </td>
+                           
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

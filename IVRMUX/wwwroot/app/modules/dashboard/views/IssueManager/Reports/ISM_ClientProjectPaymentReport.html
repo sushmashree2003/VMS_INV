@@ -1,0 +1,130 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Client Project Payment Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3" style="text-align:center">Project:<span style="color:red">*</span> </label>
+                            <div class="multiselect col-sm-8">
+
+                                <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                <label>
+                                    <input type="checkbox" name="stdd" value="1" ng-model="usercheck" data-ng-click="all_check()" />
+                                    <span class="lbl padding-8">All</span>
+                                </label>
+                                <label data-ng-model="ISMMPR_Id" ng-repeat="pro in projectlist |filter:filterchkbx" value="{{pro.ismmpR_Id}}">
+                                    <input type="checkbox" name="project" value="1" data-ng-model="pro.select" ng-click="togchkbx()" ng-required="isOptionsRequired()" />
+                                    <span class="lbl padding-8">{{pro.ismmpR_ProjectName}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.project)" ng-messages="myForm.project.$error">
+                                <div ng-message="required" style="color:red">Select Project Name</div>
+                            </div>
+                        </div>
+                    </div>                  
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="Report()" id="save-btn">
+                        <i class="fa fa-search-minus" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="printData()" ng-show="reportdetails.length>0">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#printareaId1')" ng-show="reportdetails.length>0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="reportdetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">CLIENT PROJECT PAYMENT REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div>
+                    <table class="table table-hover table-responsive table-bordered" id="table">
+                        <thead>
+                            <tr>
+                                <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                <th><a href="" ng-click="sortBy('ISMMPR_ProjectName')"><b>Project Name</b></a> </th>
+                                <th><a href="" ng-click="sortBy('ISMCLTPRP_Year')"><b>Year</b></a> </th>
+                                <th><a href="" ng-click="sortBy('ISMCLTPRP_InstallmentName')"><b>Installment Name</b></a> </th>
+                                <th><a href="" ng-click="sortBy('ISMCLTPRP_InstallmentAmt')"><b>Installment Amount</b></a> </th>
+                                <th><a href="" ng-click="sortBy('ISMCLTPRP_PaymentDate')"><b>Payment Date</b></a> </th>                           
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in reportdetails">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left">{{user.ISMMPR_ProjectName}}</td>
+                                <td class="text-left">{{user.ISMCLTPRP_Year}}</td>
+                                <td class="text-left">{{user.ISMCLTPRP_InstallmentName}}</td>
+                                <td class="text-left">{{user.ISMCLTPRP_InstallmentAmt}}</td>
+                                <td class="text-left">{{user.ISMCLTPRP_PaymentDate | date:'dd-MM-yyyy'}}</td>                             
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="false">
+        <div class="box-body" id="printareaId1">
+            <div class="row">
+                <div class="col-sm-12">
+                    <table>
+                        <tr>
+                            <td style=" text-align :left; font-size:20px;text-align:center" colspan="6">
+                                <b>CLIENT PROJECT PAYMENT REPORT</b>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <br />
+            <table class="table table-bordered table-responsive" id="printareaId">
+                <thead>
+                    <tr>
+                        <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                        <th><a href="" ng-click="sortBy('ISMMPR_ProjectName')"><b>Project Name</b></a> </th>
+                        <th><a href="" ng-click="sortBy('ISMCLTPRP_Year')"><b>Year</b></a> </th>
+                        <th><a href="" ng-click="sortBy('ISMCLTPRP_InstallmentName')"><b>Installment Name</b></a> </th>
+                        <th><a href="" ng-click="sortBy('ISMCLTPRP_InstallmentAmt')"><b>Installment Amount</b></a> </th>
+                        <th><a href="" ng-click="sortBy('ISMCLTPRP_PaymentDate')"><b>Payment Date</b></a> </th>
+                    </tr>
+                </thead>
+                <tbody>                   
+                    <tr ng-repeat="user in reportdetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.ISMMPR_ProjectName}}</td>
+                        <td class="text-left">{{user.ISMCLTPRP_Year}}</td>
+                        <td class="text-left">{{user.ISMCLTPRP_InstallmentName}}</td>
+                        <td class="text-left">{{user.ISMCLTPRP_InstallmentAmt}}</td>
+                        <td class="text-left">{{user.ISMCLTPRP_PaymentDate | date:'dd-MM-yyyy'}}</td>                       
+                    </tr>                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

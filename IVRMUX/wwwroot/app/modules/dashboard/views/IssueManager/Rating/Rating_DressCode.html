@@ -1,0 +1,878 @@
+﻿<style>
+    /*profile style*/
+    .img-area .inner-area {
+        height: calc(100% - 25px);
+        width: calc(100% - 25px);
+        border-radius: 0%;
+    }
+
+    .inner-area img {
+        height: 100%;
+        width: 100%;
+        border-radius: 0%;
+        object-fit: cover;
+    }
+
+    .img-area {
+        height: 200px;
+        width: 150px;
+        border-radius: 0%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        float: left;
+    }
+
+    .img-area {
+        background: #ecf0f3;
+        box-shadow: -3px -3px 7px #ffffff, 3px 3px 5px #ceced1;
+    }
+
+    .multiselect {
+        width: 22.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 0.5%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content admission" ng-init="OnLoadRatingDressCode()">
+    <div class="box box-primary" ng-app="MyModule">
+        <div class="box-header with-border">
+            <h3 class="box-title">Ratings DressCode & Behaviour</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <md-content>
+                <md-tabs md-dynamic-height md-border-bottom md-selected="myTabIndex" flex layout="column" md-stretch-tabs="always">
+                    <md-tab label="Rating DressCode" add="cor" ng-click="OnLoadRatingDressCode()">
+                        <form class="form-horizontal" role="form" name="myForm3" novalidate>
+                            <md-content class="md-padding">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Rating DressCode </h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="row col-sm-12">
+                                            <div class="col-sm-6 col-sm-offset-3">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Institution : <strong class="text-red">*</strong></label>
+                                                    <div class="col-sm-8">
+                                                        <select class="form-control" ng-model="DresscodeMI_Id" name="miidmastertype" id="id0"
+                                                                ng-change="OnChangeMasterInsitution()">
+                                                            <option value="">--Select--</option>
+                                                            <option ng-repeat="dd in getuserinstitution" value="{{dd.mI_Id}}"
+                                                                    ng-selected="{{dd.mI_Id==DresscodeMI_Id}}">
+                                                                {{dd.mI_Name}}
+                                                            </option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted3(myForm3.miidmastertype)" ng-messages="myForm3.miidmastertype.$error">
+                                                            <div ng-message="required">Select Institution </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br /> <br /><br />
+
+                                        <div class="row col-sm-12" ng-if="GetTypeQuestions.length>0">
+                                            <div class="box box-primary">
+                                                <div class="box-body" style="border:1px solid #333;box-sizing:border-box;margin:1%;">
+                                                    <div ng-repeat="user2 in GetTypeQuestions" style="padding:0.5% 2% 0.5% 2%;">
+
+                                                        <h4 class="text-left Question text-capitalize">
+                                                            {{user2.ratmqeclsuB_QuestionsSubclassification}} <br /><br />
+                                                            {{$index+1}} . {{user2.ratmqE_RatingQuestions}}
+
+                                                            <!--<input type="hidden" ng-model="RATMQE_Id" value="{{user2.ratmT_Id}}"  />
+                                                            <input type="hidden" ng-model="RATMT_Id" value="{{user2.ratmqE_Id}}" />-->
+                                                        </h4>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br /><br /><br />
+
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Rating Date :<strong style="color:red;">*</strong></label>
+                                                    <md-datepicker id="id3" name="sch_date"
+                                                                   ng-model="selectedDate" ng-change="checkSelectedDate()" required></md-datepicker>
+                                                    <div class="error-messages col-sm-offset-5" ng-if="interacted3(myForm3.sch_date)" ng-messages="myForm3.sch_date.$error">
+                                                        <div ng-message="required">Select Date</div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <div class="form-group" ng-if="GetEmployeeDetails.length > 0 ">
+                                                    <label for="sel2" class="control-label col-sm-4">Employee : <span style="color:red;">*</span></label>
+                                                    <div class="multiselect col-sm-8">
+                                                        <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                                        <label>
+                                                            <input name="qusoption" ng-disabled="editflag==true" ng-model="obj.usercheckCC" type="checkbox" ng-click="al_checkQuestion(obj.usercheckCC, HRME_Id)">
+                                                            <span class="lbl padding-8">
+                                                                All
+                                                            </span>
+                                                        </label>
+                                                        <label ng-repeat="role in GetEmployeeDetails | filter:searchchkbx1" value="{{hrmE_Id}}">
+                                                            <input type="checkbox" ng-disabled="editflag==true" ng-model="role.selected" ng-click="getquestion(HRME_Id)" ng-required="isOptionsRequiredquestion()" name="empname" />
+                                                            <span class="lbl padding-8">{{role.hrmE_EmployeeFirstName}} </span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="error-messages" ng-if="interacted3(myForm3.empname)" ng-messages="myForm3.empname.$error">
+                                                    <div ng-message="required" class="col-sm-8">Select Employee</div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <hr />
+
+                                        <div class="box-footer">
+                                            <div class="text-center">
+                                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="SaveRatingDresscode(user2)">
+                                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                    Save
+                                                </md-button>
+                                                <md-button ng-hide="gridOptions.data.length>0" type="submit" class="md-raised md-warn" ng-click="clear_first_tab()">
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                    Cancel
+                                                </md-button>
+                                                <input type="hidden" ng-model="FMOP_Id" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </md-content>
+
+
+                            <div class="box box-primary" ng-if="getDresscodetransaction.length>0">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Ratings DressCode Transaction Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row col-sm-12">
+                                        <div class="col-sm-4 pull-right">
+                                            <div class="form-group">
+                                                <input class="form-control" ng-model="searchValue.$" type="text" placeholder="search here..." />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+
+                                            <table class="table table-responsive table-bordered clearfix">
+                                                <thead>
+                                                    <tr style="background: aliceblue;">
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.MI_Name" type="text" placeholder="Search Institution">
+                                                        </th>
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.hrmE_EmployeeFirstName" type="text" placeholder="Search Employee">
+                                                        </th>
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.rattR_FeedbackDate" type="text" placeholder="Search Rating Date">
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                            </table>
+
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Sl.No</td>
+                                                        <td>Company Name</td>
+                                                        <td>Employee Name</td>
+                                                        <td>Rating Sub-Classification</td>
+                                                        <td>Rating Question</td>
+                                                        <td>Rating Given Date</td>
+                                                        <td>Rating</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr dir-paginate="user in filterValue=(getDresscodetransaction |filter:searchValue) |orderBy:sortKey2:sortReverse2  |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page2">
+                                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                        <td class="text-left">{{user.mI_Name}}</td>
+                                                        <td class="text-left">{{user.hrmE_EmployeeFirstName}}</td>
+                                                        <td class="text-left">{{user.ratmqeclsuB_QuestionsSubclassification}}</td>
+                                                        <td class="text-left">{{user.ratmqE_RatingQuestions}}</td>
+                                                        <td class="text-center">{{user.rattR_FeedbackDate | date:'dd/MM/yyyy'}}</td>
+                                                        <td class="text-left">{{user.ratmoP_RatingOptions}}</td>
+                                                        <!--<td class="text-center">
+                                                            <a href="javascript:void(0)" data-toggle="modal" ng-click="viewratinglist(user);" title="View Document"> <i class="fa fa-eye text-blue"></i></a>
+                                                        </td>-->
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <dir-pagination-controls max-size="10" pagination-id="page2"
+                                                                     direction-links="true"
+                                                                     boundary-links="true">
+                                            </dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </md-tab>
+
+                    <md-tab label="Rating Apperance" id="opt" ng-click="OnClickRatingAppearance()">
+                        <form class="form-horizontal" role="form" name="myForm2" novalidate>
+                            <md-content class="md-padding">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Rating Master Classification </h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="row col-sm-12">
+                                            <div class="col-sm-6 col-sm-offset-3">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Institution : <strong class="text-red">*</strong></label>
+                                                    <div class="col-sm-8">
+                                                        <select class="form-control" ng-model="Master_Type_AppearanceMI_Id" name="miidmastertype" id="id0"
+                                                              ng-change="OnChangeMasterInsitutionApperence()"  ng-disabled="EditFlagMasterFlag==true">
+                                                            <option value="">--Select--</option>
+                                                            <option ng-repeat="dd in getuserinstitution" value="{{dd.mI_Id}}"
+                                                                    ng-selected="{{dd.mI_Id==Master_Type_AppearanceMI_Id}}">
+                                                                {{dd.mI_Name}}
+                                                            </option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted2(myForm2.miidmastertype)" ng-messages="myForm2.miidmastertype.$error">
+                                                            <div ng-message="required">Select Institution </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br /><br />
+
+                                        <div class="row" ng-if="employeeprofile.length > 0">
+                                            <div class="col-sm-8 col-sm-offset-2 text-center">
+
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="d-flex flex-column align-items-center text-center">
+                                                            <div class="col-sm-4">
+                                                                <div class="img-area">
+                                                                    <div class="inner-area">
+                                                                        <img src="" ng-src="{{HRME_Photo}}" alt="" ng-click="previewimg_new(HRME_Photo)">
+                                                                    </div>
+                                                                </div><br />
+                                                            </div>
+
+                                                            <div class="col-sm-8 ">
+                                                                <table class="table">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Employee Name:</b></td>
+                                                                            <td>  {{employeename}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Date of joining:</b></td>
+                                                                            <td>{{DateOfJoining|date:'dd/MM/yyyy'}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Department:</b></td>
+                                                                            <td>{{Department}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Designation:</b></td>
+                                                                            <td> {{Designation}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Company Name:</b></td>
+                                                                            <td>{{mI_Name}}</td>
+                                                                        </tr>
+                                                                        <!--<tr>
+                                                                            <td><label><b> Pending Tasks: </label></b></td>
+                                                                            <td>
+                                                                                <a href="javascript:void(0)" class="text-aqua" ng-click="pendingtaks(ismresgmrEId)" data-toggle="modal" data-placement="bottom" data-target="#pendingtaks" title="View">
+                                                                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>-->
+
+                                                                    </tbody>
+                                                                </table>
+
+                                                            </div>
+
+                                                        </div><br />
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Rating Date :<strong style="color:red;">*</strong></label>
+                                                    <md-datepicker id="id3" name="appdate" ng-model="RATTR_FeedbackDate"
+                                                                   ng-change="checkratingAppearance()" required md-max-date="maxdate"></md-datepicker> <!--ng-change="OnChangeDate()"-->
+                                                    <div class="error-messages col-sm-offset-5" ng-if="interacted2(myForm2.appdate)" ng-messages="myForm2.appdate.$error">
+                                                        <div ng-message="required">Select Date</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!--<div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 control-label">Employee Name : <strong class="text-red">*</strong></label>
+                                                    <div class="col-sm-8">
+                                                        <ui-select id="id2" name="empname" ng-model="objques.HRME_Id" theme="bootstrap"
+                                                                   ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Employee "
+                                                                   ng-change="OnChangeBehaviourEmployee('Appearance')"
+                                                                   ng-disabled="empflag" required>
+                                                            <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">
+                                                                {{$select.selected.hrmE_EmployeeFirstName}}
+                                                            </ui-select-match>
+                                                            <ui-select-choices repeat="catgry in GetEmployeeDetails | filter: $select.search"
+                                                                               value="{{catgry.hrmE_Id}}"
+                                                                               ng-selected="{{catgry.Selected == true}}">
+                                                                <div ng-bind-html="catgry.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                                            </ui-select-choices>
+                                                        </ui-select>
+                                                        <div class="error-messages" ng-if="interacted2(myForm2.empname)" ng-messages="myForm2.empname.$error">
+                                                            <div ng-message="required">Select Employee </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>-->
+
+                                        </div>
+                                        <br /><br /><br /><br /><br /><br /><br />
+                                        <hr />
+
+                                        <div class="row col-sm-12" ng-if="ratinggrid == true && (GetEmployeeDetails.length>0)">
+                                            <div class="box box-primary">
+                                                <div class="box-header with-border text-center">
+                                                    <div class="box-tools pull-right">
+                                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                    </div>
+                                                    <h4>Rating Transaction Details</h4>
+                                                </div>
+
+                                                <div class="box-body" style="border:1px solid #333;box-sizing:border-box;margin:1%;">
+                                                    <div ng-repeat="user2 in GetTypeQuestions" style="padding:0.5% 2% 0.5% 2%;">
+
+                                                        <h4 class="text-left Question text-capitalize">
+                                                            {{user2.ratmqeclsuB_QuestionsSubclassification}} <br /><br />
+                                                            {{$index+1}} . {{user2.ratmqE_RatingQuestions}}
+                                                            <input type="hidden" value="{{user2.ratmT_Id}}" />
+                                                            <input type="hidden" value="{{user2.ratmqE_Id}}" />
+                                                        </h4>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <table class="table table-responsive table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SL No</th>
+                                                        <th>
+                                                            <label>
+                                                                <input name="option[]" value="" type="checkbox" ng-click="toggleAll(objques.allch)" ng-model="objques.allch">
+                                                                <span class="lbl padding-8"></span>
+                                                            </label>
+                                                        </th>
+                                                        <th>Photo</th>
+                                                        <th>Employee Name</th>
+
+                                                        <th>Dep & Designation</th>
+                                                        <th width="50%">Rating Options</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="user in GetEmployeeDetails track by $index" ng-form="dataForm" style="text-decoration-color:black">
+                                                        <td>{{$index+1}}</td>
+
+                                                        <td>
+                                                            <label>
+                                                                <input name="option[]" value="" type="checkbox" ng-model="user.isSelected" data-ng-change="amtdetails()" ng-disabled="allcheck">
+                                                                <span class="lbl padding-8"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td style="width:125px">
+                                                            <img src="{{user.HRME_Photo}}" width="80" height="80" /> <!--class="img-responsive" -->
+                                                        </td>
+                                                        <td>{{user.hrmE_EmployeeFirstName}}</td>
+                                                        <td hidden="hidden">{{user.hrmE_Id}}</td>
+
+                                                        <td style="text-align:left">
+                                                            <span>DOJ :</span> {{user.HRME_DOJ|date:'dd/MM/yyyy'}} <br />
+                                                            <span>Department  : </span>{{user.HRMD_DepartmentName}} <br />
+                                                            <span>Designation : </span> {{user.HRMDES_DesignationName}}
+                                                        </td>
+
+
+                                                        <td style="text-align:left;">
+                                                            <label class="radio-inline" ng-repeat="user3 in user.optionslist">
+
+                                                                <input type="radio" ng-model="user.name" name="t1_quesoption_{{user.hrmE_Id}}" value="{{user3.ratmoP_Id}}" ng-required="user.isSelected == true" />
+                                                                <span class="lbl padding-8">{{user3.ratmoP_RatingOptions}}</span>
+
+                                                            </label>
+
+
+                                                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted2(dataForm['t1_quesoption_'+user.hrmE_Id])" ng-messages="dataForm['t1_quesoption_'+user.hrmE_Id].$error">
+                                                                <div ng-message="required">Select Your Answer</div>
+                                                            </div>
+
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <div class="box-footer">
+                                                <div class="text-center">
+                                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="SaveRatingAppearance(user)">
+                                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                        Save
+                                                    </md-button>
+                                                    <md-button ng-hide="gridOptions.data.length>0" type="submit" class="md-raised md-warn" ng-click="clear_second_tab()">
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                        Cancel
+                                                    </md-button>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </md-content>
+
+                            <div class="box box-primary" ng-if="getAppearancetransaction.length>0">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Ratings Appearance Transaction Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row col-sm-12">
+                                        <div class="col-sm-4 pull-right">
+                                            <div class="form-group">
+                                                <input class="form-control" ng-model="searchValue.$" type="text" placeholder="search here..." />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+
+                                            <table class="table table-responsive table-bordered clearfix">
+                                                <thead>
+                                                    <tr style="background: aliceblue;">
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.MI_Name" type="text" placeholder="Search Institution">
+                                                        </th>
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.hrmE_EmployeeFirstName" type="text" placeholder="Search Employee">
+                                                        </th>
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.rattR_FeedbackDate" type="text" placeholder="Search Rating Date">
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                            </table>
+
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Sl.No</td>
+                                                        <td>Company Name</td>
+                                                        <td>Employee Name</td>
+                                                        <td>Rating Sub-Classification</td>
+                                                        <td>Rating Question</td>
+                                                        <td>Rating Given Date</td>
+                                                        <td>Rating</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr dir-paginate="user in filterValue=(getAppearancetransaction |filter:searchValue) |orderBy:sortKey2:sortReverse2  |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page2">
+                                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                        <td class="text-left">{{user.mI_Name}}</td>
+                                                        <td class="text-left">{{user.hrmE_EmployeeFirstName}}</td>
+                                                        <td class="text-left">{{user.ratmqeclsuB_QuestionsSubclassification}}</td>
+                                                        <td class="text-left">{{user.ratmqE_RatingQuestions}}</td>
+                                                        <td class="text-center">{{user.rattR_FeedbackDate | date:'dd/MM/yyyy'}}</td>
+                                                        <td class="text-left">{{user.ratmoP_RatingOptions}}</td>
+                                                        <!--<td class="text-center">
+                                                            <a href="javascript:void(0)" data-toggle="modal" ng-click="viewratinglist(user);" title="View Document"> <i class="fa fa-eye text-blue"></i></a>
+                                                        </td>-->
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <dir-pagination-controls max-size="10" pagination-id="page2"
+                                                                     direction-links="true"
+                                                                     boundary-links="true">
+                                            </dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </md-tab>
+
+
+                    <md-tab label="Rating Behaviour" id="opt" ng-click="OnClickRatingBehaviour()">
+                        <form class="form-horizontal" role="form" name="myForm1" novalidate>
+                            <md-content class="md-padding">
+
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Rating Behaviour </h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="row col-sm-12">
+                                            <div class="col-sm-6 col-sm-offset-3">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Institution : <strong class="text-red">*</strong></label>
+                                                    <div class="col-sm-8">
+                                                        <select class="form-control" ng-model="Master_Behaviour_MI_Id" name="miidmastertype" id="id0"
+                                                                ng-change="OnChangeBehaviourInsitution('Behaviour')" ng-disabled="EditFlagMasterFlag==true">
+                                                            <option value="">--Select--</option>
+                                                            <option ng-repeat="dd in getuserinstitution" value="{{dd.mI_Id}}"
+                                                                    ng-selected="{{dd.mI_Id==Master_Behaviour_MI_Id}}">
+                                                                {{dd.mI_Name}}
+                                                            </option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted1(myForm1.miidmastertype)" ng-messages="myForm1.miidmastertype.$error">
+                                                            <div ng-message="required">Select Institution </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br /><br />
+
+                                        <div class="row" ng-if="employeeprofile.length > 0">
+                                            <div class="col-sm-8 col-sm-offset-2 text-center">
+
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="d-flex flex-column align-items-center text-center">
+                                                            <div class="col-sm-4">
+                                                                <div class="img-area">
+                                                                    <div class="inner-area">
+                                                                        <img src="" ng-src="{{HRME_Photo}}" alt="" ng-click="previewimg_new(HRME_Photo)">
+                                                                    </div>
+                                                                </div><br />
+                                                            </div>
+
+                                                            <div class="col-sm-8 ">
+                                                                <table class="table">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Employee Name:</b></td>
+                                                                            <td>  {{employeename}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Date of joining:</b></td>
+                                                                            <td>{{DateOfJoining|date:'dd/MM/yyyy'}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Department:</b></td>
+                                                                            <td>{{Department}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Designation:</b></td>
+                                                                            <td> {{Designation}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left"><b>Company Name:</b></td>
+                                                                            <td>{{mI_Name}}</td>
+                                                                        </tr>
+                                                                        <!--<tr>
+                                                                            <td><label><b> Pending Tasks: </label></b></td>
+                                                                            <td>
+                                                                                <a href="javascript:void(0)" class="text-aqua" ng-click="pendingtaks(ismresgmrEId)" data-toggle="modal" data-placement="bottom" data-target="#pendingtaks" title="View">
+                                                                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>-->
+
+                                                                    </tbody>
+                                                                </table>
+
+                                                            </div>
+
+                                                        </div><br />
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Rating Date :<strong style="color:red;">*</strong></label>
+                                                    <md-datepicker id="id3" name="sch_date" ng-model="RATTR_FeedbackDate"
+                                                                   ng-change="checkratingbehaviour()" required md-max-date="maxdate"></md-datepicker> <!--ng-change="OnChangeDate()"-->
+                                                    <div class="error-messages col-sm-offset-5" ng-if="interacted1(myForm1.sch_date)" ng-messages="myForm1.sch_date.$error">
+                                                        <div ng-message="required">Select Date</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!--<div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 control-label">Employee Name : <strong class="text-red">*</strong></label>
+                                                    <div class="col-sm-8">
+                                                        <ui-select id="id2" name="empname" ng-model="objques.HRME_Id" theme="bootstrap"
+                                                                   ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Employee "
+                                                                   ng-change="OnChangeBehaviourEmployee('Behaviour')"
+                                                                   ng-disabled="empflag" required>
+                                                            <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">
+                                                                {{$select.selected.hrmE_EmployeeFirstName}}
+                                                            </ui-select-match>
+                                                            <ui-select-choices repeat="catgry in GetEmployeeDetails | filter: $select.search"
+                                                                               value="{{catgry.hrmE_Id}}"
+                                                                               ng-selected="{{catgry.Selected == true}}">
+                                                                <div ng-bind-html="catgry.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                                            </ui-select-choices>
+                                                        </ui-select>
+                                                        <div class="error-messages" ng-if="interacted1(myForm1.empname)" ng-messages="myForm1.empname.$error">
+                                                            <div ng-message="required">Select Employee </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>-->
+
+                                        </div>
+                                        <br /><br /><br /><br /><br /><br /><br />
+
+                                        <hr />
+
+
+                                        <div class="row col-sm-12" ng-if="ratinggrid == true && (GetTypeQuestions.length>0)">
+                                            <div class="box box-primary">
+                                                <div class="box-header with-border text-center">
+                                                    <div class="box-tools pull-right">
+                                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                    </div>
+                                                    <h4>Rating Transaction Details</h4>
+                                                </div>
+
+                                                <div class="box-body" style="border:1px solid #333;box-sizing:border-box;margin:1%;">
+                                                    <div ng-repeat="user2 in GetTypeQuestions" style="padding:0.5% 2% 0.5% 2%;">
+
+                                                        <h4 class="text-left Question text-capitalize">
+                                                            {{user2.ratmqeclsuB_QuestionsSubclassification}} <br />
+                                                            {{$index+1}} . {{user2.ratmqE_RatingQuestions}}
+                                                            <input type="hidden" value="{{user2.ratmT_Id}}" />
+                                                            <input type="hidden" value="{{user2.ratmqE_Id}}" />
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <table class="table table-responsive table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SL No</th>
+                                                        <th>
+                                                            <label>
+                                                                <input name="option[]" value="" type="checkbox" ng-click="toggleAll(objques.allch)" ng-model="objques.allch">
+                                                                <span class="lbl padding-8"></span>
+                                                            </label>
+                                                        </th>
+                                                        <th>Photo</th>
+                                                        <th>Employee Name</th>
+
+                                                        <th>Dep & Designation</th>
+                                                        <th width="50%">Rating Options</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="user in GetEmployeeDetails track by $index" ng-form="dataForm" style="text-decoration-color:black">
+                                                        <td>{{$index+1}}</td>
+
+                                                        <td>
+                                                            <label>
+                                                                <input name="option[]" value="" type="checkbox" ng-model="user.isSelected" data-ng-change="amtdetails()" ng-disabled="allcheck">
+                                                                <span class="lbl padding-8"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td style="width:125px">
+                                                            <img src="{{user.HRME_Photo}}" width="80" height="80" /> <!--class="img-responsive" -->
+                                                        </td>
+                                                        <td>{{user.hrmE_EmployeeFirstName}}</td>
+                                                        <td hidden="hidden">{{user.hrmE_Id}}</td>
+
+                                                        <td style="text-align:left">
+                                                            <span>DOJ :</span> {{user.HRME_DOJ|date:'dd/MM/yyyy'}} <br />
+                                                            <span>Department  : </span>{{user.HRMD_DepartmentName}} <br />
+                                                            <span>Designation : </span> {{user.HRMDES_DesignationName}}
+                                                        </td>
+
+
+                                                        <td style="text-align:left;">
+                                                            <label class="radio-inline" ng-repeat="user3 in user.optionslist">
+
+                                                                <input type="radio" ng-model="user.name" name="t1_quesoption_{{user.hrmE_Id}}" value="{{user3.ratmoP_Id}}" ng-required="user.isSelected == true" />
+                                                                <span class="lbl padding-8">{{user3.ratmoP_RatingOptions}}</span>
+
+                                                            </label>
+
+
+                                                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(dataForm['t1_quesoption_'+user.hrmE_Id])" ng-messages="dataForm['t1_quesoption_'+user.hrmE_Id].$error">
+                                                                <div ng-message="required">Select Your Answer</div>
+                                                            </div>
+
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+
+                                            <div class="box-footer">
+                                                <div class="text-center">
+                                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="SaveRating(user)">
+                                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                        Save
+                                                    </md-button>
+                                                    <md-button ng-hide="gridOptions.data.length>0" type="submit" class="md-raised md-warn" ng-click="clear_third_tab()">
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                        Cancel
+                                                    </md-button>
+                                                    <input type="hidden" ng-model="FMOP_Id" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <!--<div class="text-center row">
+                                            <md-button type="button" class="md-raised md-primary" ng-click="SaveMasterType(obj)">
+                                                <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                                            </md-button>
+                                            <md-button type="button" class="md-raised md-warn" ng-click="clear_first_tab()">
+                                                <i class="fa fa-times" aria-hidden="true"></i> Clear
+                                            </md-button>
+                                        </div>-->
+                                    </div>
+                                </div>
+
+                            </md-content>
+                            <div class="box box-primary" ng-if="getbehaviourtransaction.length>0">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Ratings Behaviour Transaction Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row col-sm-12">
+                                        <div class="col-sm-4 pull-right">
+                                            <div class="form-group">
+                                                <input class="form-control" ng-model="searchValue.$" type="text" placeholder="search here..." />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+
+                                            <table class="table table-responsive table-bordered clearfix">
+                                                <thead>
+                                                    <tr style="background: aliceblue;">
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.MI_Name" type="text" placeholder="Search Institution">
+                                                        </th>
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.hrmE_EmployeeFirstName" type="text" placeholder="Search Employee">
+                                                        </th>
+                                                        <th>
+                                                            <input class="form-control" ng-model="searchValue.rattR_FeedbackDate" type="text" placeholder="Search Rating Date">
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                            </table>
+
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Sl.No</td>
+                                                        <td>Company Name</td>
+                                                        <td>Employee Name</td>
+                                                        <td>Rating Sub-Classification</td>
+                                                        <td>Rating Question</td>
+                                                        <td>Rating Given Date</td>
+                                                        <td>Rating</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr dir-paginate="user in filterValue=(getbehaviourtransaction |filter:searchValue) |orderBy:sortKey2:sortReverse2  |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page2">
+                                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                        <td class="text-left">{{user.mI_Name}}</td>
+                                                        <td class="text-left">{{user.hrmE_EmployeeFirstName}}</td>
+                                                        <td class="text-left">{{user.ratmqeclsuB_QuestionsSubclassification}}</td>
+                                                        <td class="text-left">{{user.ratmqE_RatingQuestions}}</td>
+                                                        <td class="text-center">{{user.rattR_FeedbackDate | date:'dd/MM/yyyy'}}</td>
+                                                        <td class="text-left">{{user.ratmoP_RatingOptions}}</td>
+                                                        <!--<td class="text-center">
+                                                            <a href="javascript:void(0)" data-toggle="modal" ng-click="viewratinglist(user);" title="View Document"> <i class="fa fa-eye text-blue"></i></a>
+                                                        </td>-->
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <dir-pagination-controls max-size="10" pagination-id="page2"
+                                                                     direction-links="true"
+                                                                     boundary-links="true">
+                                            </dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </md-tab>
+
+                </md-tabs>
+            </md-content>
+        </div>
+    </div>
+</section>

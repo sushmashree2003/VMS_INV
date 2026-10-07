@@ -1,0 +1,277 @@
+
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">DRIVER INDENT REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="GetReport()" novalidate>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="input-group col-sm-8">
+                                    <md-datepicker ng-model="fromdate" onkeydown="return false" md-max-date="maxDatemf" ng-change="gettodate()" name="From_Date" id="date1" md-placeholder="Enter date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                        <div ng-message="required">Please Select From date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="input-group col-sm-8">
+                                    <md-datepicker ng-model="todate" onkeydown="return false" name="To_Date" md-min-date="minDatemf" md-max-date="maxDatemf" id="date2" md-placeholder="Enter date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                        <div ng-message="required">Please Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <div class="well" ng-init="rdo='All'">
+                                <label class="control-label">
+                                    <input type="radio" name="vf33" value="All" ng-model="rdo">
+                                    <span class="lbl padding-8">All</span>
+                                </label>
+                                <label class="control-label">
+                                    <input type="radio" name="vf31" value="Applied" ng-model="rdo">
+                                    <span class="lbl padding-8">Applied</span>
+                                </label>
+                                <label class="control-label">
+                                    <input type="radio" name="vf32" value="Approved" ng-model="rdo">
+                                    <span class="lbl padding-8">Approved</span>
+                                </label>
+                                <label class="control-label">
+                                    <input type="radio" name="vf33" value="Rejected" ng-model="rdo">
+                                    <span class="lbl padding-8">Rejected</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary">
+                            <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                        <!--<md-button type="button" ng-click="exptoex();" target="_blank" class="md-raised md-primary" ng-disabled="!grid_view">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>-->
+                        <md-button type="button" class="md-raised md-warn" ng-disabled="!grid_view" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+
+            </form>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <div class="box box-primary" ng-show="grid_view">
+        <div class="box-header with-border">
+            <h3 class="box-title">Grid View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!--style="overflow:scroll"-->
+        <div class="box-body">
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="table3">
+                <!--<h4>Driver Indent Report</h4>-->
+                <table class="col-sm-12 table-bordered  margin-bottom-10">
+                    <thead>
+                        <tr>
+                            <th>Sl. No.</th>
+                            <!--<th>Date</th>-->
+                            <th>Prepared By</th>
+                            <th>Vehicle No.</th>
+                            <th>Vehicle Name</th>
+                            <th>Bill No.</th>
+                            <th>Fuel Qty.</th>
+                            <th>Amount</th>
+                            <th>Opening KM</th>
+                            <th>Closing KM</th>
+                            <th>Diffrence Opening / Closing Km</th>
+                            <th>Applied Date</th>
+                            <th>Approved/Reject Date</th>
+                            <th>Remark</th>
+                            <th>Status</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="doc in indentreport">-->
+                        <tr dir-paginate="doc in filterValue1 = (indentreport | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+
+                            <!--dir-paginate="employee in filterValue = (activityIds| filter : searchValue) |orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'"-->
+                            <!--<td>{{$index+1}}</td>-->
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <!--<td>{{doc.ismdiT_Date|date:'dd-MM-yyyy'}}</td>-->
+                            <td class="text-left">{{doc.hrmE_EmployeeFirstName}}</td>
+                            <td class="text-left">{{doc.trmV_VehicleNo}}</td>
+                            <td class="text-left">{{doc.trmV_VehicleName}}</td>
+                            <td class="text-left">{{doc.ismdiT_BillNo}}</td>
+                            <td>{{doc.ismdiT_Qty}}</td>
+                            <td>{{doc.ismdiT_Amount}}</td>
+                            <td>{{doc.ismdiT_OpeningKM}}</td>
+                            <td>{{doc.ismdiT_ClosingKM}}</td>
+                            <td>{{doc.ismdiT_DiffrenceKm}}</td>
+                            <td>{{doc.ismdiT_Date|date:'dd-MM-yyyy'}}</td>
+                            <td>{{doc.updatedDate|date:'dd-MM-yyyy'}}</td>
+
+                            <td class="text-left">{{doc.ismdiT_Remarks}}</td>
+                            <td class="text-left" ng-class="{'color-red': doc.ismdiT_Status === 'Rejected', 'color-blue': doc.ismdiT_Status === 'Applied', 'color-green': doc.ismdiT_Status === 'Approved'}">
+
+                                {{doc.ismdiT_Status}}
+                                <!--{{getColor('ismdiT_Status')}}-->
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th colspan="2"></th>
+                            <th colspan="4">
+                                <strong>    Total Amount Is :</strong>
+                            </th>
+                            <th>
+                                <strong>
+                                    {{getTotal('ismdiT_Amount')}}
+                                </strong>
+                            </th>
+                            <th colspan="7">
+
+
+                            </th>
+
+                            <!--<td colspan="4"></td>-->
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="xyz">
+                </dir-pagination-controls>
+            </div>
+
+
+        </div>
+    </div>
+
+     <div ng-hide="true">
+            <div id="printSL">
+                
+                <h4 class="text-center">Driver Indent Report</h4>
+                <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr>
+                            <th>Sl. No.</th>
+                            <!--<th>Date</th>-->
+                            <th>Prepared By</th>
+                            <th>Vehicle No.</th>
+                            <th>Vehicle Name</th>
+                            <th>Bill No.</th>
+                            <th>Fuel Qty.</th>
+                            <th>Amount</th>
+                            <th>Opening KM</th>
+                            <th>Closing KM</th>
+                            <th>Diffrence Opening / Closing Km</th>
+                            <th>Applied Date</th>
+                            <th>Approved/Reject Date</th>
+                            <th>Remark</th>
+                            <th>Status</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="doc in indentreport">
+                            <td>{{$index+1}}</td>
+                            <td class="text-left">{{doc.hrmE_EmployeeFirstName}}</td>
+                            <td class="text-left">{{doc.trmV_VehicleNo}}</td>
+                            <td class="text-left">{{doc.trmV_VehicleName}}</td>
+                            <td class="text-left">{{doc.ismdiT_BillNo}}</td>
+                            <td>{{doc.ismdiT_Qty}}</td>
+                            <td>{{doc.ismdiT_Amount}}</td>
+                            <td>{{doc.ismdiT_OpeningKM}}</td>
+                            <td>{{doc.ismdiT_ClosingKM}}</td>
+                            <td>{{doc.ismdiT_DiffrenceKm}}</td>
+                            <td>{{doc.ismdiT_Date|date:'dd-MM-yyyy'}}</td>
+                            <td>{{doc.updatedDate|date:'dd-MM-yyyy'}}</td>
+
+                            <td class="text-left">{{doc.ismdiT_Remarks}}</td>
+                            <td class="text-left" ng-class="{'color-red': doc.ismdiT_Status === 'Rejected', 'color-blue': doc.ismdiT_Status === 'Applied', 'color-green': doc.ismdiT_Status === 'Approved'}">
+
+                                {{doc.ismdiT_Status}}
+                                <!--{{getColor('ismdiT_Status')}}-->
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th colspan="2"></th>
+                            <th colspan="4">
+                                <strong>    Total Amount Is :</strong>
+                            </th>
+                            <th>
+                                <strong>
+                                    {{getTotal('ismdiT_Amount')}}
+                                </strong>
+                            </th>
+                            <th colspan="7">
+
+
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    
+
+</section>

@@ -1,0 +1,436 @@
+﻿<style>
+    .Padding {
+        padding-bottom: 8px;
+    }
+</style>
+<section class="content">
+    <div data-ng-init="onpageload()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TA-DA Payment Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row Padding">
+                        <div class="col-sm-12">
+                            <div class="well text-center">
+                                <div ng-init="rdopunch='TA_ApplyPayment'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="TA_ApplyPayment" name="enhc" ng-model="rdopunch" ng-change="otherdaydatechange()">
+                                        <span class="lbl padding-8"><b> TADA Apply PaymentReport </b></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="TA_Apply_AdavancePayment" name="enhc" ng-model="rdopunch" ng-change="otherdaydatechange()">
+                                        <span class="lbl padding-8"><b>TADA Adavance  PaymentReport </b></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-md-offset-2">
+                        <!--<div class="form-group Padding">
+                            <label class="control-label col-sm-2"></label>
+                            <div class="col-sm-4">
+                                <input name="lvemp" ng-model="chk_All" type="checkbox" ng-click="All_Chk()" />
+                                <span class="lbl padding-8">
+                                    ALL
+                                </span>
+                            </div>
+                        </div>-->
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-2">Employee Name : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="usercheckC" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="room in get_emp | filter:searchchkbx1" value="{{room.hrmE_Id}}">
+                                    <input type="checkbox" data-ng-model="room.selected" ng-click="togchkbxC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired()" name="Room" />
+                                    <span class="lbl padding-8">{{room.hrmE_EmployeeFirstName}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.Room)" ng-messages="myForm.Room.$error">
+                                <div ng-message="required">Please Select Any One Employee</div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group Padding">
+                            <label class="control-label col-sm-2">
+                                Employee Name  :
+                            </label>
+                            <div class="col-sm-4">
+                                <ui-select id="sel11" name="studentname34" ng-model="$parent.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter2($select);"
+                                           title="Select emp" ng-disabled="DisaBleemp">
+                                    <ui-select-match ng-trim="false" placeholder="Select or search employee ...">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="user in get_emp | filter: $select.search " value="{{user.hrmE_Id}}" ng-selected="{{user.Selected ==true}}">
+                                        <div ng-bind-html="(user.hrmE_EmployeeFirstName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                        </div>-->
+                        <div class="form-group Padding">
+                            <label class="control-label col-sm-2">From Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-4" style="padding-left: 0px !important;">
+                                <md-datepicker ng-model="startdate" name="startdates" id="date1" md-placeholder="From Date" md-min-date="plMaxdate" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.startdates)" ng-messages="myForm.startdates.$error">
+                                    <div ng-message="required">From Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group Padding">
+                            <label class="control-label col-sm-2">To Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-4" style="padding-left: 0px !important;">
+                                <md-datepicker ng-model="enddate" name="endatediff" md-min-date="startdate" md-placeholder="To Date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.endatediff)" ng-messages="myForm.endatediff.$error">
+                                    <div ng-message="required">To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <!--------Inserting Items-------->
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="getReport()">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button ng-if="get_Report.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel()">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>
+                    <md-button ng-if="get_Report.length>0" type="button" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">TA-DA Payment Reports</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body" ng-show="get_Report.length > 0" ng-if="rdopunch=='TA_ApplyPayment'">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No
+                        </th>
+                        <th>
+                            Company Name
+                        </th>
+                        <th>
+                            Employee Code
+                        </th>
+                        <th>
+                            Emplyee Name
+                        </th>
+                        <th>
+                            City
+                        </th>
+                        <th> Amount PaidDate</th>
+                        <th>Total Paid Amount</th>
+                        <th>Mode of Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="userone in filterValue = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{userone.mI_Name}}</td>
+                        <td>
+                            {{userone.hrmE_EmployeeCode}}
+                        </td>
+                        <td>
+                            {{userone.hrmE_EmployeeFirstName}}
+                        </td>
+                        <td>
+                            {{userone.ivrmmcT_Name}}
+                        </td>
+                        <td class="text-left">{{userone.vtadaaP_Date|date:'dd/MM/yyyy'}}</td>
+                        <td>
+                            {{userone.vtadaaP_AmountPaid}}
+                        </td>
+                        <td>
+                            {{userone.vtadaaP_PaymentMode}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="xyz">
+            </dir-pagination-controls>
+        </div>
+        <div class="box-body" ng-show="get_Report.length > 0" ng-if="rdopunch=='TA_Apply_AdavancePayment'">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Company Name
+                            </th>
+                            <th>
+                                Employee Code
+                            </th>
+                            <th>
+                                Emplyee Name
+                            </th>
+                            <th>
+                                City
+                            </th>
+                            <th> Date</th>
+
+                            <th>Total Paid Amount</th>
+                            <th>Mode Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="userone in filterValue = (get_Report | filter : searchValuee)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{userone.mI_Name}}</td>
+                            <td>
+                                {{userone.hrmE_EmployeeCode}}
+                            </td>
+                            <td>
+                                {{userone.hrmE_EmployeeFirstName}}
+                            </td>
+                            <td>
+                                {{userone.ivrmmcT_Name}}
+                            </td>
+                            <td class="text-left">{{userone.vtadaaaP_Date|date:'dd/MM/yyyy'}}</td>
+                            <td>
+                                {{userone.vtadaaaP_AmountPaid}}
+                            </td>
+                            <td>
+                                {{userone.vtadaaaP_PaymentMode}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            
+            <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="xyz">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+<!------excel print--------->
+<div id="PayAdavance" style="display:none;" ng-if="rdopunch=='TA_ApplyPayment'">
+    <table class="table table-bordered table-condensed text-center">
+        <thead>
+            <tr>
+                <th>
+                    <div class="row" ng-if="imagenew!=null && imagenew!=''">                       
+                            <img src="{{imagenew}}" class="img-responsive" alt="vaps" height="103" />                        
+                    </div>
+                    <div class="row text-center">
+                        <h4 style="text-align:center">TADA Apply Payment Report</h4>
+                        <h4 style="text-align:center">{{startdate | date:'dd/MM/yyyy'}} To {{enddate | date:'dd/MM/yyyy'}}</h4>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+    </table>    
+    <table class="table table-hover table-responsive table-bordered text-center">
+        <thead>
+            <tr>
+                <th>
+                    SL.No
+                </th>
+                <th>
+                    Company Name
+                </th>
+                <th>
+                    Employee Code
+                </th>
+                <th>
+                    Emplyee Name
+                </th>
+                <th>
+                    City
+                </th>
+                <th> Amount PaidDate</th>
+                <th>Total Paid Amount</th>
+                <th>Mode of Payment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="userone in get_Report">
+                <td>{{$index+1}}</td>
+                <td>{{userone.mI_Name}}</td>
+                <td>
+                    {{userone.hrmE_EmployeeCode}}
+                </td>
+                <td>
+                    {{userone.hrmE_EmployeeFirstName}}
+                </td>
+                <td>
+                    {{userone.ivrmmcT_Name}}
+                </td>
+                <td class="text-left">{{userone.vtadaaP_Date|date:'dd/MM/yyyy'}}</td>
+                <td>
+                    {{userone.vtadaaP_AmountPaid}}
+                </td>
+                <td>
+                    {{userone.vtadaaP_PaymentMode}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!---->
+<!-------Two------>
+<div id="PayAdavance" ng-if="rdopunch=='TA_Apply_AdavancePayment'" style="display:none;">
+    <table class="table table-bordered table-condensed text-center">
+        <thead>
+            <tr>
+                <th>
+                    <div class="row" ng-if="imagenew!=null && imagenew!=''">                       
+                            <img src="{{imagenew}}" class="img-responsive" alt="vaps" height="103" />                    </div>
+                    <div class="row text-center">
+                        <h4 style="text-align:center">TADA Adavance Apply Payment Report</h4>
+                        <h4 style="text-align:center">{{startdate | date:'dd/MM/yyyy'}} To {{enddate | date:'dd/MM/yyyy'}}</h4>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+    </table>   
+    <table class="table table-hover table-responsive table-bordered text-center">
+        <thead>
+            <tr>
+                <th>
+                    SL.No
+                </th>
+                <th>
+                    Company Name
+                </th>
+                <th>
+                    Employee Code
+                </th>
+                <th>
+                    Emplyee Name
+                </th>
+                <th>
+                    City
+                </th>
+                <th> Date</th>
+
+                <th>Total Paid Amount</th>
+                <th>Mode Payment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="userone in get_Report">
+                <td>{{$index+1}}</td>
+                <td>{{userone.mI_Name}}</td>
+                <td>
+                    {{userone.hrmE_EmployeeCode}}
+                </td>
+                <td>
+                    {{userone.hrmE_EmployeeFirstName}}
+                </td>
+                <td>
+                    {{userone.ivrmmcT_Name}}
+                </td>
+                <td class="text-left">{{userone.vtadaaaP_Date|date:'dd/MM/yyyy'}}</td>
+                <td>
+                    {{userone.vtadaaaP_AmountPaid}}
+                </td>
+                <td>
+                    {{userone.vtadaaaP_PaymentMode}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+     
+
+
+
+
+
+
+
+

@@ -1,0 +1,265 @@
+﻿<link href="/css/print/Fees/MonthEndReport.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loadData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> F&F Settlement Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div  ng-init="allind ='datewise'">
+                            <input type="radio" value="datewise" name="allind" ng-model="allind">
+                            <!--<span class="lbl padding-8">Date Wise</span>-->                           
+                        </div>
+                    </div>
+                </div>              
+                <div class="row" ng-show="allind=='datewise'">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee Name:<span style="color:red">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" data-ng-model="searchchkbx" type="text" placeholder="Search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" data-ng-model="hrmE_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+
+                                    <label ng-repeat="emp in employees | filter:searchchkbx" value="{{emp.hrmE_Id}}">
+                                        <input type="checkbox" data-ng-model="emp.selected" ng-click="togchkbxC1()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired() && allind=='datewise'" name="employee" />
+                                        <span class="lbl padding-8">{{emp.hrmE_EmployeeFirstName}}</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                    <div ng-message="required">Select Employee Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Status :<span style="color:red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control " id="sel2556" name="status" ng-model="status" ng-required="allind=='datewise'">
+                                        <option value="" label="--Select Status--"> </option>
+                                        <option value="all"> All </option>
+                                        <option value="Applied"> Applied </option>
+                                        <option value="Sanctioned"> Approved </option>
+                                        <option value="Partial Approved"> Partial Approved </option>
+                                        <option value="Rejected"> Rejected </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.status)" ng-messages="myForm.status.$error">
+                                    <div ng-message="required">Select Status</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 4px;">*</strong></label>
+                                <div class="col-sm-2 input-group text-right" style="">
+                                    <md-datepicker ng-model="fromdate" onkeydown="return false" name="From_Date" id="date1" md-placeholder="From Date" ng-required="allind=='datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                        <div ng-message="required">Please Select From date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 4px;">*</strong></label>
+                                <div class="col-sm-2 input-group text-right" style="">
+                                    <md-datepicker ng-model="todate" onkeydown="return false" name="To_Date" id="date2" md-placeholder="To Date" ng-required="allind=='datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                        <div ng-message="required">Please Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="ShowReportdata()" id="save-btn">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-click="Clear_Details();" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+                        <md-button type="button" ng-if="certificaterequestid.length>0" class="md-raised md-primary" id="excel-btn" ng-click="exportToExceldetails()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" ng-if="certificaterequestid.length>0" class="md-raised md-primary" id="print-btn" ng-click="Print();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="approvaldetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">F&F SETTLEMENT REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Apply Details</th>
+                        <th>Remarks</th>                 
+                        <th>Final Status </th>
+                        <th>Sanction Level</th>
+                        <th>Approved By</th>
+                        <th>Approved Date</th>
+                        <th>Status</th>
+
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in certificaterequestid">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.templistdata.length+1}}">
+                            Requested By:{{user.EMPLOYEENAME}}<br />
+                            Requested Date:{{user.REQDATE }}
+                        </td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.HREFFS_Remarks}}</td>                      
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.HREFFS_AdvStatus}}</td>
+                    <tr ng-repeat="temp in user.templistdata">
+                        <td class="text-center">{{temp.HREFFSA_SanctionLevel}}</td>
+                        <td class="text-center">{{temp.Approvar_Name}}</td>
+                        <td class="text-center">{{temp.HREFFSA_Date | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.HREFFSA_Status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div ng-show="table_flag" id="printSectionId">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="text-center">
+                F&F Settlement Report
+            </h4>
+        </div>
+    </div>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Apply Details</th>
+                        <th>Remarks</th>                      
+                        <th>Final Status </th>
+                        <th>Sanction Level</th>
+                        <th>Approved By</th>
+                        <th>Approved Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in certificaterequestid">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.templistdata.length+1}}">
+                            Requested By:{{user.EMPLOYEENAME}}<br />
+                            Requested Date:{{user.REQDATE | date :'dd/MM/yyyy'}}
+                        </td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.HREFFS_Remarks}}</td>               
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.HREFFS_AdvStatus}}</td>
+                    <tr ng-repeat="temp in user.templistdata">
+                        <td class="text-center">{{temp.HREFFSA_SanctionLevel}}</td>
+                        <td class="text-center">
+                            {{temp.Approvar_Name}}
+                        </td>
+                        <td class="text-center">{{temp.HREFFSA_Date | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.HREFFSA_Status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div ng-show="sdfsdfdsfsd==true" id="exceltopd">
+    <table class="table table-hover table-responsive table-bordered">
+        <tr style="border:0.5px solid black">
+            <td colspan="7" style="text-align:center">
+                F&F Settlement Report
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+    </table>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered" style="border:0.5px solid black">
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>SL.No.</th>
+                        <th>Apply Details</th>
+                        <th>Remarks</th>                       
+                        <th>Final Status </th>
+                        <th>Sanction Level</th>
+                        <th>Approved By</th>
+                        <th>Approved Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in certificaterequestid" style="border:0.5px solid black">
+                    <tr style="border:0.5px solid black">
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.templistdata.length+1}}">
+                            Requested By:{{user.EMPLOYEENAME}}<br />
+                            Requested Date:{{user.REQDATE | date :'dd/MM/yyyy'}}
+                        </td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.HREFFS_Remarks}}</td>               
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.HREFFS_AdvStatus}}</td>
+                    <tr ng-repeat="temp in user.templistdata" style="border:0.5px solid black">
+                        <td class="text-center">{{temp.HREFFSA_SanctionLevel}}</td>
+                        <td class="text-center">
+                            {{temp.Approvar_Name}}
+                        </td>
+                        <td class="text-center">{{temp.HREFFSA_Date | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.HREFFSA_Status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+

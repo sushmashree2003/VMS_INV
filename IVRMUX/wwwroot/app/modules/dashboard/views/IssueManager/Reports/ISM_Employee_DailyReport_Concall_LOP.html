@@ -1,0 +1,220 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<style>
+    .ssss {
+        margin-left: 957px;
+    }
+
+    .multiselect {
+        width: 21.5em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 1.9%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .q {
+        margin-left: 12px;
+    }
+
+    .asaa {
+        margin-left: -3px;
+        width: 301px;
+    }
+
+    .ee {
+        margin-left: 157px;
+    }
+
+    .ddd {
+        margin-left: -148px;
+    }
+
+    .awe {
+        margin-left: 77px;
+        padding-left: 8px;
+        padding-right: 0px;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Con Call Task DR Response </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4"><b>Employees</b><label style="color:red">*</label></label>
+                            <div class="col-sm-8">
+                                <label class="control-label" style="padding-left: 9px;width: 100%;">
+                                    <span>
+                                        <input class="form-control asaa" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkalluu" type="checkbox" ng-click="all_checkuu(checkalluu)">
+                                        <span class="lbl padding-8">
+                                            <b style="color:#0f15d8"> All Employee</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                        <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbxuu();" title="Select Employee" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.userEmpName}} - [{{user.HRMDES_DesignationName}}]</b>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required" class="col-sm-10">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="text-align:right">Start Date:<label style="color:red">*</label></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="stdate" ng-model="start_Date" md-placeholder="Enter Date" md-max-date="maxdate" required ng-change="datechange()"></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.stdate)" ng-messages="myForm.stdate.$error">
+                                <div ng-message="required" class="col-sm-10 ee">Select Start Date</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="text-align:right">End Date:<label style="color:red">*</label></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="eddate" ng-model="end_Date" md-min-date="start_Date" md-max-date="maxdate" md-placeholder="Enter Date" required>
+                                </md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.eddate)" ng-messages="myForm.eddate.$error">
+                                <div ng-message="required" class="col-sm-10 ee">Select End Date</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="approvalReport()" id="save-btn">
+                                <i class="fa fa-search-minus" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button ng-if="get_emp_dailyreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                            <md-button ng-show="get_emp_dailyreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#excelid')">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export To Excel
+                            </md-button>
+                            <md-button type="button" ng-if="get_emp_dailyreport.length>0" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                                <i class="fa fa-times" aria-hidden="true"></i> Clear
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-if="get_emp_dailyreport.length>0" id="excelid">
+            <table class="table table-striped  table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th width="50">SL NO</th>
+                        <!--<th width="50">SELECT</th>-->
+
+                        <th width="250"><a>Employee Name</a></th>
+                        <th width="100"><a>DR Report Date</a></th>
+                        <th width="250"><a>Task Details</a></th>
+                        <!--<th width="150">Effort</th>-->
+                        <th width="250">Remark</th>
+                        <!--<th width="100">Mark Absent</th>-->
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="plnr in get_emp_dailyreport">
+                        <td class="text-center">{{$index+1}}</td>
+                        <!--<td class="text-center">
+        <label class="control-label">
+            <input type="checkbox" name="dfsd_{{$index}}" ng-model="plnr.usercheck" ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-12"></span>
+        </label>
+        <div class="error-messages" ng-if="interacted(myForm['dfsd_'+$index])"
+             ng-messages="myForm['dfsd_'+$index].$error">
+            <div ng-message="required"> Select Checkbox <i class="fa fa-warning"></i> </div>
+        </div>
+    </td>-->
+
+                        <td class="text-center">
+                            {{plnr.EmployeeName}}
+
+                        </td>
+                        <td class="text-center">
+                            {{plnr.ISMDRPT_Date|date:'dd/MM/yyyy'}}
+
+                        </td>
+
+
+                        <td class="text-left" style="width: 250px;">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label class="control-label text-body text-left">Task No.: {{plnr.ISMTCR_TaskNo}}</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label title="View Task Details" class="control-label text-body text-left " ng-model="plnr.ISMTCR_Id"
+                                           data-toggle="modal" data-target="#myModalResponse" data-ng-click="viewresponse(plnr)">
+                                        Task Title : {{plnr.ISMTCR_Title}}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label class="control-label text-body text-left"> Status : {{plnr.ISMDRPT_Status}}</label>
+                                </div>
+                            </div>
+
+                        </td>
+
+                        <!--<td class="text-left" style="width: 150px;">
+        Actual Effort: {{plnr.actualeffortinhrs}}<br />
+        Time Taken: {{plnr.timetakeninhrs}}
+    </td>-->
+                        <td style="width: 250px;" class="text-left">{{plnr.ISMDRPT_Remarks}}</td>
+
+
+
+                    </tr>
+                </tbody>
+            </table>
+           
+        </div>
+
+    </form>
+
+    
+
+</section>
+
+

@@ -1,0 +1,413 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+
+    .textarearesize {
+        resize: none !important;
+    }
+
+    .wordwrap {
+        word-break: break-all;
+    }
+
+    .well {
+        position: relative;
+        border-radius: 3px;
+        background: #ffffff !important;
+        border-top: 3px solid #d2d6de !important;
+        padding: 5px !important;
+        margin-bottom: 5px !important;
+        width: 100%;
+        -webkit-box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+        box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+        height: 300px !important
+    }
+</style>
+<section class="content" ng-init="ExpenditureIndentMappingLoaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <di class="box-header with-border">
+                <h3 class="box-title">Expenditure Indent Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </di>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Organization : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="MI_Id" id="id1" name="miname" required
+                                            ng-change="OnChangeExpenditureIndentMappingInstitution()">
+                                        <option value="">-- Select Organization --</option>
+                                        <option ng-repeat="ins in getuserinstitution" value="{{ins.mI_Id}}" ng-selected="ins.mI_Id==MI_Id">
+                                            {{ins.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.miname)" ng-messages="myForm.miname.$error">
+                                        <div ng-message="required">Select Organization</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Particular :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="PCEXPTR_Id" name="indnamep" id="id3" required
+                                            ng-change="OnChangeExpenditureIndentMappingParticular()">
+                                        <option value="">-- Select Particular --</option>
+                                        <option ng-repeat="ind in getparticularsdetails" value="{{ind.pcexptR_Id}}">
+                                            {{ind.pcmparT_ParticularName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.indnamep)" ng-messages="myForm.indnamep.$error">
+                                        <div ng-message="required">Select Particular</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Indent No.: <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="PCINDENTAP_Id" name="indname" id="id2"
+                                            ng-change="OnChangeExpenditureIndentMapping()" required>
+                                        <option value="">-- Select Indent No.--</option>
+                                        <option ng-repeat="ind in getindentapprovaldetails" value="{{ind.pcindentaP_Id}}">
+                                            {{ind.pcindenT_IndentNo}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.indname)" ng-messages="myForm.indname.$error">
+                                        <div ng-message="required">Select Indent No.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 text-center">
+                            <div class="form-group">
+                                <md-button type="button" class="md-raised md-primary" ng-click="SearchExpenditureMappingDetails()">
+                                    <i class="fa fa-search" aria-hidden="true"></i> Search
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="clearData()">
+                                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                                </md-button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="row" ng-if="showdetails==true">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group well">
+                                <h4 class="col-sm-12">Expenditure Particular Details</h4>
+                                <hr />
+                                <label class="col-sm-12 control-label text-bold">Particular Name : {{PCMPART_ParticularName}}</label>
+                                <label class="col-sm-12 control-label text-bold">Expenditure Amount : {{PCEXPTR_Amount}}</label>
+                                <label class="col-sm-12 control-label text-bold">Expenditure Date : {{PCEXPTR_Date | date:'dd/MM/yyyy'}}</label>
+                                <label class="col-sm-12 control-label text-bold">Expenditure Created By : {{employeename}}</label>
+                                <label class="col-sm-12 control-label text-bold">Expenditure No. : {{expenditureno}}</label>
+                                <label class="col-sm-12 control-label text-bold">Expenditure Ref No. : {{expenditurerefno}}</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group well">
+                                <h4 class="col-sm-12">Indent Details</h4>
+                                <hr />
+                                <label class="col-sm-12 control-label text-bold">Indent No. : {{PCINDENTAPT_IndentNo}}</label>
+                                <label class="col-sm-12 control-label text-bold">Indent Date : {{PCINDENTAPT_Date | date:'dd/MM/yyyy'}}</label>
+                                <label class="col-sm-12 control-label text-bold">Indent Amount : {{PCINDENTAPT_SanctionedAmt}}</label>
+                                <label class="col-sm-12 control-label text-bold">Amount Spent : {{PCINDENTAPT_AmountSpent}}</label>
+                                <label class="col-sm-12 control-label text-bold">Balance Amount : {{PCINDENTAPT_BalanceAmount}}</label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4" ng-if="getselectedindentparticulardetails.length>0">
+                            <div class="form-group well">
+                                <h4 class="col-sm-12">Indent Particular Details</h4>
+                                <hr />
+                                <label class="col-sm-12 control-label text-bold">Particular Name : {{PCMPART_ParticularName}}</label>
+                                <label class="col-sm-12 control-label text-bold">Particular Amount : {{PCINDENTAPDT_SanctionedAmt}}</label>
+                                <label class="col-sm-12 control-label text-bold">Amount Spent : {{PCINDENTAPDT_AmountSpent}}</label>
+                                <label class="col-sm-12 control-label text-bold">Balance Amount : {{PCINDENTAPDT_BalanceAmount}}</label>
+                                <label class="col-sm-12 control-label text-bold wordwrap">Remarks : {{PCINDENTAPDT_Remarks}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row"  ng-if="showdetails==true">
+                    <div class="col-sm-12 text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-click="SaveExpenditureMappingDetails()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                        </md-button>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="getexpenditureloaddata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">EXPENDITURE DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="" ng-click="sort('pcexptR_ExpenditureNo')">Expenditure No.</a></th>
+                        <th><a href="" ng-click="sort('pcmparT_ParticularName')">Particular</a></th>
+                        <th><a href="" ng-click="sort('employeename')">Entered By</a></th>
+                        <th><a href="" ng-click="sort('pcexptR_Amount')">Amount</a></th>
+                        <th><a href="" ng-click="sort('pcexptR_Date')">Date</a></th>
+                        <th><a href="" ng-click="sort('pcexptR_ModeOfPayment')">Mode Of Payment</a></th>
+                        <!--<th>Action</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue=(getexpenditureloaddata | filter : filterValue1) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{user.pcexptR_ExpenditureNo}}</td>
+                        <td class="text-left">{{user.pcmparT_ParticularName}}</td>
+                        <td class="text-left">{{user.employeename}}</td>
+                        <td class="text-left">{{user.pcexptR_Amount}}</td>
+                        <td class="text-center">{{user.pcexptR_Date | date:'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.pcexptR_ModeOfPayment}}</td>
+                        <!--<td style="text-align:center">
+                            <span ng-if="user.approvedflag==false">
+                                <a href="javascript:void(0)" ng-click="DeleteExpenditure(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                    <i class="fa fa-trash text-red" aria-hidden="true" title="Delete"></i>
+                                </a>
+                            </span>
+                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div id="mymodalviewdetailsfirsttab" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Indnet Details : {{indentno}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.No</th>
+                                    <th>Particular</th>
+                                    <th>Requested Amount</th>
+                                    <th>Approved Amount</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="userclient in getviewdata">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{userclient.pcmparT_ParticularName}}</td>
+                                    <td class="text-center">{{userclient.pcindentdeT_Amount}}</td>
+                                    <td class="text-center">{{userclient.pcindentdeT_ApprovedAmt}}</td>
+                                    <td class="text-left">{{userclient.pcindentdeT_Remarks}}</td>
+                                    <td class="text-center">
+                                        <span ng-if="editapprovedflag==false">
+                                            <span ng-if="userclient.pcindentdeT_ActiveFlg === true">
+                                                <a href="" ng-click="deactiveparticulars(userclient)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="userclient.pcindentdeT_ActiveFlg === false">
+                                                <a href="" ng-click="deactiveparticulars(userclient)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                                </a>
+                                            </span>
+                                        </span>
+                                        <label ng-if="editapprovedflag==true" style="color: green; font-weight:bold">Approved</label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mymodalviewdetailsfirsttabprint" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Indent Approved Details : {{indentno}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.No</th>
+                                    <th>Particular</th>
+                                    <th>Requested Amount</th>
+                                    <th>Approved Amount</th>
+                                    <th>Remarks</th>
+                                    <!--<th>Action</th>-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="userclient in getviewdataprint">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{userclient.pcmparT_ParticularName}}</td>
+                                    <td class="text-center">{{userclient.pcindentapdT_RequestedAmount}}</td>
+                                    <td class="text-center">{{userclient.pcindentapT_SanctionedAmt}}</td>
+                                    <td class="text-left">{{userclient.pcindentapdT_Remarks}}</td>
+                                    <!--<td class="text-center">
+                                        <span ng-if="userclient.pcindentdeT_ActiveFlg === true">
+                                            <a href="" ng-click="deactiveparticulars(userclient)"
+                                               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                            </a>
+                                        </span>
+                                        <span ng-if="userclient.pcindentdeT_ActiveFlg === false">
+                                            <a href="" ng-click="deactiveparticulars(userclient)"
+                                               class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                            </a>
+                                        </span>
+                                    </td>-->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <md-button type="button" class="md-raised md-primary" data-ng-click="Print()">
+                <i class="fa fa-print" aria-hidden="true"></i> Print
+            </md-button>
+        </div>
+    </div>
+</div>
+
+<div id="printSectionId" ng-show="table_flag">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+
+    <div class="row margin-top-10">
+        <div class="col-sm-12">
+            <div class="col-sm-6">
+                <h3>Indent No. {{indentno}}</h3>
+            </div>
+            <div class="col-sm-4 pull-right">
+                Date : {{pcindentapT_Dated | date:'dd/MM/yyyy'}}
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-top-10">
+        <center><h4 style="text-decoration:underline">Petty Cash Requisition</h4></center>
+    </div>
+    <br />
+    <div class="row margin-top-10">
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th class="text-center">SL. No.</th>
+                    <th class="text-center">Description</th>
+                    <th class="text-center">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in getviewdataprint">
+                    <td class="text-center">{{$index+1}}</td>
+                    <td class="text-left">{{user.pcmparT_ParticularName}}</td>
+                    <td class="text-right">{{ user.pcindentapT_SanctionedAmt | number : 2}}</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td class="text-center"><b>Total</b></td>
+                    <td class="text-right"><b>{{totalapprovedamt | number : 2 }}</b></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row margin-top-30">
+        <div class="col-sm-12">
+            <div class="col-sm-4 pull-left">
+                <b>Prepared By</b>
+            </div>
+            <div class="col-sm-4 text-center">
+                <b>Checked By</b>
+            </div>
+            <div class="col-sm-4 text-center">
+                <b>Approved By</b>
+            </div>
+        </div>
+    </div>
+    <div class="row margin-top-30">
+        <div class="col-sm-12">
+            <div class="col-sm-4 pull-left">
+                &nbsp;
+            </div>
+            <div class="col-sm-4 text-center">
+                &nbsp;
+            </div>
+            <div class="col-sm-4 text-center">
+                &nbsp;
+            </div>
+        </div>
+    </div>
+</div>

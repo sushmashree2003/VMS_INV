@@ -1,0 +1,757 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+
+    .UploadEmpDoc .file-blue:before {
+        content: 'Upload Document';
+        font-size: 12px;
+    }
+</style>
+
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">MOM Information</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-3">&nbsp;</div>
+
+                    <div class="text-center col-sm-6">
+                        <div class="form-group">
+                            <div class="radio text-center well teststyle" ng-init="optradio2 ='InternalDept'">
+                                <label style="text-align:left"><b>Meeting Type</b></label>
+                                <label>
+                                    <input name="optradio2" type="radio" value="InternalDept" data-ng-model="radiomodal" ng-change="onChangeradio(radiomodal)" required>
+                                    <span class="lbl padding-8">Internal Dept</span>
+                                </label>
+                                <label>
+                                    <input name="optradio2" type="radio" value="ExternalDept" data-ng-model="radiomodal" ng-change="onChangeradio(radiomodal)" required>
+                                    <span class="lbl padding-8">External Dept</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.optradio2)" ng-messages="myForm.optradio2.$error">
+                                <div ng-message="required">Select any one of the radio button</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="radio text-center well teststyle" ng-init="optionradio ='meeting1'">
+                                <label>
+                                    <input name="optionradio" type="radio" value="meeting" ng-model="meetingmodal" required />
+                                    <span class="lbl padding-8">New Meeting</span>
+                                </label>
+                                <label>
+                                    <input name="optionradio" type="radio" value="meeting1" ng-model="meetingmodal" required />
+                                    <span class="lbl padding-8">Old Meeting</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">&nbsp;</div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 ">
+                        <div class="form-group" ng-show="meetingmodal=='meeting'">
+                            <label class="control-label col-sm-4">Meeting Name:<strong style="color:Red">*</strong></label>
+                            <div class="col-sm-8">
+                                <input type="text" id="sel12" class="form-control" name="meetingname" rows="5" ng-model="MOM_Name" placeholder="Enter Meeting Name" required />
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="meetingmodal=='meeting1'">
+                            <label class="control-label col-sm-4">Meeting Name:<strong style="color:Red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel12" name="meetingname" rows="5" ng-model="MOM_Name" ng-disabled="editflag" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="meet in meetingname" value="{{meet.MOMName}}" ng-selected="{{meet.Selected===true}}">
+                                        {{meet.MOMName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.meetingname)" ng-messages="myForm.meetingname.$error">
+                                    <div ng-message="required">Enter Meeting Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Venue:<strong style="color:Red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel12" name="Venue" rows="5" ng-model="MOM_Venue" ng-disabled="editflag" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="opt in venue" value="{{opt.ismmvnE_VenueName}}" ng-selected="{{opt.Selected===true}}">
+                                        {{opt.ismmvnE_VenueName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.Venue)" ng-messages="myForm.Venue.$error">
+                                    <div ng-message="required">Enter Venue</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Chairperson Name:<strong style="color:Red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel12" name="employee" rows="5" ng-model="IVRMSTAUL_UserName" ng-disabled="editflag" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="opt in empname" value="{{opt.ivrmstauL_UserName}}" ng-selected="{{opt.Selected===true}}">
+                                        {{opt.ivrmstauL_UserName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                    <div ng-message="required">Enter Chairperson Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Agenda:<strong style="color:Red">*</strong></label>
+                            <div class="col-sm-8">
+                                <!--<textarea type="text" id="myP" class="form-ssscontrol" name="Purpos" rows="5" cols="50" ng-model="MOM_Agenda"
+            placeholder="Enter Meeting Purpose" required />-->
+
+                                <div id="myP">
+                                    <pre class="form-control" contenteditable="true" style="height:150px; overflow-y: scroll;" name="Purpos" ng-disabled="editflag" required> </pre>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                    <div ng-message="required">Enter Agenda</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-top: 9px;">Meeting Date : <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="entdate" id="sel10" ng-model="MOM_Date" onkeydown="return false" md-max-date="maxDate"
+                                               md-placeholder="Select date" ng-paste="$event.preventDefault()" required></md-datepicker>
+                                <div class="error-messages col-sm-offset-1" ng-if="interacted(myForm.entdate)" ng-messages="myForm.entdate.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 ">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-top: 29px;">Start Time:<strong style="color:red;">*</strong></label>
+                            <div uib-timepicker name="sch_time1" ng-model="MOM_StartTime" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" id="sel11" ng-paste="$event.preventDefault()" required></div>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.sch_time1)" ng-messages="myForm.sch_time1.$error">
+                                <div ng-message="required">Select Time</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-top: 29px;">End Time:<strong style="color:red;">*</strong></label>
+                            <div uib-timepicker name="sch_time1" ng-model="MOM_EndTime" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" id="sel11" ng-paste="$event.preventDefault()" required></div>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.sch_time1)" ng-messages="myForm.sch_time1.$error">
+                                <div ng-message="required">Select Time</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL NO</th>
+                                            <th>Upload File</th>
+                                            <th>File Name</th>
+                                            <th>View</th>
+                                            <th>Action </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="other in documentListOtherDetails track by $index" ng-form="myForm">
+                                            <td>{{$index+1}}</td>
+
+                                            <td>
+                                                <div class="col-sm-12 UploadEmpDoc1">
+                                                    <div class="form-group text-center">
+                                                        <label class="custom-file-input file-bluenew" style="width:100%;margin:auto;">
+                                                            <input type="file" name="doc" accept="image/*, application/pdf" data-ng-model="documentListOtherDetails[$index].FilePath" onchange="angular.element(this).scope().selectFileforUploadzdOtherDetail(this, angular.element(this).scope().other)">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="other.FileName" disabled />
+                                            </td>
+                                            <td>
+                                                <a ng-if="other.FilePath  !=null && other.FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(other.FilePath)"> view</a>
+                                            </td>
+                                            <td>
+                                                <span class="input-group-addon" ng-hide="documentListOtherDetails.length > 30">
+                                                    <a href="" ng-show="$last" ng-click="addNewDocumentOtherDetail()" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="documentListOtherDetails.length ==1">
+                                                    <a href="" ng-click="removeNewDocumentOtherDetail($index,other)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"> PARTICIPANTS DETAILS</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Participants  Attended :</b>
+                                    <label class="badge">
+                                        {{employeenameschange.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <table class="table  table-responsive table-bordered" ng-show="!editflag">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee Type</th>
+                                            <!--<th>Department  </th>-->
+                                            <th>Participants  </th>
+                                            <th>Designation</th>
+                                            <th>Contact No</th>
+                                            <th>Email</th>
+                                            <th ng-if="isAnyExternal()">Vendor</th>
+                                            <th>Action</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="other in employeenameschange">
+                                            <td>
+                                                <div class="radio text-center well teststyle" ng-init="other.radiomodal1 ='Internal'">
+                                                    <label>
+                                                        <input name="optradio1{{$index}}" type="radio" ng-disabled="{{employeenameschange.length}}>1" value="Internal" data-ng-model="other.radiomodal1" ng-change="onChangeradio1(other.radiomodal1)" required>
+                                                        <span class="lbl padding-8">Internal Dept</span>
+                                                    </label>
+                                                    <label>
+                                                        <input name="optradio1{{$index}}" type="radio" value="External" data-ng-model="other.radiomodal1" ng-change="onChangeradio1(other.radiomodal1)" required>
+                                                        <span class="lbl padding-8">External Dept</span>
+                                                    </label>
+                                                </div>
+                                                <div class="error-messages" ng-if="interacted(myForm['optradio1'+$index])"
+                                                     ng-messages="myForm['optradio1'+$index].$error">
+                                                    <div ng-message="required">Select any one of the radio button</div>
+                                                </div>
+
+                                            </td>
+                                            <!--<td>
+        <div ng-if="other.radiomodal1=='Internal'">
+            <select class="form-control" id="sel1" ng-model="other.obj.hrmD_Id" name="Department" required ng-change="GetDetailsByDepartment(other.obj.hrmD_Id)">
+                <option value="">Select</option>
+                <option ng-repeat="dep in departmentdropdown" value="{{dep.hrmD_Id}}" ng-selected="{{dep.Selected===true}}">
+                    {{dep.mI_Name}}   :   {{dep.hrmD_DepartmentName}}
+                </option>
+            </select>
+            <div class="error-messages" ng-if="interacted(myForm.Department)" ng-messages="myForm.Department.$error">
+                <div ng-message="required">Select Department</div>
+            </div>
+        </div>
+
+    </td>-->
+                                            <td>
+                                                <div class="multiselect  col-sm-12" style="width:170px;height:150px;margin-left:2px" ng-if="other.radiomodal1=='Internal'">
+                                                    <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                                    <label>
+                                                        <input name="clsoption" value="all" ng-model="other.usercheckC" type="checkbox" ng-click="all_check(other.usercheckC)">
+                                                        <span class="lbl padding-8">
+                                                            All
+                                                        </span>
+                                                    </label>
+                                                    <label ng-repeat="emp in other.staffData | filter:searchchkbx1" value="{{emp.hrmE_Id}}">
+                                                        <input type="checkbox" ng-model="emp.empck" ng-click="togchkbx(emp.empck);" name="empname{{$index}}" />
+                                                        <span class="lbl padding-8">{{emp.hrmE_EmployeeFirstName}}</span>
+                                                    </label>
+                                                </div>
+                                                <div class=" error-messages" ng-if="interacted(myForm.['empname'+$index])" ng-messages="myForm.['empname'+$index].$error">
+                                                    <div ng-message="required" class="=col-sm-10 col-sm-offset-4">Please Select Employee Name</div>
+                                                </div>
+
+                                                <div ng-if="other.radiomodal1=='External'">
+                                                    <input type="text" class="form-control" name="plac" ng-model="other.Particularname" placeholder="Enter Employee Name" ng-disabled="other.radiomodal1=='Internal'" ng-required="other.radiomodal1=='External'">
+                                                </div>
+                                            </td>
+                                            <td ng-if!="other.radiomodal1=='Internal'">
+                                                <input type="text" class="form-control" name="plac" ng-model="other.DesignationName" placeholder="Enter DesignationName" id="sel7" ng-disabled="other.radiomodal1=='Internal'">
+                                            </td>
+                                            <td ng-if!="other.radiomodal1=='Internal'">
+                                                <input class="form-control" name="mb2" id="catgr1y" type="text" ng-model="other.MobileNo" placeholder="Enter MobileNo" maxlength="10" minlength="10"
+                                                       allow-pattern="\d" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" ng-disabled="other.radiomodal1=='Internal'" ng-required="other.radiomodal1=='External'">
+                                                <div class="error-messages" ng-if="interacted(myForm.mb2)" ng-messages="myForm.mb2.$error">
+                                                    <div ng-message="required">Enter MobileNo</div>
+                                                </div>
+                                            </td>
+                                            <td ng-if!="other.radiomodal1=='Internal'">
+                                                <input type="email" class="form-control" name="emal" ng-model="other.EmailId" placeholder="Enter EmailId" pattern="[^ @]*@[^ @]*" ng-disabled="other.radiomodal1=='Internal'" ng-required="other.radiomodal1=='External'">
+                                                <div class="error-messages" ng-if="interacted(myForm.emal)" ng-messages="myForm.emal.$error">
+                                                    <div ng-message="required">Enter Email</div>
+                                                </div>
+                                            </td>
+                                            <td ng-if="other.radiomodal1=='External'">
+                                                <!--<div ng-if="other.radiomodal1=='External'">
+        <input type="text" class="form-control" name="plac" ng-model="other.id" placeholder="Enter Vendor Name" ng-disabled="other.radiomodal1=='Internal'" ng-required="other.radiomodal1=='External'">
+        <input class="form-control" ng-model="searchchkbx12" type="checkbox" placeholder="search here..." />
+        <label>
+        </label>
+        <label ng-repeat="emp in Vendornames | filter:searchchkbx12" value="{{emp.INVMS_Id}}">
+            <input type="checkbox" ng-model="emp.empck" ng-click="togchkbx(emp.empck);" name="empname{{$index}}" />
+            <span class="lbl padding-8">{{emp.INVMS_SupplierName}}</span>
+        </label>
+
+    </div>-->
+
+                                                <!--<div ng-disabled="other.radiomodal1=='Internal'" ng-required="other.radiomodal1=='External'" ng-if="other.radiomodal1=='External'">
+                                                    <ui-select ng-model="other.selectedVendor" theme="bootstrap" reset-search-input="true" ng-disabled="other.radiomodal1 == 'Internal'" ng-required="other.radiomodal1 == 'External'">
+                                                        <ui-select-match placeholder="Select Vendor">{{$select.selected.INVMS_SupplierName}}</ui-select-match>
+                                                        <ui-select-choices repeat="vendor in Vendornames | filter: $select.search">
+                                                            <div>{{vendor.INVMS_SupplierName}}</div>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                </div>-->
+
+
+
+
+                                                <div ng-disabled="other.radiomodal1=='Internal'"
+                                                     ng-required="other.radiomodal1=='External'"
+                                                     ng-if="other.radiomodal1=='External'">
+
+                                                    <ui-select ng-model="other.selectedVendor1"
+                                                               theme="bootstrap"
+                                                               reset-search-input="true"
+                                                               ng-disabled="other.radiomodal1 == 'Internal'"
+                                                               ng-required="other.radiomodal1 == 'External'">
+                                                        <ui-select-match placeholder="Select Vendor">
+                                                            {{$select.selected.INVMS_SupplierName}}
+                                                        </ui-select-match>
+                                                        <ui-select-choices repeat="vendor in Vendornames | filter: $select.search">
+
+                                                            <div>{{vendor.INVMS_SupplierName}}</div>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+
+                                                </div>
+
+
+                                            </td>
+                                            <td>
+                                                <span class="input-group-addon" ng-hide="employeenameschange.length > 100">
+                                                    <a href="" ng-show="$last" ng-click="addNewDetail()" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="employeenameschange.length ==1">
+                                                    <a href="" ng-click="removeNewDetail($index,other)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div ng-if="editflag === true">
+                                    <!-- Ensure editflag is boolean -->
+                                    <div ng-show="!employeenameschange.length">
+                                        No participants to display.
+                                    </div>
+                                    <table ng-show="employeenameschange.length" class="table table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Participants</th>
+                                                <th>Designation</th>
+                                                <th>CONTACT NO</th>
+                                                <th>EMAIL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="empname in employeenameschange">
+                                                <td>{{empname.MOMPRT_EXTINTFlag}}</td>
+                                                <td>{{empname.MOMPRT_ParticipantsName}}</td>
+                                                <td>{{empname.MOMPRT_Designation}}</td>
+                                                <td>{{empname.MOMPRT_MobileNo}}</td>
+                                                <td>{{empname.MOMPRT_Email}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                                <div class="text-center">
+                                    <input type="hidden" ng-model="HRME_Id" value="{{hrmE_Id}}" />
+                                    <input type="hidden" ng-model="MOM_Id" value="{{MOM_Id}}" />
+                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData()" id="save-btn">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                        Save
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                                        <i class="fa fa-print" aria-hidden="true"></i>
+                                        Print
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+
+                     
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="griddata.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title"> MOM UPDATE LIST</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{griddata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Name')">Meeting Name</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Agenda')">Agenda</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Date')">Meeting Date</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_StartTime')">Meeting StartTime</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_EndTime')">Meeting EndTime</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Venue')">Venue</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('Participants')">Participants Details</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Status')">Status</a>
+                            </th>
+                            <th>
+                                Documents
+                            </th>
+                            <th>
+                                Postpone Meeting
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue=(griddata | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.moM_Name}}</td>
+                            <td>
+                                <span>
+                                    <a class="text-primary" data-placement="bottom" data-toggle="modal" data-target="#agendadetails" data- title="VIEW Details" ng-click="agendadetails(user)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>{{user.moM_Date |date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.moM_StartTime }}</td>
+                            <td>{{user.moM_EndTime }}</td>
+                            <!--<td>
+                                <span>
+                                    <a class="text-primary" data-placement="bottom" data-toggle="modal" data-target="#minutesdetails" data- title="Details" ng-click="minutesdetails(user)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>-->
+                            <td>{{user.moM_Venue}}</td>
+                            <td>
+                                <span>
+                                    <a class="text-primary" data-placement="bottom" data-toggle="modal" data-target="#participants" data- title="VIEW Details" ng-click="ViewDetails(user)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>{{user.moM_Status}}</td>
+                            <td class="text-center">
+                                <span>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="viewdocument(user)"> <i class="fa fa-eye text-blue"></i></a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span ng-if="user.moM_Status=='Pending'">
+                                    <a class="text-aqua" href="" ng-click="Edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        Postpone Meeting  <!--<i class="fa fa-pencil-square-o" aria-hidden="true"></i>-->
+                                    </a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span>
+                                    <a href="" ng-click="deactive(user)" ng-if="user.moM_ActiveFlag === true"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        Meeting Scheduled
+                                    </a>
+                                    <a href="" ng-click="deactive(user)" ng-if="user.moM_ActiveFlag === false"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        Meeting Cancelled
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+
+<div class="modal fade" id="agendadetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">Agenda</h5>
+            </div>
+            <div class="modal-body">
+
+
+                <p id="ada">
+
+                </p>
+                <!--<div class="row">
+                    <div class="col-sm-12">
+                        <textarea name="mindetails" ng-model="moM_Agenda" style="color:#444 !important; width: 1115px; height: 230px;" rows="5" cols="50" ng-disabled="true"></textarea>
+                    </div>
+                </div>-->
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="minutesdetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">MINUTES DETAILS</h5>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <textarea name="mindetails" ng-model="MOM_Minutes" style="color:#444 !important; width: 1115px; height: 230px;" rows="5" cols="50" ng-disabled="true"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="participants" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">PARTICIPANTS COUNT : {{getParticipentsdetails.length}}</h5>
+            </div>
+            <div class="modal-body">
+                <table class="table  table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Participants</th>
+                            <th>Designation</th>
+                            <th>CONTACT NO</th>
+                            <th> EMAIL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="dd in  getParticipentsdetails">
+                            <td>{{ dd.momprT_EXTINTFlag}}</td>
+                            <td>{{dd.momprT_ParticipantsName}}</td>
+                            <td>{{dd.momprT_Designation}}</td>
+                            <td>{{dd.momprT_MobileNo}}</td>
+                            <td>{{dd.momprT_Email}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">VIEW UPLOADED FILE</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>FILE NAME</th>
+                                <th>VIEW</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documents in uploaddocfiles">
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-left">{{documents.momfL_FileName}}</td>
+                                <td class="text-center">
+                                    <span ng-if="documents.momfL_FilePath !=null && documents.momfL_FilePath !=''">
+                                        <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                           style="color:red;display:inline; font-weight: bolder;"
+                                           ng-click="previewimg_new(documents.momfL_FilePath,documents.momfL_FileName)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" style="width:40px" /> view
+                                        </a>
+                                        <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                           style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                           ng-click="previewimg_new(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                           ng-click="previewimg_new(documents.momfL_FilePath,documents.momfL_FileName)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                           style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" style="width:40px" />
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{FileName}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

@@ -1,0 +1,187 @@
+﻿<style>
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+</style>
+<section class="content">
+    <div class="box box-primary" data-ng-init="onLoadGetData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Loan Payout</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm" data-ng-submit="saveData()" novalidate>
+            <div class="box-body">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Employee:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <span class="lbl padding-7">
+                                <select class="form-control" id="sel1" data-ng-model="loan.hreL_Id" name="insti" required ng-change="Employeechange()" ng-disabled="empchange">
+                                    <option value="">Select</option>
+                                    <!--ng-selected="{{month.Selected===true}}"-->
+                                    <option ng-repeat="month in employeelist" value="{{month.hreL_Id}}" ng-selected="{{month.hreL_Id==loan.hreL_Id}}">
+                                        {{month.hrmE_EmployeeFirstName}}
+                                    </option>
+                                </select>
+                                <span class="error-messages" ng-if="interacted(myForm.insti)" ng-messages="myForm.insti.$error">
+                                    <span ng-message="required">Select Institution</span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Payout Amount:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <input class="form-control" ng-model="loan.HRELDIS_Amount" required />
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <md-datepicker name="AppliedDate" ng-model="loan.HRELDIS_DisbursedDate" onkeydown="return false" md-min-date="minDatedoi" md-max-date="maxDatedoi" md-placeholder="Select Date" required></md-datepicker>
+
+                        </div>
+                    </div>
+
+                 
+
+
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Mode Of Payment:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" name="ModeOfPayment" id="sel12" data-ng-model="loan.HRELDIS_PaymentMode" required>
+                                <option value="">--Select--</option>
+                                <option ng-repeat="modeOfPayment in modeOfPaymentdropdown" value="{{modeOfPayment.ivrmmoD_ModeOfPayment}}" ng-selected="{{modeOfPayment.Selected===true}}">
+                                    {{modeOfPayment.ivrmmoD_ModeOfPayment}}
+                                </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.ModeOfPayment)" ng-messages="myForm.ModeOfPayment.$error">
+                                <div ng-message="required">Select Mode Of Payment</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Remark:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <!--<input type="text" name="Max" class="form-control active" allow-pattern="([0-9|.])" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" minlength="1" maxlength="6" ng-paste="$event.preventDefault()" data-ng-model="loan.hrmL_Max" id="hrmL_Max" required>-->
+                            <textarea ng-model="loan.HRELDIS_Remarks" class="form-control" rows="5"></textarea>
+
+                        </div>
+                    </div>
+
+                    <!--<div class="form-group">
+        <label class="control-label col-sm-3">Interest Amount:<span style="color:red;">*</span></label>
+        <div class="col-sm-6">
+            <input type="text" name="interest" class="form-control active" allow-pattern="([0-9|.])" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" minlength="1" maxlength="6" ng-paste="$event.preventDefault()" data-ng-model="loan.hrmL_InterestAmount" id="interest" required>
+            <div class="error-messages" ng-if="interacted(myForm.interest)" ng-messages="myForm.interest.$error">
+                <div ng-message="required">Please Enter Interest Amount</div>
+
+            </div>
+        </div>
+    </div>-->
+
+
+
+                </div>
+                <br />
+                <br />
+                <div class="col-sm-12 col-sm-offset-3" >
+                    <div class="form-group col-sm-6" style="border:solid 1px;" ng-show="employeedet" >
+
+                        <label class="control-label col-sm-5">Loan Type </label> <label class="control-label col-sm-7">       :{{HRML_LoanType}}</label>
+                        <label class="control-label  col-sm-5">Applied Amount </label> <label class="control-label col-sm-7">    :{{HREL_LoanAmount}}</label>
+                        <label class="control-label  col-sm-5">Sanctioned Amount </label> <label class="control-label col-sm-7">   : {{HREL_SanctionedAmount}} </label>
+
+                        <input type="hidden" ng-model="loan.HRME_Id" />
+                    </div>
+
+                </div>
+
+
+                <div class="col-sm-12" style="margin-top:10px;">
+                    <div class="form-group">
+                        <div class="text-center">
+                            <input type="hidden" ng-model="loan.HRELDIS_Id" />
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Loan Payout Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!--<div ui-grid="gridOptions" ui-grid-pagination class="grid"></div>-->
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                       
+                        <th>Sl No</th>
+                        <th>Employee Name</th>
+                        <th>Loan Type</th>
+                        <th>Payout Date</th>
+                        <th>Paid Amount</th>
+                        <th>Payment Mode</th>
+                        <th>Remark</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in gmasterloanList">
+                        <td>{{$index+1}}</td>
+                        <td>{{user.hrmE_EmployeeFirstName}}</td>
+                        <td>{{user.hrmL_LoanType}}</td>
+                        <td>{{user.hreldiS_DisbursedDate | date:'dd/MM/yyyy' }}</td>
+                        <td hidden="hidden">{{user.hreldiS_Id}}</td>
+                        <td>{{user.hreldiS_Amount}}</td>
+                        <td>{{user.hreldiS_PaymentMode}}</td>
+                        <td>{{user.hreldiS_Remarks}}</td>
+                        <td>
+                            <span ng-if="user.hreldiS_ActiveFlg === true">
+                                <a class="text-aqua" href="" ng-click="EditData(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                            &nbsp;
+                            <span ng-if="user.hreldiS_ActiveFlg === false">
+                                <a href="" ng-click="deleterecord(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i> Activate </i>
+                                </a>
+                            </span>
+                            <span ng-if="user.hreldiS_ActiveFlg === true">
+                                <a href="" ng-click="deleterecord(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Deactivate</i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</section>

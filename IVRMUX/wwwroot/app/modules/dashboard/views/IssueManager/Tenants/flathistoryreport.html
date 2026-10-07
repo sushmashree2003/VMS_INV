@@ -1,0 +1,362 @@
+﻿
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">TENANT AGREEMENT REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Building Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamwwe" ng-model="HRMB_Id" required ng-change="buildingchange()">
+                                    <option value="">--Select Building--</option>
+                                    <option ng-repeat="option in building" value="{{option.hrmB_Id}}"
+                                            ng-selected="{{option.hrmB_Id == HRMB_Id}}">
+                                        {{option.hrmB_BuildingName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamwwe)" ng-messages="myForm.yrnamwwe.$error">
+                                    <div ng-message="required">Select Building</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Room Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="roomname" ng-model="HRMR_Id" required ng-change="roomchange()">
+                                    <option value="">--Select Room--</option>
+                                    <option ng-repeat="option in rooms" value="{{option.hrmR_Id}}"
+                                            ng-selected="{{option.hrmR_Id == HRMR_Id}}">
+                                        {{option.hrmR_RoomName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.roomname)" ng-messages="myForm.roomname.$error">
+                                    <div ng-message="required">Select Room</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <br />
+
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                        <i class="fa fa-search-minus" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cleartabl1()" ng-disabled="form.$invalid">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                    </md-button>
+                    <md-button ng-show="getloaddata.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printDeviation1')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>
+                    <md-button ng-if="getloaddata.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+
+
+            </div>
+        </div>
+
+    </form>
+
+    <div class="box box-primary" ng-show="getloaddata.length>0" id="get_printdetail" ng-model="grid">
+        <div class="box-header with-border">
+            <h3 class="box-title">Tenant Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group col-sm-12" id="printDeviation" style="overflow:auto;padding:0px;">
+            <table class="table table-bordered table-responsive" id="table1">
+                <thead>
+                    <tr>
+                        <th class="hdTH">
+                            <label>
+                                <input type="checkbox" value="all" ng-model="stdall" ng-click="toggleAllstd()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th>Sl.No</th>
+                        <th>Tenant Name</th>
+                        <th>Contact No</th>
+                        <th>Email Id</th>
+                        <th>Building Name</th>
+                        <th>Room Name</th>
+                        <th>No of Occupants</th>
+                        <th>Amount</th>
+                        <th>View</th>
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <!--<tr dir-paginate="user2 in filterValue2=(getloaddata |filter:search4) |orderBy:sortKey2:sortReverse2
+                |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page4">-->
+
+                    <tr ng-repeat="user2 in getloaddata">
+
+                        <td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user2.stdselected" value="{{user2.tenantagR_Id}}" ng-change="optionToggledstd(user2,$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+
+                        <td class="text-center">{{$index+1}}</td>
+
+                        <td class="text-left">{{user2.tenantagR_TenantName}}</td>
+                        <td class="text-left">{{user2.tenantagR_ContactNo}}</td>
+                        <td class="text-left">{{user2.tenantagR_EmailId}}</td>
+                        <td class="text-left">{{user2.hrmB_BuildingName}}</td>
+                        <td class="text-left">{{user2.hrmR_RoomName}}</td>
+                        <td class="text-left">{{user2.tenantagR_NoOfOccupants}}</td>
+                        <td class="text-left">{{user2.tenantagR_AdvanceAmount}}</td>
+                        <th class="text-center">
+                            <span ng-click="ViewHealthCheckUpFiles(user2)" data-toggle="modal" data-target="#modalviewfiles" data-backdrop="static">
+                                <i class="fa fa-eye text-black" title="View Files"></i>
+                            </span>
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="form-group col-sm-12" ng-hide="true" id="printDeviation1" style="overflow:auto;padding:0px;">
+            <table class="table table-bordered table-responsive" id="table1">
+                <thead>
+                    <tr>
+                       <th>Sl.No</th>
+                        <th>Tenant Name</th>
+                        <th>Contact No</th>
+                        <th>Email Id</th>
+                        <th>Building Name</th>
+                        <th>Room Name</th>
+                        <th>No of Occupants</th>
+                        <th>Amount</th>
+                        <th>View</th>
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <!--<tr dir-paginate="user2 in filterValue2=(getloaddata |filter:search4) |orderBy:sortKey2:sortReverse2
+                |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page4">-->
+
+                    <tr ng-repeat="user2 in getloaddata">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user2.tenantagR_TenantName}}</td>
+                        <td class="text-left">{{user2.tenantagR_ContactNo}}</td>
+                        <td class="text-left">{{user2.tenantagR_EmailId}}</td>
+                        <td class="text-left">{{user2.hrmB_BuildingName}}</td>
+                        <td class="text-left">{{user2.hrmR_RoomName}}</td>
+                        <td class="text-left">{{user2.tenantagR_NoOfOccupants}}</td>
+                        <td class="text-left">{{user2.tenantagR_AdvanceAmount}}</td>
+                        <th class="text-center">
+                            <span ng-click="ViewHealthCheckUpFiles(user2)" data-toggle="modal" data-target="#modalviewfiles" data-backdrop="static">
+                                <i class="fa fa-eye text-black" title="View Files"></i>
+                            </span>
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+        </dir-pagination-controls>
+    </div>
+</section>
+
+<div id="modalviewfiles" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10%">Sl.No</th>
+                                        <th style="width:40%">File Name</th>
+                                        <th style="width:10%">View/Download</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="userviewreponse in getviewfilesdetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">
+                                            <div class="col-sm-6">
+                                                <span ng-if="userviewreponse.tenantagrfL_FileLocation !=null && userviewreponse.tenantagrfL_FileLocation !=''">
+                                                    <label>{{userviewreponse.tenantagrfL_FileName}}</label>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span ng-if="userviewreponse.tenantagrfL_FileLocation !=null && userviewreponse.tenantagrfL_FileLocation !=''">
+                                                <a ng-if="userviewreponse.filetype=='jpg' || userviewreponse.filetype=='png'
+                                                                   || userviewreponse.filetype=='svg'|| userviewreponse.filetype=='jpeg'
+                                                                   || userviewreponse.filetype=='gif'"
+                                                   style="color:red;display:inline; font-weight: bolder;"
+                                                   data-ng-click="showmothersign(userviewreponse.tenantagrfL_FileLocation,userviewreponse.tenantagrfL_FileName)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+                                                <a ng-if="userviewreponse.filetype=='pdf'" style="color:blue;display:inline;"
+                                                   ng-click="onviewpdf(userviewreponse.tenantagrfL_FileLocation,userviewreponse.tenantagrfL_FileName)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+
+                                                <a ng-if="userviewreponse.filetype=='doc' || userviewreponse.filetype=='docx'"
+                                                   style="color:blue;display:inline;"
+                                                   ng-click="ViewDocExcelfles(userviewreponse.tenantagrfL_FileLocation,userviewreponse.tenantagrfL_FileName)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+
+                                                <a ng-if="userviewreponse.filetype=='xls' || userviewreponse.filetype=='xlsx'"
+                                                   style="color:blue;display:inline;"
+                                                   ng-click="ViewDocExcelfles(userviewreponse.tenantagrfL_FileLocation,userviewreponse.tenantagrfL_FileName)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+                                            </span>
+
+
+                                            <span ng-if="userviewreponse.tenantagrfL_FileLocation !=null && userviewreponse.tenantagrfL_FileLocation !=''">
+                                                |
+                                                <a class="downloadIcon" title="Dowload Template"
+                                                   ng-click="downloaddirectimage(userviewreponse.tenantagrfL_FileLocation,userviewreponse.tenantagrfL_FileName,userviewreponse.filetype)">
+                                                    <i class="fa fa-download" title="Download Template"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalPreview" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-sm-2 pull-left">
+                            <h4 style="text-align:center">View Document</h4>
+                        </div>
+                        <div class="col-sm-10 pull-right">
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                                <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="pdfviewdd">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="myModaldocx" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <h4 style="text-align:center">View Document</h4>
+                    </div>
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

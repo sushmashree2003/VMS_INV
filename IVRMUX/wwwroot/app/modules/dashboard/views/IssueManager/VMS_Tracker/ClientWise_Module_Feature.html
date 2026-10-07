@@ -1,0 +1,331 @@
+﻿
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Client Wise Module Feature Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-2">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Client Name :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="stdnamere" ng-model="$parent.IVRM_MI_Id" theme="bootstrap" title=" Select Client" ng-change="getmodule(IVRM_MI_Id)" required>
+                                        <ui-select-match ng-trim="false" style="outline: 0;font-weight: 700 !important;" placeholder="Select/Search Client">{{$select.selected.ismmclT_ClientName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in clientlist | filter: $select.search" value="{{name.IVRM_MI_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stdnamere)" ng-messages="myForm.stdnamere.$error">
+                                        <div ng-message="required"> Select Client Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Module Name :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="moname" ng-model="$parent.IVRMM_Id" theme="bootstrap" title=" Select Module" ng-change="getmoduleflag()" required>
+                                        <ui-select-match ng-trim="false" style="outline: 0;font-weight: 700 !important;" placeholder="Select/Search Module">{{$select.selected.ivrmM_ModuleName}}</ui-select-match>
+                                        <ui-select-choices repeat="mo in modulelist | filter: $select.search" value="{{mo.ivrmM_Id}}"
+                                                           ng-selected="{{mo.Selected == true}}">
+                                            <div ng-bind-html="mo.ivrmM_ModuleName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.moname)" ng-messages="myForm.moname.$error">
+                                        <div ng-message="required"> Select Module</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ===================================================== -->
+
+
+
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="moduleflage=='Birthday' || moduleflage=='COE'">
+                        <div class="col-sm-4 col-lg-offset-4">
+                            <div class="well">
+                                <div class="text-center" ng-init="Flag='Staff'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Staff" ng-model="Flag">
+                                        <span class="lbl padding-8"> Staff </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Student" ng-model="Flag">
+                                        <span class="lbl padding-8">Student</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="moduleflage=='Birthday' || moduleflage=='COE'">
+                        <div class="col-sm-4 col-lg-offset-4">
+                            <div class="well">
+                                <div class="text-center" ng-init="Type='Yearly'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Yearly" name="Year" ng-model="Type">
+                                        <span class="lbl padding-8">Year</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Monthly" name="Month" ng-model="Type">
+                                        <span class="lbl padding-8"> Month </span>
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="moduleflg">
+                        <div class="form-group">
+                            <div class="col-sm-9 col-sm-offset-2">
+                                <div class="col-sm-5">
+                                    <span class="lbl padding-4">From Date<b style="color:red">*</b></span>
+                                    <md-datepicker ng-model="fromdate" name="sdate" md-placeholder="Start Date" ng-required="moduleflg==true"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                        <div ng-message="required">Select Start Date</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <span class="lbl padding-4">To Date<b style="color:red">*</b></span>
+                                    <md-datepicker ng-model="todate" md-min-date="fromdate" min-date="fromdate" name="ddate1" md-placeholder="End Date" ng-required="moduleflg==true"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.ddate1)" ng-messages="myForm.ddate1.$error">
+                                        <div ng-message="required">Select End Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="getreportdetails.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="getreportdetails.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printexcel_0','#printexcel_1')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+
+        <div class="box box-primary" ng-show="getreportdetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">{{IVRMM_ModuleName}} Feature Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+           
+            <div class="box-body">
+                <!--<div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+            </div>-->
+                <div class="box-body">
+                    <div id="grid567">
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="reportdatelist.length>0 && moduleflage == 'Preadmission'">
+            <div class="box-header with-border">
+                <h3 class="box-title">PREADMISSION MONTH END REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" id="printSectionId">
+
+                <div class="baldwin text-center" ng-show="graphofmonth">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+
+                <div class="text-center">
+                    <h3 class="">{{monthmodelvalue | uppercase }} PREADMISSION MONTH END REPORT</h3>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8">
+                       
+                        <div class="form-group">
+                            
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Date</label>
+                            <label class="control-label">
+                                : {{ today | date }}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Academic Year</label>
+                            <label class="control-label">
+                                : {{acayearnow}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <table class="table table-bordered" id="Table">
+                        <thead style="border:0.5px solid #fff;">
+                            <tr>
+                                <th colspan="5" style="background: #fff;"></th>
+                                <th colspan="3" class="text-center">Missing Details</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">SL. No.</th>
+                                <th class="text-center">Name</th>
+                                <th class="text-center">Count</th>
+                                <th class="text-center">SMS Sent</th>
+                                <th class="text-center">Email Sent</th>
+                                <th class="text-center">Photo</th>
+                                <th class="text-center">Email Id</th>
+                                <th class="text-center">Contact No.</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td style="text-align:center">Total Registered</td>
+                                <td>{{total_Reg}}</td>
+                                <td>{{sent_sms_count}}</td>
+                                <td>{{sent_email_count}}</td>
+                                <td>{{missing_photo}}</td>
+                                <td>{{missing_email}}</td>
+                                <td>{{missing_no}}</td>
+
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td style="text-align:center">Total Filled</td>
+                                <td>{{total_filled}}</td>
+                                <td>{{total_filled}}</td>
+                                <td>{{total_filled}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+
+                            </tr>
+                            <tr>
+                                <td>3.</td>
+                                <td style="text-align:center">Reg. Not Filled</td>
+                                <td>{{total_notfilled}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>4.</td>
+                                <td style="text-align:center">Reg Payment Done</td>
+                                <td>{{total_regpaid}}</td>
+                                <td>{{total_regpaid - offline_pay}}</td>
+                                <td>{{total_regpaid - offline_pay}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>5.</td>
+                                <td style="text-align:center">Reg Payment Not Done</td>
+                                <td>{{total_notregpaid}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>6.</td>
+                                <td style="text-align:center">Total Transferred</td>
+                                <td>{{total_transferd}}</td>
+                                <td>{{total_transferd}}</td>
+                                <td>{{total_transferd}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="imageContainer" ng-show="img_graph">
+                        <img id="chartImage" width="1500" height="300">
+                    </div>
+                    <div class="col-sm-12" style="margin-top:10px">
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"></h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div id="rangeBarChat" style="height: 450px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                    <div>
+                        <div class="row">
+
+                            <div class="col-sm-6">Implementation Engineer:_______________</div>
+                            <div class="col-sm-6">Nodal Officer:_______________</div>
+
+                        </div>
+                        <br />
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">End User:_______________</div>
+                            <div class="col-sm-6">Seal</div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

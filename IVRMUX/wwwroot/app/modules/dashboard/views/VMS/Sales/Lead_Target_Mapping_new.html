@@ -1,0 +1,468 @@
+﻿<style>
+    .newstyle {
+        width: 100%;
+    }
+
+        .newstyle:hover {
+            background-color: #FF9900;
+        }
+
+    .newstyle1 {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+        .newstyle1:hover {
+            background-color: #6599FF;
+        }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata();" novalidate>
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Sales Target Mapping </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchValueDeptd" type="text" placeholder="Search Department here...">
+                                <input name="dept" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                <span class="lbl padding-8">
+                                    <strong>All </strong>
+                                </span>
+                                <label ng-repeat="department in departmentdropdown | filter:searchValueDeptd">
+                                    <input type="checkbox" name="dept" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)" ng-click="addColumn(department, $index,departmentdropdown)">
+                                    <span class="lbl padding-8">
+                                        <b>{{department.hrmD_DepartmentName}} </b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-4 padding-left-2px">
+
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchValueDesgd" type="text" placeholder="Search Designation here...">
+                                <input name="desg" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                <span class="lbl padding-8">
+                                    <strong>All </strong>
+                                </span>
+                                <label ng-repeat="designation in designationdropdown | filter:searchValueDesgd">
+                                    <input type="checkbox" name="desg" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                    <span class="lbl padding-8">
+                                        <strong>{{designation.hrmdeS_DesignationName}} </strong>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-2px">
+
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                <input name="empl" value="All" type="checkbox" ng-model="employeedropdownselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(employeedropdownselectedAll)">
+                                <span class="lbl padding-8">
+                                    <strong>All </strong>
+                                </span>
+                                <label ng-repeat="emp in employeedropdown  | filter:searchValueUEMd">
+                                    <input type="checkbox" name="empl" ng-model="emp.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeedropdown(emp)">
+                                    <span class="lbl padding-8">
+                                        <strong>  {{emp.hrmE_EmployeeFirstName}}&nbsp;&nbsp;{{emp.hrmE_EmployeeMiddleName}}&nbsp;&nbsp;{{emp.hrmE_EmployeeLastName}}</strong>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="error-messages" ng-if="interacted(myForm.empl)" ng-messages="myForm.empl.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 well">
+                            <div class="text-center">
+                                <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="getdetails()" aria-disabled="false">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    GET DETAILS
+                                </md-button>
+
+                                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata1()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <br />
+                <div class="box box-primary" ng-show="IsHiddendown">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">SALES LEAD Details</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="col-sm-12 well">
+                            <div class="">
+                                <div class="col-sm-4 pull-right">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-search"></i>
+                                            </div>
+                                            <input class="form-control" ng-model="search" type="text" placeholder="search here..">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered text-left">
+                                        <thead>
+                                            <tr>
+                                                <th>SL. No</th>
+                                                <th> select </th>
+                                                <th>Employee Name</th>
+                                                <th>View</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in emp_list | filter : search">
+                                                <td>{{$index+1}}</td>
+                                                <td class="text-center">
+                                                    <label>
+                                                        <input type="checkbox" data-ng-model="user.selected" ng-click="getcatdetails(user)">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                    <label ng-if="obja.categorychecklist.length>0">
+                                                        <a href="" ng-click="ViewAddChecklistDetails(obja)">
+                                                            <i class="fa fa-eye text-black" title="View Checklist"></i>
+                                                        </a>
+                                                    </label>
+                                                </td>
+                                                <td class="text-left" hidden="hidden">{{user.hrmE_Id}}</td>
+                                                <td class="text-left">{{user.hrmE_EmployeeFirstName}} </td>
+                                                <td>
+                                                    <span ng-if="user.selectedcat.length>0">
+                                                        <a href="" ng-click="ViewAddChecklistDetails(user)">
+                                                            <i class="fa fa-eye text-black"></i>
+                                                        </a>
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div>
+
+                            <div class="col-sm-12">
+                                <div class="text-center">
+                                    <md-button class="md-raised md-primary" id="save-btn" ng-click="SaveTargetMapping()" aria-disabled="false">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                        Save
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="box box-primary" ng-show="targetMappinglists.length > 0 ">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Employee Target Mapping Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </div>
+                                <input class="form-control" ng-model="search123" type="text" placeholder="search here..">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th style="width:30px">SL.NO</th>
+                            <th style="width:140px">Employee Name </th>
+                            <th style="width:20px" class="hdTH" ng-disabled="true">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th style="width:124px">Category Name  </th>
+                            <th style="width:124px">Target Count </th>
+                            <th style="width:124px">Periodicity </th>
+                            <th style="width:124px">Start Date </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody ng-repeat="user in taskid5 | filter : search123">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.targetMappinglists.length+1}}">{{$index+1}}</td>
+                            <td style="text-align:center" rowspan="{{user.targetMappinglists.length+1}}">
+                                {{user.HRME_EmployeeFirstName}}
+                            </td>
+                        </tr>
+                        <tr ng-repeat="obja in user.targetMappinglists">
+                            <td class="text-center  hdTD">
+                                <label ng-init="obja.selected=false">
+                                    <input type="checkbox" data-ng-model="obja.selected" ng-change="optionToggled(obja)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td class="text-left">{{obja.ISMMTCAT_TaskCategoryName}}</td>
+                            <!--<td class="text-left">{{obja.ISMSLETARM_Numbers}} </td>-->
+                            <td class="text-left">
+                                <input type="text" class="form-control text-center" value=" {{ obja.ISMSLETARM_Numbers }}" ng-disabled="obja.selected==false" ng-model="obja.ISMSLETARM_Numbers" />
+                            </td>
+                            <td class="text-left">{{obja.ISMSLETARM_Periodicity}} </td>
+                            <td class="text-left">{{obja.ISMSLETARM_CreatedDate | date:'dd/MM/yyyy'}} </td>
+                        </tr>
+                    </tbody>
+
+
+                </table>
+                <div>
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <md-button class="md-raised md-primary" id="save-btn" ng-click="Update()" aria-disabled="false">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Update
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+
+        </div>
+
+
+    </form>
+
+</section>
+
+
+<div id="myModal1" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width:1000px;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                    <h4 class="modal-title text-white">Lead  Deatils</h4>
+                </div>
+                <div class="box-body">
+
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+
+                                <th class="text-center">
+                                    Sl No <strong style="color:red;">*</strong>
+                                </th>
+                                <th class="text-center">
+                                    Category <strong style="color:red;">*</strong>
+                                </th>
+                                <th class="text-center">
+                                    Target <strong style="color:red;">*</strong>
+                                </th>
+                                <th> Periodicity</th>
+                                <th class="text-center" colspan="2">Action </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-repeat="document in materaldocuupload">
+                                <td>{{$index+1}}</td>
+                                <td>
+                                    <select class="form-control" id="sel1" name="statt{{$index}}" ng-model="document.ISMMTCAT_Id">
+                                        <option ng-repeat="personal in emp_list_cat" value="{{personal.ISMMTCAT_Id}}" ng-selected="{{personal.ISMMTCAT_Id == document.ISMMTCAT_Id}}">
+                                            {{personal.ISMMTCAT_TaskCategoryName}}
+                                        </option>
+                                    </select>
+                                </td>
+
+
+                                <td>
+                                    <input class="form-control" name="certificateFileName" data-ng-model="document.ismsletarM_Numbers" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="50">
+
+                                </td>
+                                <td>
+                                    <select class="form-control" ng-model="document.ismsletarM_LeadPeriodicity" name="ld" required>
+                                        <option value="">--Select Lead Periodicity--</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Quarterly">Quarterly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <span class="input-group-addon">
+                                        <a href="" ng-show="$last" ng-click="addgrnrows()" style="color:#000;">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                                    </span>
+                                    <span class="input-group-addon" id="remove">
+                                        <a href="" ng-click="removegrnrows($index,other)" style="color:#000;">
+                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Target Date:<span style="color:Red">*</span></label>
+                            <div class="col-sm-6" draggable="false">
+                                <md-datepicker name="demodate1" ng-model="TargetCreatedDate" md-placeholder="Enter Date" onkeydown="return false" md-min-date="empdoj" md-max-date="currentdate"  required ></md-datepicker>
+                            </div>
+                            <!--<div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.demodate1)" ng-messages="myForm.demodate1.$error">
+                                <div ng-message="required">Enter Demo Date</div>
+                            </div>-->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <input type="hidden" ng-model="hrmE_Id" />
+                            <md-button type="submit" class="md-raised md-primary" ng-click="AddFiles(materaldocuupload)">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i> ADD
+                            </md-button>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="savedfiles.length>0">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No</th>
+                                            <th>Category  Name</th>
+                                            <th>Target </th>
+                                            <th>Periodicity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="ur in savedfiles">
+                                            <td class="text-center">{{$index+1}}</td>
+                                            <td class="text-center">{{ur.ISMMTCAT_TaskCategoryName}}</td>
+                                            <td class="text-center">{{ur.ISMSLETARM_Numbers}}</td>
+                                            <td class="text-center">{{ur.ISMSLETARM_Periodicity}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-click="SaveCheckListDeails(savedfiles)"
+                                       ng-disabled="savedfiles.length==0">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i> SAVE & Close
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="viewaddedchecklist" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width:1000px;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                    <h4 class="modal-title text-white">Target Deatils</h4>
+                </div>
+                <div class="box-body">
+                    <div class="row" ng-if="savedfiles.length>0">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No</th>
+                                            <th>Category  Name</th>
+                                            <th>Target</th>
+                                            <th>Periodicity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="ur in addedchecklist">
+                                            <td class="text-center">{{$index+1}}</td>
+                                            <td class="text-center">{{ur.ISMMTCAT_TaskCategoryName}}</td>
+                                            <td class="text-center">{{ur.ISMSLETARM_Numbers}}</td>
+                                            <td class="text-center">{{ur.ISMSLETARM_Periodicity}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                  
+
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

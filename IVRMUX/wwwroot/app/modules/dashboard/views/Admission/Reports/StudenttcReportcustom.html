@@ -1,0 +1,988 @@
+
+
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform" data-ng-init="StuAttRptDropdownList();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student TC Report Custom</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" ng-click="ShowHideup()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHiddenup">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Last Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="stcrclstyr" required>
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                    <div ng-message="required">Select Last Year.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Select Radio Button:<strong style="color:red;">*</strong></label>
+                            <div class="text-center col-sm-8" ng-show="Admno_flag">
+                                <div class="well" >
+                                    <label class="radio-inline">
+                                        <input type="radio" value="regno" ng-disabled="showlist" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                        <span class="lbl padding-8">Adm. No.</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="stdname" ng-disabled="showlist" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                        <span class="lbl padding-8">Name</span>
+                                    </label>
+                                </div>
+                                <div class="text-center error-messages" ng-if="interacted(myform.stcrcrad)" ng-messages="myform.stcrcrad.$error">
+                                    <div ng-message="required">Select Adm. No./Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="selsec" data-ng-model="ASMCL_Id" name="stcrccls" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="options in classlist" value="{{options.asmcL_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.stcrccls)" ng-messages="myform.stcrccls.$error">
+                                    <div ng-message="required">Select Class.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="stu_name_flag">
+                            <label class="control-label col-sm-4">Student Name:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="amsT_Id" ng-click="reportshow()"  required>
+                                    <option value="" label="Select Student"> </option>
+                                    <option ng-repeat="student in studentDropdown" value="{{student.amsT_Id}}" ng-selected="{{student.Selected == true}}">
+                                        {{student.amsT_FirstName + ' ' + student.amsT_MiddleName + ' ' + student.amsT_LastName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="accsection" data-ng-model="ASMC_Id"  name="stcrcsec" ng-change="changesection()" required>
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="options in seclist" value="{{options.asmS_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.stcrcsec)" ng-messages="myform.stcrcsec.$error">
+                                    <div ng-message="required">Select Section.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="mididi">
+                            <label class="control-label col-sm-4">Promotion :</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" data-ng-model="prom">
+                                    <option value="" label="Select Promotion Type"> </option>
+                                    <option value="Granted">Granted</option>
+                                    <option value="Refused">Refused</option>
+                                    <option value="Not Applicable">Not Applicable</option>
+                                    <option value="Passed ICSE">Passed ICSE</option>
+                                    <option value="ISC">ISC</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="mididi1">
+                            <label class="control-label col-sm-4">Prevoius School :</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" ng-model="pervious" maxlength="50" allow-pattern="(\s|[a-zA-Z0-9.]|-|,)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="mididi1girls">
+                            <!--<label class="control-label col-sm-4">Admitted Class :</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" ng-model="adnittedclass" maxlength="50" allow-pattern="(\s|[a-zA-Z0-9.]|-|,)">
+                            </div>-->                           
+                                <label class="control-label col-sm-4">Admitted Class:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="selsec" data-ng-model="ASMCL_Id1" name="stcrccls1">
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="options1 in classlist1" value="{{options1.asmcL_Id}}" ng-selected="{{option1.Selected == true}}">{{options1.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrccls1)" ng-messages="myform.stcrccls1.$error">
+                                        <div ng-message="required">Select Admitted Class.</div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-show="report_flag" ng-click="savetmpldata();">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary"  ng-click="printToCart()"><!--ng-show="Print_flag"-->
+                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="BStudentTc" id="BStudentTc">
+
+            <div ng-show="baldwinsboys"><!---->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="printSectionIdboys" id="printSectionIdboys">
+                            <section class="margin-top-205">
+                                <div class="row">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="width-120">School DISE NO :</td>
+                                                <td class="text-bold">29200909303</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table margin-top-4">
+                                        <tbody>
+                                            <tr>
+                                                <td class="width-110">TC Serial No.:</td>
+                                                <td class="border-bottom-dotted text-left">{{stuTCno}}</td>
+                                                <td class="pull-right">Admission No :</td>
+                                                <td class="border-bottom-dotted">{{stuAdmno}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="120" class="padding-left-50 width-172">This is to certify that</td>
+                                                <td class="border-bottom-dotted">{{stuFN + ' ' + stuMN + ' ' + stuLN}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="40" class="width-81">son of</td>
+                                                <td class="border-bottom-dotted">{{stuFatName}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="200" class="width-237">was admitted into this school on the</td>
+                                                <td class="border-bottom-dotted">{{stuDoa|date:'dd/MM/yyyy'}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="150" class="width-191">on a transfer certificate from </td>
+                                                <td class="border-bottom-dotted">{{stuschoolname}}</td>
+                                                <td width="35">School</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="80" class="width-141">and left on the</td>
+                                                <td class="border-bottom-dotted">{{last_date_attended|date:'dd/MM/yyyy'}}</td>
+                                                <td width="50" class="text-center width-86">with a</td>
+                                                <td class="border-bottom-dotted">{{stuCond}}</td>
+                                                <td width="40">character.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100" class="width-133">He belongs to the</td>
+                                                <td class="border-bottom-dotted">{{religion}}</td>
+                                                <td width="50" class="text-center">religion</td>
+                                                <td class="border-bottom-dotted">{{studcaste}}</td>
+                                                <td width="150" class="width-198">caste as per the school records.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="140" class="width-186">He was then studying in the</td>
+                                                <td class="border-bottom-dotted">{{std1}}  {{stuLcs}}</td>
+                                                <td width="100" class="text-center width-114">standard of the</td>
+                                                <td class="border-bottom-dotted"> ICSE</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table" style="margin-bottom:2px;">
+                                        <tbody>
+                                            <tr>
+                                                <td width="190" class="width-230">stream, the school year being from</td>
+                                                <td class="border-bottom-dotted">{{frommonth1}}  {{fromyear}} to {{tomonth1}}  {{toyear}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row margin-top-10">
+                                        <div class="flower margin-bottom-10">
+                                            <div class="col-sm-5 label">
+                                                All sums due to this School<br />On his account have been
+                                            </div>
+                                            <div class="col-sm-1 flower-bracket padding-left-right-none">}</div>
+                                            <div class="col-sm-5 label padding-left-none">-Paid<br />-remitted<br />-satisfactorily arranged for</div>
+                                        </div>
+                                    </div>
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="340" class="width-404">His date of birth, according to the Admission Register, is (in figures)</td>
+                                                <td class="border-bottom-dotted">{{stuDob|date:'dd/MM/yyyy'}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="80" class="width-81">(in words)</td>
+                                                <td class="border-bottom-dotted">{{stuDobwords}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="60">Promotion</td>
+                                                <td class="border-bottom-dotted">{{std}}  {{nextclass}}&nbsp;{{nextclassname}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="clearfix">
+                                        <div class="row padding-top-30">
+                                            <div class="col-sm-6">
+                                                <label>Date :</label>
+                                                <label class="border-bottom-dotted">{{getdate|date:'dd/MM/yyyy'}}</label>
+                                            </div>
+                                           
+                                            <div class="col-sm-6">
+                                                <label class="pull-right"> ( Principal ) </label>
+                                               
+                                            </div>
+                                        </div>
+                                        <!--<table class="table clearfix">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="width-80">Date :</td>
+                                                    <td class="border-bottom-dotted width-100 clearfix"></td>
+                                                    <td class="pull-right clearfix"><h4>( Principal )</h4></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>-->
+                                    </div>
+                                </div>
+                                <div class="margin-top-10 text-center col-sm-12" style="font-size:12px;">NB Final class Standard X - indian certificate of Secondary Education (ICSE)</div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="baldwinsgirls">
+                <!---->
+                <!--<div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+
+                        <div id="printSectionIdgirls" class="printSectionIdgirls">
+                            <section class="margin-top-260">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-110 text-bold">TC Serial No.:</td>
+                                            <td class="border-bottom width-150 text-center">{{stuTCno}}</td>
+                                            <td class="pull-right text-bold">Admission /Registration No.</td>
+                                            <td class="border-bottom width-150">{{stuAdmno}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-150 text-bold">This is certify that</td>
+                                            <td class="border-bottom">{{stuFN + ' ' + stuMN + ' ' + stuLN |uppercase}} </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-110 text-bold">Daughter of</td>
+                                            <td class="border-bottom">{{stuFatName |uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-280 text-bold">was admitted into this school on (date)</td>
+                                            <td class="border-bottom text-left">{{stuDoa|date:'dd-MM-yyyy'}}</td>
+                                            <td class="width-110 text-bold">in standard</td>
+                                            <td class="border-bottom">{{joinclass}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-220 text-bold">on a transfer certificate from </td>
+                                            <td class="border-bottom">{{stuschoolname|uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-110 text-bold">and left on the</td>
+                                            <td class="border-bottom">{{last_date_attended|date:'dd-MM-yyyy'}}</td>
+                                            <td class="width-60 text-bold">with a</td>
+                                            <td class="border-bottom">GOOD</td>
+                                            <td class="width-150 text-bold">character.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-225 text-bold">She was then studying in the(@)</td>
+                                            <td class="border-bottom">{{data2girls}}</td>
+                                            <td class="width-150 text-bold">standard of the (+)</td>
+                                            <td class="border-bottom text-bold">ICSE</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-260 text-bold">stream.The school year being from (*)</td>
+                                            <td class="border-bottom">{{frommonth1}}  {{fromyear}}</td>
+                                            <td class="width-60 text-bold">to (*)</td>
+                                            <td class="border-bottom">{{tomonth1}} {{toyear}} </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-bold">Alls sums due to the school (%) on her account has been remitted.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-480 text-bold">Her date of birth, according to he Admission register, is (in figures)</td>
+                                            <td class="border-bottom">{{stuDob|date:'dd-MM-yyyy'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-130 text-bold">(Date in words)</td>
+                                            <td class="border-bottom">{{stuDobwords}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-130 text-bold">Promotion ($)</td>
+                                            <td class="border-bottom">{{promotiontype|uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-30">
+                                    <tbody>
+                                        <tr>
+                                            <td width="80" class="text-bold">Date :</td>
+                                            <td width="100" class="border-bottom">{{tcdategirls|date:'dd-MM-yyyy'}}</td>
+                                            <td class="pull-right text-bold">Signature : </td>
+                                            <td width="100" class="border-bottom"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-50" style="margin-bottom:0px;">
+                                    <tbody>
+                                        <tr>
+                                            <td class="col-sm-4 text-bold"> Countersigned</td>
+                                            <td class="text-left col-sm-4 text-bold">School Seal/Rubber Stamp</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                              
+                                <table class="table margin-top-none">
+                                    <tbody>
+                                        <tr>
+                                            <td class="border-bottom"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-bottom"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-40">(@)</td>
+                                            <td class="width-20">-</td>
+                                            <td>To be given in words</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">(+)</td>
+                                            <td class="width-20">-</td>
+                                            <td>Mention Whether ICSE/ISC Stream</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">(*)</td>
+                                            <td class="width-20">-</td>
+                                            <td>Write Month and year</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">(%)</td>
+                                            <td class="width-20">-</td>
+                                            <td>includes payments for which provision is made in the rules supplied to the parent when the student was admitted into the school</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">($)</td>
+                                            <td class="width-20">-</td>
+                                            <td>Granted/Refused/Not Applicable/Passed ICSE/ISC.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </section>
+                        </div>
+
+                    </div>
+                </div>-->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+
+                        <div id="printSectionIdgirls" class="printSectionIdgirls">
+                            <section class="margin-top-260">
+                                <br />
+                                <br />
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-110 text-bold">TC Serial No.:</td>
+                                            <td class="border-bottom width-150 text-center">{{stuTCno}}</td>
+                                            <td class="pull-right text-bold">Admission /Registration No.</td>
+                                            <td class="border-bottom width-150">{{stuAdmno}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-150 text-bold">This is to certify that</td>
+                                            <td class="border-bottom">{{stuFN + ' ' + stuMN + ' ' + stuLN |uppercase}} </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-110 text-bold">Daughter of</td>
+                                            <td class="border-bottom">{{stuFatName |uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-260 text-bold">was admitted into this school on (date)</td>
+                                            <td class="border-bottom text-left">{{stuDoa|date:'dd-MM-yyyy'}}</td>
+                                            <td class="width-110 text-bold text-center">In standard</td>
+                                            <td class="border-bottom">{{joinclass}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-180 text-bold">on a transfer from </td>
+                                            <td class="border-bottom">{{stuschoolname|uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-100 text-bold">and left on</td>
+                                            <td class="border-bottom">{{last_date_attended|date:'dd-MM-yyyy'}}</td>
+                                            <td class="width-60 text-bold text-center">with a</td>
+                                            <td class="border-bottom">GOOD</td>
+                                            <td class="width-110 text-bold text-center">character.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-200 text-bold">She was then studying in (@)</td>
+                                            <td class="border-bottom">{{data2girls}}</td>
+                                            <td class="width-150 text-bold text-center">standard of the (+)</td>
+                                            <td class="border-bottom text-bold">ICSE</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-260 text-bold">stream.The school year being from (*)</td>
+                                            <td class="border-bottom">{{frommonth1}}  {{fromyear}}</td>
+                                            <td class="width-60 text-bold text-center">to (*)</td>
+                                            <td class="border-bottom">{{tomonth1}} {{toyear}} </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-bold">All sums due to the school (%) on her account has been remitted.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-480 text-bold">Her date of birth, according to the Admission register, is (in figures)</td>
+                                            <td class="border-bottom">{{stuDob|date:'dd-MM-yyyy'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-130 text-bold">(Date in words)</td>
+                                            <td class="border-bottom">
+                                                <label>{{stuDobwords}}</label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-130 text-bold">Promotion ($)</td>
+                                            <td class="border-bottom">{{promotiontype|uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-30">
+                                    <tbody>
+                                        <tr>
+                                            <td width="80" class="text-bold">Date :</td>
+                                            <td width="100" class="border-bottom">{{tcdategirls|date:'dd-MM-yyyy'}}</td>
+                                            <td class="pull-right text-bold">Signature : </td>
+                                            <td width="100" class="border-bottom"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-50" style="margin-bottom:0px;">
+                                    <tbody>
+                                        <tr>
+                                            <td class="col-sm-4 text-bold"> Countersigned</td>
+                                            <td class="text-left col-sm-4 text-bold">School Seal/Rubber Stamp</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-none">
+                                    <tbody>
+                                        <tr>
+                                            <td class="border-bottom"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-bottom"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-40">(@)</td>
+                                            <td class="width-20">-</td>
+                                            <td>To be given in words</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">(+)</td>
+                                            <td class="width-20">-</td>
+                                            <td>Mention Whether ICSE/ISC Stream</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">(*)</td>
+                                            <td class="width-20">-</td>
+                                            <td>Write Month and year</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">(%)</td>
+                                            <td class="width-20">-</td>
+                                            <td>includes payments for which provision is made in the rules supplied to the parent when the student was admitted into the school</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="width-40">($)</td>
+                                            <td class="width-20">-</td>
+                                            <td>Granted/Refused/Not Applicable/Passed ICSE/ISC.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </section>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div ng-show="baldwinscoedu">
+                <!---->
+                <!--<div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="printSectionIdcoedu" class="BCOEStudentTc">
+                            <section class="margin-top-200">
+                                <div class="pull-right text-bold clearfix"><u>ICSE Affiliation No KA125</u></div>
+                                <div class="text-center margin-top-4 clearfix"><h3><u>TRANSFER CERTIFICATE</u></h3></div>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-220">TC Serial No.:</td>
+                                            <td class="width-320 text-bold">{{stuTCno}}</td>
+                                            <td class="width-320">Admission /Registration No.</td>
+                                            <td class="width-220 text-bold">{{stuAdmno}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-220">This is to certify that</td>
+                                            <td class="text-bold">{{stuFN + ' ' + stuMN + ' ' + stuLN |uppercase}} </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-220">son / daughter of</td>
+                                            <td class="text-bold">{{stuFatName |uppercase}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-320">was admitted into this school on</td>
+                                            <td class="text-bold width-150">{{stuDoa|date:'dd-MM-yyyy'}}</td>
+                                            <td class="width-220">on a transfer from </td>
+                                            <td class="text-bold">{{stuschoolname|uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-150">and left on </td>
+                                            <td class="text-bold width-360">{{last_date_attended|date:'dd/MM/yyyy'}}</td>
+                                            <td class="width-150">with a</td>
+                                            <td class="text-bold width-150">GOOD</td>
+                                            <td class="width-150">character.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-280"> He / She was then studying in the</td>
+                                            <td class="text-bold width-150">{{data2girls}}</td>
+                                            <td class="width-150">standard,</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-280">of the school year being from </td>
+                                            <td class="width-180 text-bold">{{frommonth1}}  {{fromyear}}</td>
+                                            <td class="width-40">to </td>
+                                            <td class="text-bold">{{tomonth1}} {{toyear}} </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="">All sums due to this school on his / her account has been remitted satisfactorily.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-480"> His / Her date of birth, according to the Admission register is (in figures)</td>
+                                            <td class="text-bold">{{stuDob|date:'dd-MM-yyyy'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-130">(in words)</td>
+                                            <td class="text-bold">{{stuDobwords}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-280">Promotion has been</td>
+                                            <td class="text-bold">GRANTED</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="80">Date :</td>
+                                            <td width="100" class="text-bold">{{tcdategirls|date:'dd/MM/yyyy'}}</td>
+                                            <td class="pull-right">Signature<br />(Principal) </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row margin-top-20">
+                                    <div class="text-center col-sm-12 margin-bottom-5">School Seal/Rubber Stamp</div>
+                                    <div class="text-center col-sm-12 ">NB Final Class Standard X (Indian Certificate of Secondary Education I.C.S.E)</div>
+                                </div>
+
+                            </section>
+                        </div>
+                    </div>
+
+                </div>-->
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="printSectionIdcoedu" class="BCOEStudentTc">
+                            <section class="margin-top-200">
+                                <!--<div class="pull-right text-bold clearfix"><u>ICSE Affiliation No KA125</u></div>-->
+                                <div class="text-center margin-top-4 clearfix"><h2><u>TRANSFER CERTIFICATE</u></h2></div>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="150">TC Serial No.:</td>
+                                            <td class="text-bold">{{stuTCno}}</td>
+                                            <td width="550" class="text-right">Admission /Registration No.</td>
+                                            <td width="100" class="text-bold">{{stuAdmno}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-50">
+                                    <tbody>
+                                        <tr>
+                                            <td width="150">This is to certify that</td>
+                                            <td class="text-bold border-bottom-dotted">{{stuFN + ' ' + stuMN + ' ' + stuLN |uppercase}} </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="150">son / daughter of</td>
+                                            <td class="text-bold border-bottom-dotted">{{stuFatName |uppercase}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="250">was admitted into this school on</td>
+                                            <td class="text-bold width-100 border-bottom-dotted">{{stuDoa|date:'dd-MM-yyyy'}}</td>
+                                            <td width="150">on a transfer from </td>
+                                            <td class="text-bold border-bottom-dotted">{{stuschoolname|uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="90">and left on </td>
+                                            <td class="text-bold border-bottom-dotted">{{stuIssDat|date:'dd/MM/yyyy'}}</td>
+                                            <td width="80">with a</td>
+                                            <td width="100" class="text-bold border-bottom-dotted">GOOD</td>
+                                            <td width="70">character.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-30">
+                                    <tbody>
+                                        <tr>
+                                            <td width="240"> He / She was then studying in the</td>
+                                            <td class="text-bold border-bottom-dotted">{{data2girls}}</td>
+                                            <td width="70">standard,</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="210">of the school year being from </td>
+                                            <td class="text-bold border-bottom-dotted">{{frommonth1}}  {{fromyear}}</td>
+                                            <td width="30">to</td>
+                                            <td class="text-bold border-bottom-dotted">{{tomonth1}} {{toyear}} .</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-30">
+                                    <tbody>
+                                        <tr>
+                                            <td>All sums due to this school on his / her account has been remitted satisfactorily.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="480"> His / Her date of birth, according to the Admission register is (in figures)</td>
+                                            <td class="text-bold border-bottom-dotted">{{stuDob|date:'dd-MM-yyyy'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="100">(in words)</td>
+                                            <td class="text-bold border-bottom-dotted">{{stuDobwords}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="150">Promotion has been</td>
+                                            <td class="text-bold border-bottom-dotted">{{progress}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td width="150">STS NO. </td>
+                                            <td class="text-bold border-bottom-dotted">{{govtno}}</td>
+                                            <td width="150">DICE NO. </td>
+                                            <td class="text-bold border-bottom-dotted">29200111538</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-50">
+                                    <tbody>
+                                        <tr>
+                                            <td width="60">Date :</td>
+                                            <td width="" class="text-bold">{{tcdategirls|date:'dd/MM/yyyy'}}</td>
+                                            <td width="200" class="text-right">Signature<br />(Principal) </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row margin-top-50">
+                                    <div class="text-center col-sm-12 margin-bottom-5">School Seal/Rubber Stamp</div>
+                                    <div class="text-center col-sm-12 ">NB Final Class Standard X (Indian Certificate of Secondary Education I.C.S.E)</div>
+                                </div>
+
+                            </section>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+</section>

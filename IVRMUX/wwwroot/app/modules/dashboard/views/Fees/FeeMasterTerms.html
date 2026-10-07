@@ -1,0 +1,546 @@
+﻿
+
+<section class="content" data-ng-init="loaddata()">
+    <div class="well">
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom>
+
+                <md-tab label="Master Terms" ng-click="cance()">
+                    <md-content class="md-padding">
+                        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform1" novalidate>
+                            <div class="">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Master Terms</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-sm-offset-3">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Term Name:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" name="tname" ng-model="FMT_Name" class="form-control" maxlength="50" required />  <!--allow-pattern="(\s|[a-zA-Z1-9])"--> 
+                                                        <div class="error-messages" ng-if="interacted(myform1.tname)" ng-messages="myform1.tname.$error">
+                                                            <div ng-message="required">Enter the Term Name</div>
+                                                            <div ng-message="pattern">The Term Name contains only alphabets</div>
+                                                            <div ng-message="minlength">The Term Name should contain minimum 3 alphabets </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div class="text-center">
+                                            <input type="hidden" name="fmT_Id" ng-model="fmT_Id" value="{{fmT_Id}}" />
+                                            <md-button type="submit" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn">
+                                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                Save
+                                            </md-button>
+                                            <md-button type="button" class="md-raised md-warn" data-ng-click="cance()">
+                                                <i class="fa fa-times" aria-hidden="true"></i>
+                                                Cancel
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Fee Master Terms Grid View</h3>
+                                    <!--<h3 class="box-title"> (Total Count -  {{totcountfirst}} )</h3>-->
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body">
+
+                                    <div class="">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    <b> Total Grid Records :</b>
+                                                    <label class="badge">
+                                                        {{totcountfirst}}
+                                                    </label>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group" ng-if="search1!=''">
+                                                <label class="control-label">
+                                                    <b>Total Records Searched : </b>
+                                                    <label class="badge">
+                                                        {{filterValue.length}}
+                                                    </label>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 pull-right">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">
+                                                        <i class="fa fa-search"></i>
+                                                    </span>
+                                                    <input class="form-control" ng-model="search1" type="text" placeholder="search here...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                   
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a href="" ng-click="sort('fmT_Id')">SLNO</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('fmT_Name')">Term Name</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('fmT_ActiveFlag')">Active/InActive</a>
+                                                </th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="user in filterValue=(pages  | filter : search1) |orderBy:sortKey:reverse |filter:search1 |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                                <!--<tr ng-repeat="user in pages | orderBy:predicate:default | filter:paginate| filter:search |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+                                                <td>{{ itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                <td>{{ user.fmT_Name}}</td>
+                                                <td style="text-transform:capitalize;">{{ user.fmT_ActiveFlag}}</td>
+
+                                                <td class="text-center">
+                                                    <a href="javascript:void(0)" ng-click="getorgvalue(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                    </a>
+                                                    <!--<a href="javascript:void(0)" ng-click="deletedata(user)"
+               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </a>-->
+                                                    <span ng-if="user.fmT_ActiveFlag ===false ">
+                                                        <a href="" ng-click="deactive(user)"
+                                                           class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                            Activate
+                                                        </a>
+                                                    </span>
+                                                    <span ng-if="user.fmT_ActiveFlag === true ">
+                                                        <a href="" ng-click="deactive(user)"
+                                                           class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                            Deactivate
+                                                        </a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+                                </div>
+                            </div>
+                     
+                    </md-content>
+                </md-tab>
+
+
+                <md-tab label="Master Term Fee Head" ng-click="cance1(arrlistchk)">
+                    <md-content class="md-padding">
+                        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform2" novalidate>
+                            <div class="">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Master Term FeeHead</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-sm-offset-3">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4" for="email">Term Name:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8">
+                                                        <select class="form-control" id="sda" data-ng-model="fterm" name="Termreq" required ng-disabled="termsdisable">
+                                                            <option value="">Select</option>
+                                                            <option ng-repeat="options1 in arrlist6" value="{{options1.fmT_Id}}" ng-selected="{{option1.Selected == true}}">{{options1.fmT_Name}}</option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted1(myform2.Termreq)" ng-messages="myform2.Termreq.$error">
+                                                            <div ng-message="required">Select the field Term Name</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="form-group">
+                                                    <label class="control-label col-sm-4" for="email">Fees Head:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8">
+                                                        <select class="form-control" id="bv" data-ng-model="hname" name="fehead" required >
+                                                            <option value="">Select</option>
+                                                            <option ng-repeat="options2 in arrlist7" value="{{options2.fmH_Id}}" ng-selected="{{option2.Selected == true}}">{{options2.fmH_FeeName}}</option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted1(myform2.fehead)" ng-messages="myform2.fehead.$error">
+                                                            <div ng-message="required">Select the Fees Head</div>
+                                                        </div>
+                                                    </div>
+                                                </div>-->
+                                                <div class="form-group">
+                                                    <label for="sel2" class="control-label col-sm-4">
+                                                        Fees Head :<span style="color:red;">*</span>
+                                                    </label>
+                                                    <div class="multiselect col-sm-8">
+                                                        <input class="form-control" ng-model="searchchkbxhd" type="text" placeholder="search here...">
+                                                        
+                                                        <label data-ng-model="fmH_Id" ng-repeat="role in arrlist7|filter:searchchkbxhd" value="{{role.fmH_Id}}">
+                                                            <input type="checkbox" name="head" data-ng-model="role.selected" ng-required="isOptionsRequiredhd();">
+                                                            <span class="lbl padding-8">{{role.fmH_FeeName}}</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-sm-8 error-messages" ng-if="interacted1(myform2.head)" ng-messages="myform2.head.$error" style="padding-left:184px">
+                                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="sel2" class="control-label col-sm-4">
+                                                        Installment Name :<span style="color:red;">*</span>
+                                                    </label>
+                                                    <div class="multiselect col-sm-8">
+                                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                                        <label data-ng-model="insName" ng-repeat="role in arrlistchk|filter:filterchkbx" value="{{role.ftI_ID}}">
+                                                            <input type="checkbox" name="installments" data-ng-model="role.selected" ng-required="isOptionsRequired();">
+                                                            <span class="lbl padding-8">{{role.ftI_NAME}}</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-sm-8 error-messages" ng-if="interacted1(myform2.installments)" ng-messages="myform2.installments.$error" style="padding-left:184px">
+                                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <hr />
+                                        <div class="text-center">
+                                            <input type="hidden" name="fmtfH_Id" ng-model="fmtfH_Id" value="{{fmtfH_Id}}" />
+                                            <md-button type="submit" class="md-raised md-primary" ng-click="savetermsmap(arrlistchk)" ng-disabled="form.$invalid" id="save-btn">
+                                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                Save
+                                            </md-button>
+                                            <md-button type="button" class="md-raised md-warn" data-ng-click="cance1(arrlistchk,arrlist7)">
+                                                <i class="fa fa-times" aria-hidden="true"></i>
+                                                Cancel
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Fee Master Term Fee Head Grid View</h3>
+                                    <!--<h3 class="box-title"> (Total Count -  {{totcountsecond}} )</h3>-->
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body">
+                                    <div class="">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    <b> Total Grid Records :</b>
+                                                    <label class="badge">
+                                                        {{totcountsecond}}
+                                                    </label>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group" ng-if="search2!=''">
+                                                <label class="control-label">
+                                                    <b>Total Records Searched : </b>
+                                                    <label class="badge">
+                                                        {{filterValue1.length}}
+                                                    </label>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 pull-right">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">
+                                                        <i class="fa fa-search"></i>
+                                                    </span>
+                                                    <input class="form-control" ng-model="search2" type="text" placeholder="search here...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                    
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a href="" ng-click="sort1('slno')">SLNO</a>
+                                                </th>
+                                                <th style="display:none">
+                                                    <a href="" ng-click="sort1('slno')">SLNO</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort1('termnaem')">Term Name</a>
+                                                </th>
+                                                <th><a href="" ng-click="sort1('headname')">Fee Head</a> </th>
+                                                <th><a href="" ng-click="sort1('installmentname')">Fee Installment</a> </th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="user in filterValue1=(termsmaping  | filter : search2) |orderBy:sortKey1:reverse1  |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'" pagination-id="page2">
+                                                <!--<tr ng-repeat="user in termsmaping | orderBy:predicate:default | filter:paginate| filter:search |itemsPerPage:itemsPerPage" current-page="currentPage1" ng-class-odd="'odd'">-->
+                                                <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                                <td style="display:none">{{ user.idforedt}}</td>
+                                                <td>{{ user.termnaem}}</td>
+                                                <td>{{ user.headname}}</td>
+                                                <td>{{ user.installmentname}}</td>
+
+                                                <!--<td>{{ user.fmtfH_Id}}</td>
+                                                <td>{{ user.fmT_Id}}</td>
+                                                <td>{{ user.fmH_Id}}</td>
+                                                <td>{{ user.ftI_Id}}</td>-->
+
+
+                                                <td class="text-center">
+                                                    <a href="javascript:void(0)" ng-click="getorgvalueY(user,arrlistchk)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                    </a>
+
+                                                    <a href="javascript:void(0)" ng-click="deletedataY(user)"
+                                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    </a>
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls max-size="5" pagination-id="page2"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+                                </div>
+                            </div>
+                      
+                    </md-content>
+                </md-tab>
+
+
+            <!--<md-tab label="Master Term FeeHead DueDate" ng-click="cance2()" ng-show="termduadatestab" class="hidden-lg">
+                    <md-content class="md-padding">
+                        <form class="form-horizontal" role="form" name="myform3" novalidate>
+                            <div class="">
+                                <div class="box-body">
+                                    <div class="col-sm-6 col-sm-offset-3">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4" for="email">Academic Year:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" data-ng-model="ASMAYIdT" name="yer" ng-disabled="acyrdisabl" required>
+                                                    <option value="">Select</option>
+                                                    <option ng-repeat="options in arrlist8" value="{{options.asmaY_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmaY_Year}}</option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted2(myform3.yer)" ng-messages="myform3.yer.$error">
+                                                    <div ng-message="required">Select the field Year</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4" for="email">Term Name:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sda" data-ng-model="fmTIdT" name="trm" ng-disabled="trmdisabl" required>
+                                                    <option value="">Select</option>
+                                                    <option ng-repeat="options1 in arrlist9" value="{{options1.fmT_Id}}" ng-selected="{{option1.Selected == true}}">{{options1.fmT_Name}}</option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted2(myform3.trm)" ng-messages="myform3.trm.$error">
+                                                    <div ng-message="required">Select the field Term Name</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4" for="email">Fees Head:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="bv" data-ng-model="fmHIdT" ng-change="BindGrid(fmTIdT,fmHIdT)" name="fehdreq" ng-disabled="fhdisabl" required>
+                                                    <option value="">Select</option>
+                                                    <option ng-repeat="options2 in arrlist11" value="{{options2.fmH_Id}}" ng-selected="{{option2.Selected == true}}">{{options2.fmH_FeeName}}</option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted2(myform3.fehdreq)" ng-messages="myform3.fehdreq.$error">
+                                                    <div ng-message="required">Select the field Head Name</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="box box-primary" ng-show="grigview2">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Terms Dua Dates Grid View</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="box-body">
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a href="" ng-click="sort('FTI_Id')">SLNO</a>
+                                                </th>
+                                                <th style="display:none;">
+                                                    <a href="" ng-click="sort('FMTFH_Id')">SLNO</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('insname')">Installment Name</a>
+                                                </th>
+                                                <th><a href="" ng-click="sort('fmtfhdD_FromDate')">From Date</a> </th>
+                                                <th><a href="" ng-click="sort('fmtfhdD_ToDate')">To Date</a> </th>
+                                                <th><a href="" ng-click="sort('fmtfhdD_ApplicableDate')">Applicable Date</a> </th>
+                                                <th><a href="" ng-click="sort('fmtfhdD_DueDate')">Due Date</a> </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in termsmapin | orderBy:predicate:default | filter:paginate| filter:search" ng-class-odd="'odd'">
+                                                <td>{{$index+1}}</td>
+                                                <td style="display:none;">{{user.fmtfH_Id}}</td>
+                                                <td>{{user.insname}}</td>
+                                                <td>
+                                                    <md-datepicker name="fd" onkeydown="return false" ng-model="user.fmtfhdD_FromDate" placeholder="Enter date" ng-change='setTodate(user.fmtfhdD_FromDate)' required></md-datepicker>
+                                                    <div class="error-messages" ng-if="interacted2(myform3.fd)" ng-messages="myform3.fd.$error">
+                                                        <div ng-message="required">Please fill out this field </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <md-datepicker name="fd1" onkeydown="return false" ng-model="user.fmtfhdD_ToDate" placeholder="Enter date" md-min-date="minDate" md-max-date="maxDate" ng-change='checkErr(user.fmtfhdD_FromDate,user.fmtfhdD_ToDate)' required></md-datepicker>
+                                                    <div class="error-messages" ng-if="interacted2(myform3.fd1)" ng-messages="myform3.fd1.$error">
+                                                        <div ng-message="required">Please fill out this field </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <md-datepicker name="fd2" onkeydown="return false" ng-model="user.fmtfhdD_ApplicableDate" placeholder="Enter date" md-min-date="minDate" md-max-date="maxDate" required></md-datepicker>
+                                                    <div class="error-messages" ng-if="interacted2(myform3.fd2)" ng-messages="myform3.fd2.$error">
+                                                        <div ng-message="required">Please fill out this field </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <md-datepicker name="fd3" onkeydown="return false" ng-model="user.fmtfhdD_DueDate" placeholder="Enter date" md-min-date="minDate" md-max-date="maxDate" required></md-datepicker>
+                                                    <div class="error-messages" ng-if="interacted2(myform3.fd3)" ng-messages="myform3.fd3.$error">
+                                                        <div ng-message="required">Please fill out this field </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <span style="color:red;">{{errMessage}}</span>
+                                </div>
+                                <div class="well text-center">
+                                    <input type="hidden" name="fmtfhdD_Id" ng-model="fmtfhdD_Id" value="{{fmtfhdD_Id}}" />
+                                    <button type="submit" class="btn btn-primary" ng-click="savedatadues(termsmapin)" ng-disabled="form.$invalid" id="save-btn">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                        Save
+                                    </button>
+                                    <button type="button" class="btn btn-info" ng-click="cance2()">
+                                        <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Terms Dua Dates Grid View</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 pull-right">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input class="form-control" ng-model="search3" type="text" placeholder="search here...">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="box-body">
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a href="" ng-click="order('FTI_Id')">SLNO</a>
+                                                </th>
+                                                <th style="display:none">
+                                                    <a href="" ng-click="sort('FMTFHDD_Id')"></a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('termname')">TermName</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('headnamed')">FeeHead</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('yearname')">AcademicYear</a>
+                                                </th>
+                                                <th><a href="" ng-click="sort('FMTFHDD_FromDate')">From Date</a> </th>
+                                                <th><a href="" ng-click="sort('FMTFHDD_ToDate')">To Date</a> </th>
+                                                <th><a href="" ng-click="sort('FMTFHDD_ApplicableDate')">Applicable Date</a> </th>
+                                                <th><a href="" ng-click="sort('FMTFHDD_DueDate')">Due Date</a> </th>
+                                                <th>
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="user in saveddatadisplay |orderBy:sortKey:reverse |filter:search3 |itemsPerPage:itemsPerPage2" current-page="currentPage2" ng-class-odd="'odd'" pagination-id="page3">
+                                                <tr ng-repeat="user in saveddatadisplay | orderBy:predicate:default | filter:paginate| filter:search |itemsPerPage:itemsPerPage" current-page="currentPage4" ng-class-odd="'odd'">
+                                                <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                                                <td style="display:none">{{ user.fmthddid}}</td>
+                                                <td>{{ user.termname}}</td>
+                                                <td>{{ user.headnamed}}</td>
+                                                <td>{{user.yearname}}</td>
+                                                <td>{{user.fdate1|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{user.tdate1|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{user.aplc1|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{user.ddate1|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{user.fdate1}} /></td>
+                                                <td>{{user.tdate1"}} /></td>
+                                                <td>{{user.aplc1"}}/></td>
+                                                <td>{{user.ddate1"}} /></td>
+                                                <td class="text-center">
+                                                    <a href="javascript:void(0)" ng-click="getorgvalueDYTTTT(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a href="javascript:void(0)" ng-click="deletedataYTTTT(user)"
+                                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls max-size="5" pagination-id="page3"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+                                </div>
+                            </div>
+                        </form>
+                    </md-content>
+                </md-tab>-->
+
+
+            </md-tabs>
+        </md-content>
+    </div>
+</section>

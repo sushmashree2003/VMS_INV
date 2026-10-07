@@ -1,0 +1,235 @@
+﻿
+<section class="content">
+    <div data-ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Enquiry Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group" ng-show="userflag=='ADMIN' || userflag=='admin'">
+                                <label class="control-label col-sm-4">Company Name :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="miname" ng-model="MIId" ng-change="getroom(MIId)">
+                                        <option ng-repeat="mi in milist" value="{{mi.mI_Id}}" ng-selected="{{mi.mI_Id==MIId}}">{{mi.mI_Name}}</option>
+                                        <option value="">--Select Compamy--</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.miname)" ng-messages="myForm.miname.$error">
+                                        <div ng-message="required">Select Compamy Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Status  <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="bok" ng-model="enqstatus" name="Status" required ng-change="get_listdata();">
+                                        <option value="">--Select Status--</option>
+                                        <option value="ALL">ALL</option>
+                                        <option value="INPROGRESS">INPROGRESS</option>
+                                        <option value="REPLIED">REPLIED</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Status)" ng-messages="myForm.Status.$error">
+                                        <div ng-message="required">Select the Enquiry Status</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> Type  <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="bok" ng-model="enqtype" name="Type" required ng-change="get_listdata();">
+                                        <option value="">--Select Type--</option>
+                                        <option value="B">BOOKING</option>
+                                        <option value="V">VISITING</option>
+
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Type)" ng-messages="myForm.Type.$error">
+                                        <div ng-message="required">Select the Enquiry Type</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8" style="padding-left:0px;">
+                                    <md-datepicker name="startdate" ng-model="testfromdate" md-placeholder="Select date..." required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Please Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8" style="padding-left:0px;">
+                                    <md-datepicker name="enddate" ng-model="testtodate" md-placeholder="Select date..." md-min-date="testfromdate" onkeydown="return false" ng-disabled="!testfromdate" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.enddate)" ng-messages="myForm.enddate.$error">
+                                        <div ng-message="required">Please Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                        
+                 
+                    <hr />
+                    <div class="text-center">
+                        <div class="">
+                            <div class="text-center">
+                                <md-button type="button" class="md-raised md-primary" ng-click="get_report()" id="save-btn">
+                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-click="printData()" ng-show="printflag">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="excel-btn" ng-click="ExportToExcel('#printtable')" ng-show="enqlist_Report.length > 0">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Export to Excel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="box box-primary" ng-show="reportlist">
+            <div class="box-header with-border">
+                <h3 class="box-title">Enquiry Reports</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{enqlist_Report.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-bordered table-hover table-responsive text-center">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th><a href="" ng-click="sort('OSENQ_Name')"> Enquired By</a></th>
+                                <th><a href="" ng-click="sort('OSENQ_EmailId')">Email Id</a></th>
+                                <th><a href="" ng-click="sort('OSENQ_MobileNo')">Mobile No</a></th>
+                                <th><a href="" ng-click="sort('OSENQ_Enquiry')">Enquiry Message</a></th>
+                                <th ng-if="enqtype!='V'"><a href="" ng-click="sort('OSENQ_CreatedDate')">Enquiry Date</a></th>
+                                <th ng-if="enqstatus=='BOTH'"><a href="" ng-click="sort('OSENQ_Status')" >
+                                        Enquiry Status
+                                    </a>
+                                </th>
+                                <th ng-if="enqtype=='V'"> <a href="" ng-click="sort('OSENQ_VisitDate')">Visit Date</a>
+                                </th>
+                                <th ng-if="enqtype=='V'"> <a href="" ng-click="sort('OSENQ_VisitTime')">Visit Time</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue=(enqlist_Report | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td style="text-align:center">{{user.OSENQ_Name}}</td>
+                                <td style="text-align:center">{{user.OSENQ_EmailId}}</td>
+                                <td style="text-align:center">{{user.OSENQ_MobileNo}}</td>
+                                <td style="text-align:left">{{user.OSENQ_Enquiry}}</td>
+                                <td style="text-align:center" ng-if="enqtype!='V'">{{user.OSENQ_CreatedDate |date:'dd-MM-yyyy'}}</td>
+                                <td style="text-align:center" ng-if="enqstatus=='BOTH'">{{user.OSENQ_Status}}</td>
+                                <td style="text-align:center" ng-if="enqtype=='V'">{{user.OSENQ_VisitDate |date:'dd-MM-yyyy'}}</td>
+                                <td style="text-align:center" ng-if="enqtype=='V'">{{user.OSENQ_VisitTime}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary" id="printtable" ng-hide="true">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <table>
+            <tr>
+                <th colspan="7" style="font-size:16px"><b>Enquiry Reports</b></th>
+            </tr>
+        </table>
+        <br /><br />
+              <div class="box-body">
+                  <b>Company Name :{{company_name}} </b>
+                  <table class="table table-bordered table-hover table-responsive text-center">
+                      <thead>
+                          <tr>
+                              <td ng-if="enqstatus!='BOTH'" colspan="6" style="text-align:center">Booking Status : {{enqstatus}}</td>
+                          </tr>
+                          <tr>
+                              <th>SL.No.</th>
+                              <th>Enquired By</th>
+                              <th>Email Id</th>
+                              <th>Mobile No</th>
+                              <th>Enquiry Message</th>
+                              <th ng-if="enqtype!='V'">Enquiry Date</th>
+                              <th ng-if="enqstatus=='BOTH'">Enquiry Status</th>
+                              <th ng-if="enqtype=='V'">Visit Date</th>
+                              <th ng-if="enqtype=='V'">Visit Time</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr ng-repeat="user in enqlist_Report">
+                              <td style="text-align:center">{{$index+1}}</td>
+                              <td style="text-align:center">{{user.OSENQ_Name}}</td>
+                              <td style="text-align:center">{{user.OSENQ_EmailId}}</td>
+                              <td style="text-align:center">{{user.OSENQ_MobileNo}}</td>
+                              <td style="text-align:center">{{user.OSENQ_Enquiry}}</td>
+                              <td style="text-align:center" ng-if="enqtype!='V'">{{user.OSENQ_CreatedDate |date:'dd-MM-yyyy'}}</td>
+                              <td style="text-align:center" ng-if="enqstatus=='BOTH'">{{user.OSENQ_Status}}</td>
+                              <td style="text-align:center" ng-if="enqtype=='V'">{{user.OSENQ_VisitDate |date:'dd-MM-yyyy'}}</td>
+                              <td style="text-align:center" ng-if="enqtype=='V'">{{user.OSENQ_VisitTime}}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+    </div>
+
+</section>

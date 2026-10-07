@@ -1,0 +1,305 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Task Register Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <div class="text-center well">
+                            <div ng-init="reporttype='Consolidated'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Consolidated" name="cdreport" ng-model="reporttype" ng-change="onchangeReportType()">
+                                    <span class="lbl padding-8"><b> Consolidated </b></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Detailed" name="cdreport" ng-model="reporttype" ng-change="onchangeReportType()">
+                                    <span class="lbl padding-8"><b>Detailed</b></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 10px;width: 93%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-click="all_checkdept(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b> All Department</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                    <input name="dept" ng-model="user.selected" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDC_Name}} Department</b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b> All Designation</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                    <input name="desg" ng-model="user.selected" type="checkbox" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 ">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                    <span class="lbl padding-8">
+                                        <b>  All Employees</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                    <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="start_Date" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display:none;">  
+                            <div class="multiselect">
+                                <input class="form-control" data-ng-model="client" type="text" placeholder="Search client name here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="ismmclT_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkCCCC()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="room in client_Master | filter:client" value="{{room.ismmclT_Id}}">
+                                    <input type="checkbox" data-ng-model="room.selected" ng-click="togchkbxCCCC()" ng-true-value="true" ng-false-value="false" />   <!--ng-required="isOptionsRequiredtwo()"-->
+                                    <span class="lbl padding-8">{{room.ismmclT_ClientName}}</span>
+                                </label>
+                            </div>                                                         
+                        </div>
+                        <!--<div class="form-group">
+                        <label class="control-label col-sm-4">Priority Issues:<span style="color:red;">*</span></label>
+                        <input type="checkbox" ng-model="prioritycheck" ng-true-value="1" ng-false-value="0" />
+                        <label class="lbl label-8"></label>
+                        </div>-->
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"></label>
+                            <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                <span ng-show="get_Status.length>0">
+                                    <input class="form-control" ng-model="searchValueS" type="text" placeholder="Search Status here...">
+                                </span>
+                                <label>
+                                    <input name="all" value="1" ng-model="checkallS" type="checkbox" ng-click="all_checkS(checkallS)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in get_Status | filter : searchValueS">
+                                    <input name="status" ng-model="user.statusck" type="checkbox" ng-click="togchkbxS();" title="Select Status" ng-required="isOptionsRequiredS()">
+                                    <span class="lbl padding-8">
+                                        {{user.ismmistS_StatusName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.status)" ng-messages="myForm.status.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-4">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" >
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"></label>
+                            <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                <span >
+                                    <input class="form-control" ng-model="searchValueP" type="text" placeholder="Search Priority here...">
+                                </span>
+                                <label>
+                                    <input name="all" value="1" ng-model="checkallP" type="checkbox" ng-click="all_checkP(checkallP)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in prioritylist | filter : searchValueP">
+                                    <input name="pririty" ng-model="user.statusck" type="checkbox" ng-click="togchkbxP();" title="Select Priority" >
+                                    <span class="lbl padding-8">
+                                        {{user.hrmP_Name}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.pririty)" ng-messages="myForm.pririty.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-4">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="taskReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <!--<md-button ng-if="get_taskregisterReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>-->
+                <md-button type="button" ng-if="get_taskregisterReport.length>0" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="get_taskregisterReport.length>0">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12" style="text-align:center">
+                    <h4> Task Register Report</h4>
+                    <h4>{{start_Date | date:'dd/MM/yyyy'}} To {{end_Date | date:'dd/MM/yyyy'}}</h4>
+                </div>
+            </div>
+            <div ng-show="!prt" id="gridall" style="overflow:scroll"></div>
+            <div ng-show="prt" id="gridpriority" style="overflow:scroll"></div>
+            <br />
+            <div id="table">
+            </div>
+        </div>
+        <div ng-hide="true">
+            <div id="printTR">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-4">
+                            <div class="form-group">
+                                <h4>  TASK REGISTER REPORT</h4>
+                                <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="reporttype=='Consolidated'">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr>
+                                    <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                    <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Status</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('start')"><b>Count </b></a> </th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in employeeid">
+                                <tr>
+                                    <td class="text-center" rowspan="{{user.taskdetails.length+1}}">{{$index+1}}</td>
+                                    <td class="text-left" rowspan="{{user.taskdetails.length+1}}"><b>{{user.employeename}}</b></td>
+                                </tr>
+                                <tr ng-repeat="status in user.taskdetails">
+                                    <td class="text-left">{{status.ISMTCR_Status}}</td>
+                                    <td class="text-left">{{status.totalCount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div ng-if="reporttype=='Detailed'">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr>
+                                    <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                    <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('ISMTCR_TaskNo')"><b>Task No.</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('ISMTCR_Title')"><b>Task Title</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('ISMTCR_BugOREnhancementFlg')"><b>Type</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('ISMTCR_Status')"><b>Status</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('HRMP_Name')"><b>Priority</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Created Date</b></a> </th>
+                                    <th><a href="" ng-click="sortBy('AssignedBy')"><b>Assigned By</b></a> </th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in employeeid">
+                                <tr>
+                                    <td class="text-center" rowspan="{{user.taskdetails.length+1}}">{{$index+1}}</td>
+                                    <td class="text-left" rowspan="{{user.taskdetails.length+1}}"><b>{{user.employeename}}</b></td>
+                                </tr>
+                                <tr ng-repeat="status in user.taskdetails">
+                                    <td class="text-left">{{status.ISMTCR_TaskNo}}</td>
+                                    <td class="text-left">{{status.ISMTCR_Title}}</td>
+                                    <td class="text-left">{{status.ISMTCR_BugOREnhancementFlg}}</td>
+                                    <td class="text-left">{{status.ISMTCR_Status}}</td>
+                                    <td class="text-left">{{status.HRMP_Name}}</td>
+                                    <td class="text-left">{{status.ISMTCR_CreationDate | date:'dd-MM-yyyy'}}</td>
+                                    <td class="text-left">{{status.AssignedBy}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

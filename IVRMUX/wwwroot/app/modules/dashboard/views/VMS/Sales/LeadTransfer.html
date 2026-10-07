@@ -1,0 +1,329 @@
+﻿<style>
+
+
+    .multiselect {
+        width: 24.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 70.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata();" novalidate>
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Lead Transfer</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Financial Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="IMFY_Id" name="fy_year" ng-change="gettransferLeads()" required>
+                                    <option value="">--Select Financial Year--</option>
+                                    <option ng-repeat="fy in yearlist" value="{{fy.imfY_Id}}" ng-selected="{{fy.imfY_Id==IMFY_Id}}">
+                                        {{fy.imfY_FinancialYear}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.fy_year)" ng-messages="myForm.fy_year.$error">
+                                <div ng-message="required">Select Financial Year</div>
+                            </div>
+                        </div>
+                    </div>                  
+                </div>
+         
+                <div class="row" ng-show="leadlist.length > 0">
+                    <div class="col-sm-4 pull-right" >
+                        <input type="text" placeholder="Search Client......" class="form-control" ng-model="searchtwo" />
+                    </div>
+                    <div class="col-sm-12">
+
+                        <table class="table table-bordered table-responsive" ng-show="leadlist.length > 0">
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>Sl No</td>
+                                    <td>
+                                        Lead name
+                                    </td>
+                                    <th> Before Incharge</th>
+                                    <td>
+                                        State Name
+                                    </td>
+                                    <td>
+                                        Contact Name
+                                    </td>
+                                    <td>
+                                        Contact Number
+                                    </td>
+                                    <th>
+                                        Email
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="dd in filterValue1=(leadlist |filter:searchtwo) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                                    current-page="currentPage" pagination-id="page2">
+                                    <td>
+                                        <input type="checkbox" ng-model="dd.checked" />
+                                        <span class="lbl padding-8"></span>
+                                    </td>
+                                    <td>
+                                        {{itemsPerPage *(currentPage-1)+$index+1}}
+                                    </td>
+                                    <td>
+                                        {{dd.ismslE_LeadName}}
+                                    </td>
+                                    <td class="text-left">{{dd.Before_employeeName}}</td>
+
+                                    <td>
+                                        {{dd.IVRMMS_Name}}
+                                    </td>
+                                    <td>
+                                        {{dd.ISMSLE_ContactPerson}}
+                                    </td>
+
+                                    <td>
+                                        {{dd.ISMSLE_ContactNo}}
+                                    </td>
+                                    <td>
+                                        {{dd.ISMSLE_EmailId}}
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                        <dir-pagination-controls max-size="5" pagination-id="page2"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+                <hr />
+                <div class="" ng-show="leadlist.length > 0">
+                    <div class="text-center">
+
+                        <span>
+                            <md-button class="md-raised md-primary" id="save-btn" ng-click="AddToCart()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                ADD To Cart
+                            </md-button>
+                        </span>
+                        <md-button type="submit" class="md-raised md-warn" data-ng-click="Clearid();">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                    </div>
+                    <!--<div class="text-center">
+                        <input type="hidden" ng-model="ISMSLE_Id" value="{{ISMSLE_Id}}" />
+                        <span>
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="LeadTransferSave()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Transfer
+                            </md-button>
+                        </span>
+                        <md-button type="submit" class="md-raised md-warn" data-ng-click="Clearid();">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                    </div>-->
+                </div>
+
+                <div class="row" ng-show="LeadTransfer.length > 0">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+
+                                    <td>Sl No</td>
+                                    <td>
+                                        Lead name
+                                    </td>
+                                    <th> Before Incharge</th>
+                                    <td>
+                                        State Name
+                                    </td>
+                                    <td>
+                                        Contact Name
+                                    </td>
+                                    <td>
+                                        Contact Number
+                                    </td>
+                                    <th>
+                                        Email
+                                    </th>
+                                    <th>
+                                        Remove
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="dd in  LeadTransfer">
+
+                                    <td>
+                                        {{$index+1}}
+                                    </td>
+                                    <td>
+                                        {{dd.ismslE_LeadName}}
+                                    </td>
+                                    <td class="text-left">{{dd.Before_employeeName}}</td>
+                                    <td>
+                                        {{dd.IVRMMS_Name}}
+                                    </td>
+                                    <td>
+                                        {{dd.ISMSLE_ContactPerson}}
+                                    </td>
+
+                                    <td>
+                                        {{dd.ISMSLE_ContactNo}}
+                                    </td>
+                                    <td>
+                                        {{dd.ISMSLE_EmailId}}
+                                    </td>
+                                    <td>
+                                        <a class="text-danger" href="" ng-click="RemoveY($index,dd)">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Incharge:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="client" ng-model="$parent.HRME_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,ts.optradio);" title="Select Incharge"
+                                               ng-change="onchangeIncharge(HRME_Id)" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Incharge">
+                                            {{$select.selected.empname}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="catgry in inchargelist | filter: $select.search" value="{{catgry.hrmE_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.empname | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+
+                                </div>
+                                <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.tel)" ng-messages="myForm.tel.$error">
+                                    <div ng-message="required">Select Incharge</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Incharge:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="Name" class="form-control" ng-model="inchargeName" ng-disabled="true" />
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.LeadNameCode)"
+                                     ng-messages="myForm.LeadNameCode.$error">
+                                    <div ng-message="required">Enter Incharge</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="text-center" ng-show="LeadTransfer.length > 0">
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="LeadTransferSave()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Transfer
+                            </md-button>
+
+                            <md-button type="submit" class="md-raised md-warn" data-ng-click="Clearid();">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <div class="box box-primary" ng-show="allleadIncharge.length > 0 ">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Sales Lead Transfer Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{allleadIncharge.length}}
+                                </label>
+                            </label>
+                        </div>
+                        
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <input type="text" placeholder="Search Lead" ng-model="Serachvalues" class="form-control" />
+                        </div>
+                        </div>
+
+                    </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th style="width:30px">SL.NO</th>
+                            <th style="width:140px">Lead Name </th>
+                            <th style="width:300px"> Before Incharge</th>
+                            <th style="width:300px"> After Incharge</th>
+                           
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (allleadIncharge | filter : Serachvalues) |itemsPerPage:itemsPerPage1 " current-page="currentPage1" ng-class-odd="'odd'" pagination-id="paginate1">
+
+
+                            <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td class="text-left">{{user.ISMSLE_LeadName}}</td>
+                            <td class="text-left">{{user.Before_employeeName}}</td>
+                            <td class="text-left">{{user.employeeName}}</td>
+                          
+                        <tr />
+                    </tbody>
+
+
+                </table>
+                <dir-pagination-controls max-size="5" pagination-id="paginate1" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                <hr />
+            </div>
+
+        </div>
+
+    </form>
+</section>

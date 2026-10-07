@@ -1,0 +1,395 @@
+﻿<style>
+    .multiselect {
+        width: 22em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 4%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .aaa {
+        margin-top: 28px;
+        margin-right: 10px;
+        padding-right: 1px;
+        text-align: center;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+
+
+
+
+    <form class="form-horizontal ng-pristine ng-valid" role="form" ng-model="myForm" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">NOC Request</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row" ng-if="eligibilitymonths<24">
+                    <div class="text-center">
+                        <span style="color:red;font-weight:700;font-size:larger">Apply For NOC After Completion Of 2 Years</span>
+                    </div>
+                </div>
+                <!--ng-if="eligibilitymonths>=24"-->
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Requested Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="RequestDate" ng-model="obj.ISMCERTREQ_RequestDate" md-placeholder="Enter date" ng-disabled="todate"></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.RequestDate)" ng-messages="myForm.RequestDate.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select  Date</div>
+                            </div>
+                        </div>
+
+                        <!--<div class="form-group">
+                            <label class="control-label col-sm-4">Receiving Mode :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel2" name="Mode" data-ng-model="obj.ISMCERTREQ_ReceivingMode" required>
+                                    <option value="">--Select--</option>
+                                    <option value="By Hand">By Hand</option>
+                                    <option value="Courier">Courier</option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.Mode)" ng-messages="myForm.Mode.$error">
+                                <div ng-message="required">Select Receiving Mode</div>
+                            </div>
+                        </div>-->
+
+                        <div class="form-group" ng-if="obj.ISMCERTREQ_ReceivingMode=='Courier'">
+                            <label class="control-label col-sm-4">Courier Address:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control textareaclass" rows="5" placeholder="Enter Courier Address" name="address" id="usr" type="text" ng-model="obj.ISMCERTREQ_RecivingAddress" ng-required="obj.ISMCERTREQ_ReceivingMode=='Courier'"></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.address)" ng-messages="myForm.address.$error">
+                                    <div ng-message="required">Enter Courier Address</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Remark:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control textareaclass" rows="5" placeholder="Enter Remark" name="remark" id="usr" type="text" data-ng-model="obj.ISMCERTREQ_Remarks" required></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.remark)" ng-messages="myForm.remark.$error">
+                                    <div ng-message="required">Enter Remark</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        
+
+
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <!--<label class="control-label col-sm-4"><b>Attachment :</b></label>-->
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Upload File</th>
+                                        <th>File Name</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="col-sm-12 UploadEmpDoc1">
+                                                <div class="form-group text-center">
+                                                    <label class="custom-file-input file-bluenew" style="width:100%;margin:auto;">
+                                                        <input type="file" name="doc" accept="image/*, application/pdf" data-ng-model="documentListOtherDetails[$index].file" onchange="angular.element(this).scope().selectFileforUploadzdOtherDetail(this, angular.element(this).scope().other)">
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" ng-model="obj.ismcertreQ_FileName" disabled />
+                                        </td>
+                                        <td>
+                                            <a ng-if="ismcertreQ_FilePath  !=null && ismcertreQ_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(ismcertreQ_FilePath)"> view</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <br>
+
+
+                    <div class="row" ng-hide="desabledleave==true">
+                       
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" data-ng-click="savedata()"  ng-if="eligibilitymonths>=24">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </form>
+
+    <!--<div class="box box-primary" ng-show="get_data.length>0">-->
+    <div class="box box-primary" ng-if="get_data.length>0">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">NOC Request Details </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('hrmE_EmployeeFirstName')">Employee Name</a></th>
+                            <th><a href="" ng-click="sortBy('ismcertreQ_RequestDate')">Requested Date</a></th>
+                            <th><a href="" ng-click="sortBy('ismcertreQ_Remarks')">Remark</a></th>
+                           
+                            <th>Status</th>
+                            <th>Document</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_data | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td> {{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td>{{user.hrmE_EmployeeFirstName}}</td>
+                            <td>{{user.ismcertreQ_RequestDate |date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.ismcertreQ_Remarks}}</td>
+                            <td>{{user.ismcertreQ_AppRejFlag}}</td>                            
+                            <td>
+                                <a ng-if="user.ismcertreQ_FilePath.length>0">
+                                    <i class="fa fa-eye" style="color:black;" data-ng-click="previewimg_new(user.ismcertreQ_FilePath)"
+                                       title="View Detais"></i>
+                                </a>
+                            </td>
+                            <td style="text-align:center">
+                                <span>
+                                    <a>
+                                        <i class="fa fa-eye" style="color:black;" data-target="#mymodalviewdetailssecondtab" data-toggle="modal"
+                                           title="View Detais" ng-click="viewaproval(user);"></i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.ismcertreQ_AppRejFlag=='Pending'">
+                                    |
+                                    <a class="text-aqua" href="" ng-click="Edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                    &nbsp;
+                                    |
+                                    <span ng-if="user.ismcertreQ_ActiveFlag === true">
+                                        <a href="" ng-click="deactive(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                            <i> Deactivate</i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user.ismcertreQ_ActiveFlag === false">
+                                        <a href="" ng-click="deactive(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                            <i> Activate </i>
+                                        </a>
+                                    </span>
+                                </span>
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+    </div>
+    <div id="showpdf" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <form id="qqqq">
+
+                <div class="modal-content">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+
+
+                    <div id="pdfIdzz">
+
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="myimagePreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:55%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h3>{{filenames}}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</section>
+
+
+<!--<div id="mymodalviewdetailssecondtab" ng-show="modalview.length>0" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">-->
+<div id="mymodalviewdetailssecondtab" ng-show="modalview.length>0" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+
+                <h4 class="modal-title text-white">Approved Details </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+
+                                <tr>
+
+                                    <th>SL.No</th>
+                                    <th>Approved By</th>
+                                    <th>Approved Date</th>
+                                    <th>Approved Level</th>
+                                    <th>Approved Status</th>
+                                    <th>Approved Remark</th>
+
+                                </tr>
+                            </thead>
+
+
+
+                            <tbody ng-repeat="userclient in modalview ">
+                                <tr>
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-center">{{userclient.EmployeeName}}</td>
+                                    <td class="text-center">{{userclient.ISMCERTREQAPP_ApprovedDate | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-left">{{userclient.HRPAON_SanctionLevelNo}}</td>
+                                    <td class="text-left">
+
+                                        <span ng-if="userclient.ISMCERTREQAPP_AppRejFlag ==='Approved'">
+                                            <b class="text-success">{{userclient.ISMCERTREQAPP_AppRejFlag}}</b>
+
+                                        </span>
+                                        <span ng-if="userclient.ISMCERTREQAPP_AppRejFlag === 'Rejected'">
+                                            <b class="text-danger">{{userclient.ISMCERTREQAPP_AppRejFlag}}</b>
+
+                                        </span>
+
+
+                                    </td>
+
+                                    <td class="text-left">{{userclient.ISMCERTREQAPP_Remarks}}</td>
+
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="receivingaddress" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Courier Address</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <div class="col-sm-6 col-sm-offset-4">                           
+                            <div class="form-group">
+                                <div class="col-sm-8 input-group text-right">
+                                    <textarea class="form-control textareaclass" ng-disabled="true" name="disc" rows="3" ng-model="ISMCERTREQ_RecivingAddress" id="usrnn"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

@@ -1,0 +1,326 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div data-ng-init="loaddata()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">USER EMPLOYEE MAPPING</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-2">
+                                    Employee's:
+                                    <!--<span style="color:red;">*</span>-->
+                                </label>
+                                <div class="multiselect col-sm-10" style="width: 33.1em  !important;">
+                                    <input class="form-control" ng-model="searchvalueE" type="text" placeholder="search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" ng-model="usercheckE" type="checkbox" ng-click="all_checkE(usercheckE)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="option in get_employeelist | filter:searchvalueE" value="{{hrmE_Id}}">
+                                        <input type="checkbox" ng-model="option.selected" ng-click="togchkbxE()" ng-required="isOptionsRequired()" name="emp" />
+                                        <span class="lbl padding-8"><b>{{option.employeename}} :</b> {{option.designationName}} </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required">Select Any One Employee</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Reporting Head/User :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="user" ng-model="obj.user_Id" ng-disabled="userflg" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select User" ng-change="onuserchange(objs.user_Id,objs)" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or search User in the list...">{{$select.selected.usersname}}: {{$select.selected.hrmE_EmployeeCode}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_userslist | filter: $select.search" value="{{option.user_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.usersname +' : '+  option.hrmE_EmployeeCode | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.user)" ng-messages="myForm.user.$error">
+                                        <div ng-message="required">Please Select User </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Department :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="depart" ng-model="obj.hrmD_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Department" ng-change="ondepartmentchange(objs.hrmD_Id,objs)" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Department in the list...">{{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_departmentlist | filter: $select.search " value="{{option.HRMD_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.HRMD_DepartmentName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.depart)" ng-messages="myForm.depart.$error">
+                                        <div ng-message="required">Please Select Department </div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Department/Company :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="dept" ng-model="$parent.obj.HRMD_Id" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="ondepartmentchange(obj)" title="Department/Company">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Department/Company in the list...">{{$select.selected.MI_Name}} : {{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_departmentlist | filter: $select.search " value="{{option.HRMD_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.HRMD_DepartmentName +' : '+  option.MI_Name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Reporting hierarchy/Level:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <!--<input type="text" name="orderName" class="form-control active" ng-paste="$event.preventDefault()" allow-pattern="([0-9])" data-ng-model="order" id="OrderName" maxlength="2" required>-->
+                                    <select class="form-control" name="orderName" ng-model="order" id="OrderName" required>
+                                        <option value="">--Select Reporting Level--</option>
+                                        <option ng-if="self" value="0">Self Mapping</option>
+                                        <option value="1">Reporting Level 1</option>
+                                        <option value="2">Reporting Level 2</option>
+                                        <option value="3">Reporting Level 3</option>
+                                        <option value="4">Reporting Level 4</option>
+                                        <option value="5">Reporting Level 5</option>
+                                        <option value="6">Reporting Level 6</option>
+                                    </select>
+                                    <!--<div class="error-messages" ng-if="interacted(myForm.orderName)" ng-messages="myForm.orderName.$error">
+                                        <div ng-message="required">Enter Order</div>
+                                    </div>-->
+                                    <div class="error-messages" ng-if="interacted(myForm.orderName)" ng-messages="myForm.orderName.$error">
+                                        <div ng-message="required">Please Select Reporting Level</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="text-center" ng-if="get_employeelist.length>0">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="AddEmployee()" id="save-btn">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            ADD
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+
+                    <div ng-if="employeeList.length>0">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <div class="box box-primary">
+                                <div class="box-body">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title col-sm-8">Employee's Mapping Under : <span style="color:chocolate">{{reportinghead}}</span></h3>
+                                        <b class="box-title col-sm-4"> Total Selected Employee : &nbsp;&nbsp; {{seletedcount}} </b>
+                                    </div>
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th width="5%">
+                                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                                </th>
+                                                <th><a href="" ng-click="sortBy('invmS_StoreName')">Employee Name</a></th>
+                                                <th>Proxy</th>
+                                                <th><a href="" ng-click="sortBy('invmS_StoreLocation')">Employee Code</a> </th>
+                                                <th width="14%"><a href="" ng-click="sortBy('invmS_StoreLocation')">Reporting Level</a> </th>
+                                                <th>Remove</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="user in filterValue = (employeeList | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" pagination-id="page2" ng-class-odd="'odd'">
+                                                <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                                                <td style="text-align: left;">{{user.employeename}}</td>
+                                                
+                                                <td>
+                                                    <input type="checkbox" ng-model="user.proxyflag" />
+                                                    <span class="lbl padding-8"></span>
+                                                </td>
+                                               
+                                                <td>{{user.hrmE_EmployeeCode}}</td>
+                                                <td>
+                                                    <!--{{user.ismusemM_Order}}-->
+                                                    <input type="text" name="orderName11" class="form-control active" allow-pattern="([0-9])" data-ng-model="user.ismusemM_Order" maxlength="2" min="0">
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="javascript:void(0)" ng-click="deletesecondgriddata(itemsPerPage2 *(currentPage2-1)+$index,user,this)"
+                                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls max-size="5" pagination-id="page2"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center" ng-if="employeeList.length>0">
+                    <input type="hidden" ng-model="ismusemM_Id" value="{{ismusemM_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="savedata()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+
+            </div>
+
+            <div class="box box-primary" ng-show="get_userEmpcount.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">User Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValueD" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('userName')">Employee Name</a></th>
+                                <th><a href="" ng-click="sortBy('DesignationName')">DesignationName</a></th>
+                                <th width="15%"><a href="" ng-click="sortBy('employeecount')">Employee Mapped Under</a></th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1 = (get_userEmpcount | filter : searchValueD)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="page1" ng-class-odd="'odd'">
+                                <td class="text-center">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                <td class="text-left">{{user.userName}}</td>
+                                <td class="text-left">{{user.DesignationName}}</td>
+                                <td class="text-center">{{user.employeecount}}</td>
+                                <td class="text-center">
+                                    <span>
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Tax" data-ng-model="taxOption" data-target="#myModal" data-ng-click="onformclick(user.User_Id)">
+                                            <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user.ismtcR_ActiveFlg === true">
+                                        <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5" pagination-id="page1"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 75%; overflow:auto;">
+            <div class="modal-content" style="overflow:auto;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white col-sm-10">Employee List </h4>
+                </div>
+                <div class="box-body">
+                    <table class="table table-responsive table-bordered clearfix">
+                        <thead>
+                            <tr>
+                                <th>SL NO</th>
+                                <th style="width:30%"><a href="" ng-click="sort('invmI_Id')">Employee Name</a></th>
+                                <th><a href="" ng-click="sort('invmuoM_Id')">Employee Code</a></th>
+                                <th style="width: 10%;"><a href="" ng-click="sort('ismusemM_Order')">Order</a></th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="objm in get_userEmpDetails track by $index">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left">
+                                    {{objm.employeename}}
+                                </td>
+                                <td class="text-left">
+                                    {{objm.hrmE_EmployeeCode}}
+                                </td>
+                                <td class="text-left">
+                                    <input type="text" name="orderName1" class="form-control active" allow-pattern="([0-9])" data-ng-model="objm.ismusemM_Order" maxlength="2" required>
+                                </td>
+                                <td>
+                                    <span ng-if="objm.ismusemM_ActiveFlag === false">
+                                        <a href="" ng-click="deactive(objm)"
+                                           class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                            <i> Activate </i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="objm.ismusemM_ActiveFlag === true">
+                                        <a href="" ng-click="deactive(objm)"
+                                           class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                            <i> Deactivate</i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="updateorder()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>

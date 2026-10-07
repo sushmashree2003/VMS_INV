@@ -1,0 +1,353 @@
+﻿<style>
+    div.scrollTable {
+        overflow: auto;
+        /*white-space: nowrap;*/
+    }
+
+        div.scrollTable a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px;
+            text-decoration: none;
+        }
+
+            div.scrollTable a:hover {
+                background-color: #777;
+            }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Loan Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="form-group col-sm-12  margin-top-10">
+
+                        <div class="col-sm-6 col-sm-offset-3" style="font-weight: 700;">
+                            <div class="well text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Color" name="stask" ng-modal="Type" ng-checked="Type=='Approval'" ng-click="datachange('Approval')">
+                                    <span class="lbl padding-8">Approval  </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="BlackWhite" name="stask" ng-modal="Type" ng-checked="Type=='Payout'" ng-click="datachange('Payout')">
+                                    <span class="lbl padding-8"> Payout </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="BlackWhite" name="stask" ng-modal="Type" ng-checked="Type=='Transaction'" ng-click="datachange('Transaction')">
+                                    <span class="lbl padding-8"> Transaction </span>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-right-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="department in departmentdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)">
+                                        <span class="lbl padding-8">
+                                            {{department.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="designation in designationdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                        <span class="lbl padding-8">
+                                            {{designation.hrmdeS_DesignationName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<div class="col-sm-12">
+                    <div class="text-center">
+                        <div class="col-sm-8 col-sm-offset-2">
+                      
+                            <div class="form-group well">
+                                <div class="text-center">
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            Month :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="Employee.hreS_Month" name="hreS_Month" required ng-change="SetFromDateAndToDateByMonth(Employee.hreS_Month,Employee.hreS_Year)">
+                                                <option value="">Select</option>
+
+                                                <option ng-repeat="month in monthdropdown" value="{{month.ivrM_Month_Id}}" ng-selected="{{month.Selected===true}}">
+                                                    {{month.ivrM_Month_Name}}
+                                                </option>
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.hreS_Month)" ng-messages="myForm.hreS_Month.$error">
+                                                <span ng-message="required">Select Month</span>
+                                            </span>
+                                        </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="Employee.hreS_Year" name="hreS_Year" required ng-change="SetMonthByYear(Employee.hreS_Year)">
+                                                <option value="">Select</option>
+                                                <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.hrmlY_LeaveYear}}" ng-selected="{{leaveyear.Selected===true}}">
+                                                    {{leaveyear.hrmlY_LeaveYear}}
+                                                </option>
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                                <span ng-message="required">Select Year</span>
+                                            </span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>-->
+
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="button" ng-click="printToCart()" class="md-raised md-primary">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            print
+                        </md-button>
+                        <md-button type="button" ng-click="ExportToexcel()" class="md-raised md-primary">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Export TO Excel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-if="employeeid.length>0 || employeePayoutDetails.length>0 || employeeTransDetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Loan Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div ng-if="employeeid.length>0" id="employeeApprovalDetails">
+
+                    <table class="table table-hover table-responsive table-bordered" id="table">
+                        <thead>
+                            <tr>
+
+
+
+
+                                <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                                <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Loan Id</b></a> </th>
+                                <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Loan Type</b></a> </th>
+                                <th width="10%"><a href="" ng-click="sortBy('start')"><b>Applied Date</b></a> </th>
+                                <th width="10%"><a href="" ng-click="sortBy('end')"><b>Loan Amount</b></a></th>
+                                <th width="10%"><a href="" ng-click="sortBy('end')"><b>Sactioned Amount</b></a></th>
+
+                                <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Approved By</b>   </a> </th>
+                                <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Level</b>   </a> </th>
+                                <th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b> Status</b>   </a> </th>
+                                <th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b> Remark</b>   </a> </th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in employeeid">
+                            <tr>
+
+                                <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.HRME_EmployeeName}}</b></td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.HREL_EmpLoanId}}</b></td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.HRML_LoanType}}</b></td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.HREL_AppliedDate | date:'dd-MM-yyyy'}}</td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.HREL_LoanAmount}}</td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.HREL_SanctionedAmount}}</td>
+                            </tr>
+                            <tr ng-repeat="planner in user.plannerdetails">
+                                <td class="text-left">{{planner.UserName}}</td>
+                                <td class="text-center">{{planner.HRELA_SanctionLevel }}</td>
+
+                                <td class="text-left">{{planner.HRELA_ApprovalFlag}}</td>
+                                <td class="text-left">{{planner.HRESAA_Remarks}}</td>
+
+                            </tr>
+                            <tr></tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+
+                <div ng-if="employeePayoutDetails.length>0" id="employeePayoutDetails">
+
+                    <table class="table table-bordered table-responsive">
+                        <thead>
+                            <tr>
+
+                                <th>Sl.No</th>
+
+                                <th>Employee Name</th>
+                                <th>Loan Id</th>
+                                <th>Loan Type</th>
+                                <th>Applied Date</th>
+                                <th>Sactioned Amount</th>
+                                <th>Payout Date</th>
+                                <th>Pay Mode</th>
+
+                                <th>Payout Amount</th>
+
+
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr ng-repeat="employee in employeePayoutDetails">
+                                <td style="text-align:right">{{$index +1}}</td>
+                                <td class="text-left">{{employee.HRME_EmployeeName}}</td>
+                                <td class="text-left">{{employee.HREL_EmpLoanId}}</td>
+                                <td class="text-center">{{employee.HRML_LoanType}}</td>
+                                <td class="text-center">{{employee.HREL_AppliedDate | date:'dd-MM-yyyy'}}</td>
+                                <td class="text-center">{{employee.HREL_SanctionedAmount}}</td>
+                                <td class="text-center">{{employee.HRELDIS_DisbursedDate | date:'dd-MM-yyyy'}}</td>
+
+                                <td class="text-center">{{employee.HRELDIS_PaymentMode}}</td>
+
+                                <td class="text-center">{{employee.HRELDIS_Amount}}</td>
+
+
+
+
+                            </tr>
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+                <div ng-if="employeeTransDetails.length>0" id="employeeTransDetails">
+
+                    <table class="table table-bordered table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+
+                                <th>Employee Name</th>
+                                <th>Loan Id</th>
+                                <th>Loan Type</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th>Loan Amount</th>
+                                <th>Paid Amount</th>
+                                <th>Pending Loan Amount</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="employee in employeeTransDetails">
+                                <td style="text-align:right">{{$index +1}}</td>
+                                <td class="text-left">{{employee.HRME_EmployeeName}}</td>
+                                <td class="text-left">{{employee.HREL_EmpLoanId}}</td>
+                                <td class="text-left">{{employee.HRML_LoanType}}</td>
+                                <td class="text-center">{{employee.HRELT_Year}}</td>
+                                <td class="text-center">{{employee.HRELT_Month}}</td>
+                                <td class="text-center">{{employee.HRELT_LoanAmount}}</td>
+                                <td class="text-center">{{employee.HRELT_PrincipalAmount}}</td>
+                                <td class="text-center">{{employee.HRELT_LoanAmount-employee.HRELT_PrincipalAmount}}</td>
+                            </tr>
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </form>
+</section>

@@ -1,0 +1,244 @@
+﻿<style>
+    .red {
+        background-color: red;
+    }
+
+    .darkred {
+        background-color: darkRed;
+    }
+
+    .green {
+        background-color: green;
+    }
+
+    .html2canvas-container {
+        width: 3000px !important;
+        height: 3000px !important;
+    }
+
+    .multiselect {
+        /*width: 24.1em;*/
+        height: 12em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="loaddata()">
+
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">New Employee's Daily Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4 padding-left-none">
+                        </div>
+                        <div class="col-sm-5 padding-left-none">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                        <span class="lbl padding-8">
+                                            <b>  All Employees</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:searchValueUEMd) ">
+                                        <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.EmployeeName}}</b>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="start_Date" onkeypress="return false" name="startdate" md-placeholder="Enter Date" ng-change="onchangestartdate()" md-max-date="maxdate" required>
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Select Start Date</div>
+                                        <div ng-message="valid">The entered value is not Valid!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" md-min-date="start_Date" md-max-date="maxdate"
+                                                   md-placeholder="Enter Date" required ng-change="onchangeenddate()"></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                    <div ng-message="required">Select End Date</div>
+                                    <div ng-message="valid">The entered value is not Valid!</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Status :
+                                    <span style="color:red;" ng-if="todayorothers!='consolidatereport' && todayorothers!='MultiLevelDRApproval'
+                                          && todayorothers!='DailyReportBlockedCountDetails'">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="StatusFlg"
+                                            ng-required="todayorothers!='consolidatereport' && todayorothers!='MultiLevelDRApproval'" name="statusflg"
+                                            ng-change="OnChangeStatus()" ng-disabled="todayorothers=='consolidatereport' || todayorothers=='MultiLevelDRApproval'
+                                            || todayorothers=='DailyReportBlockedCountDetails'">
+                                        <option value="">--Select Status--</option>
+                                        <!--<option value="All">All</option>-->
+                                        <option value="Open">Open</option>
+                                        <option value="Close">Close</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Not Completed">Not Completed</option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.statusflg)" ng-messages="myForm.statusflg.$error">
+                                    <div ng-message="required">Select Status</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="todayorothers!='consolidatereport' && get_report.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel()">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+
+                <md-button ng-if="todayorothers!='consolidatereport' && get_report.length>0" type="button" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Training and certification process List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th>Employee's Name</th>
+                        <th>Date</th>
+                        <th>Remarks</th>
+                        <th>Time Taken In Hrs</th>
+                        <th>Status</th>
+                        <th>TaskNo</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    <tr dir-paginate="bm in filterValue1 = (get_report | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}
+                        <td class="text-center">{{bm.EmployeeName}}</td>
+                        <td class="text-center">{{bm.ISMDRPT_Date}}</td>
+                        <td class="text-center">{{bm.ISMDRPT_Remarks}}</td>
+                        <td class="text-center">{{bm.ISMDRPT_TimeTakenInHrs}}</td>
+                        <td class="text-center">{{bm.ISMDRPT_Status}}</td>
+                        <td class="text-center">{{bm.ISMTCR_TaskNo}}</td>
+                        <td class="text-center">{{bm.ISMTCR_Status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+

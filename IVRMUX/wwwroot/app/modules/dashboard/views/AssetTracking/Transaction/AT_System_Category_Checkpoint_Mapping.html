@@ -1,0 +1,152 @@
+﻿<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border" style=" color: white;">
+                <h3 class="box-title">System Category Checkpoint Mapping</h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+
+                        <!-- Project Dropdown -->
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Project :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="project" ng-model="ISMMPR_Id"
+                                        ng-options="option.ismmpR_Id as option.ismmpR_ProjectName for option in projectlist" required>
+                                    <option value="">Select Project</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.project)" ng-messages="myForm.project.$error">
+                                    <div ng-message="required">Select Project</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Dropdown -->
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">System :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="system" ng-model="MS_Id"
+                                        ng-options="option.mS_Id as option.system for option in systemlist" required>
+                                    <option value="">Select System</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.system)" ng-messages="myForm.system.$error">
+                                    <div ng-message="required">Select System</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Dropdown -->
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Category :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="category" ng-model="MC_Id"
+                                        ng-options="option.mC_Id as option.category for option in categorylist" required>
+                                    <option value="">Select Category</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.category)" ng-messages="myForm.category.$error">
+                                    <div ng-message="required">Select Category</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checkpoint Multiselect Box with Search -->
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Checkpoint :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <div class="multiselect col-sm-12" style="height: 150px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
+                                    <input class="form-control" type="text" ng-model="searchCheckpoint" placeholder="Search Checkpoint..." style="margin-bottom: 5px;">
+
+                                    <label ng-if="checkpointlist.length > 0">
+                                        <input type="checkbox" ng-model="isAllSelected" ng-change="toggleAllCheckpoints()">
+                                        <span class="lbl padding-8"><b>Select All</b></span>
+                                    </label>
+
+                                    <div ng-repeat="option in checkpointlist | filter: searchCheckpoint">
+                                        <label>
+                                            <input type="checkbox" ng-model="option.selected" ng-change="countSelectedCheckpoints()">
+                                            <span class="lbl padding-8">{{option.checkPoint || option.CheckPoint}}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Items (Disabled / Auto-calculated) -->
+                        <!--<div class="form-group">
+                            <label class="control-label col-sm-4">Total items :</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" type="text" ng-model="TotalItems" disabled placeholder="0">
+                            </div>
+                        </div>-->
+
+                    </div>
+                </div>
+
+                <hr />
+                <!-- Buttons -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary" ng-click="saverecord()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-danger" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Grid Table Section -->
+    <div class="box box-primary" ng-if="alldata.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">System Category Checkpoint Mapping Details</h3>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="search" type="text" placeholder="Search here...">
+                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Project</th>
+                        <th>System</th>
+                        <th>Category</th>
+                        <th>Total Items</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in alldata | filter:search">
+                        <td>{{$index + 1}}</td>
+                        <td>{{user.ProjectName || user.projectName}}</td>
+                        <td>{{user.systemName || user.SystemName || user.system || user.System}}</td>
+                        <td>{{user.categoryName || user.CategoryName || user.category || user.Category}}</td>
+                        <td>{{user.totalItems || user.TotalItems || user.total_Item || user.Total_Item}}</td>
+                        <td class="text-center">
+                            <span ng-if="user.activeFlag === true || user.ActiveFlag === true">
+                                <button type="button" class="btn btn-danger btn-xs" ng-click="deactive(user)">
+                                    Deactivate
+                                </button>
+                            </span>
+                            <span ng-if="user.activeFlag === false || user.ActiveFlag === false">
+                                <button type="button" class="btn btn-success btn-xs" ng-click="deactive(user)">
+                                    Activate
+                                </button>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

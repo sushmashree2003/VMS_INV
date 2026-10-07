@@ -1,0 +1,233 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+
+<section class="content" ng-init="Loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Deviation Department Remarks Mapping </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+
+            </div>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="frmmodule" novalidate>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="stuclassd" data-ng-model="MI_Id" required
+                                        ng-change="onchangeinstitution();" ng-disabled="disable==true">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="deptd in institution" value="{{deptd.mI_Id}}" ng-selected="{{deptd.mI_Id == MI_Id}}">
+                                        {{deptd.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages text-center" ng-if="interacted2(frmmodule.stuclassd)" ng-messages="frmmodule.stuclassd.$error">
+                                    <div ng-message="required">Select the Company Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Department Name: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="stuclass" data-ng-model="HRMD_Id" required
+                                        ng-change="onchangedept();" ng-disabled="deptdetials ==true">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="dept in deptartmentlist" value="{{dept.hrmD_Id}}" ng-selected="{{dept.hrmD_Id==HRMD_Id}}">
+                                        {{dept.hrmD_DepartmentName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages text-center" ng-if="interacted2(frmmodule.stuclass)" ng-messages="frmmodule.stuclass.$error">
+                                    <div ng-message="required">Select the Department Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Remarks :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <input name="stuemailid" type="text" id="reservation" class="form-control" data-ng-model="remarks" required ng-blur="checkduplicate()">
+                                <div class="error-messages text-center" ng-if="interacted2(frmmodule.frmmodule)" ng-messages="frmmodule.stuemailid.$error">
+                                    <div ng-message="required">Enter Remarks</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-8">
+                                <label> Deviation Flag :</label>
+                                <input name="mand" type="checkbox" ng-model="checkoruncheck">
+                                <span class="lbl padding-16"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ismmclT_Id" value="{{ismmclT_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="addnewrow()" id="save-btn">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        Add
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="tempadd.length>0">
+        <!--ng-hide="details"-->
+        <div class="box-header with-border">
+            <h3 class="box-title">Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!--<div ui-grid="gridOptions" ui-grid-pagination ui-grid-edit class="grid text-center" id="style-4" style="height: 270px;"></div>-->
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SLNO</th>
+                        <th>Company Name</th>
+                        <th>Department Name </th>
+                        <th>Remarks</th>
+                        <th>Deviation Flag</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="cls in tempadd ">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{cls.mI_Name}}</td>
+                        <td class="text-left">{{cls.hrmD_DepartmentName}}</td>
+                        <td class="text-left">{{cls.ISMDR_Remarks}}</td>
+                        <td class="text-center">
+                            <i ng-if="cls.ISMDR_ReasonFlag==true" class="fa fa-check text-green" title="Deviation Flag True"></i>
+                            <i ng-if="cls.ISMDR_ReasonFlag==false" class="fa fa-times text-red" title="Deviation Flag False"></i>
+                        </td>
+                        <td class="text-center">
+                            <!--<span class="">
+                                <a href="javascript:void(0)" ng-click="edit(cls,$index);">
+                                    <i class="fa fa-pencil-square-o"></i>
+                                </a>
+                            </span>-->
+                            <span class="">
+                                <a href="javascript:void(0)" ng-click="delete(cls,$index);">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" ng-click="savedata()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Save
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="box box-primary" ng-show="newuser.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Deviation Department Remarks Mapping Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{newuser.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">SL NO</th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Company Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Department Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleDesc')">Remarks </a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleDesc')">Deviation Flag </a></th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="userU in lengthval = (newuser | filter : searchValueU)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPageU"
+                            current-page="currentPageU" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                            <td class="text-left">{{userU.instituitonname}}</td>
+                            <td class="text-left">{{userU.departmentname}}</td>
+                            <td class="text-left">{{userU.remarks}}</td>
+                            <td class="text-center">
+                                <i ng-if="userU.ismdR_ReasonFlag==true" class="fa fa-check text-green" title="Deviation Flag True"></i>
+                                <i ng-if="userU.ismdR_ReasonFlag==false" class="fa fa-times text-red" title="Deviation Flag False"></i>
+                            </td>
+                            <td class="text-center">
+                                <a class="text-aqua" href="" ng-click="Editdata(userU)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                |
+                                &nbsp;
+                                <span ng-if="userU.ismdR_ActiveFlag === false">
+                                    <a href="" ng-click="deactive(userU)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="userU.ismdR_ActiveFlag === true">
+                                    <a href="" ng-click="deactive(userU)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td hidden="hidden">{{newuser.ivrmM_Id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+</section>

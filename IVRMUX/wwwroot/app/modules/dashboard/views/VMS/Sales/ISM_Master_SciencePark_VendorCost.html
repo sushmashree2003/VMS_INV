@@ -1,0 +1,291 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        /*border: 1px solid #3e85a0;*/
+        padding: 12px;
+        /*min-height: 371px;*/
+        /*border-radius: 5px;*/
+    }
+
+    .file-bluedd:before {
+        content: 'Download Template';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .file-bluenew:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e85a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+        .box-label:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+<section class="content" ng-init="OnLoadData()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> MASTER SCIENCE PARK VENDORCOST </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Supplier Name  : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-9">
+                                <ui-select id="id2" name="supname" ng-model="$parent.INVMS_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Supplier "
+                                           ng-change="OnChangeBehaviourEmployee('Appearance')"
+                                           ng-disabled="empflag" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Supplier">
+                                        {{$select.selected.INVMS_SupplierName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in getsupplierNames | filter: $select.search"
+                                                       value="{{catgry.INVMS_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.INVMS_SupplierName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted2(myForm.supname)" ng-messages="myForm.supname.$error">
+                                    <div ng-message="required">Select Supplier </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-12" style="overflow:auto !important">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Sl No.
+                                </th>
+                                <th>
+                                    Package Name
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+                                    Price
+                                </th>
+                                <th>
+                                    Percentage
+                                </th>
+                                <th>
+                                    TotalCost
+                                </th>
+                                <th>
+                                    TotalCostPerQty
+                                </th>
+                                <th>
+                                    Package Flag
+                                </th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="materal in materaldocuupload" ng-class-odd="'odd'">
+                                <td>
+                                    {{$index+1}}
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Package Name" ng-model="materal.Package" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" placeholder="Quantity" ng-model="materal.Quantity" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control " placeholder="Price" ng-model="materal.Price" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" placeholder="Percentage" ng-model="materal.Percentage" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" placeholder="TotalCost" ng-model="materal.TotalCost" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" placeholder="TotalCostPerQty" ng-model="materal.TotalCostPerQty" />
+                                </td>
+                                <td>
+                                    <select class="form-control" ng-model="materal.PackageFlag" name="flag" required>
+                                        <option value="">--Select Status--</option>
+                                        <option value="SP">SP</option>
+                                        <option value="GP">GP</option>
+                                        <option value="PPOM">PPOM</option>
+                                        <option value="SPIM">SPIM</option>
+                                        <option value="GPIM">GPIM</option>
+                                        <option value="PPIM">PPIM</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+
+                                    <span class="" ng-hide="materaldocuupload.length > 9">
+                                        <a href="" ng-show="$last" ng-click="addmateral()">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                                    </span>
+                                    <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                        <a href="" ng-click="removemateral($index)">
+                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-footer">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="SaveData(user)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="box box-primary" ng-show="OnLoadVendorCostListNew.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">MASTER SCIENCE PARK VENDORCOST LIST</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{OnLoadVendorCostList.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <!--<div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search1" placeholder="search here...">
+                    </div>
+                </div>
+            </div>-->
+
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No.
+                        </th>
+                        <th>
+                            <a href="">SupplierName</a>
+                        </th>
+                        <th>
+                            <a href="">Package Name</a>
+                        </th>
+                        <th>
+                            <a href="">Quantity</a>
+                        </th>
+                        <th>
+                            <a href="">Price</a>
+                        </th>
+                        <th>
+                            <a href="">Percentage</a>
+                        </th>
+                        <th>
+                            <a href="">Total Cost </a>
+                        </th>
+                        <th>
+                            <a href="">TotalCostPerQty</a>
+                        </th>
+                        <th>
+                            <a href="">Package Flag</a>
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in OnLoadVendorCostListNew | filter: search1">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.datadetails.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.datadetails.length+1}}"><b>{{user.INVMS_SupplierName}}</b></td>
+
+                    </tr>
+                    <tr ng-repeat="data in user.datadetails | filter : search1">
+                        <td>{{data.IMSV_PackageName}}</td>
+                        <td>{{data.IMSV_Quantity}}</td>
+                        <td>{{data.IMSV_Price}}</td>
+                        <td>{{data.IMSV_Percentage}}</td>
+                        <td>{{data.IMSV_TotalCost}}</td>
+                        <td>{{data.IMSV_TotalCostPerQty}}</td>
+                        <td>{{data.IMSV_PackageFlag}}</td>
+                        <td style="text-align:center">
+                            <span ng-if="user.IMSV_ActiveFlag==false">
+                                <a href="" ng-click="deactiveY(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                            <span ng-if="user.IMSV_ActiveFlag==true">
+                                <a href="" ng-click="deactiveY(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+
+

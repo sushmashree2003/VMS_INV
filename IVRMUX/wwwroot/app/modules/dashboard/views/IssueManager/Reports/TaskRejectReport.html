@@ -1,0 +1,202 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Task Rejected Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="start_Date" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="end_Date" name="endate" md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="TaskRejectReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    TaskRejectReport
+                </md-button>
+                <md-button ng-if="RejectReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <!--<md-button ng-show="RejectReport.length>0" type="button" class="md-raised md-primary" id="excel-btn"  ng-click="exportToExcel('#excelid')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>-->
+
+                <md-button type="button" ng-if="RejectReport.length>0" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="RejectReport.length>0">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">TASK REJECTED REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div id="printDeviation">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-4">
+                        <div class="form-group">
+                            <h4> TASK REJECTED REPORT</h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th> SL No.</th>
+                            <th>Employee Name </th>
+                            <th>Rejected Date </th>
+                            <th>DR Sent(Min)</th>
+                            <th>DR Approve (Min)</th>
+
+                            <th>Total Hours</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr ng-repeat="reject in RejectReport">
+                            <td class="text-left">{{$index+1}}</td>
+                            <td class="text-left">{{reject.Name1}}</td>
+                            <td class="text-center">{{reject.ISMDRPT_Date | date:'dd-MM-yyyy'}}</td>
+
+                            <td class="text-left">{{reject.drsendingmins}}</td>
+                            <td class="text-left">{{reject.drapprovemins}}</td>
+
+                            <td class="text-left">{{reject.RunningTotalhours}}</td>
+                            <td class="text-left">{{reject.ISMDRPTAPP_Remarks}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="box box-primary" ng-show="hide_n">
+        <div id="printP">
+            <div class="box-body">
+                <div class="col-sm-6 col-sm-offset-4">
+                    <div class="form-group">
+                        <h4> TASK REJECTED REPORT</h4>
+                        <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                    </div>
+                </div>
+                <br />
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th> SL No.</th>
+                            <th>Employee Name </th>
+                            <th>Rejected Date </th>
+                            <th>DR Sent(Min)</th>
+                            <th>DR Approve (Min)</th>
+
+                            <th>Toatl Hours</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr ng-repeat="reject in RejectReport">
+                            <td class="text-left">{{$index+1}}</td>
+                            <td class="text-left">{{reject.Name1}}</td>
+                            <td class="text-center">{{reject.ISMDRPT_Date | date:'dd-MM-yyyy'}}</td>
+
+                            <td class="text-left">{{reject.drsendingmins}}</td>
+                            <td class="text-left">{{reject.drapprovemins}}</td>
+
+                            <td class="text-left">{{reject.RunningTotalhours}}</td>
+                            <td class="text-left">{{reject.ISMDRPTAPP_Remarks}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="dffsd==true" id="excelid">
+
+
+        <div style="border:0.5px solid black">
+            TASK REJECTED REPORT
+
+        </div>
+
+        <div colspan="5" style="text-align:center">{{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</div>
+
+        <div>
+            <table class="table table-hover table-responsive table-bordered" id="table">
+                <thead>
+                    <tr>
+                        <th> SL No.</th>
+                        <th>Employee Name </th>
+                        <th>Rejected Date </th>
+                        <th>DR Sent(Min)</th>
+                        <th>DR Approve (Min)</th>
+
+                        <th>Toatl Hours</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr ng-repeat="reject in RejectReport">
+                        <td class="text-left">{{$index+1}}</td>
+                        <td class="text-left">{{reject.Name1}}</td>
+                        <td class="text-center">{{reject.ISMDRPT_Date | date:'dd-MM-yyyy'}}</td>
+
+                        <td class="text-left">{{reject.drsendingmins}}</td>
+                        <td class="text-left">{{reject.drapprovemins}}</td>
+
+                        <td class="text-left">{{reject.RunningTotalhours}}</td>
+                        <td class="text-left">{{reject.ISMDRPTAPP_Remarks}}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>

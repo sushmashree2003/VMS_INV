@@ -1,0 +1,535 @@
+﻿<style>
+    .multiselect {
+        width: 22em;
+        height: 11em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: -11.3%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+
+    .mul {
+        width: 22.1em;
+        height: 14em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .inst {
+        margin-left: -71px;
+    }
+
+    .taglbl {
+        margin-left: -15px;
+    }
+
+    .taglbl1 {
+        margin-left: -99px;
+    }
+</style>
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Purchase Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row" ng-show="staffcheck=='Staff'">
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="GRNNo-Wise" name="GRN" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">GRNNo-wise</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Item-wise" name="item" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Item-wise</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Supplier" name="Supplier" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Supplier</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9" ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ===========================GRN========================== -->
+
+                            <div class="form-group" ng-if="optionflag=='GRNNo-Wise'">
+
+
+                                <label class="control-label col-sm-4">Select or Search GRN No:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8 ">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_POdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search GRN No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="grnall" type="checkbox" ng-click="all_checkG(grnall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMGRN_Id" ng-repeat="grn in get_POdetails | filter : searchValue">
+                                            <input name="grnno" ng-model="grn.grnck" type="checkbox" ng-click="togchkbxG();" ng-required="isOptionsRequiredG()">
+                                            <span class="lbl padding-8">
+                                                {{grn.INVMGRN_GRNNo}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.grnno)" ng-messages="myForm.grnno.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- ===========================ITEMS========================== -->
+                            <div class="form-group" ng-if="optionflag=='Item-wise'">
+                                <label class="control-label col-sm-4">Select or Search Item :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_POdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMI_Id" ng-repeat="itm in get_POdetails | filter : searchValue">
+                                            <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                            <span class="lbl padding-8">
+                                                {{itm.INVMI_ItemName}}/{{itm.MI_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ======================= Supplier ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Supplier'">
+                                <label class="control-label col-sm-4">Select or Search Supplier No:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_POdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Supplier No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="spall" type="checkbox" ng-click="all_checkSP(spall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMS_Id" ng-repeat="sp in get_POdetails | filter : searchValue">
+                                            <input name="splr" ng-model="sp.spck" type="checkbox" ng-click="togchkbxSP();" ng-required="isOptionsRequiredSP()">
+                                            <span class="lbl padding-8">
+                                                {{sp.INVMS_SupplierName}}/{{sp.MI_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.splr)" ng-messages="myForm.splr.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row" ng-hide="staffcheck=='Staff'">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4">
+                                <div class="col-sm-8 col-lg-offset-2">
+                                    <label for="sel2" class="control-label col-sm-3 inst">Institutions: <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8 mul">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search Item here...">
+                                            <label>
+                                                <input name="alitem" value="1" ng-model="allmi" type="checkbox" ng-click="all_miid(allmi)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-model="MI_Id" ng-repeat="mi in get_mi_list | filter : searchValue">
+                                                <input name="mi" ng-model="mi.miid" type="checkbox" ng-click="mi_click();" ng-required="isRequiredmi()">
+                                                <span class="lbl padding-8">
+                                                    {{mi.MI_Name}}
+                                                </span>
+                                            </label>
+
+                                        </div>
+                                        <div class="error-messages" ng-if="interacted(myForm.mi)" ng-messages="myForm.mi.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="col-sm-10 col-lg-offset-2">
+                                    <div class="well">
+                                        <div class="text-center" ng-init="optionflag='All'">
+                                            <label class="radio-inline">
+                                                <input type="radio" value="All" name="All1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8"> All </span>
+                                            </label>
+                                          
+                                            <label class="radio-inline">
+                                                <input type="radio" value="GRNNo-Wise" name="GRN1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">GRNNo-wise</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="Item-wise" name="item1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">Item-wise</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="Supplier" name="Supplier1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">Supplier</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                           
+                                </div>
+                            <div class="col-sm-8 col-lg-offset-2">
+
+                                <!-- ===========================GRN========================== -->
+
+                                <div class="form-group" ng-if="optionflag=='GRNNo-Wise'">
+
+
+                                    <label class="control-label col-sm-4">Select or Search GRN No:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8 ">
+                                        <div class="multiselect col-sm-8">
+                                            <span ng-show="get_POdetails.length>0">
+                                                <input class="form-control" ng-model="searchValue" type="text" placeholder="Search GRN No. here...">
+                                            </span>
+                                            <label>
+                                                <input name="classes" value="1" ng-model="grnall" type="checkbox" ng-click="all_checkG(grnall)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+
+                                            <label ng-model="INVMGRN_Id" ng-repeat="grn in get_POdetails | filter : searchValue">
+                                                <input name="grnno" ng-model="grn.grnck" type="checkbox" ng-click="togchkbxG();" ng-required="isOptionsRequiredG()">
+                                                <span class="lbl padding-8">
+                                                    {{grn.INVMGRN_GRNNo}}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.grnno)" ng-messages="myForm.grnno.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ===========================ITEMS========================== -->
+                                <div class="form-group" ng-if="optionflag=='Item-wise'">
+                                    <label class="control-label col-sm-4">Select  Item :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8">
+                                            <span ng-show="get_POdetails.length>0">
+                                                <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+                                            </span>
+                                            <label>
+                                                <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+
+                                            <label ng-model="INVMI_Id" ng-repeat="itm in get_POdetails | filter : searchValue">
+                                                <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                                <span class="lbl padding-8">
+                                                    {{itm.INVMI_ItemName}}/{{itm.MI_Name}}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ======================= Supplier ============================ -->
+                                <div class="form-group" ng-if="optionflag=='Supplier'">
+                                    <label class="control-label col-sm-4">Select Supplier:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8">
+                                            <span ng-show="get_POdetails.length>0">
+                                                <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Supplier No. here...">
+                                            </span>
+                                            <label>
+                                                <input name="classes" value="1" ng-model="spall" type="checkbox" ng-click="all_checkSP(spall)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+
+                                            <label ng-model="INVMS_Id" ng-repeat="sp in get_POdetails | filter : searchValue">
+                                                <input name="splr" ng-model="sp.spck" type="checkbox" ng-click="togchkbxSP();" ng-required="isOptionsRequiredSP()">
+                                                <span class="lbl padding-8">
+                                                    {{sp.INVMS_SupplierName}}/{{sp.MI_Name}}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.splr)" ng-messages="myForm.splr.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            </div>
+
+                      
+                        <div class="col-sm-12">
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <div class="col-sm-3">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                            <span class="lbl padding-4">Between Dates </span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-9 bwdate" ng-show="bw_dates">
+                                        <div class="col-sm-5">
+                                            <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                                <div ng-message="required">Select Start Date</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                                <div ng-message="required">Select End Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="get_POreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="get_POreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printpo')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="get_POreport.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">PURCHASE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="overflow:scroll">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered ">
+                    <thead style="width:100%">
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_GRNNo')">GRN No</a></th>
+                            <th><a href="" ng-click="sortBy('GRN_Date')">GRN Date</a></th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_PurchaseDate')">Purchase Date</a></th>
+                            <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier Name </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_InvoiceNo')">Supplier InvoiceNo </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemCode')">Item Code</a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMUOM_UOMName')">UOM</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_Qty')">Quantity</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_PurchaseRate')">Rate</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_MRP')">MRP</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_SalesPrice')">Sales Rate</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_DiscountAmt')">Discount</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_TaxAmt')">Taxes</a> </th>
+                             <th><a href="" ng-click="sortBy('INVTGRN_Amount')">Total Amount</a> </th>
+
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_POreport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td >{{user.INVMGRN_GRNNo}}</td>
+                            <td>{{user.GRN_Date | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.INVMGRN_PurchaseDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.INVMS_SupplierName}}</td>
+                            <td>{{user.INVMGRN_InvoiceNo}}</td>
+                            <td>{{user.INVMI_ItemCode}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVMUOM_UOMName}}</td>
+                            <td>{{user.INVTGRN_Qty | number :2}}</td>
+                            <td>{{user.INVTGRN_PurchaseRate | number :2}}</td>
+                            <td>{{user.INVTGRN_MRP | number :2}}</td>
+                            <td>{{user.INVTGRN_SalesPrice | number :2}}</td>
+                            <td>{{user.INVTGRN_DiscountAmt | number :2}}</td>
+                            <td>{{user.INVTGRN_TaxAmt | number :2}}</td>
+                            <td>{{user.INVTGRN_Amount | number :2}}</td>
+
+                        </tr>
+                       
+
+                
+
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+        <div ng-hide="true">
+            <div id="printpo">
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                </div>
+                <h4 class="text-center">PURCHASE REPORT</h4>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_GRNNo')">GRN No</a></th>
+                            <th><a href="" ng-click="sortBy('GRN_Date')">GRN Date</a></th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_PurchaseDate')">Purchase Date</a></th>
+                            <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier Name </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_InvoiceNo')">Supplier Invoice No </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemCode')">Item Code</a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMUOM_UOMName')">UOM</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_Qty')">Quantity</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_PurchaseRate')">Rate</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_MRP')">MRP</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_SalesPrice')">Sales Rate</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_DiscountAmt')">Discount</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_TaxAmt')">Taxes</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_Amount')">Total Amount</a> </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_POreport">
+                            <td>{{user.INVMGRN_GRNNo}}</td>
+                            <td>{{user.GRN_Date | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.INVMGRN_PurchaseDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.INVMS_SupplierName}}</td>
+                            <td>{{user.INVMGRN_InvoiceNo}}</td>
+                            <td>{{user.INVMI_ItemCode}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVMUOM_UOMName}}</td>
+                            <td>{{user.INVTGRN_Qty | number :2}}</td>
+                            <td>{{user.INVTGRN_PurchaseRate | number :2}}</td>
+                            <td>{{user.INVTGRN_MRP | number :2}}</td>
+                            <td>{{user.INVTGRN_SalesPrice | number :2}}</td>
+                            <td>{{user.INVTGRN_DiscountAmt | number :2}}</td>
+                            <td>{{user.INVTGRN_TaxAmt | number :2}}</td>
+                            <td>{{user.INVTGRN_Amount | number :2}}</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+
+
+            </div>
+
+        </div>
+
+    </div>
+</section>

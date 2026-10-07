@@ -1,0 +1,234 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Planner Approval Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <div class="form-group col-sm-6">
+                            <label class="control-label col-sm-3">Start Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="start_Date" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date"></md-datepicker>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label class="control-label col-sm-3">End Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" ng-change="onenddatechange()" md-min-date="start_Date" md-placeholder="Enter Date"></md-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="depdes==true">
+                    <div class="col-sm-6" style="padding-left: 30px !important;">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 13px;width: 78%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-click="all_checkdept(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Department</b>
+                                    </span>
+                                </label>
+                                <hr />
+                                <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                    <input name="dept" ng-model="user.selected" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDC_Name}} Department</b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 16px;/* width: 25.0em; */width: 77%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+
+                                <label>
+                                    <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Designation</b>
+                                    </span>
+                                </label>
+                                <hr />
+                                <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                    <input name="desg" ng-model="user.selected" type="checkbox" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6" style="padding-left: 30px !important;">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 13px;width: 78%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="checkalluu" type="checkbox" ng-click="all_checkuu(checkalluu)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Employee</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                    <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbxuu();" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-if="get_Plannerlist.length>0">
+                            <!--<label class="control-label col-sm-8">Planner's :<span style="color:Red">*</span></label>-->
+                            <label class="control-label" style="padding-left: 16px;/* width: 25.0em; */width: 77%;">
+                                <span ng-show="get_Plannerlist.length>0">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Planner here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in get_Plannerlist | filter : searchValue">
+                                    <input name="emp22" ng-model="user.plnrck" type="checkbox" ng-click="togchkbx();" title="Select Planner" ng-required="isOptionsRequired5()">
+                                    <span class="lbl padding-8">
+                                        <b>{{user.empname}}</b> : {{user.ismtpL_PlannerName }}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.emp22)" ng-messages="myForm.emp22.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+            <div class="row center">
+                <div class="col-sm-12 text-center">
+                    <div class="form-group" ng-init="approved='1'">                       
+                            <label class="radio-inline">
+                                <input type="radio" value="1" name="approved" ng-change="clearreport()" ng-model="approved">
+                                <span class="lbl padding-8"><b>APPROVED</b> </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="0" name="notapproved" ng-change="clearreport()" ng-model="approved">
+                                <span class="lbl padding-8"><b>NOT APPROVED</b></span>
+                            </label>   
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="approvalReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="get_approvalreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button ng-show="get_approvalreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printP')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_approvalreport.length>0">
+        <div id="printP">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-4">
+                        <div class="form-group">
+                            <h4> APPROVAL REPORT</h4>                           
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th width="22%"><a href="" ng-click="sortBy('ISMTPL_PlannerName')"><b>Planner Details</b></a> </th>
+                            <th><a href="" ng-click="sortBy('ISMTPLAP_Remarks')"><b>Remarks</b></a> </th>
+                            <th style="width: 14%"><a href="" ng-click="sortBy('ISMTCR_TaskNo')"><b>Task No.</b></a> </th>
+                            <th><a href="" ng-click="sortBy('ISMTCR_Title')"><b>Task Title</b></a> </th>
+                            <th><a href="" ng-click="sortBy('ISMTCR_BugOREnhancementFlg')"><b>Type</b></a> </th>
+                            <th><a href="" ng-click="sortBy('ISMTPLTA_StartDate')"><b>Start Date</b></a> </th>
+                            <th><a href="" ng-click="sortBy('ISMTPLTA_EndDate')"><b>End Date</b></a> </th>
+                            <th><a href="" ng-click="sortBy('ISMTPLTA_ApprovalFlg')"><b>Status</b></a> </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in plannerid">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">
+                                <span class="col-sm-12"><b>{{user.ISMTPL_PlannerName}} </b></span>
+                                <span class="col-sm-10">{{user.ISMTPL_StartDate | date:'dd/MM/yyyy'}} To {{user.ISMTPL_EndDate | date:'dd/MM/yyyy'}}</span>
+                                <span class="col-sm-10">Planned By:<br /> <b>{{user.plannedby}}</b></span>
+                                <span ng-if="approved=='1'" class="col-sm-10">Approved By:<br /> <b>{{user.approvedby}}</b></span>
+                            </td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.ISMTPLAP_Remarks}}</td>
+                        </tr>
+                        <tr ng-repeat="plnr in user.plannerdetails">
+                            <td class="text-left">{{plnr.ISMTCR_TaskNo}}</td>
+                            <td class="text-left">{{plnr.ISMTCR_Title}}</td>
+                            <td class="text-left">{{plnr.ISMTCR_BugOREnhancementFlg}}</td>
+                            <td class="text-left">{{plnr.ISMTPLTA_StartDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-left">{{plnr.ISMTPLTA_EndDate | date:'dd/MM/yyyy'}}</td>                          
+                            <td class="text-left" rowspan="{{plnr.plannerdetails.length+1}}">
+                                <span ng-if="plnr.ISMTPLTA_ApprovalFlg==true && approved=='1'" style="color:green;">APPROVED</span>
+                                <span ng-if="plnr.ISMTPLTA_ApprovalFlg==false  && approved=='1'" style="color:red;">REJECTED</span>
+                                <span ng-if="plnr.ISMTPLTA_ApprovalFlg==true && approved=='0'" style="color:green;">DEFAULT APPROVED</span>
+                                <span ng-if="plnr.ISMTPLTA_ApprovalFlg==false  && approved=='0'" style="color:blue;">PENDING</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>

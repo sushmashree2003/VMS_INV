@@ -1,0 +1,163 @@
+﻿<section class="content" data-ng-init="load_data()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Enquiry Status </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box box-body">                
+                <div class="form-group">
+                    <div style="text-align:center;" ng-init="OSENQ_Type='B'">
+                        <input value="B" ng-model="OSENQ_Type" type="radio" ng-click="ClickBookVisit()" name="aaa">
+                        <span class="lbl padding-8">
+                            Booking
+                        </span>
+                        <input value="V" ng-model="OSENQ_Type" type="radio" ng-click="ClickBookVisit()" name="aaa">
+                        <span class="lbl padding-8">
+                            Visiting
+                        </span>
+                    </div>
+                </div>                
+            </div>
+        </div>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Enquiry Status Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="text-center">
+                        <table class="table table-responsive table-bordered text-left" border="1" id="table1">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Room Name</th>
+                                    <th>Enquiry</th>
+                                    <th>Date</th>
+                                    <th ng-if="OSENQ_Type!='B'">Time</th>
+                                    <th>Status</th>
+                                    <th>Reply</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="enquiry in filterValue1 = (enquirydetailList | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td> 
+                                    
+                                    <td class="text-left">{{enquiry.osenQ_Name}}</td>
+                                    <td class="text-left">{{enquiry.osenQ_Enquiry}} </td>
+                                    <td class="text-center" >{{enquiry.osenQ_VisitDate}}</td>
+                                    <td class="text-center" ng-if="OSENQ_Type!='B'">{{enquiry.osenQ_VisitTime}}</td>
+                                    <td class="text-left">{{enquiry.osenQ_Status}}</td>
+                                    <td class="text-center">                                       
+                                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="reply(enquiry)" aria-disabled="false">                                          
+                                           Reply
+                                        </md-button>                                       
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+
+            </div>
+        </div>        
+        <div class="box box-body" id="grid" ng-show="flag==true">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <div class="form-group">
+                        <div class="well text-center">
+                            <label class="control-label">
+                                <input type="checkbox" value="sms" data-ng-model="R_SMS" name="smsmail">
+                                <span class="lbl padding-right-30" align="center" >SMS</span>
+                            </label>
+                            <label class="control-label">
+                                <input type="checkbox" value="mail" data-ng-model="R_Email" name="smsmail">
+                                <span class="lbl padding-right-30" align="center">EMAIL</span>
+                            </label>
+                            <div class="error-messages" ng-if="interacted(myForm.smsmail)" ng-messages="myForm.smsmail.$error">
+                                <div ng-message="required">Click SMS/EMAIL</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">
+                            Email Subject<span style="color:red;">*</span>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="AuthorisationKey" data-ng-model="emailid" required name="AuthorisationKey">
+                            <div class="error-messages" ng-if="interacted(myForm.AuthorisationKey)" ng-messages="myForm.AuthorisationKey.$error">
+                                <div ng-message="required">Enter Email Subject</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">
+                            SMS<span style="color:red;">*</span>
+                        </label>
+                        <div class="col-sm-8" ng-disabled="R_Email">
+                            <textarea class="form-control" id="Sms" data-ng-model="smsid" required name="Sms" rows="2"></textarea>                           
+                            <div class="error-messages" ng-if="interacted(myForm.Sms)" ng-messages="myForm.Sms.$error">
+                                <div ng-message="required">Enter SMS</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">
+                            Body<span style="color:red;">*</span>
+                        </label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="body" data-ng-model="bodyid" required name="body" rows="3"></textarea>                          
+                            <div class="error-messages" ng-if="interacted(myForm.body)" ng-messages="myForm.body.$error">
+                                <div ng-message="required">Enter Body</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">
+                            Footer<span style="color:red;">*</span>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="footer" data-ng-model="footerid" required name="footer">
+                            <div class="error-messages" ng-if="interacted(myForm.footer)" ng-messages="myForm.footer.$error">
+                                <div ng-message="required">Enter Footer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="text-center">
+                    <input type="hidden" name="OSENQ_Id" ng-model="OSENQ_Id" value="{{OSENQ_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SendStatus(enquiry)" aria-disabled="false">
+                        Send
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

@@ -1,0 +1,145 @@
+<style>
+    .abcd {
+        word-wrap: break-word;
+        height:30px;
+        align-content:center;
+    }
+</style>
+
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Laptop Application Approval</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                        <div class="col-sm-12" style="overflow:scroll">
+                            <div ui-grid="gridlapstatus" ui-grid-pagination ui-grid-edit ui-grid-selection class="grid text-center" id="style-4" style="width:100% !important;height:300px;"></div>
+                        </div>
+
+                        <hr />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Remark : <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" ng-model="remarkstxta" name="reason" required></textarea>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.reason)" ng-messages="myForm.reason.$error">
+                                        <div ng-message="required" style="padding-left: 30px;">Enter Remark</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="text-center">
+                                    <input type="hidden" ng-model="VLAPAPPLAUT_Id" />
+                                    <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="get_status()">
+                                        <i class="fa fa-check" aria-hidden="true"></i> Approved
+                                    </md-button>
+                                    <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="reject_status()">
+                                        <i class="fa fa-check" aria-hidden="true"></i> Rejected
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Laptop Application Approval Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-6 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 table-wrap">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+                                <th>Employee Name</th>
+                                <th>From Date</th>
+                                <th>To Date</th>
+                                <th>Total Days</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="employee in filterValue = (activityIds| filter : searchValue) |orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td class="text-left">{{$index +1}}</td>
+                                <td class="text-left">{{employee.hrmE_EmployeeFirstName}}</td>
+                                <td class="text-left">{{employee.vlapappL_FromDate|date:'dd-MM-yyyy'}}</td>
+                                <td class="text-left">{{employee.vlapappL_ToDate|date:'dd-MM-yyyy'}}</td>
+                                <td class="text-left">{{employee.vlapappL_TotalDays}}</td>
+                                <td class="text-left">{{employee.vlapappL_Reason}}</td>
+                                <td class="text-left">{{employee.vlapappL_ApplicationStatus}}</td>
+                                <td class="text-left">{{employee.vlapapplauT_Remarks}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <!--<embed id="idpdf" ng-src="{{content}}" onload="refreshDialer();" style="width: 100%;" height="1000" />
+                <div class="modal-body" oncontextmenu="return false"></div>-->
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-center">
+                        <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                        <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                    </div>
+                    <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

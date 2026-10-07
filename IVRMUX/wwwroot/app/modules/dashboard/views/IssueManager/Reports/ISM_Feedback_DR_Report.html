@@ -1,0 +1,403 @@
+﻿<style>
+
+    .red {
+        background-color: red;
+    }
+
+    .darkred {
+        background-color: darkRed;
+    }
+
+    .green {
+        background-color: green;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Feedback Consolidated Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <!--<div class="row">
+                    <div class="col-sm-12">
+                        <div class="text-center well">
+                            <div ng-init="todayorothers='consolidatereport'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="consolidatereport" name="enhc" ng-model="todayorothers" ng-change="otherdaydatechange()">
+                                    <span class="lbl padding-8"><b> Consolidate Report </b></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="detailedreport" name="enhc" ng-model="todayorothers" ng-change="otherdaydatechange()">
+                                    <span class="lbl padding-8"><b>Detailed Report</b></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-3 padding-left-2px">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 8px;width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueDeptd" type="text" placeholder="Search Department here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                    <label>
+                                        <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                        <span class="lbl padding-8">
+                                            <b> All Department</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                        <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired() && todayorothers!='consolidatereport' ">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueDesgd" type="text" placeholder="Search Designation here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                    <label>
+                                        <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdesg(designationselectedAll)">
+                                        <span class="lbl padding-8">
+                                            <b> All Designation</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                        <input name="desg" ng-model="user.selected" type="checkbox" ng-disabled="roleflag==true" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired() && todayorothers!='consolidatereport'">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 padding-left-none">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                        <span class="lbl padding-8">
+                                            <b>  All Employees</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                        <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired() && todayorothers!='consolidatereport'">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="start_Date" onkeypress="return false" name="startdate" md-placeholder="Enter Date" ng-change="onchangestartdate()" required>
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Select Start Date</div>
+                                        <div ng-message="valid">The entered value is not Valid!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" md-min-date="start_Date" md-max-date="getMaxDate" md-placeholder="Enter Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                    <div ng-message="required">Select End Date</div>
+                                    <div ng-message="valid">The entered value is not Valid!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="todayorothers!='consolidatereport' && get_report.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel()">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button ng-if="todayorothers!='consolidatereport' && get_report.length>0" type="button" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_report.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Feedback Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12 off-sm-6">
+                    <h4 class="text-center">Detailed Consolidated Report </h4>
+                    <h4 class="text-center">From {{start_Date | date:'dd/MM/yyyy'}} To {{end_Date | date:'dd/MM/yyyy'}}</h4>
+                </div>
+            </div>
+            <div style="overflow-x:scroll;width:100%;">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr>
+                                    <th width="200">Department Head</th>
+                                    <th width="200">Employee Details</th>
+                                    <th>Date</th>
+                                    <th>Task No.</th>
+                                    <th>Task Title</th>
+                                    <th>Description</th>
+                                    <th>Comments</th>
+                                    <th>View Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in dept_headist">
+                                <tr>
+                                    <td class="text-left" rowspan="{{user.emp_dr_date_list.length+1}}">
+                                        {{user.Emp_Dept_head}}
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="emp in user.emp_dr_date_list">
+                                    <td class="text-left">
+                                        Name : {{emp.EMPLOYEENAME}}<br />
+                                        Code : {{emp.EMPLOYEECODE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.DR_DATE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.TASKNO}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.ISMTCR_Title}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.TASKDES}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.COMMENTS}}
+                                    </td>
+                                    <td>
+                                        <a href="">
+                                            <i class="fa fa-eye" style="color:black;" data-target="#myModalViewfeedback" data-toggle="modal"
+                                               title="View Comments" ng-click="viewcomments(emp);"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="consolidatedetailed">
+            <div id="detailedreport">
+                <table>
+                    <tr style="border :0.5px solid black">
+                        <td colspan="6" style="text-align:center">Feedback Consolidated Report</td>
+                    </tr>
+                    <tr style="border :0.5px solid black">
+                        <td colspan="6" style="text-align:center">From {{start_Date | date:'dd/MM/yyyy'}} To {{end_Date | date:'dd/MM/yyyy'}}</td>
+                    </tr>
+                </table>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr style="border :0.5px solid black">
+                                    <th width="200">Department Head</th>
+                                    <th width="200">Employee Details</th>
+                                    <th>Date</th>
+                                    <th>Task No.</th>
+                                    <th>Task Title</th>
+                                    <th>Description</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in dept_headist">
+                                <tr style="border :0.5px solid black">
+                                    <td class="text-left" rowspan="{{user.emp_dr_date_list.length+1}}">
+                                        {{user.Emp_Dept_head}}
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="emp in user.emp_dr_date_list" style="border :0.5px solid black">
+                                    <td class="text-left">
+                                        Name : {{emp.EMPLOYEENAME}}<br />
+                                        Code : {{emp.EMPLOYEECODE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.DR_DATE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.TASKNO}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.ISMTCR_Title}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.TASKDES}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.COMMENTS}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="detailedreportprint">
+                <table>
+                    <tr>
+                        <td colspan="8" style="text-align:center">Feedback Consolidated Report</td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" style="text-align:center">From {{start_Date | date:'dd/MM/yyyy'}} To {{end_Date | date:'dd/MM/yyyy'}}</td>
+                    </tr>
+                </table>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr>
+                                    <th width="200">Department Head</th>
+                                    <th width="200">Employee Details</th>
+                                    <th>Date</th>
+                                    <th>Task No.</th>
+                                    <th>Task Title</th>
+                                    <th>Description</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in dept_headist">
+                                <tr>
+                                    <td class="text-left" rowspan="{{user.emp_dr_date_list.length+1}}">
+                                        {{user.Emp_Dept_head}}
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="emp in user.emp_dr_date_list">
+                                    <td class="text-left">
+                                        Name : {{emp.EMPLOYEENAME}}<br />
+                                        Code : {{emp.EMPLOYEECODE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.DR_DATE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.TASKNO}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.ISMTCR_Title}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.TASKDES}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{emp.COMMENTS}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="myModalViewfeedback" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width:90%;" overflow:auto;">
+        <div class="modal-content" style="overflow:auto;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white col-sm-3">Feedback Details</h4>
+                <h4 class="modal-title text-white"> Task No.: {{taskno}} &nbsp; Date :  {{taskdate}}  </h4>
+            </div>
+            <div class="box-body">
+                <div style="overflow-x:auto;width:100%; height:300px;">
+                    <table class="table table-responsive table-bordered clearfix">
+                        <thead>
+                            <tr>
+                                <th>SL NO</th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Employee Name</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Feedback</a></th>
+                                <th>Send/Receive</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="fd in get_feedback">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center">{{fd.empname}}</td>
+                                <td class="text-center">{{fd.ISMDRFS_FeedBack}}</td>
+                                <td>
+                                    <span ng-if="fd.ISMDRFS_Status === '1'">
+                                        <a class="text-aqua" href="" data-placement="bottom" data-toggle="tooltip" title="Send">
+                                            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="fd.ISMDRFS_Status === '2'">
+                                        <a class="text-aqua" href="" data-placement="bottom" data-toggle="tooltip" title="Receive">
+                                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

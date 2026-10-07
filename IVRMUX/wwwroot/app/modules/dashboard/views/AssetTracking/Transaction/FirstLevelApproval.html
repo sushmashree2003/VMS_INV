@@ -1,0 +1,132 @@
+﻿<section class="content admission" ng-controller="FirstLevelApprovalController" ng-init="loaddata()">
+    <div class="box box-primary">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">1<sup>st</sup> Level Approval</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="collapsible">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <form class="form-horizontal" role="form" name="approvalForm" novalidate>
+
+                <!-- Status Header / Badge -->
+                <div class="row style-margin-bottom">
+                    <div class="col-sm-3">
+                        <button type="button" class="btn btn-info btn-block disabled" style="background-color: #cce0ff; color: #000; border-color: #b8daff;">
+                            Verify Checklist
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Inputs Section -->
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+
+                        <!-- Project Name Dropdown -->
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Project Name : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control"
+                                        name="projectName"
+                                        ng-model="obj.ISMMPR_Id"
+                                        ng-change="onProjectChange()"
+                                        ng-options="project.ismmpR_Id as project.ismmpR_ProjectName for project in projectList"
+                                        required>
+                                    <option value="">Select Project</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(approvalForm.projectName)" ng-messages="approvalForm.projectName.$error">
+                                    <div ng-message="required">Please select a Project Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Verification Checklist Grid Table -->
+                <div class="row margin-top-20" ng-show="checklistGroups.length > 0">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center">
+                                <thead>
+                                    <tr style="background-color: #0000cc; color: #ffffff;">
+                                        <th style="width: 50px;" class="text-center">
+                                            <md-checkbox ng-model="selectAll"
+                                                         ng-change="toggleAll(selectAll)"
+                                                         aria-label="Select All Items"
+                                                         class="md-primary"
+                                                         style="margin: 0 auto; display: flex; justify-content: center;">
+                                            </md-checkbox>
+                                        </th>
+                                        <th style="width: 60px;" class="text-center">SI.NO</th>
+                                        <th class="text-center">SYSTEM</th>
+                                        <th class="text-center">CHECK POINT</th>
+                                        <th style="width: 140px;" class="text-center">STATUS</th>
+                                        <th class="text-center">OBSERVATION / REMARKS</th>
+                                        <th style="width: 120px;" class="text-center">PRIORITY</th>
+                                        <th class="text-center">CHECKED BY</th>
+                                        <th style="width: 130px;" class="text-center">CHECKED DATE</th>
+                                    </tr>
+                                </thead>
+
+                                <!-- Dynamic Category Grouping -->
+                                <tbody ng-repeat="group in checklistGroups">
+                                    <tr style="background-color: #ffffff; font-weight: bold;">
+                                        <td colspan="9" class="text-left" style="padding-left: 15px; border-bottom: 2px solid #ddd;">
+                                            <i class="fa fa-lightbulb-o text-yellow" style="margin-right: 5px;"></i>
+                                            {{group.categoryName}}
+                                        </td>
+                                    </tr>
+
+                                    <tr ng-repeat="item in group.items">
+                                        <td class="text-center" style="vertical-align: middle;">
+                                            <md-checkbox ng-model="item.selected"
+                                                         ng-change="searchValue()"
+                                                         aria-label="Select Row"
+                                                         class="md-primary"
+                                                         style="margin: 0 auto; display: flex; justify-content: center;">
+                                            </md-checkbox>
+                                        </td>
+                                        <td class="text-center" style="vertical-align: middle;">{{item.slNo}}</td>
+                                        <td class="text-left" style="vertical-align: middle;">{{item.system}}</td>
+                                        <td class="text-left" style="vertical-align: middle;">{{item.checkPoint}}</td>
+                                        <td style="vertical-align: middle;">
+                                            <span class="label" ng-class="{'label-success': item.status === 'Passed', 'label-danger': item.status === 'Failed', 'label-warning': !item.status || item.status === 'Pending'}">
+                                                {{item.status || 'Pending'}}
+                                            </span>
+                                        </td>
+                                        <td class="text-left" style="vertical-align: middle;">{{item.remarks || 'N/A'}}</td>
+                                        <td style="vertical-align: middle;">
+                                            <span class="badge" ng-class="{'bg-red': item.priority === 'Critical', 'bg-orange': item.priority === 'High', 'bg-blue': item.priority === 'Medium', 'bg-gray': item.priority === 'Low'}">
+                                                {{item.priority || 'N/A'}}
+                                            </span>
+                                        </td>
+                                        <td style="vertical-align: middle;">{{item.checkedBy || 'N/A'}}</td>
+                                        <td style="vertical-align: middle;">{{item.checkedDate}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Action Buttons -->
+                <div class="box-footer" ng-show="checklistGroups.length > 0">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-click="approve()">
+                            Approve
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="reject()">
+                            Reject
+                        </md-button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,417 @@
+﻿<style>
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+</style>
+<section class="content">
+    <div class="box box-primary" data-ng-init="onLoadGetData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Loan</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm" data-ng-submit="saveData()" novalidate>
+            <div class="box-body">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Employee :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="sel1" data-ng-model="loan.hrmE_Id" name="hrmE_Id" required ng-change="GetDetailsByEmployee()">
+                                <option value="">Select</option>
+                                <option ng-repeat="employee in employeedropdown" value="{{employee.hrmE_Id}}" ng-selected="{{employee.Selected===true}}">
+                                    {{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}
+                                </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.hrmE_Id)" ng-messages="myForm.hrmE_Id.$error">
+                                <div ng-message="required">Select Employee</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Applied Date :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <md-datepicker name="AppliedDate" ng-model="loan.hreL_AppliedDate" onkeydown="return false" md-min-date="minDatedoi" md-max-date="maxDatedoi" md-placeholder="Select Date" required ng-disabled="true"></md-datepicker>
+                            <div class="error-messages" ng-if="interacted(myForm.AppliedDate)" ng-messages="myForm.AppliedDate.$error">
+                                <div ng-message="required">Select Applied Date</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Loan Type :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="sel1" data-ng-model="loan.hrmlN_Id" name="EmployeeLoan" required ng-change="loanchange()">
+                                <option value="">Select</option>
+                                <option ng-repeat="loan in masterloandropdown" value="{{loan.hrmlN_Id}}" ng-selected="{{loan.Selected===true}}">
+                                    {{loan.hrmL_LoanType}}
+                                </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.EmployeeLoan)" ng-messages="myForm.EmployeeLoan.$error">
+                                <div ng-message="required">Select Loan Type</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Mode Of Payment:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" name="ModeOfPayment" id="sel12" data-ng-model="loan.hreL_ModeOfPayment" required>
+                                <option value="">--Select--</option>
+                                <option ng-repeat="modeOfPayment in modeOfPaymentdropdown" value="{{modeOfPayment.ivrmmoD_ModeOfPayment}}" ng-selected="{{modeOfPayment.Selected===true}}">
+                                    {{modeOfPayment.ivrmmoD_ModeOfPayment}}
+                                </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.ModeOfPayment)" ng-messages="myForm.ModeOfPayment.$error">
+                                <div ng-message="required">Select Mode Of Payment</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Reference No. :<!--<span style="color:red;">*</span>--></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="ReferenceNo" class="form-control active" allow-pattern="([0-9])" ng-paste="$event.preventDefault()" data-ng-model="loan.hreL_ReferenceNo" id="ReferenceNo" maxlength="15">
+                            <div class="error-messages" ng-if="interacted(myForm.ReferenceNo)" ng-messages="myForm.ReferenceNo.$error">
+                                <div ng-message="required"> Enter Reference No</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Loan Amount :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="LoanAmount" class="form-control active" allow-pattern="([0-9.])" ng-paste="$event.preventDefault()" ng-disabled="LoanDetailsDis" data-ng-model="loan.hreL_LoanAmount" id="LoanAmount" maxlength="20" required ng-blur="CalculateEMI()">
+                            <div class="error-messages" ng-if="interacted(myForm.LoanAmount)" ng-messages="myForm.LoanAmount.$error">
+                                <div ng-message="required">Enter Loan Amount</div>
+                                <div ng-message="minlength">Field must contain atleast 1 character</div>
+                                <div ng-message="maxlength">Field cannot take more than 20 characters</div>
+                                <div ng-message="pattern">Pattern does not match</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Loan Interest :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="LoanInterest" class="form-control active" allow-pattern="([0-9|.])" ng-pattern="/^\d{0,2}(\.\d{1,2})?$/" step="0.01" ng-paste="$event.preventDefault()" ng-disabled="LoanDetailsDis" data-ng-model="loan.hreL_LoanInterest" id="LoanInterest" minlength="1" maxlength="5" required>
+                            <div class="error-messages" ng-if="interacted(myForm.LoanInterest)" ng-messages="myForm.LoanInterest.$error">
+                                <div ng-message="required">Enter Loan Interest</div>
+                                <div ng-message="minlength">Field must contain atleast 1 character</div>
+                                <div ng-message="maxlength">Field cannot take more than 2 characters</div>
+                                <div ng-message="pattern">Pattern does not match</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Loan Installments (IN MONTHS) :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="LoanInstallments" class="form-control active" allow-pattern="([0-9])" ng-paste="$event.preventDefault()" ng-disabled="LoanDetailsDis" data-ng-model="loan.hreL_LoanInsallments" id="LoanInstallments" minlength="1" maxlength="3" required ng-blur="CalculateEMI()">
+                            <div class="error-messages" ng-if="interacted(myForm.LoanInstallments)" ng-messages="myForm.LoanInstallments.$error">
+                                <div ng-message="required">Enter Loan Installments</div>
+                                <div ng-message="minlength">Field must contain atleast 1 character</div>
+                                <div ng-message="maxlength">Field cannot take more than 3 characters</div>
+                                <div ng-message="pattern">Pattern does not match</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Loan EMI :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="Loanemi" class="form-control active" allow-pattern="(\s|[0-9.])" ng-paste="$event.preventDefault()" ng-disabled="LoanEMIDis" data-ng-model="loan.hreL_LaonEMI" id="Loanemi" minlength="1" maxlength="18" required>
+                            <div class="error-messages" ng-if="interacted(myForm.Loanemi)" ng-messages="myForm.Loanemi.$error">
+                                <div ng-message="required">Enter Loan EMI</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Installment/Month :<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="Loaninstall" class="form-control active" allow-pattern="(\s|[0-9])" data-ng-model="loan.hreL_NoofInstallment" id="Loaninstall" minlength="1" maxlength="18" required>
+                            <div class="error-messages" ng-if="interacted(myForm.Loaninstall)" ng-messages="myForm.Loaninstall.$error">
+                                <div ng-message="required">Enter Loan Installment</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+                </div>
+
+                <div class="col-sm-12" ng-if="loan.hrmlN_Id>0">
+                    <div class="from-group">
+
+                        <table class="table table-responsive table-bordered clearfix">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO.</th>
+                                    <th>Document Name</th>
+                                    <th>File</th>
+
+                                    <th>View</th>
+                                    <!--<th>Action</th>-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="teacher in loan.teacherdocuupload" ng-class-odd="'odd'">
+                                    <td class="text-center">{{$index +1}}</td>
+                                    <td>{{teacher.hrmdoC_DocumentName}}</td>
+                                    <td hidden="hidden">{{teacher.hrmdoC_Id}}</td>
+                                    <td class="text-center">
+                                        <input class="custom-file-input file-bluenew" id="{{teacher.HRELD_Filepath}}" 
+                                               data-ng-model="teacher.HRELD_Filepath" type="file"
+                                               accept="image/*"
+                                               name="doc"
+                                               onchange="angular.element(this).scope().uploadtecherdocuments(this,angular.element(this).scope().teacher)" required>
+                                        <div class="error-messages" ng-if="interacted(myForm.doc)" ng-messages="myForm.doc.$error">
+                                            <div ng-message="required">Attach File</div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+
+                                        <span ng-if="teacher.HRELD_Filepath !=null && teacher.HRELD_Filepath !=''">
+                                            <a ng-if="teacher.filetype=='jpg' || teacher.filetype=='png' || teacher.filetype=='JPG'
+                                                               || teacher.filetype=='svg'|| teacher.filetype=='jpeg' || teacher.filetype=='gif'"
+                                               style="color:red;display:inline; font-weight: bolder;"
+                                               data-ng-click="showmothersign(teacher.HRELD_Filepath)">
+                                                Image
+
+                                            </a>
+
+                                            <a ng-if="teacher.filetype=='mp4' || teacher.filetype=='mp4'"
+                                               style="color:red;display:inline; font-weight: bolder;" data-toggle="modal"
+                                               data-target="#popup15"
+                                               ng-click="showGuardianPhotonew(teacher)">
+                                                Video
+                                            </a>
+                                            <a ng-if="teacher.filetype=='pdf'" style="color:blue;display:inline;"
+                                               ng-click="onviewpdf(teacher.HRELD_Filepath,teacher.HRELD_Filetype)">
+                                                <b style="color:orangered;display:inline; ">Pdf</b>
+                                            </a>
+
+                                            <a ng-if="teacher.filetype=='doc'|| teacher.filetype=='docx'"
+                                               style="color:blue;display:inline;"
+                                               href="{{teacher.document_Pathnew}}" target="_blank">
+                                                <b style="color:orangered;display:inline;">Document</b>
+                                            </a>
+                                            <a ng-if="teacher.filetype=='ppt'|| teacher.filetype=='pptx'"
+                                               style="color:blue;display:inline;"
+                                               href="{{teacher.document_Pathnew}}" target="_blank">
+                                                <b style="color:orangered;display:inline;">PPT</b>
+                                            </a>
+                                            <a ng-if="teacher.filetype=='xls'|| teacher.filetype=='xlsx'"
+                                               style="color:blue;display:inline;"
+                                               href="{{teacher.document_Pathnew}}" target="_blank">
+                                                <b style="color:orangered;display:inline;">Excel</b>
+                                            </a>
+                                        </span>
+                                    </td>
+                                    <!--<td class="text-center">
+                                        <span class="" ng-hide="teacherdocuupload.length > 9">
+                                            <a href="" ng-show="$last" ng-click="addNewsiblingguard()">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="" id="remove" ng-hide="teacherdocuupload.length ==1">
+                                            <a href="" ng-click="removeNewsiblingguard($index)">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>-->
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                <div class="col-sm-12" style="margin-top:10px;">
+                    <div class="form-group">
+                        <div class="text-center">
+                            <input type="hidden" ng-model="loan.hreL_Id" />
+                            <md-button type="submit" class="md-raised md-primary" ng-if="loanoption" ng-disabled="form.$invalid" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary" ng-if="gridOptions.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Loan List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!--<div ui-grid="gridOptions" ui-grid-pagination class="grid"></div>-->
+
+        
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+
+                            <th class="text-left">
+                                SL.No.
+                            </th>
+                            <th class="text-left"> Employee Name</th>
+                            <th class="text-left">Loan Type</th>
+                            <th class="text-left"> Loan Amount </th>
+                            <th class="text-left">  Sactioned Amount</th>
+                            <th class="text-left">Pending Amount</th>
+                            <th class="text-left">Loan Insallments</th>
+                            <th class="text-left">Loan EMI</th>
+                            <th class="text-left">Applied Date </th>
+                            <th>Loan Status</th>
+
+                            <!--<th class="text-left">Action</th>-->
+
+                        </tr>
+                    </thead>
+                    <tbody dir-paginate="user in filterValue = (gridOptions | filter : searchValue)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <tr>
+                            <td class="text-left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-left">{{user.masterEmployee.hrmE_EmployeeFirstName}}</td>
+                            <td>{{user.hrMasterLoan.hrmL_LoanType}}</td>
+                            <td>{{user.hreL_LoanAmount}}</td>
+                            <td>{{user.hreL_SanctionedAmount}}</td>
+                            <td>{{user.hreL_TotalPending}}</td>
+                            <td>{{user.hreL_LoanInsallments}}</td>
+                            <td>{{user.hreL_LaonEMI}}</td>
+                            <td class="text-left">{{user.hreL_AppliedDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.hreL_LoanStatus}}</td>
+
+                            
+
+
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+            <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+
+    <div id="myModaldocx" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+
+        <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+            <div class="modal-content">
+
+                <div class="modal-footer">
+
+                    <div class="row">
+                        <div class="col-sm-2 pull-left">
+
+                            <h4 style="text-align:center">View Document</h4>
+                        </div>
+                        <div class="col-sm-10 pull-right">
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                                <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="box" style="overflow:auto;">
+                        <div class="box-body">
+                            <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <form id="qqqq">
+                <div class="modal-content">
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-sm-2 pull-left">
+                                <h4 style="text-align:center">View Document</h4>
+                            </div>
+                            <div class="col-sm-10 pull-right">
+                                <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                                    <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="pdfviewdd">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="myModalPreview" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class=" col-sm-0 pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="box" style="overflow:auto;">
+                        <div class="box-body">
+                            <img id="preview1" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="myModalimg" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img id="preview" class="img-responsive" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

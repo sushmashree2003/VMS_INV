@@ -1,0 +1,151 @@
+﻿
+
+<style>
+    .badge-success {
+        color: #fff;
+        background-color: #28a745;
+    }
+
+    .badge-primary {
+        color: #fff;
+        background-color: #007bff;
+    }
+
+    .badge-warning {
+        color: #1f2d3d;
+        background-color: #ffc107;
+    }
+
+    .badge-danger {
+        color: #fff;
+        background-color: #dc3545;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Present and Absent Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="text-center">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2 font-weight-bold"><b>Date:</b><span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="getcurrentdate" name="date" onkeypress="return false" ng-change="getpresentabsentdetails()" required></md-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Present and Absent List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm0" enctype="multipart/form-data" novalidate>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="col-sm-4 pull-left">
+                        <h5 class="box-title" id="demo"> {{getcurrentdate|date:'dd/MM/yyyy'}} &nbsp; : &nbsp; {{ getcurrentdate | date : 'EEEE' }} </h5>
+                    </div>
+                    <div class="col-sm-4 pull-center">
+                        <h5 class="box-title"> {{HR_Master_DepartmentCode_Head}} </h5>
+                    </div>
+                </div>
+
+
+
+                <table class="table table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sort('sno')">SL.No.</a></th>
+                            <th><a href="" ng-click="sort('lpmcomP_ComplexityName')">Employee Name</a></th>
+                            <th><a href="" ng-click="sort('lpmcomP_ComplexityDesc')">Present/Absent</a></th>
+                            <th><a href="" ng-click="sort('lpmcomP_ComplexityDesc')">Leave Details</a></th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in GetReport">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center" style="overflow-wrap:break-word">{{user.HRME_EmployeeFirstName}}</td>
+                            <td style="text-align:center">
+                                <span ng-if="user.Status=='Absent'" style="color:red"> {{ user.Status}}</span>
+                                <span ng-if="user.Status=='Present'" style="color:forestgreen"> {{ user.Status}}</span>
+                            </td>
+                            <td class="text-center">
+                                <i class="fa fa-eye text-blue" aria-hidden="true" data-toggle="modal" ng-model="hrmE_Id" data-target="#approver" ng-click="approverName(user)"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="10" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </form>
+    </div>
+</section>
+
+<div id="approver" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="model-header custom-header margin-top-20">
+                <center><h3 class="modal-title custom">Leave Approver Name</h3></center>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row margin-top-10">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Leave Name</th>
+                                        <th>Sanction Level</th>
+                                        <th>Approver Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="appr in lengthval = (employeeid | filter : searchValueU)  | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                                    <tr>
+                                        <td class="text-center" rowspan="{{appr.plannerdetails.length+1}}">{{$index+1}}</td>
+                                        <td class="text-left" rowspan="{{appr.plannerdetails.length+1}}"><b>{{appr.HRML_LeaveName}}</b></td>
+                                    </tr>
+                                    <tr ng-repeat="planner in appr.plannerdetails">
+
+                                        <td class="text-left">{{planner.HRLAON_SanctionLevelNo}}</td>
+                                        <td class="text-left">{{planner.Approver_Name}}</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>

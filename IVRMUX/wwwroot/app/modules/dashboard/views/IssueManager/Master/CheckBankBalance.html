@@ -1,0 +1,702 @@
+<style>
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">bank Balance Entry</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamwwe" ng-model="obj.MI_Id" ng-change="oncmpchange()" required ng-disabled="editflag==true">
+                                    <option value="">--Select Company--</option>
+                                    <option ng-repeat="option in allcompany" value="{{option.mI_Id}}"
+                                            ng-selected="{{option.mI_Id == obj.MI_Id}}">
+                                        {{option.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamwwe)" ng-messages="myForm.yrnamwwe.$error">
+                                    <div ng-message="required">Select Company</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body" ng-show="obj.MI_Id>0">
+                <div class="col-sm-12">
+                    <div class="col-sm-6 form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Bank Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamddwwe" ng-model="obj.HRMBD_Id" ng-change="bankchange()" required ng-disabled="editflag==true">
+                                    <option value="">--Select Bank--</option>
+                                    <option ng-repeat="option in banklist" value="{{option.hrmbD_Id}}"
+                                            ng-selected="{{option.hrmbD_Id == obj.HRMBD_Id}}">
+                                        {{option.hrmbD_BankName}}--{{option.hrmbD_BankAccountNo}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamddwwe)" ng-messages="myForm.yrnamddwwe.$error">
+                                    <div ng-message="required">Select Bank</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display:none !important">
+                            <label class="control-label col-sm-4"> Credit :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="visittyp" ng-model="obj.VBABRS_CRDRFlg" ng-change="typechange();" ng-disabled="editflag==true">
+                                    <option value="">--Select--</option>
+                                    <option value="CR">Credit </option>
+                                    <!--<option value="DR">Debit</option>-->
+
+                                </select>
+                                <div class="text-left error-messages" ng-if="interacted(myForm.visittyp)" ng-messages="myForm.visittyp.$error">
+                                    <div ng-message="required">Select Credit</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Amount:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="ddamtt" placeholder="Enter Amount" ng-model="obj.VBABRS_Amount" allow-pattern="[0-9.]"   ng-blur="typechange()" autocomplete="off" ng-disabled="editflag==true" maxlength="10" required>
+                                <div class="error-messages" ng-if="interacted(myForm.ddamtt)" ng-messages="myForm.ddamtt.$error">
+                                    <div ng-message="required">Enter Amount</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Date<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8 input-group">
+                                <md-datepicker name="payment_date" onkeypress="return false" data-ng-model="obj.VBABRS_Date" md-placeholder="Enter Date" md-max-date="newdate" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.payment_date)" ng-messages="myForm.payment_date.$error">
+                                    <div ng-message="required">Select  Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Bank Balance:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="blll" placeholder="0" ng-model="obj.VBABRS_BankBalalnce" step="0.01" allow-pattern="(\s|[0-9.])" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" ng-disabled="true" autocomplete="off" style="font-size:25px !important; width: 100%;height: 41px;" required>
+                                <div class="error-messages" ng-if="interacted(myForm.blll)" ng-messages="myForm.blll.$error">
+                                    <div ng-message="required">Enter Bank Balance</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Narration :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" rows="6" id="comment" name="ccc" ng-model="obj.VBABRS_Remarks" placeholder="Narration" maxlength="250" required></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.ccc)" ng-messages="myForm.ccc.$error">
+                                    <div ng-message="required">Enter Narration</div>
+                                </div>
+                            </div>
+                           
+                        </div>
+
+
+                    </div>
+                    <hr />
+
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <input type="hidden" ng-model="obj.VBABRS_Id " value="{{obj.vbabrS_Id}}" />
+                        <input type="hidden" ng-model="obj.VPAYVOU_Id " value="{{obj.vpayvoU_Id}}" />
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn" ng-hide="obj.bankbalanceone ==true">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            SAVE
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+
+                            CANCEL
+                        </md-button>
+
+
+
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="alldata.length>0 ">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">bank Balance Entry List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{alldata.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="obj.search" type="text" placeholder="search here..." />
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th ng-hide="true">Amount Clear</th>
+                        <th><a href="" ng-click="sort('HRMBD_BankName')">Bank Name</a></th>
+
+
+                        <th><a href="" ng-click="sort('VBABRS_Date')">Date</a></th>
+
+                        <th><a href="" ng-click="sort('VBABRS_Amount')">Amount </a></th>
+                        <th>
+                            <a href="" ng-click="sort('VBABRS_CRDRFlg')">
+                                Credit
+                            </a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('VBABRS_CRDRFlg')">
+                                Debit
+                            </a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('VBABRS_BankBalalnce')">
+                                Bank  Balance
+                            </a>
+                        </th>
+
+                        <th><a href="" ng-click="sort('VBABRS_Remarks')">Narration</a></th>
+                        <th><a href="" ng-click="sort('VBABRS_ClearedFlg')">Clearance Flag</a></th>
+                        <th  ng-hide="true"><a href="" ng-click="sort('VBABRS_ClearedDate')">Cleared Date</a></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1=(alldata |filter:obj.search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                        current-page="currentPage" pagination-id="page1">
+                        <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td  ng-hide="true">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" data-ng-model="user.VBABRS_ClearedFlgone" ng-disabled="user.VBABRS_ClearedFlg==true">
+                                <span class="lbl padding-8"></span>
+                            </label>
+
+                        </td>
+                        <td style="text-align:left">{{user.HRMBD_BankName}}-{{user.HRMBD_BankAccountNo}}</td>
+
+                        <td style="text-align:left">{{user.VBABRS_Date |date:'dd/MM/yyyy'}}</td>
+
+                        <td style="text-align:left">{{user.VBABRS_Amount}}</td>
+                        <td style="text-align:left">
+                            <span ng-if="user.VBABRS_CRDRFlg=='CR'">
+
+                                Credit
+                            </span>
+                        </td>
+                        <td style="text-align:left">
+                            <span class="hidden">
+                                {{user.VBABRS_Id}}
+                            </span>
+                            <span ng-if="user.VBABRS_CRDRFlg=='DR'">
+                                Debit
+                            </span>
+                        </td>
+                        <td style="text-align:left">{{user.VBABRS_ActualBankBalance}}</td>
+                        <td style="text-align:left">{{user.VBABRS_Remarks}}</td>
+                        <td style="text-align:left">
+                            <span ng-if="user.VBABRS_ClearedFlg==true">
+                                <i class="fa fa-check  text-green"></i>
+                            </span>
+                            <span ng-if="user.VBABRS_ClearedFlg==false">
+                                <i class="fa fa-times  text-red"></i>
+                            </span>
+                        </td>
+                        <td style="text-align:left"  ng-hide="true">
+                            {{user.VBABRS_ClearedDate |date:'dd/MM/yyyy'}}
+
+                            <span ng-if="user.VBABRS_ClearedFlg==false && user.VBABRS_ClearedDate==null">
+                                <md-datepicker name="Clear_datse" onkeypress="return false" data-ng-model="user.VBABRS_ClearedDateone" md-placeholder="Clear Date" ng-required="user.VBABRS_ClearedFlg==true"></md-datepicker>
+
+                            </span>
+                        </td>
+
+
+                    </tr>
+                </tbody>
+            </table>
+            <!--<div class="col-sm-12 text-center">
+                <md-button class="md-raised md-primary" ng-click="savedataClearFlag()" id="save-btn">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    SAVE
+                </md-button>
+            </div>-->
+            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="alldatatwo.length>0  && obj.optionflag=='bnktobnk'">
+        <div class="box-header with-border">
+            <h3 class="box-title">cheque book Entry List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{alldata.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered" style="overflow:auto !important">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="" ng-click="sort('VPAYVOU_VoucherNo')">Voucher No</a></th>
+                        <th><a href="" ng-click="sort('HRMBD_BankName')">From Bank</a></th>
+                        <th><a href="" ng-click="sort('Tobank')">To Bank</a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_PaymentTo')">Pay Name</a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_VoucherNo')">Cheque No</a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_PaymentDate')">Payment Date</a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_AppliedAmount')">Applied Amount </a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_PaymentDate')">Approved Date</a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_ApprovedAmount')">Approved Amount </a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_Remarks')">Narration</a></th>
+                        <th><a href="" ng-click="sort('VPAYVOU_StatusFlg')">Status</a></th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1=(alldatatwo |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                        current-page="currentPage" pagination-id="page1">
+                        <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                        <td style="text-align:left">{{user.VPAYVOU_VoucherNo}}</td>
+                        <td style="text-align:left">
+                            {{user.HRMBD_BankName}}<br />A/c No
+                            {{user.HRMBD_BankAccountNo}}
+                        </td>
+                        <td style="text-align:left">
+                            {{user.Tobank}}<br />A/c No
+                            {{user.toaccountnumber}}
+                        </td>
+                        <td style="text-align:left">
+                            {{user.VPAYVOU_PaymentTo}}
+                        </td>
+                        <td style="text-align:left">{{user.VPAYVOU_ChequeNo}}</td>
+                        <td style="text-align:left">{{user.VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}</td>
+
+                        <td style="text-align:left">{{user.VPAYVOU_AppliedAmount}}</td>
+                        <td style="text-align:left"><span ng-show="user.VPAYVOU_StatusFlg=='Approved'">{{user.VPAYVOU_UpdatedDate |date:'dd/MM/yyyy'}}</span></td>
+                        <td style="text-align:left">{{user.VPAYVOU_ApprovedAmount}}</td>
+
+
+                        <td style="text-align:left">{{user.VPAYVOU_Remarks}}</td>
+                        <td style="text-align:left">{{user.VPAYVOU_StatusFlg}}</td>
+                        <td class="text-center">
+                            <span class="hidden">
+                                {{user.VPAYVOU_TDS}}
+                            </span>
+                            <span class="hidden">
+                                {{user.VPAYVOU_Penalty}}
+                            </span>
+                            <span ng-if="user.VPAYVOU_ActiveFlg==true && user.VPAYVOU_StatusFlg=='Pending'">
+                                <!--<a class="text-aqua" href="" ng-click="Editdata(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>-->
+                                <a href="" ng-click="clientDecative(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Deactivate</i>
+                                </a>
+
+                            </span>
+                            <span ng-if="user.VPAYVOU_ActiveFlg==false  && user.VPAYVOU_StatusFlg=='Pending'">
+                                <a href="" ng-click="clientDecative(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Activate</i>
+                                </a>
+                            </span>
+                            <span ng-if="user.VPAYVOU_StatusFlg=='Approved' || user.VPAYVOU_StatusFlg=='Rejected'">
+                                ----
+                            </span>
+
+                        </td>
+
+
+
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="10" pagination-id="page1"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+
+<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    TAX INVOICE  DETAILS
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printData()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div class="row">
+                                <div class="col-sm-12" style="text-align:center">
+                                    <h5> TAX INVOICE </h5>
+                                </div>
+                                <div class="col-sm-2">
+                                    &nbsp; &nbsp;
+                                </div>
+                                <div class="col-sm-8" style="text-align:center">
+                                    <img src="{{imagename}}" class="img-responsive" />
+                                </div>
+                                <div class="col-sm-2">
+                                    &nbsp; &nbsp;&nbsp; &nbsp;
+                                </div>
+
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive" style="border:none !important" width="100%">
+                                        <tr>
+                                            <td>Contact No.:&nbsp; 08068112900/2925</td>
+                                            <td>  Email:&nbsp; accounts@vapstech.com</td>
+                                            <td> GST NO:&nbsp; {{cgst}}</td>
+                                            <!--<td> CIN:&nbsp; {{ccin}}</td>-->
+                                        </tr>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:50%;text-align:left">TO</td>
+                                            <td style="width:50%;text-align:left">  INVOICE NO:&nbsp;{{INVMSL_SalesNo}}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:50%;text-align:left" rowspan="2">
+                                                <span>
+                                                    {{ISMMCLT_Desc}}<br />
+                                                    {{client}}<br />
+                                                    {{ISMMCLT_Address}}<br />
+                                                    Phone No.{{clmobile}}<br />
+                                                    Email    :{{clemail}}<br />
+                                                    GST No :&nbsp; {{clientgst}}
+
+                                                </span>
+
+                                            </td>
+                                            <td style="width:50%;text-align:left">DATE:&nbsp;{{INVMSL_SalesDate |date:'dd/MM/yyyy'}}</td>
+                                        </tr>
+                                        <!--<tr>
+                                            <td style="width:50%;text-align:left">ISSUED TO :&nbsp;{{temptorecbyname}}</td>
+                                        </tr>-->
+                                        <!--<tr>
+                                            <td style="width:50%;text-align:left">MODE OF TRANSPORT: &nbsp;By Hand/ by Courier  </td>
+                                        </tr>-->
+                                        <!--<tr>
+                                            <td style="width:50%;text-align:left">
+                                                GST No :&nbsp; {{clientgst}}
+                                            </td>
+
+
+                                        </tr>-->
+
+
+                                        <tr>
+
+
+                                            <td style="width:50%;text-align:left">
+                                                MOU Ref. No:    &nbsp;{{mno}}
+                                                &nbsp; &nbsp; Date:&nbsp;{{mdate|date:'dd/MM/yyyy'}}
+                                            </td>
+
+
+                                        </tr>
+
+
+                                    </table>
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:65px"><b>SL. NO.</b></td>
+                                            <td><b>DESCRIPTION</b></td>
+                                            <td><b>QTY.</b> </td>
+                                            <td><b>Rate/Unit.</b> </td>
+                                            <td><b>Amount</b> </td>
+                                        </tr>
+                                        <tr ng-repeat="it in get_SaleItemDetails">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{it.ismincD_ItemDesc}}</td>
+                                            <td>{{it.ismincD_Qty}}</td>
+                                            <td>{{it.ismincD_UnitRate |number:2}}</td>
+                                            <td><span style="float:right">{{it.ismincD_Amount |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4"><b style="float:right">TOTAL&nbsp;(Before Tax)</b></td>
+                                            <td><b style="float:right">{{ttl |number:2}}</b></td>
+                                        </tr>
+
+                                        <tr ng-repeat="ss in masterTax">
+                                            <td colspan="4"><b style="float:right">{{ss.invmT_TaxName}}</b></td>
+                                            <td colspan="4"><span style="float:right">{{ss.taxamount |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4"><b style="float:right">Roundoff</b></td>
+                                            <td><span style="float:right">{{roundoffttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4"><b style="float:right">TOTAL</b></td>
+                                            <!--<td><b style="float:right">{{mainttl |number:2}}</b></td>-->
+                                            <td><b style="float:right">{{roundoffttl |number:2}}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5">
+                                                <b style="float:left">Amount in Words:&nbsp;&nbsp;{{words}}  &nbsp;Only</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="text-align:left">
+                                                TERMS AND CONDITION :
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="Remarks!=null && Remarks!=''">
+                                            <td colspan="5" style="text-align:left">
+                                                {{Remarks}}
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="Remarks==null || Remarks==''">
+                                            <td colspan="5" style="text-align:left;height:30px">
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="text-align:left">
+                                                MODE OF PAYMENT: &nbsp;&nbsp;{{mof}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="text-align:left">
+                                                BANK DETAILS:
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="text-align:left">
+                                                <span ng-repeat="bb in bankarray">
+                                                    Name:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BankName}}<br />
+                                                    Account No.:&nbsp;&nbsp;{{bb.hrmbD_BankAccountNo}}<br />
+                                                    Branch:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BranchName}}<br />
+                                                    IFSC Code:&nbsp;&nbsp;&nbsp;{{bb.hrmbD_IFSCCode}}<br />
+                                                    Address:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BankAddress}}<br />
+                                                </span>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <h5>&nbsp; </h5>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <h5> For &nbsp; {{miname}} </h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Receiver's signature </h5>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Authorised Signatory </h5>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="chequecancel" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!--<button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>-->
+                <h4 class="modal-title text-white">
+                    Checque Cancel Details
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <h4 class="text-center">    Cheque No Misssing Remarks</h4>
+                            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormone" novalidate>
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                sl No
+                                            </th>
+                                            <th>
+                                                Cheque No
+                                            </th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="rpt in leafcancelD">
+                                            <td>
+                                                {{$index+1}}
+                                            </td>
+
+                                            <td>
+                                                {{rpt.vpayvoU_ChequeNoleaf}}
+                                            </td>
+                                            <td>
+                                                <textarea class="form-control" rows="2" id="comment" name="ccyc" ng-model="rpt.VPAYVOU_Remarksleaf" placeholder="Remark" ng-paste="$event.preventDefault()" required></textarea>
+                                                <div class="error-messages" ng-if="interactedone(myFormone.ccycT)" ng-messages="myFormone.ccycT.$error">
+                                                    <div ng-message="required">Enter Remark</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+
+                                <div class="text-center">
+                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedataModal()" id="save-btn">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                        Save
+                                    </md-button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

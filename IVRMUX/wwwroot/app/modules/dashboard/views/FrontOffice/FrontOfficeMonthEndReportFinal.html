@@ -1,0 +1,214 @@
+﻿<link href="/css/print/Fees/MonthEndReport.css" rel="stylesheet" />
+
+<!--<style>
+    tr:nth-child(even) {
+        background-color: Lightgreen;
+    } 
+</style>-->
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="GetFinalReport()" name="myForm" data-ng-init="loadData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Final Attendance Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="year1" ng-model="year" ng-change="getchanged();" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                    <div ng-message="required">Please Select the Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="month1" ng-model="month" ng-change="getchanged();" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in fillmonth" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.monthname}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                    <div ng-message="required">Please Select the month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-click="Clear_Details();" target="_blank" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+                        <md-button type="button" ng-show="report" class="md-raised md-primary" id="excel-btn" ng-click="exptoex()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="report" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="button" ng-show="report" class="md-raised md-primary" id="mail-btn" ng-click="sendmailMD()">
+                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                            Send Mail MD/PStoMD
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="report">
+            <div class="box-header with-border">
+                <h3 class="box-title">FINAL ATTENDANCE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" style="overflow:scroll">
+                <div class="MonthEndReport" id="tablegrp">
+                    <h3 class="text-center">{{institutename}} – Attendance Report for Month of {{monthname}} {{year}}</h3>
+                    <div class="">
+                        <table class="table table-bordered" border="1">
+                            <thead>
+                                <tr style="text-align:center;">
+                                    <th width="50px">SL.NO</th>
+                                    <th width="70px">Emp Code</th>
+                                    <th width="150px">Name</th>
+                                    <th width="120px">DOJ</th>
+                                    <th width="120px">Designation</th>
+                                    <!--<th width="200px">Leave Count</th>-->
+                                    <th width="120px">No. of Days in Month</th>
+                                    <th width="120px">No. of Working Days</th>
+                                    <th width="300px">S/W LOP Details</th>
+                                    <th width="200px">S/W Late/Early (After 180)</th>
+                                    <th width="200px">S/W LOP</th>
+                                    <th width="150px">S/W Total</th>
+                                    <th width="200px">Approved Leave Details</th>
+                                    <!--<th width="150px">HR Updates</th>-->
+                                    <th width="200px">HR Total</th>
+                                    <th width="200px">Salary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="val in monthendreport" style="text-align:center;">
+                                    <td width="50px">{{ $index+1 }}</td>
+                                    <td width="70px">{{val.vmscrT_EMPCode}}</td>
+                                    <td width="150px">{{val.vmscrT_EName}}</td>
+                                    <td width="120px">{{val.vmscrT_DOJ|date:'dd-MM-yyyy'}}</td>
+                                    <td width="120px">{{val.vmscrT_DesigCode}}</td>
+                                    <td width="120px">{{numberofdays}}</td>
+                                    <td width="120px">{{numberofdays - val.vmscrT_unauthorizedleave}}</td>
+                                    <!--<td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>Early Out</td><td>{{val.vmscrT_Earlyout}}</td></tr>
+                                            <tr><td>Daily Report Not Sent</td><td>{{val.vmscrT_DailyReportnotsend}}</td></tr>
+                                            <tr><td>Late Coming</td><td>{{val.vmscrT_Latecoming}}</td></tr>
+                                            <tr><td>UnAuthorized Leave</td><td>{{val.vmscrT_unauthorizedleave}}</td></tr>
+                                        </table>
+                                    </td>-->
+
+                                    <td width="300px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>Late In (Dates)</td><td>{{val.vmscrT_LCDetails}}</td></tr>
+                                            <tr><td>Early Out (Dates)</td><td>{{val.vmscrT_EODetails}}</td></tr>
+                                            <tr><td>UnAuthorized Leave (Dates)</td><td>{{val.vmscrT_ULDetails}}</td></tr>
+                                            <tr><td>Daily Report Not Sent (Dates)</td><td>{{val.vmscrT_DRDetails}}</td></tr>
+                                            <tr><td>Half Daily Report Sent (Dates)</td><td>{{val.vmscrT_HDRDetails}}</td></tr>
+                                            <tr><td>Blocked Daily Report (Dates)</td><td>{{val.vmscrT_BDRDetails}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>Late In (After 180)</td><td>{{val.vmscrT_LCU180}}</td></tr>
+                                            <tr><td>Early Out (After 180)</td><td>{{val.vmscrT_EOU180}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>Late Coming LOP</td><td>{{val.vmscrT_Latecoming * 0.5}}</td></tr>
+                                            <tr><td>Early Out LOP</td><td>{{val.vmscrT_Earlyout * 0.5}}</td></tr>
+                                            <tr><td>UnAuthorized Leave LOP</td><td>{{val.vmscrT_unauthorizedleave}}</td></tr>
+                                            <tr><td>Daily Report Not Sent LOP</td><td>{{val.vmscrT_DailyReportnotsend * 0.5}}</td></tr>
+                                            <tr><td>Half Daily Report Sent LOP</td><td>{{val.vmscrT_HDailyReport * 0.5}}</td></tr>
+                                            <tr><td>Blocked Daily Report LOP</td><td>{{val.vmscrT_BDailyReport}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="150px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>Total LOP</td><td>{{val.vmscrT_TLOP}}</td></tr>
+                                            <tr><td>Total Payable Days</td><td>{{numberofdays - val.vmscrT_TLOP}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <!--<td width="150px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>HR LC</td><td>{{val.vmscrT_HRLC}}</td></tr>
+                                            <tr><td>HR EO</td><td>{{val.vmscrT_HREO}}</td></tr>
+                                            <tr><td>HR UL</td><td>{{val.vmscrT_HRUL}}</td></tr>
+                                            <tr><td>HR DR</td><td>{{val.vmscrT_HRDR}}</td></tr>
+                                        </table>
+                                    </td>-->
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr ng-repeat="data in val.approvedleavedetails">
+                                                <td>{{data.approvedleavetype}}</td>
+                                                <td>{{data.approvedleavedays}} (No. of Days)</td>
+                                                <td>{{data.leavebalance}} (Balance)</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>HR Total LOP</td><td>{{val.vmscrT_HRTLOP}}</td></tr>
+                                            <tr><td>HR Total Payable</td><td>{{numberofdays - val.vmscrT_HRTLOP}}</td></tr>
+                                            <tr><td>HR Remarks</td><td>{{val.vmscrT_Remarks}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr ng-repeat="data in val.salarydetails">
+                                                <td>{{data.salaryhead}}</td>
+                                                <td>{{data.headamount}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr style="height:50px">
+                                    <td colspan="5" style="vertical-align:bottom"><b>Prepared By</b></td>
+                                    <td colspan="3" style="vertical-align:bottom"><b>Verified By</b></td>
+                                    <td colspan="3" style="vertical-align:bottom"><b>Approved By</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

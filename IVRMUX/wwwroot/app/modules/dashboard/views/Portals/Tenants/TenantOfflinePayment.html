@@ -1,0 +1,979 @@
+﻿<style>
+    .multiselect {
+        width: 18.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        /*min-height: 280px;*/
+        border-radius: 5px;
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="loaddata()" name="myForm1" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Tenant Offline Payment</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-10 col-sm-offset-1">
+                    <div class="well text-center">
+                        <!--ng-init="all1='Rent'"-->
+                        <div class="form-group" ng-init="all1='Rent'">
+
+                            <label class="radio-inline">
+                                <input type="radio" value="Rent" name="all1" data-ng-model="all1" ng-change="onradiobuttonSelect(all1)" required>
+                                <span class="lbl padding-8">Rent</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="WaterBill" name="all1" data-ng-model="all1" ng-change="onradiobuttonSelect(all1)" required>
+                                <span class="lbl padding-8">Water Bill</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Electrical" name="all1" data-ng-model="all1" ng-change="onradiobuttonSelect(all1)" required>
+                                <span class="lbl padding-8">Electricity Bill</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Advance" name="all1" data-ng-model="all1" ng-change="onradiobuttonSelect(all1)" required>
+                                <span class="lbl padding-8">Advance</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Other" name="all1" data-ng-model="all1" ng-change="onradiobuttonSelect(all1)" required>
+                                <span class="lbl padding-8">Other</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Fine" name="all1" data-ng-model="all1" ng-change="onradiobuttonSelect(all1)" required>
+                                <span class="lbl padding-8">Fine</span>
+                            </label>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-12 form-horizontal">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="text-center well" ng-init="radioval='Name'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="radioval" name="radioval" value="Name" ng-change="onclickloaddata()">
+                                <span class="lbl padding-8">Name</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="radioval" name="radioval" value="Place" ng-change="onclickloaddata()">
+                                <span class="lbl padding-8">Place</span>
+                            </label>
+
+                            <!--<div class="error-messages" ng-if="interacted(myForm1.radioval)" ng-messages="myForm1.radioval.$error">
+                                <div ng-message="required">Select Place/Name.</div>
+                            </div>-->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-if="place_flg==true && radioval=='Place' &&  edit_flag==false">
+                            <label class="control-label col-sm-4">Building:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sm" name="buildingname" ng-model="obj.HRMB_Id"
+                                        ng-change="onSelectbuilding(obj.HRMB_Id)" ng-required="place_flg==true">
+                                    <option value="">Select</option>
+                                    <option ng-repeat="building in building_array" value="{{building.hrmB_Id}}"
+                                            ng-selected="obj.HRMB_Id == building.hrmB_Id">
+                                        {{building.hrmB_BuildingName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.buildingname)"
+                                     ng-messages="myForm1.buildingname.$error">
+                                    <div ng-message="required">Select Building</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-if="place_flg==true && radioval=='Place' &&  edit_flag==false">
+                            <label class="control-label col-sm-4">Floor:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sm" name="floorname" ng-model="obj.HRMF_Id"
+                                        ng-change="onSelectfloor(obj.HRMF_Id)" ng-required="place_flg==true && edit_flag!=true">
+                                    <option value="">Select</option>
+                                    <option ng-repeat="floor in floor_array" value="{{floor.hrmF_Id}}"
+                                            ng-selected="HRMF_Id == floor.hrmF_Id">
+                                        {{floor.hrmF_FloorName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.floorname)"
+                                     ng-messages="myForm1.floorname.$error">
+                                    <div ng-message="required">Select Floor</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-if="place_flg==true && radioval=='Place' &&  edit_flag==false">
+                            <label class="control-label col-sm-4">Room:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sm" name="roomname" ng-model="obj.HRMR_Id"
+                                        ng-change="getTenantdetails(obj.HRMR_Id)" ng-required="place_flg==true">
+                                    <option value="">Select</option>
+                                    <option ng-repeat="room in room_array" value="{{room.hrmR_Id}}"
+                                            ng-selected="obj.HRMR_Id == room.hrmR_Id">
+                                        {{room.hrmR_RoomName}}
+                                    </option>
+                                </select>
+
+                                <div class="error-messages" ng-if="interacted1(myForm1.roomname)"
+                                     ng-messages="myForm1.roomname.$error">
+                                    <div ng-message="required">Select Room</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-if="name_flg==true && radioval=='Name' &&  edit_flag==false">
+                            <label class="control-label col-sm-4">Tenant:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="tenant_id" ng-model="$parent.TENANTAGR_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Tenant" ng-change="getTenantdetails(TENANTAGR_Id)" ng-required="name_flg==true && edit_flag==true">
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Tenant">{{$select.selected.tenantagR_TenantName}}</ui-select-match>
+                                    <ui-select-choices repeat="catgry in tenantlist | filter: $select.search" value="{{catgry.tenantagR_Id}}" ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.tenantagR_TenantName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.tenant_id)" ng-messages="myForm1.tenant_id.$error">
+                                    <div ng-message="required">Select Tenant</div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                    <div class="col-sm-6" ng-if="all1=='Rent' || all1=='WaterBill' || all1 == 'Other' || all1 == 'Electrical' || all1 == 'Fine'">
+
+
+
+                        <!--<div class="form-group" ng-if="edit_flag==false">
+                            <label class="control-label col-sm-4">Month : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-8">
+
+                                <select class="form-control" ng-model="MonthId" name="monthsgg" id="id0" ng-change="onSelectMonthdetailsTwo(MonthId)"
+                                        required>
+                                    <option value="">--Select Month --</option>
+                                    <option ng-repeat="monthdfff in get_month_details" value="{{monthdfff.MonthId}}" ng-selected="monthdfff.MonthId==MonthId">
+                                        {{monthdfff.Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.monthsgg)"
+                                     ng-messages="myForm1.monthsgg.$error">
+                                    <div ng-message="required">Select Month </div>
+                                </div>
+                            </div>
+
+                        </div>-->
+                        <div class="form-group" ng-if="edit_flag==false">
+                            <label class="control-label col-sm-3">Month:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="class" ng-model="obj.MonthId" ng-change="onSelectMonthdetailsTwo(obj.MonthId)" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="clas in get_month_details" value="{{clas.MonthId}}" ng-selected="{{clas.MonthId==MonthId}}">
+                                        {{clas.Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm.class)" ng-messages="myForm.class.$error">
+                                    <div ng-message="required">Select Month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 form-horizontal box-content clearfix" ng-repeat="usr in get_tenant_details" ng-if="tenant_details=true && get_tenant_details.length>0">
+                        <div class="col-sm-1">
+                            <img src="{{usr.imgpath}}" height="100" width="100" />
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important">
+                                    TENANT NAME
+                                </h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">: &nbsp;<strong>{{usr.TENANTAGR_TenantName}} </strong> </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important">
+                                    EMAIL-ID
+                                </h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong> {{usr.TENANTAGR_EmailId}} </strong>   </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important"> BUILDING</h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong> {{usr.HRMB_BuildingName}} </strong>   </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important"> Monthly Rent</h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong>  {{usr.TENANTAGR_MonthlyRent}}  </strong>   </h5>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important">  AGREEMENT FROM DATE</h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong> {{usr.TENANTAGR_AgrFromDate |date:'dd-MM-yyyy'}}  </strong>   </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important">  AGREEMENT TO DATE</h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong>  {{usr.TENANTAGR_AgrToDate| date:'dd-MM-yyyy'}}  </strong>   </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important">  ADDRESS</h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong>   {{usr.TENANTAGR_Address}} </strong>   </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important">   ROOM</h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong>{{usr.HRMR_RoomName}}  </strong>   </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="col-sm-5" style="color:#444 !important">   Floor</h5>
+                                <div class="col-sm-7">
+                                    <h5 style="color:#444 !important">:&nbsp;<strong> {{usr.HRMF_FloorName}} </strong>   </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group ">
+                                <table class="table table-hover table-responsive table-bordered table-width text-center">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Type</th>
+                                            <th>Total Payable</th>
+                                            <th>Total Paid</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody ng-repeat="user in get_tenant_paid_details">
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Rent')">Rent</a></td>
+                                            <td>{{user.rent_total_payable}}</td>
+                                            <td>{{user.rent_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('WaterBill')">Water</a></td>
+                                            <td>{{user.water_total_payable}}</td>
+                                            <td>{{user.water_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Electrical')">Electricity</a></td>
+                                            <td>{{user.electricity_total_payable}}</td>
+                                            <td>{{user.electricity_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Fine')">Fine</a></td>
+                                            <td>{{user.fine_total_payable}}</td>
+                                            <td>{{user.fine_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Other')">Other</a></td>
+                                            <td>{{user.other_total_payable}}</td>
+                                            <td>{{user.other_total_paid}}</td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td><b>Total</b></td>
+                                            <td><b>{{user.total_payable}}</b></td>
+                                            <td><b>{{user.total_paid}}</b></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><b>Total Outstanding</b></td>
+                                            <td colspan="2">{{user.outstanding}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="col-sm-12 box-content clearfix" ng-repeat="usr in get_tenant_details" ng-if="tenant_details=true && get_tenant_details.length>0" style="padding:0px !important;">
+
+                        <div class="col-sm-2" style="text-align: center;padding:0px;">
+                            <img src="{{usr.imgpath}}" height="100" width="100" />
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <div class="col-sm-12" style="padding:0px;">
+
+
+                                    <label class="col-sm-4" style="color:#444 !important">
+                                        TENANT NAME
+                                    </label>
+
+                                    <div class="col-sm-8">
+                                        <h5>: <span style="color:#444 !important">&nbsp;{{usr.TENANTAGR_TenantName}} </span> </h5>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12" style="padding:0px;">
+                                    <label class="col-sm-4">
+                                        EMAIL-ID
+                                    </label>
+
+                                    <div class="col-sm-8">
+                                        <h5>: <span style="color:#444 !important">&nbsp;{{usr.TENANTAGR_EmailId}}</span> </h5>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12" style="padding:0px;">
+                                    <label class="col-sm-4">
+                                        CONTACT NUMBER
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <h5>: <span style="color:#444 !important">&nbsp;{{usr.TENANTAGR_ContactNo}}</span> </h5>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12" style="padding:0px;">
+                                    <label class="col-sm-4">
+                                        BUILDING
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <h5>: <span style="color:#444 !important">&nbsp;{{ usr.HRMB_BuildingName}} </span> </h5>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12" style="padding:0px;">
+                                    <label class="col-sm-4">
+                                        Monthly Rent
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <h5>: <span style="color:#444 !important">&nbsp;{{ usr.TENANTAGR_MonthlyRent}} </span> </h5>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label class="col-sm-4">
+                                    AGREEMENT FROM DATE
+                                </label>
+                                <div class="col-sm-8">
+                                    <h5>: <span style="color:#444 !important">&nbsp;{{usr.TENANTAGR_AgrFromDate|date:'dd-MM-yyyy'}}</span> </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4">
+                                    AGREEMENT TO DATE
+                                </label>
+                                <div class="col-sm-8">
+                                    <h5>: <span style="color:#444 !important">&nbsp;{{usr.TENANTAGR_AgrToDate  | date:"dd-MM-yyyy"}} </span> </h5>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-sm-4">
+                                    ADDRESS
+                                </label>
+                                <div class="col-sm-8">
+                                    <h5>: <span style="color:#444 !important">&nbsp;{{ usr.TENANTAGR_Address}} </span> </h5>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-4">
+                                    ROOM
+                                </label>
+                                <div class="col-sm-8">
+                                    <h5>: <span style="color:#444 !important">&nbsp;{{ usr.HRMR_RoomName}} </span> </h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4">
+                                    Floor
+                                </label>
+                                <div class="col-sm-8">
+                                    <h5>: <span style="color:#444 !important">&nbsp;{{ usr.HRMF_FloorName}} </span> </h5>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-sm-3" style="text-align: center;">
+                            <div class="form-group ">
+                                <table class="table table-hover table-responsive table-bordered table-width text-center">
+                                    <tr>
+                                        <th rowspan="2">Type</th>
+                                        <th>Total Payable</th>
+                                        <th>Total Paid</th>
+                                    </tr>
+                                    <tbody ng-repeat="user in get_tenant_paid_details">
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Rent')">Rent</a></td>
+                                            <td>{{user.rent_total_payable}}</td>
+                                            <td>{{user.rent_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Water')">Water</a></td>
+                                            <td>{{user.water_total_payable}}</td>
+                                            <td>{{user.water_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Electricity')">Electricity</a></td>
+                                            <td>{{user.electricity_total_payable}}</td>
+                                            <td>{{user.electricity_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Fine')">Fine</a></td>
+                                            <td>{{user.fine_total_payable}}</td>
+                                            <td>{{user.fine_total_paid}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><a ng-click="getMonthlyPaid_details('Other')">Other</a></td>
+                                            <td>{{user.other_total_payable}}</td>
+                                            <td>{{user.other_total_paid}}</td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td><b>Total</b></td>
+                                            <td><b>{{user.total_payable}}</b></td>
+                                            <td><b>{{user.total_paid}}</b></td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>-->
+                    <div class="col-sm-12  box-content clearfix" ng-if="all1!='Fine'">
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <div class="well" style="display: flex;">
+                                    <div ng-repeat="user in modeofpayment_array">
+                                        <label class="radio-inline">
+
+                                            <input type="radio" name="modee" ng-model="obj.IVRMMOD_Id" value="{{user.ivrmmoD_Id}}" data-ng-click="onselectmodeofpayment(obj.IVRMMOD_Id)" ng-checked="user.ivrmmoD_Id==obj.IVRMMOD_Id" required>
+                                            <span class="lbl padding-8">{{user.ivrmmoD_ModeOfPayment}}</span>
+                                        </label>
+
+                                    </div>
+
+                                </div>
+                                <div class="error-messages" ng-if="interacted1(myForm1.modee)" ng-messages="myForm1.modee.$error">
+                                    <div ng-message="required">Select Mode</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-7">
+                            <div data-ng-show="bankdetails">
+                                <div class="form-group" ng-if="obj.IVRMMOD_Id!='C' && obj.IVRMMOD_Id!='U'">
+                                    <label class="control-label col-sm-5">Bank Name :<span ng-if="obj.IVRMMOD_Id!='C' && obj.IVRMMOD_Id!='U'" style="color:Red">*</span></label>
+                                    <div class="col-sm-7">
+                                        <select class="form-control" ng-model="TENANTAGRPAY_Bankname" name="banknme" ng-required="obj.IVRMMOD_Id=='B'">
+                                            <option value="">---Select---</option>
+                                            <option ng-repeat="option in bank_array " value="{{option.hrmbD_BankName}}" ng-selected="{{option.hrmbD_BankName==HRMBD_Id}}" ng-disabled="disbankname">{{option.hrmbD_BankName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted1(myForm1.banknme)" ng-messages="myForm1.banknme.$error">
+                                            <div ng-message="required">Select Bank Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5" ng-if="(obj.IVRMMOD_Id=='B' || obj.IVRMMOD_Id=='CHQ')  && obj.IVRMMOD_Id!='C' ">Cheque/DD No. : </label>
+                                    <label class="control-label col-sm-5" ng-if="obj.IVRMMOD_Id=='R' && obj.IVRMMOD_Id!='C'">NEFT/RTGS Reference No. :</label>
+                                    <label class="control-label col-sm-5" ng-if="obj.IVRMMOD_Id=='S' && obj.IVRMMOD_Id!='C'">Card Reference No. :</label>
+                                    <label class="control-label col-sm-5" ng-if="obj.IVRMMOD_Id=='U' && obj.IVRMMOD_Id!='C'">UPI Reference No. :</label>
+                                    <div class="col-sm-7">
+                                        <input type="text" class="form-control" placeholder="Enter Cheque/DD No./Card No" name="cardno" data-ng-model="TENANTAGRPAY_Chequeno" id="chequeno" allow-pattern="[0-9 ]" ng-required="obj.IVRMMOD_Id=='B' && FYP_PayModeType=='Single'" ng-disabled="disddno" />
+                                        <div class="error-messages" ng-if="interacted(myForm.cardno)" ng-messages="myForm.cardno.$error">
+                                            <div ng-message="required">Enter Cheque/DD No./Card No.</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5" ng-if="(obj.IVRMMOD_Id=='B' || obj.IVRMMOD_Id=='CHQ') ">Cheque/DD Date :</label>
+                                    <label class="control-label col-sm-5" ng-if="obj.IVRMMOD_Id=='R'">RTGS/NEFT Date :</label>
+                                    <label class="control-label col-sm-5" ng-if="obj.IVRMMOD_Id=='S'">Transaction Date :</label>
+                                    <label class="control-label col-sm-5" ng-if="obj.IVRMMOD_Id=='U'">Transaction Date :</label>
+                                    <div class="col-sm-7">
+
+                                        <md-datepicker ng-model="TENANTAGRPAY_Chequedate" name="tdate" id="chequedddate" md-placeholder="Enter date" ng-required="FYP_Bank_Or_Cash=='B' && FYP_PayModeType=='Single'" ng-disabled="disdddate"></md-datepicker>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                            <div ng-message="required">Kindly enter in (dd-mm-yyyy) format</div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Payment Date:<strong style="color:red;">*</strong></label>
+                            <md-datepicker name="pay_date" md-placeholder="Payment Date" ng-model="obj.tenantagrpaY_PaymentDate" ng-paste="$event.preventDefault()" onkeydown="return false" ng-change="getfine(obj.tenantagrpaY_PaymentDate)" required></md-datepicker>
+
+                            <div class="error-messages " ng-if="interacted1(myForm1.pay_date)" ng-messages="myForm1.pay_date.$error">
+                                <div ng-message="required">Select PaymentDate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 box-content clearfix" ng-if="all1!='Fine'">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Total Payable:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_pay" type="text" placeholder="Total Amount..." ng-model="obj.total_payable" maxlength="15" allow-pattern="\d" required ng-blur="onclickpayabledata(total_payable)" ng-disabled="all1=='Electrical'">
+
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_pay)" ng-messages="myForm1.ttl_pay.$error">
+                                        <div ng-message="required">Total Payable</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Total Balance:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_bal" ng-disabled="true" type="text" placeholder="Total Amount..." ng-model="total_balance" maxlength="15" allow-pattern="\d" required>
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_bal)" ng-messages="myForm1.ttl_bal.$error">
+                                        <div ng-message="required">Total Balance</div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Total excess:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_acc" ng-disabled="true" type="text" placeholder="Total Amount..." ng-model="total_excess" maxlength="15" allow-pattern="\d" required>
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_acc)" ng-messages="myForm1.ttl_acc.$error">
+                                        <div ng-message="required">Total Balance</div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Payable Fine:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_acc" ng-disabled="true" type="text" placeholder="Total Amount..." ng-model="total_fine_paid" maxlength="15" allow-pattern="\d" required>
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_acc)" ng-messages="myForm1.ttl_acc.$error">
+                                        <div ng-message="required">Payable Fine</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Monthly Fine:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_acc" type="text" placeholder="Total Amount..." ng-model="monthly_fine" maxlength="15" allow-pattern="\d" ng-disabled="all1=='Electrical' || all1=='WaterBill' || all1=='Other' || all1=='Advance'" required>
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_acc)" ng-messages="myForm1.ttl_acc.$error">
+                                        <div ng-message="required">Monthly Fine</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Monthly Amount:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_pay" ng-disabled="true" type="text" placeholder="Total Amount..." ng-model="month_pay" maxlength="15" allow-pattern="\d" required>
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_pay)" ng-messages="myForm1.ttl_pay.$error">
+                                        <div ng-message="required">Total Monthly Rent</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Fine:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_pay" ng-disabled="ttlamt_flg==true" type="text" placeholder="Total Amount..." ng-model="fine" maxlength="15" allow-pattern="\d" ng-click="onclickpayabledata(total_payable)" required>
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_pay)" ng-messages="myForm1.ttl_pay.$error">
+                                        <div ng-message="required">Fine</div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Remarks:</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="paymentplace" id="usr" type="text" ng-model="obj.TENANTAGRPAY_Remarks" placeholder="Remarks"
+                                              allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)" maxlength="1000"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 box-content clearfix" ng-if="all1=='Fine'">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Fine Amount:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_pay" type="text" placeholder="Total Amount..." ng-model="total_fine_payable" ng-disabled="actualfineflag==true" maxlength="15" allow-pattern="\d" required>
+                                   
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_pay)" ng-messages="myForm1.ttl_pay.$error">
+                                        <div ng-message="required">Total Payable</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Payable Fine:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="ttl_pay" type="text" placeholder="Total Amount..." ng-model="obj.fine"  maxlength="15" allow-pattern="\d" ng-change="checkfine(obj.fine)"  required>
+                                    <div class="error-messages " ng-if="interacted1(myForm1.ttl_pay)" ng-messages="myForm1.ttl_pay.$error">
+                                        <div ng-message="required">Fine</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Payment Date:<strong style="color:red;">*</strong></label>
+                                <md-datepicker name="pay_date" md-placeholder="Payment Date" ng-model="obj.tenantagrpaY_PaymentDate" ng-paste="$event.preventDefault()" onkeydown="return false" ng-change="getfine(obj.tenantagrpaY_PaymentDate)" required></md-datepicker>
+
+                                <div class="error-messages " ng-if="interacted1(myForm1.pay_date)" ng-messages="myForm1.pay_date.$error">
+                                    <div ng-message="required">Select PaymentDate</div>
+                                </div>
+                            </div>-->
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Remarks:</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="paymentplace" id="usr" type="text" ng-model="obj.TENANTAGRPAY_Remarks" placeholder="Remarks"
+                                              allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)" maxlength="1000"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <input type="text" class="hidden" ng-model="TENANTAGRPAY_Id" value="{{TENANTAGRPAY_Id}}" />
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-click="savepaymentdetails()">
+                                Save And Proceed <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12" ng-if="tenant_array.length>0">
+
+
+                        <div style="overflow:scroll;" class="clearfix" id="style-4">
+                            <div class="col-sm-4" style="float:right">
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                            </div>
+
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+
+                                    <tr>
+                                        <th>
+                                            SL. No
+
+                                        </th>
+                                        <th ng-click="sort('tenantagR_TenantName')">
+                                            TENANT NAME
+
+                                        </th>
+                                        <!--<th ng-click="sort('tenantagR_TenantName')">
+                                            MONTHLY RENT
+
+                                        </th>-->
+                                        <th ng-click="sort('tenantagrpaY_Amount')">
+                                            AMOUNT PAID
+
+                                        </th>
+                                        <th ng-click="sort('tenantagrpaY_PaymentDate')">
+                                            PAYMENT DATE
+
+                                        </th>
+                                        <th ng-click="sort('ivrmmoD_ModeOfPayment')">
+                                            Mode of Payment
+
+                                        </th>
+                                        <th ng-click="sort('tenantagrpaY_PaymentYear')">
+                                            Paid Year
+
+                                        </th>
+                                        <th ng-click="sort('ivrM_Month_Name')">
+                                            Paid Month
+
+                                        </th>
+                                        <th ng-click="sort('tenantagrpaY_Remarks')">
+                                            REMARKS
+
+                                        </th>
+                                        <th ng-click="sort('tenantagrpaY_Remarks')">
+                                            PAYMENT TYPE
+
+                                        </th>
+                                        <th ng-click="sort('tenantagrpaY_ReceiptNo')">
+                                            Receipt Number
+
+                                        </th>
+                                        <th>
+                                            VIEW
+                                        </th>
+
+                                        <!--<th>Edit</th>-->
+
+
+                                        <th hidden="hidden"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="user in filterValue1=(tenant_array |filter:search ) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td>{{user.tenantagR_TenantName }}</td>
+                                        <!--<td>{{user.tenantagR_MonthlyRent}}</td>-->
+                                        <td>{{user.tenantagrpaY_Amount}}</td>
+                                        <td>{{user.tenantagrpaY_PaymentDate | date:"dd-MM-yyyy" }}</td>
+                                        <td>{{user.ivrmmoD_ModeOfPayment }}</td>
+                                        <td>{{user.tenantagrpaY_PaymentYear }}</td>
+                                        <td>{{user.ivrM_Month_Name }}</td>
+                                        <td>{{user.tenantagrpaY_Remarks}}</td>
+                                        <td>{{user.tenantagrpaY_Flag}}</td>
+                                        <td>{{user.tenantagrpaY_ReceiptNo}}</td>
+                                        <td hidden="hidden">{{user.tenantagrpaY_Id}}</td>
+
+                                        <td class="text-center">
+                                            <span>
+                                                <a class="text-aqua" href="" ng-click="Editdata(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                            <span>
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="viewdocument(user.tenantagrpaY_PaymentMonth,user.tenantagrpaY_PaymentYear,user.tenantagrpaY_Id);"> <i class="fa fa-eye text-blue"></i></a>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <dir-pagination-controls max-size="10"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+    </form>
+
+
+</section>
+
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printData();" style="float:right;margin-right:52px;">Print</button>
+                <h4 class="modal-title text-white"> Payment Receipt </h4>
+            </div>
+            <div class="modal-body" id="printDeviation">
+                <div class="box-body margin-top-10">
+                    <div class="col-sm-12">
+                        <div class="printmodal clearfix">
+                            <div class="col-sm-12" style="">
+                                <img src="{{imagenew}}" alt="baldwin" style="width:80%;height:100px">
+                            </div>
+
+                            <div class="col-sm-12 text-center" style="margin-top:25px!important;padding-bottom:25px!important">
+                                <h4>Receipt</h4>
+                            </div>
+                            <hr />
+                            <div class="row" style="padding:20px;">
+                                <div class="row margin-bottom-10">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Name</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp;<b> {{name}} </b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Receipt No : </label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; <b> {{receiptNo}} </b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row margin-bottom-10">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Phone Number </label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; {{phonenumber}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Email : </label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; {{email}}   </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row margin-bottom-10">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Agreement from Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; {{agreementfromdate | date : "dd/MM/yyyy"}} </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Agreement To Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">:  &nbsp; &nbsp; {{agreementtodate | date : "dd/MM/yyyy"}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row margin-bottom-10">
+                                    <table class="table table-hover table-responsive table-bordered table-width text-center" id="modaltblr">
+                                        <thead>
+                                            <tr>
+                                                <th>SL:NO</th>
+                                                <th>Payment Month</th>
+                                                <th>Payment Type</th>
+                                                <th>Paid Amount</th>
+                                                <th>Paid date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in uploadfilesdetails">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{user.ivrM_Month_Name}}</td>
+                                                <td>{{user.tenantagrpaY_Flag}}</td>
+                                                <td>{{user.tenantagrpaY_Amount}}</td>
+                                                <td>{{user.tenantagrpaY_PaymentDate | date : "dd/MM/yyyy"}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <h5><b style="color:black">NOTE : Signature is not required because it is a computer generated receipt.</b></h5>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalMonthlyDetails" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg" style="width:90%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row modal-header" style="padding-top: 0%;padding-bottom: 0%; margin-right: 0px;">
+                    <div class="col-sm-6">
+                        <h4 class="text-left text-white" style="color:white; text-align:left">MonthLy Paid Details</h4>
+                    </div>
+                    <div class="col-sm-6">
+                        <button type="button" class="btn btn-default  pull-right" data-dismiss="modal">Close</button>
+                    </div>
+
+                </div>
+                <div class="box-body" style="padding-top: 0px;">
+
+                    <div class="text-center" style="overflow: auto;" ng-if="tenant_monthly_paid_details.length>0">
+                        <table class="table table-hover table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th> SL.NO </th>
+                                    <th> Month </th>
+                                    <th>Year</th>
+                                    <th>Payable Amount</th>
+                                    <th>Paid Amount</th>
+                                    <th>paid Date</th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user1 in filterValue = (tenant_monthly_paid_details | filter : searchValue2)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                                    <td>
+                                        {{user1.IVRM_Month_Name}}
+                                        <!--{{ user1.MonthId}}-->
+                                    </td>
+
+                                    <td>{{ user1.yearid}}</td>
+                                    <td>{{ user1.TENANTAGR_MonthlyRent}}</td>
+
+                                    <td>{{ user1.typepaid}}</td>
+                                    <td>{{ user1.TENANTAGRPAY_PaymentDate | date:'dd/MM/yyyy'}}</td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="10"
+                                                 direction-links="true"
+                                                 boundary-links="true" pagination-id="page1">
+                        </dir-pagination-controls>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

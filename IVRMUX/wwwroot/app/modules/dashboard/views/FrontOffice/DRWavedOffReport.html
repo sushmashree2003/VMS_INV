@@ -1,0 +1,123 @@
+﻿<style>
+    .multiselect {
+        width: 22.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+</style>
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Employee DR Waved Of Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+
+            </div>
+            <!-- /.box-header -->
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="GetReport()" novalidate>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 text-right">Year:<span style="color:red;">*</span></label>
+
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="year1" ng-model="year">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.hrmlY_LeaveYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                        <div ng-message="required">Please Select the Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Month:<span style="color:red;">*</span></label>
+                                <div class="multiselect col-sm-6">
+                                    <label>
+                                        <input name="chktype" value="1" ng-model="usercheck" type="checkbox" ng-click="all_check()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label data-ng-model="Emp_GroupType" ng-repeat="option in fillmonth">
+
+                                        <input type="checkbox" ng-model="option.selected" value="{{option.ivrM_Month_Id}}" name="option" ng-required="isOptionsRequired();">
+                                        <span class="lbl padding-8">{{option.ivrM_Month_Name}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.option)" ng-messages="myForm.option.$error">
+                                <div ng-message="required">Please Select Atleast One Month</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2"></div>
+                    </div>
+                    <div class="text-center">
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary">
+                            <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                        <md-button type="button" ng-click="exptoex();" class="md-raised md-primary" ng-disabled="!grid_view">
+
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+
+                    </div>
+                </div>
+                <hr />
+            </form>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="grid_view">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee DR Waved Of Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body" style="overflow:scroll">
+            <div id="table">
+                <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;text-align:center;width:100%">
+                    <thead>
+                        <tr><th colspan="{{arraycount}}">Blocked Days Consolidated Report</th></tr>                       
+                        <tr>
+                            <th style=" position: sticky;left: 0;background-color: #0463c2;">SLNO</th>
+                            <th style=" position: sticky;left: 0;background-color: #0463c2;">Employee Code</th>
+                            <th style=" position: sticky;left: 0;background-color: #0463c2;">Employee Name</th>
+                            <th style=" background-color: #0463c2;" ng-repeat="user in monthnames">{{ user.IVRM_Month_Name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in drblockedReport|orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                            <td style=" position: sticky;left: 0;background-color: #d6d2d2;border: solid 0.5px #a38c8c;">{{ $index+1}}</td>
+                            <td style=" position: sticky;left: 0;background-color: #d6d2d2;border: solid 0.5px #a38c8c;">{{ user.EMPCode}}</td>
+                            <td style=" position: sticky;left: 0;background-color: #d6d2d2;border: solid 0.5px #a38c8c;">{{user.EmpName}}</td>
+                            <td ng-repeat="obj in monthnames">{{user[obj.IVRM_Month_Name]}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+</section>

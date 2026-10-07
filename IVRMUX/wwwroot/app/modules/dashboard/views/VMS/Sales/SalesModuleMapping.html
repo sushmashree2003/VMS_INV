@@ -1,0 +1,387 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        /*border: 1px solid #3e85a0;*/
+        padding: 12px;
+        /*min-height: 371px;*/
+        /*border-radius: 5px;*/
+    }
+
+    .file-bluedd:before {
+        content: 'Download Template';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .file-bluenew:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e85a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+        .box-label:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }
+</style>
+
+<!--<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        /*min-height: 280px;*/
+        border-radius: 5px;
+    }
+</style>-->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+<section class="content" ng-init="OnLoadModuleNames()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> SalesModuleMapping </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="box-content">
+
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-style="{'border-color': interacted2(myForm.empname) && myForm.empname.$error.required ? 'red' : ''}">
+                            <label class="col-sm-4 control-label">ISMSBOM Name : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-8">
+                                <ui-select id="id2" name="bom" ng-model="$parent.ismsboM_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select, ts.optradio);" title="Select Or Search Employee "
+                                           ng-change="OnChangeBehaviourEmployee('Appearance')"
+                                           ng-disabled="empflag" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Module Name">
+                                        {{$select.selected.ismsboM_BOMFlg}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in getIsmSalesData | filter: $select.search"
+                                                       value="{{catgry.ismsboM_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.ismsboM_BOMFlg | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.bom)" ng-messages="myForm.bom.$error">
+                                    <div ng-message="required" class="col-sm-8">Please select atleast one BOM</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group col-sm-12" ng-style="{'border-color': interacted(myForm.mon) && myForm.mon.$error.required ? 'red' : ''}">
+                            <label class="control-label col-sm-8">Module :<strong style="color:red;">*</strong></label>
+
+                            <div class="multiselect col-sm-12" style="width: 90% !important;">
+                                <input class="form-control" ng-model="searchchkbx5" type="text" placeholder="search here..." />
+                                <label>
+                                    <input name="all" value="1" ng-model="checkallm" type="checkbox" ng-click="all_checkm(checkallm)">
+                                    <span class="lbl padding-8">
+                                        <b> All</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in getModuleData | filter:searchchkbx5">
+                                    <input name="mon" ng-model="user.selected" type="checkbox" ng-click="togchkbxm()" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>{{user.ivrmM_ModuleName}}</b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.mon) && isOptionsRequired()" ng-messages="myForm.mon.$error">
+                                <div class="col-sm-8" ng-message="required">Please select at least one module</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="control-label col-sm-4">School/College :</label>
+                        <div class="col-sm-8" style="font-weight: 700;" ng-init="selfassign='S'">
+                            <div class="well text-left">
+                                <label class="radio-inline">
+                                    <input type="radio" value="S" name="stask" ng-change="ondatechange()" ng-model="selfassign">
+                                    <span class="lbl padding-8"> S </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="C" name="stask" ng-change="ondatechange()" ng-model="selfassign">
+                                    <span class="lbl padding-8"> C </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--<div class="col-sm-6">
+
+                        <label for="sel2" class="control-label col-sm-4">Module : <span style="color:red;">*</span></label>
+                        <div class="multiselect col-sm-8">
+
+                            <input class="form-control" ng-model="searchchkbx5" type="text" placeholder="search here..." />
+                            <label>
+                                <input name="clsgrp" value="all" ng-disabled="editflag==true" ng-model="usercheckG" type="checkbox" ng-click="all_checkG(usercheckG)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </label>
+                            <label ng-repeat="module in getModuleData | filter:searchchkbx5" value="{{hrmE_Id}}">
+                                <input type="checkbox" ng-model="role.selected" ng-click="togchkbxG()" name="employee" ng-disabled="editflag==true" ng-required="isOptionsRequired()" />
+                                <span class="lbl padding-8">{{module.ivrmM_ModuleName}}</span>
+                            </label>
+                        </div>
+                        <div class="col-sm-offset-1 error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                            <div ng-message="required" class="col-sm-12" style="padding-left:40%"> Select Module</div>
+                        </div>
+
+                    </div>-->
+
+
+                    <div class="box-footer">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="SaveData(user)">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button ng-hide="gridOptions.data.length>0" type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+            </div>
+        </div>
+
+    </form>
+
+
+    <div class="box box-primary" ng-show="getMasterData.length>0">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">SALES MODULEMAPPING LIST</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{getMasterData.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="masterData">
+                    <div class="box-body">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr>
+                                    <th><b>SL.No.</b></th>
+                                    <th><b>BOM desc</b></th>
+                                    <th><b>Module Order setting</b></th>
+                                    <th><b>IVRM Module Name</b> </th>
+                                    <th><b>INS TYPE</b></th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <!--| filter : { ISMSBOM_BOMDescription : search}-->
+
+                            <tbody ng-repeat="user in bomids | customSearch : search">
+                                <!--<tbody>-->
+                                <!--<tr dir-paginate="user in alldata = (employeeid | filter : search)| orderBy:sortKey:sortReverse  | itemsPerPage:itemsPerPage" current-page="currentPage">-->
+                                <tr>
+                                    <td class="text-center" rowspan="{{user.datadetails.length+1}}">{{$index+1}}</td>
+                                    <td class="text-left" rowspan="{{user.datadetails.length+1}}"><b>{{user.ISMSBOM_BOMDescription}}</b></td>
+                                    <td class="text-left" rowspan="{{user.datadetails.length+1}}">
+                                        <a title="View Allowence Details" class="fa fa-eye text-black" ng-click="getView(user)"></a>
+                                    </td>
+
+
+                                    <!--<td>
+                <span>
+                    <input type="checkbox" class="form-control text-center" rowspan="{{user.datadetails.length+1}}" />
+
+                </span>
+
+            </td>-->
+                                    <!--<a title="View Allowence Details" class="fa fa-eye text-black" rowspan="{{user.datadetails.length+1}}" ng-click="getView(user)">
+            </a>-->
+
+                                </tr>
+                                <!--<tr dir-paginate="data in alldata = (user.datadetails | filter : search)| orderBy:sortKey:sortReverse  | itemsPerPage:itemsPerPage" current-page="currentPage">-->
+                                <tr ng-repeat="data in user.datadetails | filter : search">
+
+                                    <!--<tr ng-repeat="data in user.datadetails | filter : search">-->
+
+                                    <td class="text-center">{{data.IVRMM_ModuleName}}</td>
+                                    <td class="text-center">{{data.IMMB_InsType}}</td>
+
+                                    <td style="text-align:center">
+
+                                        <span ng-if="data.IMMB_ActiveFlag==false">
+                                            <a href="" ng-click="deactiveY(data)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                Activate
+                                            </a>
+                                        </span>
+                                        <span ng-if="data.IMMB_ActiveFlag==true">
+                                            <a href="" ng-click="deactiveY(data)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                Deactivate
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr></tr>
+                            </tbody>
+                        </table>
+                        <!--<dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>-->
+
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+    <div id="moduleordersetting" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg" style="width:100% !important">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body">
+                        <form class="form-horizontal" method="post" role="form" name="myForm2" novalidate>
+                           
+
+                            <div class="row">
+                                <hr />
+                                <div class="col-sm-12">
+                                    <table class="table table-bordered table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <!--<th>
+        Sl No
+    </th>-->
+                                                <!--<th>
+        BOM Name
+    </th>-->
+                                                <th>
+                                                    Module Name
+                                                </th>
+                                                <th>
+                                                    INS TYPE
+                                                </th>
+                                                <th>
+                                                    Order
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ui-sortable="sortableOptions" ng-model="RepeatDetails">
+                                            <tr ng-repeat="dd in  RepeatDetails">
+                                                <!--<td>
+        {{$index+1}}
+    </td>-->
+                                                <td>
+                                                    {{dd.IVRMM_ModuleName}}
+                                                </td>
+                                                <td>
+                                                    {{dd.IMMB_InsType}}
+                                                </td>
+                                                <td>
+                                                    {{dd.IMMB_IVRMMID_Order}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                                <div class="text-center" ng-if="RepeatDetails.length > 0">
+                                    <md-button class="md-accent md-raised" data-ng-click="sortableNumber()" ng-disabled="orderFlag">
+                                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Set Order
+                                    </md-button>
+                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="orderFlag==false" data-ng-click="SaveModuleOrder()">
+                                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Save
+                                    </md-button>
+                                    <hr />
+                                </div>
+
+
+                            </div>
+                        </form>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+

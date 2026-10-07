@@ -1,0 +1,293 @@
+﻿<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Attendance Approval Rerport </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Company Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="usercheck" type="checkbox" data-ng-click="all_check()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-model="MI_Id" ng-repeat="year in institutionlist |filter:filterchkbx" value="{{year.mI_Id}}">
+                                        <input name="year" value="1" data-ng-model="year.select" type="checkbox" ng-click="togchkbx();" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            {{year.mI_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                    <div ng-message="required" style="color:red">Select Company Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 text-center">
+                            <div class="form-group">
+
+                                <label class="control-label col-sm-4">Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="sel1" ng-model="HRMLY_LeaveYear" name="tslacdyr" ng-change="getYear()">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="user in getyear" value="{{user.hrmlY_LeaveYear}}">{{user.hrmlY_LeaveYear}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 text-center">
+                            <div class="form-group">
+
+                                <label class="control-label col-sm-4">Month:<span style="color:Red">*</span></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="sel1" ng-model="IVRM_Month_Name" name="tslacdyr" ng-change="getYear()">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="user in getmonth" value="{{user.ivrM_Month_Id}}">
+                                            {{user.ivrM_Month_Name}}
+                                        </option>
+
+
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 text-center">
+                            <div class="well text-center" data-ng-init="radiotype ='Both'">
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="radiotype" value="Approved" name="scldbet" ng-click="onselectradio()" required>
+                                    <span class="lbl padding-8">Approved</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="radiotype" value="Hold" name="scldbet" ng-click="onselectradio()" required>
+                                    <span class="lbl padding-8">Not Approved</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="radiotype" value="Both" name="scldbet" ng-click="onselectradio()" required>
+                                    <span class="lbl padding-8">Both</span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="invmT_Id" value="{{invmT_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-click="report()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-disabled="screportbutton" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="exportbutton" ng-click="exportToExcel()">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+                </div>
+            </div>
+        </form>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Approval Report List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <!--<div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>-->
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <!--<label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>-->
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <!--<div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>-->
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('HRME_EmployeeCode')">Employee Name</a></th>
+                            <th><a href="" ng-click="sortBy('VMSCRT_DesigCode')">Designation </a></th>
+                            <th><a href="" ng-click="sortBy('Approvedby')">Approver Name</a> </th>
+                            <th><a href="" ng-click="sortBy('VMSCRT_Approval')">Approval Level</a> </th>
+                            <th><a href="" ng-click="sortBy('HREAA_Date')">Approved Date</a> </th>
+                            <th>Final Flag</th>
+                            <th><a href="" ng-click="sortBy('VMSCRT_Remarks')">HR Remark</a></th>
+                            <th><a href="" ng-click="sortBy('HREAA_Remarks')">Remark</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in getreport">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.Employeename}}-{{user.HRME_EmployeeCode}}</td>
+                            <td>{{user.VMSCRT_DesigCode}}</td>
+                            <td>{{user.Approvedby}}</td>
+                            <td>
+                                {{user.HREAA_SanctionLevel}}
+                            </td>
+                            <td>{{user.HREAA_Date|date:'dd/MM/yyyy'}}</td>
+                            <td>
+                                <span><i ng-if="user.VMSCRT_Approval==true" class="fa fa-check  text-green"></i></span>
+                            </td>
+                            <td>{{user.VMSCRT_Remarks}}</td>
+                            <td>{{user.HREAA_Remarks}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+       </div>
+</section>
+
+ <div ng-show="sdfsdfdsfsd==true" id="printSectionId">
+            <!--<div class="row" ng-if="imagenew!=null && imagenew!=''">
+                <div class="baldwin text-center">
+                    <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4 class="text-center">
+                        ATTENDANCE APPROVAL RERPORT 
+                    </h4>
+                </div>
+            </div>
+            <div class="row margin-top-20">
+                <div class="col-sm-12">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('HRME_EmployeeCode')">Employee Name</a></th>
+                                <th><a href="" ng-click="sortBy('VMSCRT_DesigCode')">Designation </a></th>
+                                <th><a href="" ng-click="sortBy('Approvedby')">Approver Name</a> </th>
+                                <th><a href="" ng-click="sortBy('VMSCRT_Approval')">Approval Level</a> </th>
+                                <th><a href="" ng-click="sortBy('HREAA_Date')">Approved Date</a> </th>
+                                <th><a href="" ng-click="sortBy('VMSCRT_Remarks')">HR Remark</a></th>
+                                <th><a href="" ng-click="sortBy('HREAA_Remarks')">Remark</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in getreport">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td>{{user.Employeename}}-{{user.HRME_EmployeeCode}}</td>
+                                <td>{{user.VMSCRT_DesigCode}}</td>
+                                <td>{{user.Approvedby}}</td>
+                                <td>
+                                    {{user.HREAA_SanctionLevel}}
+                                </td>
+                                <td>{{user.HREAA_Date|date:'dd/MM/yyyy'}}</td>
+                                <td>{{user.VMSCRT_Remarks}}</td>
+                                <td>{{user.HREAA_Remarks}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="sdfsdfdsfsd==true" id="exceltopd">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="7" style="text-align:center">
+                        {{institutioname}}
+                    </td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="7" style="text-align:center">
+                        ATTENDANCE APPROVAL RERPORT
+                    </td>
+                </tr>
+
+            </table>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('HRME_EmployeeCode')">Employee Name</a></th>
+                        <th><a href="" ng-click="sortBy('VMSCRT_DesigCode')">Designation </a></th>
+                        <th><a href="" ng-click="sortBy('Approvedby')">Approver Name</a> </th>
+                        <th><a href="" ng-click="sortBy('VMSCRT_Approval')">Approval Level</a> </th>
+                        <th><a href="" ng-click="sortBy('HREAA_Date')">Approved Date</a> </th>
+                        <th><a href="" ng-click="sortBy('VMSCRT_Remarks')">HR Remark</a></th>
+                        <th>Final Flag</th>
+                        <th><a href="" ng-click="sortBy('HREAA_Remarks')">Remark</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in getreport">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.Employeename}}-{{user.HRME_EmployeeCode}}</td>
+                        <td>{{user.VMSCRT_DesigCode}}</td>
+                        <td>{{user.Approvedby}}</td>
+                        <td>
+                            {{user.HREAA_SanctionLevel}}
+                        </td>
+                        <td>{{user.HREAA_Date|date:'dd/MM/yyyy'}}</td>
+                        <td>
+                            <span><i ng-if="user.VMSCRT_Approval==true" class="fa fa-check  text-green"></i></span>
+                        </td>
+                        <td>{{user.VMSCRT_Remarks}}</td>
+                        <td>{{user.HREAA_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>

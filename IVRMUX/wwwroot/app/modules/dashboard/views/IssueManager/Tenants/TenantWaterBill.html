@@ -1,0 +1,236 @@
+﻿<style>
+    .multiselect {
+        width: 22em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 4%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .aaa {
+        margin-top: 28px;
+        margin-right: 10px;
+        padding-right: 1px;
+        text-align: center;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+
+
+           
+
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savetrainerfeedback()" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Tenant Water Bill</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Building Name:<span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="sel1" ng-model="HRMB_ID" name="tenant" required>
+                            <option value="" label="">--Select Building--</option>
+                            <option ng-repeat="option in tenant_array" value="{{option.hrmB_Id}}" ng-selected="{{option.Selected == true}}">
+                                {{option.hrmB_BuildingName}}
+                            </option>
+                        </select>
+                        <div class="error-messages" ng-if="interacted(myForm.tenant)" ng-messages="myForm.tenant.$error">
+                            <div ng-message="required">Select Building</div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Month:<span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="sel1" ng-model="TENANTEBWB_Month" name="month" required>
+                            <option value="" label="">--Select Month--</option>
+                            <option ng-repeat="option in monthnames" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                {{option.ivrM_Month_Name}}
+                            </option>
+                        </select>
+                        <div class="error-messages" ng-if="interacted(myForm.month)" ng-messages="myForm.month.$error">
+                            <div ng-message="required">Select Month</div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="sel1" ng-model="TENANTEBWB_Year" name="year" required>
+                            <option value="" label="">--Select Year--</option>
+                            <option ng-repeat="option in years" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                {{option.hrmlY_LeaveYear}}
+                            </option>
+                        </select>
+                        <div class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                            <div ng-message="required">Select Year</div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Amount:<span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <input class="form-control" placeholder="Enter Amount" name="n" id="usr" type="text" ng-paste="$event.preventDefault()" data-ng-model="TENANTEBWB_Amount" required allow-pattern="[0-9.]">
+                        <div class="error-messages" ng-if="interacted(myForm.n)" ng-messages="myForm.n.$error">
+                            <div ng-message="required">Enter Amount</div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="TENANTMWBILL_Id" />
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="tenantdata.length>0" id="get_printdetail">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Tenant Water Bill</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge"></label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12" id="printDeviation">
+                    <table class="table table-bordered table-responsive">
+                        <thead>
+                            <tr>
+                               
+                                <th>Sl.No</th>
+                                <th>Building Name</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th>Amount</th>
+                                <th>View</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <!--<tr ng-repeat="user2 in tenantdata">-->
+
+                            <tr dir-paginate="user2 in filterValue1 = (tenantdata | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" class="{{user2.cls}}">
+
+
+                                <td class="hidden">
+                                    {{user2.tenantmwbilL_Id}}
+                                </td>
+                                <!--<td class="text-center">{{$index+1}}-->
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                                <td class="text-left">{{user2.hrmB_BuildingName}}</td>
+                                <td class="text-left">{{user2.tenantmwbilL_Year}}</td>
+                                <td class="text-left">{{user2.ivrM_Month_Name}}</td>
+                                <td class="text-left">{{user2.tenantmwbilL_TotalAmount}}</td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" data-toggle="modal" ng-click="viewroomwisewaterbill(user2);" title="View Document"> <i class="fa fa-eye text-blue"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="" ng-click="deleterecord(user2)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i class="">Delete </i>
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+
+    </form>
+       
+</section>
+
+<div id="viewwaterbill" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg" style="width:85%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Monthly Water Bill RoomWise</h4>
+            </div>
+            <div class="modal-body" id="printDeviation">
+                <div class="box-body margin-top-5">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered text-center " style=" border:1px" ng-if="viewWaterBillRoomWise.length>0 " border="1">
+                            <thead>
+
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('TENANTAGR_TenantName')">Tenant Name </a></th>
+                                    <th><a href="" ng-click="sortBy('HRMB_BuildingName')">Apartment Name </a></th>
+                                    <th><a href="" ng-click="sortBy('HRMR_RoomName')">Flat No</a></th>
+                                    <th><a href="" ng-click="sortBy('TENANTMWBILLRW_Amount')">Amount</a></th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in viewWaterBillRoomWise">
+                                <tr>
+                                    <td class="text-center">
+                                        {{$index+1}}
+                                    </td>
+                                    <td>{{user.TENANTAGR_TenantName}}</td>
+                                    <td>{{user.HRMB_BuildingName}}</td>
+                                    <td>{{user.HRMR_RoomName}}</td>
+                                    <td>{{user.TENANTMWBILLRW_Amount}}</td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

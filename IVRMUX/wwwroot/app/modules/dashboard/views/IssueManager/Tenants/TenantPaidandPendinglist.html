@@ -1,0 +1,301 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <section class="content">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" ng-init="onLoadGetData()" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Tenant Paid AND Pending List </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4 ">
+                                <div class="form-group">
+                                    <label class="control-label ">Pay-Type: <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="text-center well">
+                                    <div ng-init="tenantpaidpending='Pending'">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Pending" name="enhc" ng-model="tenantpaidpending">
+                                            <span class="lbl padding-8"><b> Pending </b></span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Paid" name="enhc" ng-model="tenantpaidpending">
+                                            <span class="lbl padding-8"><b>Paid</b></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 col-sm-offset-1">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Month :</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" id="sel1" data-ng-model="obj.month" name="hreS_Month" required ng-change="GetEmployeeList()">
+                                            <option value="" label="Select">Select</option>
+                                            <option ng-repeat="month in monthdropdown" value="{{month.ivrM_Month_Id}}" ng-selected="{{month.Selected===true}}">
+                                                {{month.ivrM_Month_Name}}
+                                            </option>
+                                        </select>
+                                        <span class="error-messages" ng-if="interacted(myForm.hreS_Month)" ng-messages="myForm.hreS_Month.$error">
+                                            <span ng-message="required">Select Month</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">  Year :</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" id="sel1" data-ng-model="obj.year" name="hreS_Year" required ng-change="GetEmployeeList()">
+                                            <option value="" label="Select">Select Year</option>
+                                            <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.hrmlY_LeaveYear}}" ng-selected="{{leaveyear.Selected===true}}">
+                                                {{leaveyear.hrmlY_LeaveYear}}
+                                            </option>
+                                        </select>
+                                        <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                            <span ng-message="required">Select Year</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                <br />
+                <br />
+
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                        <i class="fa fa-search-minus" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-click="SendEmail()" ng-show="sendsmsemail"
+                               ng-disabled="btn">
+                        <i class="fa fa-save" aria-hidden="true"></i> SendEmail
+                    </md-button>
+                </div>
+            </div>
+
+
+            <div class="box box-primary" ng-show="tenantpendingreport.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Tenant Water Bill Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">{{presentCountgrid}}</label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <table class="table table-bordered table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>
+                                        <label>
+                                            <input name="option[]" value="1" type="checkbox" ng-click="toggleAll(all)" ng-model="all">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>
+                                    <th style="width:25%">Tenant Details</th>
+                                    <!--<th>Contact No</th>
+                                    <th>Email</th>-->
+                                    <th>Month</th>
+                                    <th>Year</th>
+                                    <th>Rent</th>
+                                    <th>Electrical</th>
+                                    <th>Water</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <!--<tr dir-paginate="user2 in filterValue1 = (tenantpendingreport | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+                                <tr ng-repeat="user2 in tenantpendingreport">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <!--<td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>-->
+                                    <td>
+                                        <label>
+                                            <input name="option[]" value="" type="checkbox" ng-model="user2.isSelected" data-ng-change="amtdetails(user2,tenantpendingreport)" ng-disabled="allcheck">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-left"><div><b> Name : </b> {{user2.TENANTAGR_TenantName}}</div>
+                                    <div><b>Contact No : </b>{{user2.TENANTAGR_ContactNo}} </div>
+                                    <div><b>Email : </b>{{user2.TENANTAGR_EmailId}}</div></td>
+                                    <td class="text-left">{{user2.IVRM_Month_Name}}</td>
+                                    <td class="text-left">{{user2.TENANTEBWB_Year}}</td>
+                                    <td class="text-left">{{user2.Rentbill_Amount}}</td>
+                                    <td class="text-left">{{user2.Waterbill_Amount}}</td>
+                                    <td class="text-left">{{user2.Electricalbill_Amount}}</td>
+                                    <td>
+                                        <textarea class="form-control" name="remark" type="text" placeholder="Enter Remarks .... " ng-model="user2.facility_Remarks" rows="3" style="resize:none" ng-required="user2.isSelected == true"></textarea>
+                                        <div class="error-messages" ng-if="interacted(dataForm.remark)" ng-messages="dataForm.remark.$error">
+                                            <div ng-message=""> Enter Remarks </div>
+                                        </div>
+                                    </td>
+                                    <td class="hidden">{{user2.TENANTAGR_Id}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+       
+            </div>
+
+
+            <!--<div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">TENANT PAID AND PENDING REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="display:none !important">
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Tenant Name</th>
+                        <th>Mobile No</th>
+                        <th>Email</th>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>Rent</th>
+                        <th>Electrical</th>
+                        <th>Water</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user2 in tenantpendingreport">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user2.TENANTAGR_TenantName}}</td>
+                        <td class="text-left">{{user2.TENANTAGR_ContactNo}}</td>
+                        <td class="text-left">{{user2.TENANTAGR_EmailId}}</td>
+                        <td class="text-left">{{user2.IVRM_Month_Name}}</td>
+                        <td class="text-left">{{user2.TENANTEBWB_Year}}</td>
+                        <td class="text-left">{{user2.Rentbill_Amount}}</td>
+                        <td class="text-left">{{user2.Waterbill_Amount}}</td>
+                        <td class="text-left">{{user2.Electricalbill_Amount}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+        </dir-pagination-controls>
+    </div>-->
+
+            <div class="col-sm-12" ng-if="tenantagrpaY_Flag == 'Pending'" style="display:none !important">
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Tenant Name</th>
+                            <th>Mobile No</th>
+                            <th>Email</th>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Rent</th>
+                            <th>Electrical</th>
+                            <th>Water</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user2 in tenantpendingreport">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left">{{user2.TENANTAGR_TenantName}}</td>
+                            <td class="text-left">{{user2.TENANTAGR_ContactNo}}</td>
+                            <td class="text-left">{{user2.TENANTAGR_EmailId}}</td>
+                            <td class="text-left">{{user2.IVRM_Month_Name}}</td>
+                            <td class="text-left">{{user2.TENANTEBWB_Year}}</td>
+                            <td class="text-left">{{user2.Rentbill_Amount}}</td>
+                            <td class="text-left">{{user2.Waterbill_Amount}}</td>
+                            <td class="text-left">{{user2.Electricalbill_Amount}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-sm-12" id="printDeviation" ng-if="tenantagrpaY_Flag !='Paid'" style="display:none !important">
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+
+                            <th>Sl.No</th>
+                            <th>Tenant Name</th>
+                            <th>Amount</th>
+                            <th>Building Name</th>
+                            <th>Room</th>
+                            <th>Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user2 in printdatatable">
+
+
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left">{{user2.TENANTAGR_TenantName}}</td>
+                            <td class="text-left">{{user2.TENANTAGRPAY_Amount}}</td>
+                            <td class="text-left">{{user2.HRMB_BuildingName}}</td>
+                            <td class="text-left">{{user2.HRMR_RoomName}}</td>
+                            <td class="text-left">{{user2.tenantagrpaY_Flag}}</td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </form>
+    </section>
+</body>
+</html>

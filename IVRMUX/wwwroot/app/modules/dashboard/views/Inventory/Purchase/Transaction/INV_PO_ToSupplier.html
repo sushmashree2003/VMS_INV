@@ -1,0 +1,572 @@
+﻿
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+
+<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">PO EMAIL Notification To Supplier</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+
+                    <div class="col-sm-7 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Purchase Order No.:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="pino" ng-model="$parent.obj.invmpO_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Purchase Indent No" ng-change="onpichange($parent.obj.invmpO_Id)" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Purchase Order No. in the list...">{{$select.selected.invmpO_PONo}} </ui-select-match>
+                                    <ui-select-choices repeat="option in get_piNo | filter: $select.search " value="{{option.invmpO_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.invmpO_PONo | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.pino)" ng-messages="myForm.pino.$error">
+                                    <div ng-message="required"> Select Purchase Order No</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--<div class="text-center" ng-show="obj.invmpO_Id">
+                            <div class="well">
+                                <label>Please Select Check Box:<span style="color:red;">*</span></label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="sms" value="sms" ng-model="sms">
+                                    <span class="lbl padding-8">SMS</span>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="email" value="email" ng-model="email">
+                                    <span class="lbl padding-8">EMAIL</span>
+                                </label>
+                            </div>
+
+                        </div>-->
+                    </div>
+                </div>
+                <div ng-show="get_pidetails.length>0">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="well">
+                                    <div class="box-content clearfix" style="min-height:auto">
+                                        <div class="row">
+
+                                            <div class="col-sm-6">
+
+                                                <label class="control-label"><b>Supplier Name:</b>&nbsp;&nbsp;{{supname}}</label>
+
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="control-label"><b>Contact Person:</b>&nbsp;&nbsp;{{conperson}}</label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="control-label"><b>Mobile No:</b>&nbsp;&nbsp;{{conmobile}}</label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="control-label"><b>Email:</b>&nbsp;&nbsp;{{conemail}}</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br />
+
+                                    <div class="box-content clearfix" style="min-height:auto">
+                                        <div class="row">
+
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>Reference No.:</b>&nbsp;&nbsp;{{refno}}</label>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>PO Date.:</b>&nbsp;&nbsp;{{podate | date:'dd/MM/yyyy'}}</label>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>PO Amount.:</b>&nbsp;&nbsp;{{poamount}}</label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>Remarks.:</b>&nbsp;&nbsp;{{poremarks}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="box-content clearfix" style="min-height:auto">
+
+                                        <div class="">
+                                            <div class="col-sm-4 pull-right">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input class="form-control" ng-model="searchPI" type="text" placeholder="SEARCH PO NO. HERE...">
+                                                        <span class="input-group-addon">
+                                                            <i class="fa fa-search"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <h4 class="box-title" style="margin-left: 330px;">Purchase Order</h4>
+                                            <table class="table table-hover table-responsive table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 50px;">SL.NO.</th>
+                                                        <th style="width: 200px;"><a href="" ng-click="sort('invmI_ItemName')">Item</a></th>
+                                                        <th><a href="" ng-click="sort('invmuoM_Id')">UOM</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_POQty')">PO Quantity</a></th>
+
+                                                        <th><a href="" ng-click="sort('invtpO_RatePerUnit')">  Rate/Unit</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_TaxAmount')">Tax</a></th>
+                                                        <th><a href="" ng-click="sort('INVTPO_Amount')"> Amount</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_Remarks')">Remarks</a></th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <!--<tr ng-repeat="objpi in get_pidetails track by $index">-->
+                                                    <tr dir-paginate="objpi in filterValue11 = (get_pidetails | filter : searchPI)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                                        <td>{{$index+1}}</td>
+                                                        <td style="overflow-wrap:break-word">
+                                                            {{objpi.invmI_ItemName}}
+                                                        </td>
+                                                        <td style="overflow-wrap:break-word">
+                                                            {{objpi.invmuoM_UOMName}}
+                                                        </td>
+                                                        <td style="overflow-wrap:break-word">
+                                                            {{objpi.invtpO_POQty}}
+                                                        </td>
+                                                        <td style="overflow-wrap:break-word">
+                                                            {{objpi.invtpO_RatePerUnit}}
+                                                        </td>
+                                                        <td style="overflow-wrap:break-word">
+                                                            {{objpi.invtpO_TaxAmount}}
+                                                        </td>
+
+                                                        <td style="overflow-wrap:break-word">
+                                                            {{objpi.invtpO_Amount}}
+                                                        </td>
+                                                        <td style="overflow-wrap:break-word">
+                                                            {{objpi.invtpO_Remarks}}
+                                                        </td>
+                                                        <td hidden="hidden">{{objpi.invtpI_Id}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <dir-pagination-controls max-size="5"
+                                                                     direction-links="true"
+                                                                     boundary-links="true">
+                                            </dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>
+
+                                                SLNO
+                                            </th>
+                                            <th>
+                                                <!--<label>
+                                                    <input type="checkbox" value="" ng-click="toggleAll()" ng-model="all">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>-->
+                                            </th>
+                                            <th>
+                                                <a href="" ng-click="sort1('amsT_FirstName')">Coulumn Name</a>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in columnlist |orderBy:sortKey1:reverse1| filter:search1" ng-class-odd="'odd'">
+                                            <!--| filter:paginate-->
+                                            <td>{{ $index + 1}}</td>
+                                            <td class="text-center">
+                                                <label>
+                                                    <input type="checkbox" name="adcheckt_{{user.ID}}" ng-model="user.checkedvalue" ng-change="optionToggled(user)">
+
+                                                    <span class="lbl padding-8"></span>
+
+                                                </label>
+
+                                            </td>
+                                            <td>
+                                                <input class="form-control" type="text" ng-model="user.title" name="mobile{{$index}}" ng-required="user.checkedvalue" placeholder="Enter Column Name" />
+                                                <div class="error-messages" ng-if="interacted(myForm['mobile'+$index])" ng-messages="myForm['mobile'+$index].$error">
+                                                    <div ng-message="required"> Enter Column Name</div>
+                                                </div>
+                                            </td>
+
+
+                                            <td hidden="hidden">{{user.ID}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-sm-7">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Template:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-5">
+                                        <select class="form-control" name="grp" ng-model="ISES_Id" required>
+                                            <option value="">--Select--</option>
+                                            <option ng-repeat="val in templatelist" value="{{val.iseS_Id}}" ng-selected="val.iseS_Id==ISES_Id">{{val.iseS_Template_Name}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.grp)" ng-messages="myForm.grp.$error">
+                                            <div ng-message="required"> Select Template</div>
+                                        </div>
+                                    </div>
+
+                                    <label class="control-label col-sm-4">
+
+                                        <b style="color:Red" ng-show="ISES_Id>0">
+                                            <a href="javascript:void(0)" class="text-primary" ng-click="viewtemplate();">
+                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                            </a>
+                                            View Template
+                                        </b>
+                                    </label>
+
+                                </div>
+                            </div>
+
+
+
+
+
+                        </div>
+
+                        <!--<div class="form-group">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="well">
+                                    <div class="text-center">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="S" name="rdosupplier" ng-model="supplierflag" ng-change="onradiochange()" required>
+                                            <span class="lbl padding-8"> Supplier </span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="O" name="rdosupplier" ng-model="supplierflag" ng-change="onradiochange()" required>
+                                            <span class="lbl padding-8">Others</span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.rdosupplier)" ng-messages="myForm.rdosupplier.$error">
+                                        <div ng-message="required" style="margin-left:187px;">Please select any one option </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+
+                        <div class="col-sm-12 col-sm-offset-3">
+                            <div ng-show="supplierflag == 'O'">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Name :</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control active" name="sname" placeholder="Name" ng-model="invpitS_SupplierName" ng-required="supplierflag=='O'">
+                                        <div class="error-messages" ng-if="interacted(myForm.sname)" ng-messages="myForm.sname.$error">
+                                            <div ng-message="required">Please Enter Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Contact Number :</label>
+                                    <div class="col-sm-4">
+                                        <input class="form-control" name="contactno" ng-model="invpitS_ContactNo" id="usr" type="text" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" minlength="10" allow-pattern="\d" placeholder="Mobile Number" maxlength="10" ng-required="supplierflag=='O'">
+                                        <div class="error-messages" ng-if="interacted(myForm.contactno)" ng-messages="myForm.contactno.$error">
+                                            <div ng-message="pattern">Enter valid Mobile NO</div>
+                                            <div ng-message="required">Enter Mobile number</div>
+                                            <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                            <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                            <div ng-message="pattern">Mobile number must be numeric</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Email Id :</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control active" name="email" placeholder="Email-Id" ng-model="invpitS_EmailId" ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/" ng-required="supplierflag=='O'">
+                                        <div class="error-messages" ng-if="interacted(myForm.email)" ng-messages="myForm.email.$error">
+                                            <div ng-message="required">Please Enter Email-Id</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12" ng-show="get_pidetails.length>0 && supplierflag == 'S'">
+                            <div class="well">
+                                <div class="">
+                                    <div class="col-sm-4 pull-right">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input class="form-control" ng-model="searchSP" type="text" placeholder="search here...">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-search"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="col-sm-3">
+                                        <div class="form-group" ng-if="xyz!=''">
+                                            <label class="control-label">
+                                                <b>Total Records Selected : </b>
+                                                <label class="badge">
+                                                    {{totsel}}
+                                                </label>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <h4 class="box-title" style="margin-left: 330px;">List of Suppliers</h4>
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>SL NO</th>
+                                                <th>
+                                                    <label><input type="checkbox" value="" ng-change="toggleAll()" ng-model="all"><span class="lbl padding-8"></span></label>
+                                                </th>
+                                                <th><a href="" ng-click="sort('invmS_SupplierName')">Supplier Name</a></th>
+                                                <th><a href="" ng-click="sort('invmS_SupplierCode')">Code</a></th>
+                                                <th><a href="" ng-click="sort('invmS_SupplierConatctPerson')">Conatct Person</a></th>
+                                                <th><a href="" ng-click="sort('invmS_SupplierConatctNo')">Contact Number</a></th>
+                                                <th><a href="" ng-click="sort('invmS_EmailId')">Email_Id</a></th>
+                                                <th><a href="" ng-click="sort('invmS_SupplierAddress')">Address</a></th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <!--<tr ng-repeat="user in get_supplier | orderBy:sortKey:reverse |filter:search">-->
+                                            <tr dir-paginate="user in filterValue1 = (get_supplier | filter : searchSP)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                                <td>{{$index+1}}</td>
+                                                <td>
+                                                    <label>
+                                                        <input type="checkbox" name="adcheckt" value="{{user.xyz}}" ng-change="optionToggled()" ng-model="user.xyz"><span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    {{user.invmS_SupplierName}}
+                                                </td>
+                                                <td>
+                                                    {{user.invmS_SupplierCode}}
+                                                </td>
+                                                <td>
+                                                    {{user.invmS_SupplierConatctPerson}}
+                                                </td>
+                                                <td>
+                                                    {{user.invmS_SupplierConatctNo}}
+                                                </td>
+                                                <td>
+                                                    {{user.invmS_EmailId}}
+                                                </td>
+                                                <td>
+                                                    {{user.invmS_SupplierAddress}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls max-size="5"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                </div>
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="invpitS_Id" value="{{invpitS_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn" ng-show="sms==true ||email==true">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Send
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()" ng-show="sms==true ||email==true">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+
+    <div class="box box-primary" ng-show="gridlist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">PO EMAIL Notification</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridlist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue10.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('INVTPOSUP_DateTime')">DATE</a></th>
+                        <th><a href="" ng-click="sortBy('INVMPO_PONo')">PO No.</a></th>
+                        <th><a href="" ng-click="sortBy('INVMPO_ReferenceNo')">REF. No.</a></th>
+                        <th><a href="" ng-click="sortBy('INVTPOSUP_SupplierName')">Supplier Name</a></th>
+                        <th><a href="" ng-click="sortBy('INVTPOSUP_ContactNo')">CONTACT NO</a> </th>
+                        <th><a href="" ng-click="sortBy('invmpI_PIDate')">EMAIL</a> </th> 
+                        <th><a href="" ng-click="sortBy('invmpI_PIDate')">View Attachment</a> </th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue10 = (gridlist | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.INVTPOSUP_DateTime | date:'dd/MM/yyyy'}}</td>
+                        <td>{{user.INVMPO_PONo}}</td>
+                        <td>{{user.INVMPO_ReferenceNo}}</td>
+                        <td>{{user.INVTPOSUP_SupplierName}}</td>
+                        <td>{{user.INVTPOSUP_ContactNo}}</td>
+                        <td>{{user.INVTPOSUP_EmailId}}</td>
+                        <td>
+                            <a ng-if="user.INVTPOSUP_MailAttatchment!=''&& user.INVTPOSUP_MailAttatchment!=null" style="color:blue;display:inline;"
+                               ng-click="onview(user.INVTPOSUP_MailAttatchment,user.cfilename)">
+                                <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" style="width:30px"/>
+                            </a>
+                        </td>
+                        <!--<td>{{user.invtpI_PIUnitRate}}</td>
+                        <td>{{user.invtpI_ApproxAmount}}</td>-->
+
+                      
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+</section>
+
+<!-- =======================Transcation Tax Model ====================================-->
+<div id="myModal" class="modal fade" role="dialog" data-backdrop="" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-sm-4">
+                    <h4 class="modal-title text-white">PO Details</h4>
+                </div>
+                <div class="col-sm-4">
+                    <md-button type="button" class="md-raised" data-ng-click="printData()">
+                        <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                        PRINT
+                    </md-button>
+                </div>
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+
+               
+            </div>
+            <div class="modal-body">
+                <div class="box box-primary">
+
+                    <div class="box-body">
+                        <div id="test">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-8">
+
+                        <label class="checkbox">
+                            <input type="checkbox" data-ng-model="attachmentflag">
+                            <span class="lbl padding-8" style="color:red"><b>SEND ABOVE TEMPLATE AS A ATTACHMENT</b></span>
+                        </label>
+                    </div>
+                    <div class="col-sm-4">
+                        <md-button type="button" class="md-raised md-primary" data-ng-click="sendmail()" data-dismiss="modal"><i class="fa fa-envelope-o" aria-hidden="true"></i> SEND EMAIL</md-button>
+
+                    </div>
+
+                </div>
+
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+
+            <div id="pdfId">
+
+            </div>
+        </div>
+    </div>
+</div>

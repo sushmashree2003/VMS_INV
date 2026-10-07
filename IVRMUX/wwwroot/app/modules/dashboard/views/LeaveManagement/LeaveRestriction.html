@@ -1,0 +1,218 @@
+﻿<section class="content">
+    <div data-ng-init="onLoadGetData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Leave Restriction</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+
+                 
+                    <div class="row">
+                        <div class="colo-sm-6 col-sm-offset-3">
+                            <div class="col-sm-12">
+                                <div class="well text-center" data-ng-init="allind ='empwise'">
+                                    <input type="radio" value="empwise" name="allind" data-ng-model="allind">
+                                    <span class="lbl padding-8">Employee Wise</span>
+                                    <input type="radio" value="dptwise" name="allind" data-ng-model="allind">
+                                    <span class="lbl padding-8">Department Wise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="row">
+                        <div class="col-sm-6">
+
+
+                            <div class="form-group" ng-show="allind=='empwise'">
+                                <label class="control-label col-sm-4">Employee Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="filterchkbx" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="hrmE_Id" type="checkbox"  data-ng-click="all_check1emp()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label data-ng-model="hrmD_Id" ng-repeat="emp in employeelist |filter:filterchkbx" value="{{emp.hrmE_Id}}" >
+                                        <input name="employeename{{index}}" value="1" data-ng-model="emp.selected" type="checkbox" ng-click="togchkbx1emp();">
+                                        <span class="lbl padding-8">
+                                            {{emp.hrmE_EmployeeFirstName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.employeename{{index}})" ng-messages="myForm.employeename{{index}}.$error">
+                                    <div ng-message="required" style="color:red">Select Employee Name</div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" ng-show="allind=='dptwise'">
+                                <label class="control-label col-sm-4">Company Name:</label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel2" name="companyname" data-ng-model="$parent.mI_Id" ng-true-value="1" ng-change="getdepartment($parent.mI_Id)" theme="bootstrap" ng-disabled="institute" ng-keyup="searchfilter($select,filterdata);" title="Select Comapany">
+                                        <ui-select-match placeholder="Select or Search Company">
+                                            {{$select.selected.mI_Name}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in institutionarray | propsFilter: {mI_Name: $select.search}"
+                                                           value="{{option.mI_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.mI_Name | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.companyname)" ng-messages="myForm.companyname.$error">
+                                        <div ng-message="required">Select Company</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="form-group" ng-show="allind=='dptwise'">
+                                <label class="control-label col-sm-4">Department Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="filterchkbx" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="hrmD_Id" type="checkbox" ng-disabled="institute" data-ng-click="all_check1()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label data-ng-model="hrmD_Id" ng-repeat="dept in departmentdropdown |filter:filterchkbx" value="{{dept.hrmD_Id}}"  >
+                                        <input name="departmentname{{index}}" value="1" data-ng-model="dept.selected" type="checkbox" ng-click="togchkbx1();">
+                                        <span class="lbl padding-8">
+                                            {{dept.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.departmentname{{index}})" ng-messages="myForm.departmentname{{index}}.$error">
+                                    <div ng-message="required" style="color:red">Select Department Name</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="FromDate" data-ng-model="HRLRD_FromDate" onkeydown="return false" md-placeholder="Select Date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.FromDate)" ng-messages="myForm.FromDate.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> To Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="ToDate" data-ng-model="HRLRD_ToDate" onkeydown="return false" md-placeholder="Select Date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.ToDate)" ng-messages="myForm.ToDate.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Remarks:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" style="height:100px;" type="text" name="Remarks" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" data-ng-model="HRLRD_Remarks" id="Remarks" minlength="6" required>  </textarea>
+                                    <div class="error-messages" ng-if="interacted(myForm.Remarks)" ng-messages="myForm.Remarks.$error">
+                                        <div ng-message="required"> Enter  Remarks</div>
+                                        <div ng-message="minlength">Field must contain atleast 6 characters</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            <div class="text-center row">
+                <input type="hidden" value="{{HRLRD_Id}}" data-ng-model="HRLRD_Id" />
+                <md-button type="submit" ng-disabled="form.$invalid" ng-click="SaveData()" class="md-raised md-primary">
+                    <i class="fa fa-save" aria-hidden="true"></i> Save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                </md-button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="box box-primary" ng-if="leaverestriclist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title"> Leave Restriction Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{leaverestriclist.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>          
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th><a href="" ng-click="order('sno')">SLNO</a></th>                        
+                        <th><a href="" ng-click="order('sno')">Department Name</a></th>                        
+                        <th><a href="" ng-click="sort('HRLRD_FromDate')">From Date</a></th>
+                        <th><a href="" ng-click="sort('HRLRD_ToDate')">To Date</a></th>
+                        <th><a href="" ng-click="sort('HRLRD_Remarks')">Leave Restriction Remark</a></th>                       
+                        <th>Action</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in leaverestriclist| filter : searchValue">
+                        <td>{{$index+1}}</td>
+                        <td>{{user.hrmD_DepartmentName}}</td>
+                        <td>{{user.hrlrD_FromDate| date: 'dd-MM-yyyy'}}</td>
+                        <td>{{user.hrlrD_ToDate | date: 'dd-MM-yyyy'}}</td>
+                        <td>{{user.hrlrD_Remarks}}</td>
+                        <td>
+                            <span>
+                                <a href="javascript:void(0)" data-toggle="modal" ng-click="Edit(user);" title="edit"> <i class="fa fa-pencil"></i></a>
+                                |
+                                <span ng-if="user.hrlrD_ActiveFlg">
+                                    <a href="" ng-click="DeletRecord(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        Deactivate
+                                    </a>
+                                </span>
+                                <span ng-if="!user.hrlrD_ActiveFlg">
+                                    <a href="" ng-click="DeletRecord(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        Activate
+                                    </a>
+                                </span>
+                            </span>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"></dir-pagination-controls>
+        </div>
+    </div>
+</section>

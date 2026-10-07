@@ -1,0 +1,260 @@
+﻿
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">LEAVE MONTH-END REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <div class="well">
+                                <label class="control-label">
+                                    <input type="radio" name="vf31" value="All" ng-click="viewfunction()" ng-model="rdopunch">
+                                    <span class="lbl padding-8">All </span>
+                                </label>
+                                <label class="control-label" ng-init="rdopunch='Applied'">
+                                    <input type="radio" name="vf31" value="Applied" ng-click="viewfunction()" ng-model="rdopunch">
+                                    <span class="lbl padding-8">Applied </span>
+                                </label>
+                                <label class="control-label">
+                                    <input type="radio" name="vf31" value="Approved" ng-click="viewfunction()" ng-model="rdopunch">
+                                    <span class="lbl padding-8">Approved </span>
+                                </label>
+                                <label class="control-label">
+                                    <input type="radio" name="vf31" value="Rejected" ng-click="viewfunction()" ng-model="rdopunch">
+                                    <span class="lbl padding-8">Rejected </span>
+                                </label>    
+                                <label class="control-label">
+                                    <input type="radio" name="vf31" value="Partial Approved" ng-click="viewfunction()" ng-model="rdopunch">
+                                    <span class="lbl padding-8">Partial Approved </span>
+                                </label>
+                            </div>
+                        </div>
+                        <!--<div class="row">
+                            <div class="col-sm-12 form-horizontal col-sm-offset-2">
+                                <div class="col-sm-8">
+                                    <div class="text-center well" ng-init="radioval='Leavewise'">                                      
+                                        <label class="radio-inline">
+                                            <input type="radio" ng-model="radioval" name="radioval" value="Leavewise" required>
+                                            <span class="lbl padding-8">Leave Wise</span>
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted(myForm.radioval)" ng-messages="myForm.radioval.$error">
+                                            <div ng-message="required">Select Company/Department Wise .</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-12 col-md-offset-1">
+                            <div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Company Name:</label>
+                                    <div class="col-sm-4">
+                                        <ui-select id="sel2" name="companyname" ng-model="$parent.mI_Id" ng-true-value="1" ng-change="getleavetype($parent.mI_Id)" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Comapany">
+                                            <ui-select-match placeholder="Select or Search Company">
+                                                {{$select.selected.mI_Name}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="option in institutionlist | propsFilter: {mI_Name: $select.search}"
+                                                               value="{{option.mI_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.mI_Name | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(myForm.companyname)" ng-messages="myForm.companyname.$error">
+                                            <div ng-message="required">Select Company</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Leave Name :</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="sel2" name="leave" ng-model="hrmL_Id" ng-required="radioval=='Leavewise'">
+                                            <option value="">--Select Leave-</option>
+                                            <option value="999">All</option>
+                                            <option ng-repeat="qual in leave_name" value="{{qual.hrmL_Id}}" ng-selected="{{qual.Selected == true}}">
+                                                {{qual.hrmL_LeaveName}}
+                                            </option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.leave)" ng-messages="myForm.leave.$error">
+                                            <div ng-message="required"> Please Select Leave </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-6 text-center">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" name="year1" ng-disabled="disablemonth" ng-model="year"  required>
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="user in getyear" value="{{user.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                                    {{user.hrmlY_LeaveYear}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                                <div ng-message="required">Please Select the Academic Year</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 text-center">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Month :<span style="color:red;">*</span></label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" name="month1" ng-disabled="disablemonth" ng-model="ivrM_Month_Id" required>
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="user in getmonth" value="{{user.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    {{user.ivrM_Month_Name}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                                <div ng-message="required">Please Select the month</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                          
+
+                            <br />
+
+                            <div class="text-center">
+                                <md-button type="submit" class="md-raised md-primary" ng-click="getReport()">
+                                    <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                </md-button>
+                                <md-button type="button" ng-click="exptoex();" target="_blank" class="md-raised md-primary" ng-disabled="!grid_view">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Export to Excel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-disabled="!grid_view" id="print-btn" aria-disabled="false" ng-click="printData();">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+            </form>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <div class="box box-primary" ng-show="grid_view">
+        <div class="box-header with-border">
+            <h3 class="box-title">Grid View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!--style="overflow:scroll"-->
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{getmonthReport.length}}
+                        </label>
+
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="search!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filtervalue1.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+            <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Leave Name</th>
+                        <th>Total Days</th>
+                        <th>Leave Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="employee in filtervalue1 = (getmonthReport | filter : search)">
+                        <td>{{$index+1}}</td>
+                        <td class="text-left">
+                            {{employee.HRML_LeaveName}}
+                        </td>
+                        <td class="text-right">{{employee.leave}}</td>
+                        <td class="text-right">{{employee.leavestatus}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" style='font-weight: bold;'> Total</td>
+                        <td style='font-weight: bold;text-align:right;'>{{sumofleave() | number : 2}}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+         
+            <div id="table1" style="display:none;">
+                <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Leave Name</th>
+                            <th>Total Days</th>
+                            <th>Leave Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="employee in getmonthReport">
+                            <td>{{$index+1}}</td>
+                            <td class="text-left">
+                                {{employee.HRML_LeaveName}}
+                            </td>
+                            <td class="text-right">{{employee.leave}}</td>
+                            <td class="text-right">{{employee.leavestatus}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" style='font-weight: bold;'> Total</td>
+                            <td style='font-weight: bold;text-align:right;'>{{sumofleave() | number : 2}}</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

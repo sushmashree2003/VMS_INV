@@ -1,0 +1,543 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .backkk {
+        background-color: #8a494924;
+    }
+
+    .md-icon-button + .md-datepicker-input-container {
+        margin-left: -10px;
+        width: 53%;
+    }
+
+    ._md-datepicker-has-triangle-icon {
+        margin-right: -45px;
+    }
+</style>
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Planner Approval Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <div class="form-group col-sm-6">
+                            <label class="control-label col-sm-3">Start Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="start_Date" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date"></md-datepicker>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label class="control-label col-sm-3">End Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" ng-change="onenddatechange()" md-min-date="start_Date" md-placeholder="Enter Date"></md-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="depdes==true">
+                    <div class="col-sm-6" style="padding-left: 30px !important;">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 13px;width: 78%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-click="all_checkdept(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Department</b>
+                                    </span>
+                                </label>
+                                <hr />
+                                <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                    <input name="dept" ng-model="user.selected" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDC_Name}} Department</b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 16px;/* width: 25.0em; */width: 77%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+
+                                <label>
+                                    <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Designation</b>
+                                    </span>
+                                </label>
+                                <hr />
+                                <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                    <input name="desg" ng-model="user.selected" type="checkbox" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6" style="padding-left: 30px !important;">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 13px;width: 78%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="checkalluu" type="checkbox" ng-click="all_checkuu(checkalluu)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Employee</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                    <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbxuu();" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-if="get_Plannerlist.length>0">
+                            <!--<label class="control-label col-sm-8">Planner's :<span style="color:Red">*</span></label>-->
+                            <label class="control-label" style="padding-left: 16px;/* width: 25.0em; */width: 77%;">
+                                <span ng-show="get_Plannerlist.length>0">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Planner here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in get_Plannerlist | filter : searchValue">
+                                    <input name="emp22" ng-model="user.plnrck" type="checkbox" ng-click="togchkbx();" title="Select Planner" ng-required="isOptionsRequired5()">
+                                    <span class="lbl padding-8">
+                                        <b>{{user.empname}}</b> : {{user.ismtpL_PlannerName }}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.emp22)" ng-messages="myForm.emp22.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+          
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="approvalReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="newmainarray.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <!--<md-button ng-show="get_approvalreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printP')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>-->
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="newmainarray.length>0">
+        <!--ng-show="get_approvalreport.length>0"-->
+        <div >
+
+            <div dir-paginate="vv in newmainarray  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page">
+
+                <!--<div class="box-body" id="asdf1" ng-repeat="vv in newmainarray" style="break-after:always;page-break-after:always">-->
+                <div class="box-content clearfix" style="min-height:auto">
+                    <div class="text-center">
+                        <h3><b style="color:firebrick"> EMPLOYEE NAME:&nbsp;&nbsp;&nbsp;{{ename |uppercase}} </b></h3>
+                    </div>
+                    <div class="text-center">
+                        <h4> PLANNER NAME:&nbsp;&nbsp;&nbsp;{{vv.planname}} &nbsp;&nbsp;&nbsp;DATE:({{vv.sdate|date:'dd-MM-yyyy'}}&nbsp;&nbsp;TO&nbsp;&nbsp; {{vv.edate|date:'dd-MM-yyyy'}}) &nbsp;&nbsp;&nbsp;TOTAL EFFORT:<span style="color:green">{{vv.hrs}}(HOURS)</span></h4>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <!--<label class="control-label col-sm-2 font-weight-bold"><b>Total Effort:</b>{{vv.hrs}}(Hr)</label>-->
+
+                            <label class="control-label col-sm-3 font-weight-bold"><b>Current Week Effort:&nbsp;&nbsp;</b>{{vv.hrs-vv.overalleffortD}}(Hr)</label>
+                            <label class="control-label col-sm-3 font-weight-bold" style="color:red"><b>Deviated Effort:&nbsp;&nbsp;</b>{{vv.overalleffortD}}(Hr)</label>
+                            <label class="control-label col-sm-3 font-weight-bold"><b>Current Week Effort:&nbsp;&nbsp;</b>{{vv.overalleffortCP |number:2}}%</label>
+                            <label class="control-label col-sm-3 font-weight-bold" style="color:red"><b>Deviated Effort:&nbsp;&nbsp;</b>{{vv.overalleffortDP|number:2}}%</label>
+                        </div>
+
+                    </div>
+                    <div class="box-content clearfix" style="min-height:auto" ng-if="vv.catlist.length>0">
+                        <h4>CATEGORY WISE EFFORT DETAILS</h4>
+                        <table class="table table-responsive table-bordered clearfix">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Category
+                                    </th>
+                                    <th>
+                                        Total  Effort(Hr)
+                                    </th>
+                                    <th>
+                                        Current Week Effort(Hr)
+                                    </th>
+                                    <th>
+                                        Deviated Effort(Hr)
+                                    </th>
+                                    <th>
+                                        Current Week Effort(%)
+                                    </th>
+                                    <th>
+                                        Deviated Effort(%)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ss in vv.catlist">
+                                    <td>
+                                        {{ss.CNAME}}--{{ss.MINP}}% <span style="color:red;" ng-if="ss.flg==true">*</span>
+                                    </td>
+                                    <td>{{ss.TE}}</td>
+                                    <td>{{ss.TE-ss.DE}}</td>
+                                    <td style="color:orangered">{{ss.DE}}</td>
+                                    <td>{{ss.CWP |number:2}}</td>
+                                    <td style="color:orangered">{{ss.DP |number:2}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <label class="control-label col-sm-12 font-weight-bold"><b>NOTE:&nbsp;&nbsp;</b><span style="color:red;"><b>*</b>&nbsp;</span>&nbsp;&nbsp;<span style="color:chocolate">Compulsory Category</span></label>
+
+                        <!--<div class="col-sm-12" ng-repeat="ss in finalcategoryidlist">
+                        <label class="control-label col-sm-12 font-weight-bold"><b>Category Name:&nbsp;&nbsp;</b>{{ss.CNAME}}<span style="color:red;">({{ss.MINP}}%)</span></label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Total Effort:</b>&nbsp;{{ss.TE}}</label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Current Week Effort:</b>&nbsp;{{ss.TE-ss.DE}}</label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Deviated Effort</b>{{ss.DE}}</label>
+
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Current Week Effort: %:</b><span style="color:red;">*</span>{{ss.CWP}}</label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Deviated Effort: %:</b><span style="color:red;">*</span>{{ss.DP}}</label>
+                        <hr />
+                        <br />
+                    </div>-->
+
+
+                    </div>
+                    <div class="text-center">
+                        <h3> PLANNER TASK DETAILS</h3>
+                    </div>
+                    <table class="table table-responsive table-bordered clearfix">
+                        <thead>
+                            <tr>
+                                <th>SL NO</th>
+                                <th width="30%"><a href="" ng-click="sort('invmI_Id')">Issue/Task</a></th>
+                                <th width="25%"><a href="" ng-click="sort('invmI_Id')">Task Description</a></th>
+                                <th width="15%"><a href="" ng-click="sort('invtsL_SalesPrice')">Planned</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Start Date</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">End Date</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Effort(Hrs)</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Task Status</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Remarks</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Status</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="obja in vv.PlaNlist" class="{{obja.cls}}">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                                <td class="text-left">
+                                    <span class="text-head col-sm-12 text-left" ng-model="obja.ISMTCR_Id">{{obja.ISMTCR_Title}}</span>
+                                    <!--<span class="text-head col-sm-12 text-left" style="font-size:20px;" ng-model="obja.ISMTCR_Id">{{obja.ISMTCR_Title}}</span>-->
+
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">
+                                        <span class="text-left">{{obja.ISMTCR_TaskNo}}</span>
+                                        <span class="text-left" ng-if="obja.ISMTCR_BugOREnhancementFlg=='B'">Bugs & Complaints</span>
+                                        <span class="text-left" ng-if="obja.ISMTCR_BugOREnhancementFlg=='E'">Enhancement</span>
+                                        &nbsp;&nbsp;
+                                        <span ng-if="(obja.HRMP_Name=='High')|| (obja.HRMP_Name=='HIGH')"><label style="color:red;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                        <span ng-if="(obja.HRMP_Name=='Normal')||(obja.HRMP_Name=='NORMAL')"><label style="color:orange;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                        <span ng-if="(obja.HRMP_Name=='Low')||(obja.HRMP_Name=='LOW')"><label style="color:green;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                        &nbsp;&nbsp;
+                                    </label>
+                                    <span ng-if="obja.ISMMCLT_ClientName!=null">
+                                        <label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Client: {{obja.ISMMCLT_ClientName}} </label>
+                                    </span>
+                                    <span ng-if="obja.ISMMTCAT_TaskCategoryName!=null">
+                                        <label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Category: {{obja.ISMMTCAT_TaskCategoryName}} </label>
+                                    </span>
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">Created Date: {{obja.ISMTCR_CreationDate | date:'dd-MM-yyyy'}} </label>
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;" ng-if="obja.Flg!=null && obja.Flg==true">
+                                        Deviated Task?:<span style="color:red">YES</span>
+
+                                    </label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTCR_Desc}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label"><b>Date : </b>{{obja.CreatedDate | date:'dd-MM-yyyy'}}</label>
+                                    <label class="control-label"><b> By : </b>{{obja.plannedby}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_StartDate | date:'dd-MM-yyyy'}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_EndDate | date:'dd-MM-yyyy'}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_EffortInHrs}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_Status}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_Remarks}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">
+                                        <span ng-if="obja.status=='APPROVED'" style="color:green">
+                                            {{obja.status}}
+                                        </span>
+                                        <span ng-if="obja.status=='PENDING'" style="color:brown">
+                                            {{obja.status}}
+                                        </span>
+                                        <span ng-if="obja.status=='REJECTED'" style="color:red">
+                                            {{obja.status}}
+                                        </span>
+
+                                    </label>
+                                </td>
+
+                                <td class="text-left" hidden="hidden">{{obja.ISMTPLTA_Id}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <dir-pagination-controls max-size="5" pagination-id="page"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+
+
+
+        <div id="printP" ng-show="abcdef==true">
+
+           
+
+                <div class="box-body" id="asdf1" ng-repeat="vv in newmainarray" style="break-after:always;page-break-after:always">
+                <div class="box-content clearfix" style="min-height:auto">
+                    <div class="text-center">
+                        <h3><b style="color:firebrick"> EMPLOYEE NAME:&nbsp;&nbsp;&nbsp;{{ename |uppercase}} </b></h3>
+                    </div>
+                    <div class="text-center">
+                        <h4> PLANNER NAME:&nbsp;&nbsp;&nbsp;{{vv.planname}} &nbsp;&nbsp;&nbsp;DATE:({{vv.sdate|date:'dd-MM-yyyy'}}&nbsp;&nbsp;TO&nbsp;&nbsp; {{vv.edate|date:'dd-MM-yyyy'}}) &nbsp;&nbsp;&nbsp;TOTAL EFFORT:<span style="color:green">{{vv.hrs}}(HOURS)</span></h4>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <!--<label class="control-label col-sm-2 font-weight-bold"><b>Total Effort:</b>{{vv.hrs}}(Hr)</label>-->
+
+                            <label class="control-label col-sm-3 font-weight-bold"><b>Current Week Effort:&nbsp;&nbsp;</b>{{vv.hrs-vv.overalleffortD}}(Hr)</label>
+                            <label class="control-label col-sm-3 font-weight-bold" style="color:red"><b>Deviated Effort:&nbsp;&nbsp;</b>{{vv.overalleffortD}}(Hr)</label>
+                            <label class="control-label col-sm-3 font-weight-bold"><b>Current Week Effort:&nbsp;&nbsp;</b>{{vv.overalleffortCP |number:2}}%</label>
+                            <label class="control-label col-sm-3 font-weight-bold" style="color:red"><b>Deviated Effort:&nbsp;&nbsp;</b>{{vv.overalleffortDP|number:2}}%</label>
+                        </div>
+
+                    </div>
+                    <div class="box-content clearfix" style="min-height:auto" ng-if="vv.catlist.length>0">
+                        <h4>CATEGORY WISE EFFORT DETAILS</h4>
+                        <table class="table table-responsive table-bordered clearfix">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Category
+                                    </th>
+                                    <th>
+                                        Total  Effort(Hr)
+                                    </th>
+                                    <th>
+                                        Current Week Effort(Hr)
+                                    </th>
+                                    <th>
+                                        Deviated Effort(Hr)
+                                    </th>
+                                    <th>
+                                        Current Week Effort(%)
+                                    </th>
+                                    <th>
+                                        Deviated Effort(%)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ss in vv.catlist">
+                                    <td>
+                                        {{ss.CNAME}}--{{ss.MINP}}% <span style="color:red;" ng-if="ss.flg==true">*</span>
+                                    </td>
+                                    <td>{{ss.TE}}</td>
+                                    <td>{{ss.TE-ss.DE}}</td>
+                                    <td style="color:orangered">{{ss.DE}}</td>
+                                    <td>{{ss.CWP |number:2}}</td>
+                                    <td style="color:orangered">{{ss.DP |number:2}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <label class="control-label col-sm-12 font-weight-bold"><b>NOTE:&nbsp;&nbsp;</b><span style="color:red;"><b>*</b>&nbsp;</span>&nbsp;&nbsp;<span style="color:chocolate">Compulsory Category</span></label>
+
+                        <!--<div class="col-sm-12" ng-repeat="ss in finalcategoryidlist">
+                        <label class="control-label col-sm-12 font-weight-bold"><b>Category Name:&nbsp;&nbsp;</b>{{ss.CNAME}}<span style="color:red;">({{ss.MINP}}%)</span></label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Total Effort:</b>&nbsp;{{ss.TE}}</label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Current Week Effort:</b>&nbsp;{{ss.TE-ss.DE}}</label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Deviated Effort</b>{{ss.DE}}</label>
+
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Current Week Effort: %:</b><span style="color:red;">*</span>{{ss.CWP}}</label>
+                        <label class="control-label col-sm-2 font-weight-bold"><b>Deviated Effort: %:</b><span style="color:red;">*</span>{{ss.DP}}</label>
+                        <hr />
+                        <br />
+                    </div>-->
+
+
+                    </div>
+                    <div class="text-center">
+                        <h3> PLANNER TASK DETAILS</h3>
+                    </div>
+                    <table class="table table-responsive table-bordered clearfix">
+                        <thead>
+                            <tr>
+                                <th>SL NO</th>
+                                <th width="30%"><a href="" ng-click="sort('invmI_Id')">Issue/Task</a></th>
+                                <th width="25%"><a href="" ng-click="sort('invmI_Id')">Task Description</a></th>
+                                <th width="15%"><a href="" ng-click="sort('invtsL_SalesPrice')">Planned</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Start Date</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">End Date</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Effort(Hrs)</a></th>
+                                <th style="overflow-wrap:break-word"><a href="" ng-click="sort('invtsL_SalesQty')">Task Status</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Remarks</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Status</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="obja in vv.PlaNlist" class="{{obja.cls}}">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                                <td class="text-left">
+                                    <span class="text-head col-sm-12 text-left" ng-model="obja.ISMTCR_Id">{{obja.ISMTCR_Title}}</span>
+                                    <!--<span class="text-head col-sm-12 text-left" style="font-size:20px;" ng-model="obja.ISMTCR_Id">{{obja.ISMTCR_Title}}</span>-->
+
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">
+                                        <span class="text-left">{{obja.ISMTCR_TaskNo}}</span>
+                                        <span class="text-left" ng-if="obja.ISMTCR_BugOREnhancementFlg=='B'">Bugs & Complaints</span>
+                                        <span class="text-left" ng-if="obja.ISMTCR_BugOREnhancementFlg=='E'">Enhancement</span>
+                                        &nbsp;&nbsp;
+                                        <span ng-if="(obja.HRMP_Name=='High')|| (obja.HRMP_Name=='HIGH')"><label style="color:red;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                        <span ng-if="(obja.HRMP_Name=='Normal')||(obja.HRMP_Name=='NORMAL')"><label style="color:orange;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                        <span ng-if="(obja.HRMP_Name=='Low')||(obja.HRMP_Name=='LOW')"><label style="color:green;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                        &nbsp;&nbsp;
+                                    </label>
+                                    <span ng-if="obja.ISMMCLT_ClientName!=null">
+                                        <label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Client: {{obja.ISMMCLT_ClientName}} </label>
+                                    </span>
+                                    <span ng-if="obja.ISMMTCAT_TaskCategoryName!=null">
+                                        <label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Category: {{obja.ISMMTCAT_TaskCategoryName}} </label>
+                                    </span>
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">Created Date: {{obja.ISMTCR_CreationDate | date:'dd-MM-yyyy'}} </label>
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;" ng-if="obja.Flg!=null && obja.Flg==true">
+                                        Deviated Task?:<span style="color:red">YES</span>
+
+                                    </label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTCR_Desc}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label"><b>Date : </b>{{obja.CreatedDate | date:'dd-MM-yyyy'}}</label>
+                                    <label class="control-label"><b> By : </b>{{obja.plannedby}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_StartDate | date:'dd-MM-yyyy'}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_EndDate | date:'dd-MM-yyyy'}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_EffortInHrs}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_Status}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">{{obja.ISMTPLTA_Remarks}}</label>
+                                </td>
+                                <td class="text-left">
+                                    <label class="control-label">
+                                        <span ng-if="obja.status=='APPROVED'" style="color:green">
+                                            {{obja.status}}
+                                        </span>
+                                        <span ng-if="obja.status=='PENDING'" style="color:brown">
+                                            {{obja.status}}
+                                        </span>
+                                        <span ng-if="obja.status=='REJECTED'" style="color:red">
+                                            {{obja.status}}
+                                        </span>
+
+                                    </label>
+                                </td>
+
+                                <td class="text-left" hidden="hidden">{{obja.ISMTPLTA_Id}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>

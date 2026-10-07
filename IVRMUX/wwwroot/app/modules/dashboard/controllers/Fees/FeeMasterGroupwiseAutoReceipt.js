@@ -1,0 +1,244 @@
+﻿(function () {
+    'use strict';
+    angular
+.module('app')
+        .controller('FeeMasterGroupwiseAutoReceipt', FeeMasterGroupwiseAutoReceipt)
+
+    FeeMasterGroupwiseAutoReceipt.$inject = ['$rootScope', '$scope', '$state', '$location', 'Flash', 'appSettings', 'apiService', '$http', 'superCache']
+    function FeeMasterGroupwiseAutoReceipt($rootScope, $scope, $state, $location, Flash, appSettings, apiService, $http, superCache) {
+
+        $scope.searchValue = "";
+        $scope.showdet = true;
+        $scope.showbuttons = true;
+
+        $scope.prefixshow = true;
+        $scope.suffixshow = true;
+
+
+        $scope.onload = function () {
+            $scope.currentPage = 1;
+            $scope.itemsPerPage = 5;
+            var pageid = 2;
+            var data = {
+                "MI_Id": $scope.Id,
+            }
+            apiService.create("FeeMasterGroupwiseAutoReceipt/getdetails", data).
+            then(function (promise) {
+                $scope.arrlist6 = promise.acayear;
+                $scope.arrlistchk = promise.fillgroup;
+
+                if (promise.filldata.length > 0) {
+                    $scope.students = promise.filldata;
+                    $scope.presentCountgrid = promise.filldata.length;
+                }
+                else {
+                    swal("No Records Found");
+                    $scope.presentCountgrid = 0;
+                }
+              
+            })
+            $scope.sort = function (keyname) {
+                $scope.sortKey = keyname;   //set the sortKey to the param passed
+                $scope.reverse = !$scope.reverse; //if true make it false and vice versa
+            }
+        };
+
+        $scope.delete = function (det, SweetAlert) {
+
+            var data = {
+                "FGARG_Id": det.fgarG_Id
+            }
+
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to delete record?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55", confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "Cancel",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    apiService.create("FeeMasterGroupwiseAutoReceipt/delete/", data).
+                    then(function (promise) {
+                        
+                        if (promise.returnvalue == "failed") {
+                            swal("Sorry.....You can not delete this record.Because it is already mapped");
+                            return;
+                        }
+                        else if (promise.returnvalue === "deleted") {
+                            swal('Record Deleted Successfully');
+                            $state.reload();
+                        }
+                        else {
+                            swal('Record Not Deleted');
+                        }
+                    })
+                }
+                else {
+                    swal("Cancelled");
+                }
+            });
+        }
+        $scope.edit = function (det) {
+
+            var data={
+                "FGARG_Id":det.fgarG_Id
+            }
+
+            $scope.prefixnme = true;
+            $scope.suffixnme = true;
+
+            $scope.academicnme = true;
+
+            $scope.Id = det.fgarG_Id;
+            apiService.create("FeeMasterGroupwiseAutoReceipt/edit/", data).
+            then(function (promise) {
+                $scope.ASMAY_Id = promise.filldata[0].asmaY_Id;
+
+                if (promise.filldata[0].fgaR_PrefixFlag == 1)
+                {
+                    $scope.FGAR_PrefixFlag = true;
+                    $scope.FGAR_PrefixName = promise.filldata[0].fgaR_PrefixName;
+                    $scope.predisable = false;
+                    $scope.prefixnme = false;
+                }
+                else
+                {
+                    $scope.FGAR_PrefixFlag = false;
+                    $scope.FGAR_PrefixName = "";
+                    $scope.predisable = false;
+                    $scope.prefixnme = false;
+                }
+
+                if (promise.filldata[0].fgaR_SuffixFlag == 1) {
+                    $scope.FGAR_SuffixFlag = true;
+                    $scope.FGAR_SuffixName = promise.filldata[0].fgaR_SuffixName;
+                    $scope.sufdisable = false;
+                    $scope.suffixnme = false;
+                }
+                else
+                {
+                    $scope.FGAR_SuffixFlag = false;
+                    $scope.FGAR_SuffixName = "";
+                    $scope.sufdisable = false;
+                    $scope.suffixnme = false;
+                }
+
+                $scope.FGAR_Starting_No = promise.filldata[0].fgaR_Starting_No;
+                $scope.FGAR_Name = promise.filldata[0].fgaR_Name;
+                $scope.FGAR_Address = promise.filldata[0].fgaR_Address;
+
+                $scope.FMG_Id = promise.filldata[0].fmG_Id;
+
+            })
+        }
+
+        $scope.submitted = false;
+        $scope.save = function (selected, arrlistchk) {
+
+            if ($scope.myForm.$valid) {
+
+                if (arrlistchk.length > 0)
+                {
+                    $scope.albumNameArray = [];
+                    for (var j = 0; j < selected.length; j++) {
+                        for (var i = 0; i < arrlistchk.length; i++) {
+                            if (selected[j] == arrlistchk[i].fmG_Id) {
+                                $scope.albumNameArray.push(arrlistchk[i]);
+                            }
+                        }
+                    }
+
+                    var data = {
+                        "ASMAY_Id": $scope.ASMAY_Id,
+                        "FGAR_PrefixFlag": $scope.FGAR_PrefixFlag,
+                        "FGAR_PrefixName": $scope.FGAR_PrefixName,
+                        "FGAR_SuffixFlag": $scope.FGAR_SuffixFlag,
+                        "FGAR_SuffixName": $scope.FGAR_SuffixName,
+                        "FGAR_Name": $scope.FGAR_Name,
+                        "FGAR_Address": $scope.FGAR_Address,
+                        "savegroup": $scope.albumNameArray,
+                        "FGAR_Id": $scope.Id,
+                        "FGAR_Starting_No": $scope.FGAR_Starting_No
+                    }
+
+                    apiService.create("FeeMasterGroupwiseAutoReceipt/savedata/", data)
+
+                    .then(function (promise) {
+
+                        if (promise.returnvalue == "true") {
+                            swal('Record Saved Successfully');
+                            $state.reload();
+                        }
+                        else if (promise.returnvalue == "false") {
+                            swal('Record Saving Failed');
+                            $state.reload();
+                        }
+                        else if (promise.returnvalue == "updated") {
+                            swal('Record Updated Successfully');
+                            $state.reload();
+                        }
+                        else if (promise.returnvalue == "updatefailed") {
+                            swal('Record Update Failed');
+                            $state.reload();
+                        }
+                        else if (promise.returnvalue == "duplicate") {
+                            swal('Record Already Exists');
+                        }
+                        else {
+                            swal('Operation Failed');
+                            $state.reload();
+                        }
+                    })
+                }
+                else
+                {
+                    swal("Kindly select any one group!!!")
+                }
+              
+            }
+            else {
+                $scope.submitted = true;
+            }
+        };
+
+        $scope.clearid = function () {
+            $state.reload();
+
+        }
+        $scope.interacted = function (field) {
+            return $scope.submitted
+        };
+
+        $scope.sufdisable = true;
+        $scope.predisable = true;
+
+        $scope.changeprefix = function (FGAR_PrefixFlag) {
+            if(FGAR_PrefixFlag==false)
+            {
+                $scope.predisable = true;
+                $scope.FGAR_PrefixName = "";
+            }
+            else if (FGAR_PrefixFlag == true) {
+                $scope.predisable = false;
+                $scope.FGAR_PrefixName = "";
+            }
+        };
+
+
+        $scope.changesuffix = function (FGAR_SuffixFlag) {
+            if (FGAR_SuffixFlag == false) {
+                $scope.sufdisable = true;
+                $scope.FGAR_SuffixName = "";
+            }
+            else if (FGAR_SuffixFlag == true) {
+                $scope.sufdisable = false;
+                $scope.FGAR_SuffixName = "";
+            }
+        };
+
+    }
+})();

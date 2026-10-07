@@ -1,0 +1,376 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PRIORITY REPORT </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-5 col-sm-offset-1">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 92%;">
+                            <span ng-show="get_userEmplist.length>0">
+                                <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="search Employee here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 25.85em !important">
+                            <label>
+                                <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </label>
+                            <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="start_Date" ng-disabled="plannerflg" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="end_Date" name="endate" ng-disabled="plannerflg" md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="deviationReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="get_deviationreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button ng-show="get_deviationRemarksReport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printareaId')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button type="button"  class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_deviationRemarksReport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">PRIORITY REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{get_deviationRemarksReport.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" border="1" id="tabel11" style="border-collapse:collapse;width:1550px">
+
+                    <thead>
+                        <tr>
+                            <th rowspan="2" >
+                                SL.No.
+                            </th>
+                            <th rowspan="2" ><a href="" ng-click="sortBy('EmpName')">Employee Name</a></th>
+                            <th rowspan="2" ><a href="" ng-click="sortBy('HRME_EmployeeCode')">Task No.</a></th>
+                            <th rowspan="2" style="width:150px"><a href="" ng-click="sortBy('HRME_EmployeeCode')">Task</a></th>
+                            <th rowspan="2" style="width:250px"><a href="" ng-click="sortBy('ISMTCR_Desc')">Task Description</a></th>
+                            <th rowspan="2" ><a href="" ng-click="sortBy('ISMTCR_Desc')">Created Date</a></th>
+                            <th rowspan="2" ><a href="" ng-click="sortBy('ISMTCR_Desc')">Assigned By</a></th>
+                            <th rowspan="2" style="width:100px"><a href="" ng-click="sortBy('ISMTCR_Desc')">Assigned From-To Date</a></th>
+                            <th rowspan="2" ><a href="" ng-click="sortBy('ISMTCR_Desc')">Remark</a></th>
+                            <th colspan="2"><a href="" ng-click="sortBy('TaskPriorityStatus')">Switch Status </a> </th>
+                            <th rowspan="2"><a href="" ng-click="sortBy('ISMTCR_Status')">Switch Date</a> </th>
+                        </tr>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('TaskPriorityStatus')">From </a> </th>
+                            <th><a href="" ng-click="sortBy('TaskPriorityStatus')">To </a> </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody >
+                        <tr dir-paginate="user in filterValue1=(tempto | filter : searchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td >{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td >{{ user.AssignedTo }}</td>
+                            <td >{{ user.ISMTCR_TaskNo}}</td>
+                            <td >{{ user.ISMTCR_Title}}</td>
+                            <td >{{ user.ISMTCR_Desc}}</td>
+                            <td >{{ user.ISMTCR_CreationDate |date:'dd/MM/yyyy'}}</td>
+                            <td>{{ user.AssignedBy}}</td>
+                            <td >{{ user.ISMTCRASTO_StartDate |date:'dd/MM/yyyy'}} TO {{ user.ISMTCRASTO_EndDate |date:'dd/MM/yyyy'}}</td>
+                            <td >{{ user.ISMTCRASTO_Remarks}}</td>
+
+                            <td style="padding:0px">
+                                <div>
+                                    <table style="width:100%">
+                                        <tr ng-if="user.LIST.length==1" ng-repeat="ss in user.LIST" style="width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                {{ss.OldPriority}}
+                                            </td>
+
+                                        </tr>
+
+                                        <tr ng-if="user.LIST.length>1" ng-repeat="ss in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                {{ss.OldPriority}}
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </td>
+                            <td style="padding:0px">
+                                <div>
+                                    <table style="width:100%">
+                                        <tr ng-if="user.LIST.length==1" ng-repeat="ss in user.LIST" style="width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                {{ ss.NewPriority}}
+                                            </td>
+
+                                        </tr>
+
+                                        <tr ng-if="user.LIST.length>1" ng-repeat="ss in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                {{ ss.NewPriority}}
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </td>
+                            <td style="padding:0px">
+                                <div>
+                                    <table style="width:100%">
+                                        <tr ng-if="user.LIST.length==1" ng-repeat="ss in user.LIST" style="width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                {{ ss.ISMTPSCD_CurrentDate |date:'dd/MM/yyyy'}}
+                                            </td>
+
+                                        </tr>
+
+                                        <tr ng-if="user.LIST.length>1" ng-repeat="ss in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                {{ ss.ISMTPSCD_CurrentDate |date:'dd/MM/yyyy'}}
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                        
+
+                    </tbody>
+
+
+
+
+                </table>
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+            </div>
+
+
+            <div id="printareaId" ng-show="tadprint">
+                <!--<div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>-->
+                <!--<center> <h4>TRIP BOOKING DETAILS</h4></center>-->
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center" style="width:100%">
+                    <thead>
+                        <tr>
+                            <td colspan="13" class="text-center">PRIORITY STATUS REPORT</td>
+                        </tr>
+                        <tr style="background-color:antiquewhite;border:solid">
+                            <th rowspan="2">
+                                SL.No.
+                            </th>
+                            <th rowspan="2">Employee Name</th>
+                            <th rowspan="2">Task No.</th>
+                            <th rowspan="2" style="width:250px">Task</th>
+                            <th rowspan="2" style="width:350px">Task Description</th>
+                            <th rowspan="2">Created Date</th>
+                            <th rowspan="2">Assigned By</th>
+                            <th rowspan="2" style="width:100px">Assigned From-To Date</th>
+                            <th rowspan="2">Remark</th>
+                            <th colspan="2">Switch Status </th>
+                            <th rowspan="2">Switch Date </th>
+                        </tr>
+                        <tr style="background-color:antiquewhite;border:solid">
+                            <th>From  </th>
+                            <th>To  </th>
+                        </tr>
+
+                       
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="aa in tempto" style="border : solid 0.5px black;">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center">{{ aa.AssignedTo }}</td>
+                            <td class="text-center">{{ aa.ISMTCR_TaskNo}}</td>
+                            <td class="text-center">{{ aa.ISMTCR_Title}}</td>
+                            <td class="text-center">{{ aa.ISMTCR_Desc}}</td>
+                            <td class="text-center">{{ aa.ISMTCR_CreationDate |date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{ aa.AssignedBy}}</td>
+                            <td class="text-center">{{ aa.ISMTCRASTO_StartDate |date:'dd/MM/yyyy'}} TO {{ aa.ISMTCRASTO_EndDate |date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{ aa.ISMTCRASTO_Remarks}}</td>
+
+                            <td style="padding:0px" class="text-center">
+                                <div>
+                                    <table style="width:100%">
+                                        <tr ng-if="aa.LIST.length==1" ng-repeat="ff in aa.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                            <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                {{ff.OldPriority}}
+
+                                            </td>
+
+                                        </tr>
+
+                                        <tr ng-if="aa.LIST.length>1" ng-repeat="ff in aa.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                            <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                {{ff.OldPriority}}
+
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </td>
+                            <td style="padding:0px" class="text-center">
+                                <div>
+                                    <table style="width:100%">
+                                        <tr ng-if="aa.LIST.length==1" ng-repeat="ff in aa.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                            <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                {{ff.NewPriority}}
+
+                                            </td>
+
+                                        </tr>
+
+                                        <tr ng-if="aa.LIST.length>1" ng-repeat="ff in aa.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                            <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                {{ff.NewPriority}}
+
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </td>
+                            <td style="padding:0px" class="text-center">
+                                <div>
+                                    <table style="width:100%">
+                                        <tr ng-if="aa.LIST.length==1" ng-repeat="ff in aa.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                            <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                {{ff.ISMTPSCD_CurrentDate |date:'dd/MM/yyyy'}}
+
+                                            </td>
+
+                                        </tr>
+
+                                        <tr ng-if="aa.LIST.length>1" ng-repeat="ff in aa.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                            <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                {{ff.ISMTPSCD_CurrentDate |date:'dd/MM/yyyy'}}
+
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                    </tbody>
+
+
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>

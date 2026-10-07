@@ -1,0 +1,601 @@
+﻿<style>
+    .aa {
+        margin-left: 109px;
+        margin-top: -28px;
+    }
+</style>
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Stock Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-offset-3">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Item" name="item" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Item</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Store" name="Store" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Store</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Group" name="Group" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Group</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="1" ng-disabled="optionflag!='All'" name="overall" data-ng-model="overallflg">
+                                        <span class="lbl padding-8">Overall </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-offset-2" ng-hide="staffcheck=='Staff'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Institutions:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel112" ng-model="MI_Id" ng-change="onclickchange()" name="yr" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="mi1 in get_mi_list" value="{{mi1.MI_Id}}" ng-selected="{{mi1.Selected==true}}"> {{mi1.MI_Name}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yr)" ng-messages="myForm.yr.$error">
+                                        <div ng-message="required">Select Institutions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6 col-sm-offset-2">                          
+                            <div class="form-group" ng-if="optionflag=='Item'">
+                                <label class="control-label col-sm-4">Item :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="item" ng-model="obj.INVMI_Id" theme="bootstrap" ng-disabled="edits" ng-keyup="searchfilter($select);" title="Select Item" ng-required="optionflag=='Item'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Item in the list...">{{$select.selected.INVMI_ItemName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_stockdetails | filter: $select.search " value="{{option.INVMI_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.INVMI_ItemName +':'+ option.INVMI_ItemCode | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Item </div>
+                                    </div>
+                                </div>
+                            </div>                           
+                            <div class="form-group" ng-if="optionflag=='Store'">
+                                <label class="control-label col-sm-4">Store :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="store" ng-model="obj.INVMST_Id" theme="bootstrap" ng-disabled="edits" ng-keyup="searchfilter($select);" title="Select Store" ng-required="optionflag=='Store'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Store in the list...">{{$select.selected.INVMS_StoreName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_stockdetails | filter: $select.search " value="{{option.INVMST_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.INVMS_StoreName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.store)" ng-messages="myForm.store.$error">
+                                        <div ng-message="required">Please Select Store </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ======================= Group ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Group'">
+                                <label class="control-label col-sm-4">Group :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="group" ng-model="obj.INVMG_Id" theme="bootstrap" ng-disabled="edits" ng-keyup="searchfilter($select);" title="Select Group" ng-required="optionflag=='Group'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Group in the list...">{{$select.selected.INVMG_GroupName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_stockdetails | filter: $select.search " value="{{option.INVMG_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.INVMG_GroupName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.group)" ng-messages="myForm.group.$error">
+                                        <div ng-message="required">Please Select Group </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9 aa" ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" md-max-date="enddate" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                   
+                        <div class="col-sm-12">
+                            <div class="form-group" ng-init="obj.rdopunch='All'">
+                                <label class="control-label col-sm-4"></label>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All"  ng-model="obj.rdopunch" ng-change="otherdaydatechange()">
+                                        <span class="lbl padding-8"><b>All</b></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Asset"  ng-model="obj.rdopunch" ng-change="otherdaydatechange()">
+                                        <span class="lbl padding-8"><b> Asset </b></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Non-Asset"  ng-model="obj.rdopunch" ng-change="otherdaydatechange()">
+                                        <span class="lbl padding-8"><b>Non Asset</b></span>
+                                    </label>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="get_StockReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="get_StockReport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printStockExcel')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+        <!--ng-show="overallflag"-->
+        <div ng-if="overallflag">
+            <div class="box box-primary" ng-show="get_StockReport.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Stock REPORT</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th ng-hide="optionflag=='Item'"><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a></th>
+                                    <th><a href="" ng-click="sortBy('PurOBQty')">Opening Balance</a> </th>
+                                    <th><a href="" ng-click="sortBy('SalesQty')">Sale Quantity </a> </th>
+                                    <th ng-if="viewIC"><a href="" ng-click="sortBy('INVSTO_ItemConQty')">Item Consumption </a> </th>
+                                    <th ng-if="viewCKout"><a href="" ng-click="sortBy('INVSTO_CheckedOutQty')">Check-out </a> </th>
+                                    <th ng-if="viewSP"><a href="" ng-click="sortBy('INVSTO_PhyPlusQty')">Stock +</a> </th>
+                                    <th ng-if="viewSPM"><a href="" ng-click="sortBy('INVSTO_PhyMinQty')">Stock -</a> </th>
+                                    <th><a href="" ng-click="sortBy('INVSTO_AvaiableStock')">Balance</a> </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in filterValue1 = (get_StockReport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td ng-hide="optionflag=='Item'" style="text-align:left">{{user.INVMI_ItemName}}</td>
+                                    <td>{{user.PurOBQty | number:2}}</td>
+                                    <td>{{user.SalesQty | number:2}}</td>
+                                    <td ng-if="viewIC">{{user.INVSTO_ItemConQty}}</td>
+                                    <td ng-if="viewCKout">
+                                        {{user.INVSTO_CheckedOutQty}} 
+                                        <span ng-if="user.INVSTO_CheckedOutQty > 0">
+                                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Checked Out Qty" data-ng-click="gridcheckout(user)">
+                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+
+                                    </td>
+                                    <td ng-if="viewSP">{{user.INVSTO_PhyPlusQty}}</td>
+                                    <td ng-if="viewSPM">{{user.INVSTO_PhyMinQty}}</td>
+                                    <td>{{user.INVSTO_AvaiableStock | number:2}}</td>
+                                </tr>
+                                <tr ng-if="optionflag == 'Item'">
+                                    <td colspan="6" class="text-center"><b>Closing Stock</b></td>
+                                    <td><b>{{INVSTO_AvaiableStock | number :2}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <dir-pagination-controls max-size="10"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                </div>
+            </div>
+            <div ng-hide="true">
+                <div id="printStock">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No
+                                </th>
+                                <th ng-hide="optionflag=='Item'">Item</th>
+                                <th>Opening Balance </th>
+                                <th>Sale Quantity </th>
+                                <th ng-if="viewIC">Item Consumption </th>
+                                <th ng-if="viewCKout">Check-out </th>
+                                <th ng-if="viewSP">Stock + </th>
+                                <th ng-if="viewSPM">Stock - </th>
+                                <th>Balance </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in get_StockReport">
+                                <td>{{$index+1}}</td>
+                                <td ng-hide="optionflag=='Item'" style="text-align:left">{{user.INVMI_ItemName}}</td>
+                                <td>{{user.PurOBQty | number:2}}</td>
+                                <td>{{user.SalesQty | number:2}}</td>
+                                <td ng-if="viewIC">{{user.INVSTO_ItemConQty}}</td>
+                                <td ng-if="viewCKout">
+                                    {{user.INVSTO_CheckedOutQty}}
+                                </td>
+                                <td ng-if="viewSP">{{user.INVSTO_PhyPlusQty}}</td>
+                                <td ng-if="viewSPM">{{user.INVSTO_PhyMinQty}}</td>
+                                <td>{{user.INVSTO_AvaiableStock | number:2}}</td>
+                            </tr>
+                            <tr ng-if="optionflag == 'Item'">
+                                <td colspan="6" class="text-center"><b>Closing Stock</b></td>
+                                <td><b>{{INVSTO_AvaiableStock | number :2}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="printStockExcel">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No
+                                </th>
+                                <th ng-hide="optionflag=='Item'">Item</th>
+                                <th>Opening Balance </th>
+                                <th>Sale Quantity </th>
+                                <th ng-if="viewIC">Item Consumption </th>
+                                <th ng-if="viewCKout">Check-out </th>
+                                <th ng-if="viewSP">Stock + </th>
+                                <th ng-if="viewSPM">Stock - </th>
+                                <th>Balance </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in get_StockReport">
+                                <td>{{$index+1}}</td>
+                                <td ng-hide="optionflag=='Item'" style="text-align:left">{{user.INVMI_ItemName}}</td>
+                                <td>{{user.PurOBQty | number:2}}</td>
+                                <td>{{user.SalesQty | number:2}}</td>
+                                <td ng-if="viewIC">{{user.INVSTO_ItemConQty}}</td>
+                                <td ng-if="viewCKout">
+                                    {{user.INVSTO_CheckedOutQty}}
+                                </td>
+                                <td ng-if="viewSP">{{user.INVSTO_PhyPlusQty}}</td>
+                                <td ng-if="viewSPM">{{user.INVSTO_PhyMinQty}}</td>
+                                <td>{{user.INVSTO_AvaiableStock | number:2}}</td>
+                            </tr>
+                            <tr ng-if="optionflag == 'Item'">
+                                <td colspan="6" class="text-center"><b>Closing Stock</b></td>
+                                <td><b>{{INVSTO_AvaiableStock | number :2}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="!overallflag">
+            <div class="box box-primary" ng-show="get_StockReport.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Stock REPORT</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th ng-hide="optionflag=='Item'"><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a></th>
+                                    <th><a href="" ng-click="sortBy('INVSTO_AvaiableStock')">Opening Balance</a> </th>
+                                    <th><a href="" ng-click="sortBy('INVSTO_PurchaseRate')">Rate</a> </th>
+                                    <th><a href="" ng-click="sortBy('obAmount')">OB Amount</a> </th>                                  
+                                    <th><a href="" ng-click="sortBy('SalesQty')">Sale Quantity </a> </th>
+                                    <th ng-if="viewIC"><a href="" ng-click="sortBy('INVSTO_ItemConQty')">Item Consumption </a> </th>
+                                    <th ng-if="viewCKout"><a href="" ng-click="sortBy('INVSTO_CheckedOutQty')">Checked-Out </a> </th>
+                                    <th ng-if="viewSP"><a href="" ng-click="sortBy('INVSTO_PhyPlusQty')">Stock +</a> </th>
+                                    <th ng-if="viewSPM"><a href="" ng-click="sortBy('INVSTO_PhyMinQty')">Stock -</a> </th>
+                                    <th><a href="" ng-click="sortBy('INVSTO_AvaiableStock')">Balance</a> </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in filterValue1 = (get_StockReport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td ng-hide="optionflag=='Item'" style="text-align:left">{{user.INVMI_ItemName}}</td>
+                                    <td>{{user.PurOBQty | number:2}}</td>
+                                    <td>{{user.INVSTO_PurchaseRate | number:2}}</td>
+                                    <td>{{user.obAmount | number:2}}</td>
+                                    <!--<td>{{user.PurOBQty | number:2}}</td>-->
+                                    <td>{{user.SalesQty | number:2}}</td>
+                                    <td ng-if="viewIC">{{user.INVSTO_ItemConQty}}</td>
+                                    <td ng-if="viewCKout">{{user.INVSTO_CheckedOutQty}}
+                                        <span ng-if="user.INVSTO_CheckedOutQty > 0">
+                                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Checked Out Qty" data-ng-click="gridcheckout(user)">
+                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                       
+                                    </td>
+                                    <td ng-if="viewSP">{{user.INVSTO_PhyPlusQty}}</td>
+                                    <td ng-if="viewSPM">{{user.INVSTO_PhyMinQty}}</td>
+                                    <td>{{user.INVSTO_AvaiableStock | number:2}}</td>
+                                </tr>
+                                <tr ng-if="optionflag == 'Item'">
+                                    <td colspan="5" class="text-center"><b>Closing Stock</b></td>
+                                    <td colspan="4"><b>{{clstoc | number :2}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <dir-pagination-controls max-size="10"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                </div>
+            </div>
+            <div ng-hide="true">
+                <div id="printStock">
+                    <div class="text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No.
+                                </th>
+                                <th ng-hide="optionflag=='Item'">Item</th>
+                                <th>Opening Balance </th>
+                                <th>Rate</th>
+                                <th>OB Amount </th>
+                                <th>Sale Quantity</th>
+                                <th ng-if="viewIC">Item Consumption</th>
+                                <th ng-if="viewCKout">Checked-Out </th>
+                                <th ng-if="viewSP">>Stock + </th>
+                                <th ng-if="viewSPM">Stock - </th>
+                                <th>Balance </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in get_StockReport">
+                                <td>{{$index+1}}</td>
+                                <td ng-hide="optionflag=='Item'" style="text-align:left">{{user.INVMI_ItemName}}</td>
+                                <td>{{user.PurOBQty | number:2}}</td>
+                                <td>{{user.INVSTO_PurchaseRate | number:2}}</td>
+                                <td>{{user.obAmount | number:2}}</td>
+                                <td>{{user.SalesQty | number:2}}</td>
+                                <td ng-if="viewIC">{{user.INVSTO_ItemConQty}}</td>
+                                <td ng-if="viewCKout">
+                                    {{user.INVSTO_CheckedOutQty}}
+                                </td>
+                                <td ng-if="viewSP">{{user.INVSTO_PhyPlusQty}}</td>
+                                <td ng-if="viewSPM">{{user.INVSTO_PhyMinQty}}</td>
+                                <td>{{user.INVSTO_AvaiableStock | number:2}}</td>
+                            </tr>
+                            <tr ng-if="optionflag == 'Item'">
+                                <td colspan="5" class="text-center"><b>Closing Stock</b></td>
+                                <td colspan="4"><b>{{clstoc | number :2}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>     
+                <div id="printStockExcel">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No.
+                                </th>
+                                <th ng-hide="optionflag=='Item'">Item</th>
+                                <th>Opening Balance </th>
+                                <th>Rate</th>
+                                <th>OB Amount </th>
+                                <th>Sale Quantity</th>
+                                <th ng-if="viewIC">Item Consumption</th>
+                                <th ng-if="viewCKout">Checked-Out </th>
+                                <th ng-if="viewSP">>Stock + </th>
+                                <th ng-if="viewSPM">Stock - </th>
+                                <th>Balance </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in get_StockReport">
+                                <td>{{$index+1}}</td>
+                                <td ng-hide="optionflag=='Item'" style="text-align:left">{{user.INVMI_ItemName}}</td>
+                                <td>{{user.PurOBQty | number:2}}</td>
+                                <td>{{user.INVSTO_PurchaseRate | number:2}}</td>
+                                <td>{{user.obAmount | number:2}}</td>
+                                <td>{{user.SalesQty | number:2}}</td>
+                                <td ng-if="viewIC">{{user.INVSTO_ItemConQty}}</td>
+                                <td ng-if="viewCKout">
+                                    {{user.INVSTO_CheckedOutQty}}
+                                </td>
+                                <td ng-if="viewSP">{{user.INVSTO_PhyPlusQty}}</td>
+                                <td ng-if="viewSPM">{{user.INVSTO_PhyMinQty}}</td>
+                                <td>{{user.INVSTO_AvaiableStock | number:2}}</td>
+                            </tr>
+                            <tr ng-if="optionflag == 'Item'">
+                                <td colspan="5" class="text-center"><b>Closing Stock</b></td>
+                                <td colspan="4"><b>{{clstoc | number :2}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+    </div>
+</section>
+
+<div id="myModal" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">              
+                <md-button ng-show="get_checkoutreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printDatatwo()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div class="modal-body">                           
+                <div class="box-body">
+                    <div class="col-sm-12" id="CheckOutQty">
+                        <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                            <thead>
+                                <tr>
+                                    <td style="font-size:15px;text-align:center" colspan="6"> Item Name : {{itemname}} </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        SL.No.
+                                    </th>
+                                    <th>
+                                        Asset Tag
+                                    </th>
+                                    <th>From Store </th>                                  
+                                    <th>To Location</th>
+                                    <th>Check-out Date</th>
+                                    <th>Check-out Quantity </th>
+                                    <th>Received By </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in get_checkoutreport">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{user.INVAAT_AssetId}}</td>
+                                    <td style="text-align:left !important"> {{user.INVMS_StoreName}}</td>
+                                    <!--<td style="text-align:left !important">{{user.INVMI_ItemName}}</td>-->
+                                    <td style="text-align:left !important">{{user.INVMLO_LocationRoomName}}</td>
+                                    <td>{{user.INVACO_CheckoutDate | date:'dd/MM/yyyy'}}</td>
+                                    <td>{{user.INVACO_CheckOutQty}}</td>
+                                    <td style="text-align:left !important">{{user.INVACO_ReceivedBy}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

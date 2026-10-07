@@ -1,0 +1,171 @@
+﻿<style>
+    input[type="file"] {
+        display: none !important;
+    }
+
+    .student-photoadm .file-blue:before {
+        content: 'Upload Photo';
+        font-size: 13px;
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" data-ng-init="getAllDetail()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Training Monitoring</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Employee :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="sel1" data-ng-model="hrmE_Id" name="hrmE_Id" required ng-change="GetDetailsByEmployee()">
+                                    <option value="">Select</option>
+                                    <option ng-repeat="employee in employeedropdown" value="{{employee.hrmE_Id}}" ng-selected="{{employee.Selected===true}}">
+                                        {{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.hrmE_Id)" ng-messages="myForm.hrmE_Id.$error">
+                                    <div ng-message="required">Select Employee</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Description:<span style="color:Red">*</span></label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control" placeholder="Enter Description" rows="4" name="Descr" ng-model="description" required></textarea>
+                            </div>
+                            <div class="col-sm-6 col-sm-offset-4 error-messages" ng-if="interacted(myForm.Descr)" ng-messages="myForm.Descr.$error">
+                                <div ng-message="required">Enter Description</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <br />
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="date" md-max-date="maxdate" data-ng-model="date_of" md-placeholder="Select date" required></md-datepicker>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.date)" ng-messages="myForm.date.$error">
+                                <div ng-message="required">Enter Date</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Start Time: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8" allow-pattern="\d">
+
+                                <div uib-timepicker name="sch_time1" ng-model="VMSMDSH_ShiftStartTime" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" required></div>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_time1)"
+                                     ng-messages="myForm.sch_time1.$error">
+                                    <div ng-message="required">Select Start Time </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> End Time: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div uib-timepicker name="sch_time2" ng-model="VMSMDSH_ShiftEndTime" min="min" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" required></div>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_time2)"
+                                     ng-messages="myForm.sch_time2.$error">
+                                    <div ng-message="required">Select End Time </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <input type="hidden" ng-model="id" value="{{hrmetR_Id}}" />
+                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" data-ng-click="savetmpldata()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th><a href="" ng-click="sort('building')">Employee Code</a></th>
+                        <th><a href="" ng-click="sort('building')">Employee Name</a></th>
+                        <th><a href="" ng-click="sort('building')">Description</a></th>
+                        <th><a href="" ng-click="sort('building')">Date</a></th>
+                        <th><a href="" ng-click="sort('building')">Start Time</a></th>
+                        <th><a href="" ng-click="sort('building')">End Time</a></th>
+                        <th><a href="" ng-click="sort('building')">HR Remark</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="tr in filterValue1 = (trainingIssue_lists | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{tr.empcode}} </td>
+                        <td class="text-center">{{tr.empname}} </td>
+                        <td class="text-center">{{tr.TMO_Description}}</td>
+                        <td class="text-center">{{tr.TMO_Date |date:'dd/MM/yyyy'}} </td>
+                        <td class="text-center">{{tr.TMO_StartTime}} </td>
+                        <td class="text-center">{{tr.TMO_EndTime}} </td>
+                        <td class="text-center">{{tr.TMO_Remark}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+

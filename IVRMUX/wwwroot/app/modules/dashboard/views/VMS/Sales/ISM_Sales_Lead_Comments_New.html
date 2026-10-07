@@ -1,0 +1,423 @@
+﻿<style>
+    .colef {
+        margin-left: 16%;
+    }
+</style>
+<section class="content" data-ng-init="getAllDetail()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savetmpldata()" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Sales Lead Comments</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="row text-center">
+                        <div class="col-sm-6 col-sm-offset-3" ng-init="optionflag='HOT'">
+                            <div class="well">
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="HOT" name="HOT" ng-model="optionflag" ng-click="onradiobuttonSelect(optionflag)" required>
+                                        <span class="lbl padding-8">HOT</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="WARM" name="WARM" ng-model="optionflag" ng-click="onradiobuttonSelect(optionflag)" required>
+                                        <span class="lbl padding-8">WARM</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="COLD" name="COLD" ng-model="optionflag" ng-click="onradiobuttonSelect(optionflag)" required>
+                                        <span class="lbl padding-8">COLD</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interactedradio(myForm.all11)" ng-messages="myForm.all11.$error">
+                                <div ng-message="required">Select any one of the radio button</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br />
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Lead Name :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="client" ng-model="$parent.ISMSLE_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Lead Name" required ng-disabled="editflag==true">
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Lead Name">
+                                        {{$select.selected.ISMSLE_LeadName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in followuplead | filter: $select.search" value="{{catgry.ISMSLE_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.ISMSLE_LeadName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                    <div ng-message="required">Lead Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+
+                            <label class="control-label col-sm-4">Remainder Date :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker id="id3" name="sch_date" ng-model="ismslecoM_RemainderDate" onkeydown="return false"
+                                               required md-max-date="maxdate" md-placeholder="Enter Date"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Remainder Hours : <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <div uib-timepicker name="sch_time1" ng-model="ismslecoM_RemainderTime" min="min" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" required></div>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_time1)" ng-messages="myForm.sch_time1.$error">
+                                    <div ng-message="required"> Enter Remainder Hours </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Comments:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" rows="5" placeholder="Enter Comments" name="qty" id="usr1" type="text" data-ng-model="ISMSLECOM_Comments" required style="resize:none"></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.qty)" ng-messages="myForm.qty.$error">
+                                    <div ng-message="required">Enter Comments</div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Hours : <span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" allow-pattern="[0-9]" maxlength="1" placeholder="Enter Hours" class="form-control"
+                                       data-ng-model="ismslecoM_RemainderHrs" name="name" required />
+                                <div class="error-messages" ng-if="interacted(myForm.name)" ng-messages="myForm.name.$error">
+                                    <div ng-message="required">Enter Hours</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <!--<div class="col-sm-8">
+                        <label> Proposal  Request :</label>
+                        <input type="checkbox" ng-true-value="true" ng-false-value="false" name="Demoapplicableflag" data-ng-model="ismslecoM_SendQuotationFlg">
+                        <span class="lbl padding-16"></span>
+                    </div>-->
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12 box-content clearfix">
+                        <div class="margin-top-10">
+                            <p style="color:red;font-size:14px !important">
+                                *  File   Must Be Upload jpeg,Png,pdf, Document
+                                <br />
+                                * File size should be less than 2 MB
+                            </p>
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Upload</th>
+                                        <th>View</th>
+                                        <th>Description </th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="materal in materaldocuupload">
+                                        <td class="text-center">
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                                <input type="file" name="impfile" id="document" class="btn btn-success" value="Import" ng-model="ismclT_FilePath" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().materal)" style="padding-top: 1px;padding-bottom: 2px;" />
+
+                                            </label>
+
+                                        </td>
+                                        <td>
+                                            <span ng-show="materal.ismclT_FilePath!=null && materal.ismclT_FilePath!=''">
+                                                <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.ismclT_FilePath  !=null && materal.ismclT_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.ismclT_FilePath)">
+                                                    view
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <textarea maxlength="250" name="remark" ng-model="materal.VTADAAF_Remarks" class="form-control"
+                                                      rows="2" style="resize:none" placeholder="Description" />
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                <a href="" ng-click="removegrnrows($index,objg)">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="ISMSLECOM_Id" value="{{ismslecom_id}}" />
+
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+    <div class="box box-primary" ng-if="commentlist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Sales Lead Comments List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th>Lead Name</th>
+                        <th>Comments</th>
+                        <th>SendQuotation Request</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                        <th>View</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="bm in filterValue1 = (commentlist | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}
+                        <td class="text-left">{{bm.ismslE_LeadName}}</td>
+                        <td class="text-left">{{bm.ismslecoM_Comments}}</td>
+                        <td class="text-center">
+                            <span ng-if="bm.ismslecoM_SendQuotationFlg === true">
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                            </span>
+                            <span ng-if="bm.ismslecoM_SendQuotationFlg === false">
+
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span ng-if="bm.ismslecoM_ActiveFlag === true">
+                                <a href="" ng-click="deactive(bm)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                            <span ng-if="bm.ismslecoM_ActiveFlag === false">
+                                <a href="" ng-click="deactive(bm)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="edit(bm)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <span>
+                                <a class="text-primary" data-placement="bottom" data-toggle="modal" title="View Data" data-target="#ViewStatus" ng-click="viewdetails(bm)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                </a>
+                            </span>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--==================== Image Preview Model ===========================-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 style="color:white"> Sales Lead </h4>
+
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="ViewStatus" class="modal fade" role="dialog" data-backdrop="false" name="formm" ng-show="StatusUpdateOnLoad.length > 0">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <h4>Status Update</h4>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:20px" class="hdTH" ng-disabled="true">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>SL NO</th>
+                            <th>Product</th>
+                            <th>Discussion Points</th>
+                            <th>Status</th>
+                            <th>Packages</th>
+                            <th>Remark</th>
+                            <th>Quotation Request</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="evet in StatusUpdateOnLoad">
+                            <td class="text-center  hdTD">
+                                <label ng-init="evet.selected=false">
+                                    <input type="checkbox" data-ng-model="evet.selected" ng-change="optionToggled(evet)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index + 1 }}</td>
+                            <td class="text-center">{{evet.ISMSMPR_ProductName}}</td>
+                            <td class="text-center">{{evet.ISMSLEDMPR_DiscussionPoints}}</td>
+                            <td class="text-center">
+                                <select name="sts" ng-model="evet.ISMSMST_Id">
+                                    <!--<select name="sts" ng-model="ISMSMST_Id" ng-change="updatestatusname(ISMSMST_Id)">-->
+                                    <option ng-repeat="p in StatusDropDown" value="{{p.ISMSMST_Id}}" ng-selected="{{p.ISMSMST_Id==evet.ISMSMST_Id}}">
+                                        {{p.ISMSMST_StatusName}}
+                                    </option>
+                                </select>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1.sts)" ng-messages="myForm1.sts.$error">
+                                    <div ng-message="required">select status</div>
+                                </div>
+                            </td>
+                            <td class="text-center">{{evet.ISMSBOM_BOMName}}</td>
+                            <td class="text-center">{{evet.ISMSMPR_Remarks}}</td>
+                            <td class="text-center">
+                                <input type="checkbox" ng-model="evet.ISMSLEDMPR_SendQuotationFlg" ng-change="updateCheckbox2(evet)" name="aemoncb">
+                                <span class="lbl padding-8"></span>
+                            </td>
+                            <!--<td class="text-center">
+                                <md-button type="submit" class="md-raised md-primary" ng-click="Save_responseNew(selectedEvent)">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                            </td>-->
+
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="modal-footer custom-footer" style="display: flex; justify-content: center; align-items: center;">
+
+                    <md-button type="submit" class="md-raised md-primary" ng-click="Save_responseNew(StatusUpdateOnLoad)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

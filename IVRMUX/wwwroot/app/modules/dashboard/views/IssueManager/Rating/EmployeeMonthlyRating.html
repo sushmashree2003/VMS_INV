@@ -1,0 +1,393 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <di class="box-header with-border">
+                <h3 class="box-title">Rating  Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </di>
+
+
+            <div class="box-body">
+
+
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="col-sm-6">
+                            <div class="form-group col-sm-12">
+                                <label class="control-label col-sm-8" for="email">Academic Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-12">
+                                    <select class="form-control" id="sel1"
+                                            ng-model="asmaY_Id" name="yerrrr"
+                                            ng-change="change_year()" ng-disabled="accyr" required>
+                                        <option value="">Select</option>
+                                        <option ng-repeat="options in arrlist8" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == asmaY_Id}}">{{options.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yerrrr)" ng-messages="myForm.yerrrr.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group col-sm-12">
+                                <label class="control-label col-sm-8" for="year">
+
+                                    Year:<span style="color:red;">*</span>
+
+                                </label>
+                                <div class="col-sm-12">
+                                    <select class="form-control" ng-model="fmtP_Years" name="yrrrrs" ng-disabled="yeardisable" required>
+                                        <option value="">Select</option>
+                                        <option ng-repeat="options3 in fillyear" value="{{options3.fmtP_Year}}" ng-selected="{{options3.fmtP_Year == fmtP_Years}}" ng-click="get_years()">{{options3.fmtP_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yrrrrs)" ng-messages="myForm.yrrrrs.$error">
+                                        <div ng-message="required">Select Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group col-sm-12">
+                                <label class="control-label col-sm-8">Month :<strong style="color:red;">*</strong></label>
+
+
+
+                                <div class="multiselect col-sm-12" style="width: 90% !important;">
+
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkallm" type="checkbox" ng-click="all_checkm(checkallm)">
+                                        <span class="lbl padding-8">
+                                            <b>  All Months</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue8=(monthlist_temp  ) ">
+                                        <input name="mon" ng-model="user.selected" type="checkbox" ng-click="togchkbxm();" title="Select Employee" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.ivrM_Month_Name}}</b>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.mon)" ng-messages="myForm.mon.$error">
+                                    <div ng-message="required" class="col-sm-8">Select Month</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                            <i class="fa fa-file" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="consolidateData.length==0" ng-show="consolidateData.length>0" ng-click="Print()">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="consolidateData.length==0" ng-show="consolidateData.length>0" ng-click="exportToExceldetails()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="consolidateData.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Consolidated Report DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+
+            <div class="col-sm-12" style="overflow:scroll; max-height:600px;">
+                <div id="printSectionId">
+                    <table class="table table-bordered table-condensed">
+                        <thead>
+                            <tr>
+
+                                <th>SL No</th>
+                                <th>Employee</th>
+                                <!--<th>Type</th>-->
+                                <th>Overall Average</th>
+                                <!--<th>Rating Type</th>-->
+                                <th>Questions</th>
+                                <th ng-repeat="rpt in month_list">
+                                    <span>{{rpt.ivrM_Month_Name}}</span> <br />
+
+                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Click To View Details" data-ng-model="receiptdetails"
+                                       data-target="#myModal" data-ng-click="headinstallmentid(rpt.ivrM_Month_Id)">
+
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+
+                                </th>
+                                <th>Total Average</th>
+                                <!--<th> </th>
+                                <th ng-repeat=""></th>-->
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in employeeid" style="page-break-after:always !important;">
+
+                            <tr>
+
+
+                                <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+
+
+                                <td class="text-left text-center" rowspan="{{user.plannerdetails.length+1}}">{{user.EmpName}}</td>
+
+                                <td rowspan="{{user.plannerdetails.length+1}}">{{user.TotalAverage}}</td>
+
+
+                            </tr>
+                            <tr ng-repeat="planner in user.plannerdetails">
+
+
+                                <td>{{planner.RATMQECLSUB_QuestionsSubclassification}}</td>
+                                <!--<td>{{planner.RATMQE_RatingQuestions}}</td>-->
+                                <td ng-repeat="obj in month_list"><b>{{planner[obj.ivrM_Month_Name]}}</b></td>
+                                <td>{{planner.TotalRating}}</td>
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+
+</section>
+
+<div ng-show="sdfsdfdsfsd==true">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="text-center">
+                Consolidated Report Details From Date : {{fromdated | date :'dd/MM/yyyy'}} To Date : {{todated | date :'dd/MM/yyyy'}}
+            </h4>
+        </div>
+    </div>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="">Employee Name</a></th>
+                        <th><a href="">Department specific parameters</a></th>
+                        <th><a href=""></a>january</th>
+                        <th><a href="">February</a></th>
+                        <th><a href="">MArch</a></th>
+                        <th><a href="">April</a></th>
+                        <th><a href="">MAy</a></th>
+                        <th><a href="">June</a></th>
+                        <th><a href="">July</a></th>
+                        <th><a href="">August</a></th>
+                        <th><a href="">September</a></th>
+                        <th><a href="">october</a></th>
+                        <th><a href="">november</a></th>
+                        <th><a href="">December</a></th>
+                        <th><a href="">Total Average</a></th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in consolidateData">
+                    <tr>
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-center" ng-repeat="emp in employeenamee" ng-if="user.EmpName==emp.EmpName">
+                            <!--ng-repeat="emp in employeename" ng-if="user.EmpName==emp.EmpName"-->
+                            {{user.EmpName}}
+                        </td>
+                        <td class="text-center">
+                            {{user.RATMQE_RatingQuestions}}
+                        </td>
+                        <td class="text-center">
+                            {{user.January}}
+                        </td>
+                        <td class="text-center">{{user.February}}</td>
+                        <td class="text-center">{{user.March}}</td>
+                        <td class="text-center">{{user.April}}</td>
+                        <td class="text-center">{{user.May}}</td>
+                        <td class="text-center">{{user.June}}</td>
+                        <td class="text-center">{{user.July}}</td>
+                        <td class="text-center">{{user.August}}</td>
+                        <td class="text-center">{{user.September}}</td>
+                        <td class="text-center">{{user.October}}</td>
+                        <td class="text-center">{{user.November}}</td>
+                        <td class="text-center">{{user.December}}</td>
+                        <td class="text-center">{{user.TotalRating}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div ng-show="sdfsdfdsfsd==true" id="exceltopd">
+    <table>
+        <tr style="border:0.5px solid black">
+            <td colspan="9" style="text-align:center">
+                {{institutioname}}
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td colspan="9" style="text-align:center">
+                Expenditure Details From Date : {{fromdated | date :'dd/MM/yyyy'}} To Date : {{todated | date :'dd/MM/yyyy'}}
+            </td>
+        </tr>
+    </table>
+    <table class="table table-hover table-responsive table-bordered">
+        <thead>
+            <tr>
+                <th>SL.No.</th>
+                <th><a href="">Employee Name</a></th>
+                <th><a href="">Department specific parameters</a></th>
+                <th><a href=""></a>january</th>
+                <th><a href="">February</a></th>
+                <th><a href="">MArch</a></th>
+                <th><a href="">April</a></th>
+                <th><a href="">MAy</a></th>
+                <th><a href="">June</a></th>
+                <th><a href="">July</a></th>
+                <th><a href="">August</a></th>
+                <th><a href="">September</a></th>
+                <th><a href="">october</a></th>
+                <th><a href="">november</a></th>
+                <th><a href="">December</a></th>
+                <th><a href="">Total Average</a></th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="user in consolidateData">
+            <tr>
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-center">
+                    {{user.EmpName}}
+                </td>
+                <td class="text-center">
+                    {{user.RATMQE_RatingQuestions}}
+                </td>
+                <td class="text-center">
+                    {{user.January}}
+                </td>
+                <td class="text-center">{{user.February}}</td>
+                <td class="text-center">{{user.March}}</td>
+                <td class="text-center">{{user.April}}</td>
+                <td class="text-center">{{user.May}}</td>
+                <td class="text-center">{{user.June}}</td>
+                <td class="text-center">{{user.July}}</td>
+                <td class="text-center">{{user.August}}</td>
+                <td class="text-center">{{user.September}}</td>
+                <td class="text-center">{{user.October}}</td>
+                <td class="text-center">{{user.November}}</td>
+                <td class="text-center">{{user.December}}</td>
+                <td class="text-center">{{user.TotalRating}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- Modal -->
+
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 65%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Rating Question Parameterwise Details</h4>
+            </div>
+            <div class="modal-body">
+                <div class="">
+                    <div class="box box-primary">
+
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-offset-1"><b>Year :  {{fmtP_Years}} </b></label>
+                            <label class="col-sm-4 col-md-offset-1"><b>Month:  {{PCMonthName}} </b></label> <br />
+                        </div>
+                        <div class="box-body">
+                            <div class="col-sm-12" style="overflow:scroll; max-height:600px;">
+                                <div id="printSectionId">
+                                    <table class="table table-bordered table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>SL No</th>
+                                                <th>Question</th>
+                                                <th>Rating Parameter</th>
+                                                <th>Rating</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-repeat="user in subclassification" style="page-break-after:always !important;">
+
+                                            <tr>
+                                                <td class="text-center" rowspan="{{user.ratingquestion.length+1}}">{{$index+1}}</td>
+                                                <td class="text-left text-center" rowspan="{{user.ratingquestion.length+1}}">{{user.QuestionsSubclassification}}</td>
+                                            </tr>
+                                            <tr ng-repeat="planner in user.ratingquestion">
+                                                <td>{{planner.RATMQE_RatingQuestions}}</td>
+                                           
+                                                <td>{{planner.RATMOP_OptionsValue}}</td>
+
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <br />
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--//modal-->

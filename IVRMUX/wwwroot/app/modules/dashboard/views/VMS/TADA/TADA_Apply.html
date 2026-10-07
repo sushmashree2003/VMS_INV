@@ -1,0 +1,1309 @@
+
+<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        /*min-height: 280px;*/
+        border-radius: 5px;
+    }
+
+    .vl {
+        border-left: 1px solid #ff9800;
+        height: 140px;
+    }
+
+    .padding {
+        padding-bottom: 15px !important;
+    }
+</style>
+<section class="content">
+    <div data-ng-init="onpageload()">
+        <div class="well">
+            <md-content>
+                <md-tabs md-dynamic-height md-border-bottom md-selected="myTabIndex" flex layout="column" md-stretch-tabs="always">
+                    <md-tab label="TADA Apply" id="tab1" ng-click="cance()">
+                        <md-content class="md-padding">
+                            <form class="form-horizontal" method="post" role="form" name="myForm" novalidate>
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">TA-DA  Apply</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="col-sm-12 box-content clearfix">
+                                            <div class="margin-top-10">
+                                                <h4>
+                                                    <b> NOTE :  </b>
+                                                </h4>
+                                                <p style="color:red;font-size:14px !important">
+                                                    *  TA-DA Should Be Applied with 48 Hours of Arrival
+                                                    <br />
+                                                    * If Daily Report Not Generated TADA Not Applicable
+                                                    <br />
+                                                    * New TADA is not applicable until previous TADA is settled
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 box-content clearfix">
+                                            <div class="col-sm-6 form-horizontal">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">From Date:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8" style="padding-left: 0px !important;">
+                                                        <md-datepicker ng-model="obj.startdate" name="startdate" ng-change="FromDates()" id="date1" md-placeholder="From Date" md-min-date="plMaxdate" md-max-date="newdate" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " ng-paste="$event.preventDefault()" onkeydown="return false" required></md-datepicker>
+                                                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                                            <div ng-message="required">From Date</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4"> Departure Time:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8" allow-pattern="\d">
+
+                                                        <div uib-timepicker name="sch_time1" ng-model="vtadaA_DepartureTime" min="min" hour-step="hstep" minute-step="mstep" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " show-meridian="ismeridian" required></div>
+                                                        <div class="error-messages" ng-if="interacted(myForm.sch_time1)"
+                                                             ng-messages="myForm.sch_time1.$error">
+                                                            <div ng-message="required"> Time </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-1 form-horizontal">
+
+                                            </div>
+                                            <div class="col-sm-5 form-horizontal">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">To Date:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8" style="padding-left: 0px !important;">
+                                                        <md-datepicker ng-model="obj.enddate" name="endatediff" ng-change="Getdatas()" md-min-date="obj.startdate" md-placeholder="To Date" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 || !obj.startdate " md-max-date="newdate" ng-paste="$event.preventDefault()" onkeydown="return false" required></md-datepicker>
+                                                        <div class="error-messages" ng-if="interacted(myForm.endatediff)" ng-messages="myForm.endatediff.$error">
+                                                            <div ng-message="required">To Date</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4"> Arrival Time:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8" allow-pattern="\d">
+                                                        <div uib-timepicker name="sch_time2" ng-model="vtadaA_ArrivalTime" min="min" hour-step="hstep" minute-step="mstep" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " show-meridian="ismeridian" required></div>
+                                                        <div class="error-messages" ng-if="interacted(myForm.sch_time2)"
+                                                             ng-messages="myForm.sch_time2.$error">
+                                                            <div ng-message="required"> Time </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 box-content clearfix">
+                                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sl.No.</th>
+                                                        <th>From Departure</th>
+                                                        <th>To Arrival</th>
+                                                        <th>
+                                                            To City
+                                                        </th>
+                                                        <th>Travel</th>
+                                                        <th>Travel Details</th>
+
+                                                        <th>Travel Amount</th>
+                                                        <th> Amount</th>
+                                                        <th>Action</th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="Distance in CityDistance">
+                                                        <td class="text-center">
+                                                            {{$index+1}}
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <select class="form-control" id="sel1" name="Fromstate" ng-change="Tostates(Distance,$index)" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0  || !obj.startdate || !obj.enddate || !vtadaA_ArrivalTime || !vtadaA_DepartureTime" required ng-model="Distance.Fromstate">
+                                                                    <option value="">--Select--</option>
+                                                                    <option ng-repeat="option in getstate" value="{{option.ivrmmS_Id}}" ng-selected="{{Distance.IVRMMS_Id == option.ivrmmS_Id}}">
+                                                                        {{option.ivrmmS_Name}}
+                                                                    </option>
+
+                                                                </select>
+                                                            </div>
+
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <select class="form-control" id="sel1" name="Tostate" ng-model="Distance.tostate" ng-change="OnloadTostate(Distance)">
+                                                                    <option value="">--Select --</option>
+                                                                    <option ng-repeat="option in Distance.Tostate" value="{{option.ivrmmS_Id}}" ng-selected="{{option.ivrmmS_Id == Distance.tostate}}">
+                                                                        {{option.ivrmmS_Name}}
+                                                                    </option>
+
+                                                                </select>
+                                                            </div>
+
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <select class="form-control" id="sel1" name="Tostate" ng-model="Distance.IVRMMCT_Id" ng-change="onchangecitylist(Distance)">
+                                                                    <option value="">--Select City--</option>
+                                                                    <option ng-repeat="option in Distance.CityList" value="{{option.IVRMMCT_Id}}" ng-selected="{{option.IVRMMCT_Id == Distance.IVRMMCT_Id}}">
+                                                                        {{option.IVRMMCT_Name}}
+                                                                    </option>
+
+                                                                </select>
+                                                            </div>
+
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <select class="form-control" id="sel2" name="Travel" ng-model="Distance.vtadamT_Id" ng-change="changeTravelDetails(Distance)">
+                                                                    <option value="">--Select--</option>
+                                                                    <option ng-repeat="travel in Travel_data" value="{{travel.vtadamT_Id}}" ng-selected="{{travel.vtadamT_Id ==Distance.vtadamT_Id}}">
+                                                                        {{travel.vtadamT_Name}}
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <select class="form-control" id="sel3" name="Travel_Details" ng-model="Distance.VTADAMD_Id" ng-change="Getamount(Distance)">
+                                                                    <option value="">--Select--</option>
+                                                                    <option ng-repeat="option2 in Distance.Travel_Details" value="{{option2.VTADAMD_Id}}" ng-selected="{{option2.VTADAMD_Id == Distance.VTADAMD_Id}}">
+                                                                        {{option2.VTADAMD_Name}}
+                                                                    </option>
+
+                                                                </select>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            {{Distance.VTADAMC_AmountNew}}
+                                                        </td>
+
+                                                        <td>
+                                                            <div>
+                                                                {{Distance.VTADAMC_Amount}}
+                                                                <!--<input name="Travel" ng-model="Distance.VTADAMC_Amount" ng-change="travelAmountDetails(Distance)" class="form-control" />-->
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <span>
+                                                                <a href="" ng-show="$last" ng-click="addrowsclient()" ng-hide="CityDistance.length ==2">
+                                                                    <i class="fa fa-plus"></i>
+                                                                </a>
+                                                            </span>
+                                                            <span class="" id="remove" ng-hide="CityDistance.length ==1">
+                                                                <a href="" ng-click="remove($index,objg1)">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </a>
+                                                            </span>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="7">
+                                                            Total Travel Amount
+                                                        </td>
+                                                        <td>
+                                                            {{vtadacM_TravelAmt}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-12 box-content clearfix">
+                                            <div class="col-sm-6 form-horizontal">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Address:</label>
+                                                    <div class="col-sm-8">
+                                                        <textarea name="address" ng-model="txt_Address" class="form-control" resize: none; rows="3" placeholder="Address" />
+                                                        <div class="error-messages" ng-if="interacted(myForm.address)" ng-messages="myForm.address.$error">
+                                                            <div ng-message="required">Enter Address</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="form-group">
+                                                    <label class="control-label col-sm-4">State:<span style="color:red;">*</span></label>
+                                                    <div class="col-sm-8">
+                                                        <select class="form-control" id="sel1" name="Posdddd" ng-model="IVRMMS_Id" ng-change="Dropdown_State()" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0  || !obj.startdate || !obj.enddate || !vtadaA_ArrivalTime || !vtadaA_DepartureTime" required>
+                                                            <option value="">--Select State--</option>
+                                                            <option ng-repeat="chk in getstate" value="{{chk.ivrmmS_Id}}" ng-selected="{{chk.ivrmmS_Id == IVRMMS_Id}}">
+                                                                {{chk.ivrmmS_Name}}
+                                                            </option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted(myForm.Posdddd)"
+                                                             ng-messages="myForm.Posdddd.$error">
+                                                            <div ng-message="required">Select State </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">
+                                                        City:
+                                                        <span style="color:red;">*</span>
+                                                    </label>
+                                                    <div class="col-sm-8">
+                                                        <select class="form-control" id="sel1" name="PosId" ng-model="City_Id" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " ng-change="Dropdown_cityTWO();" required>
+                                                            <option value="">--Select  City--</option>
+                                                            <option ng-repeat="chk in getCity" value="{{chk.ivrmmcT_Id}}" ng-selected="{{chk.ivrmmcT_Id == City_Id}}">
+                                                                {{chk.ivrmmcT_Name}}
+                                                            </option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted(myForm.PosId)"
+                                                             ng-messages="myForm.PosId.$error">
+                                                            <div ng-message="required">Select City </div>
+                                                        </div>
+                                                    </div>
+                                                </div>-->
+
+
+                                                <div class="form-group" ng-show="Appriamt==true">
+
+
+                                                    <label class="control-label col-sm-4"> Adavance  Amount:el</label>
+                                                    <div class="col-sm-8 col-md-8">
+                                                        <input type="text" ng-model="Total_ApplAmt" class="form-control" placeholder="Total Approximate amount" maxlength="10" allow-pattern="[0-9.]" autocomplete="off" value="{{vtadaaA_TotalAppliedAmount}}" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " />
+                                                    </div>
+                                                    <input type="text" allow-pattern="[0-9.]" maxlength="10" ng-model="Total_ApplAmthideen" value="{{vtadaaA_TotalAppliedAmount}}" class="hidden" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " />
+                                                </div>
+                                                <div class="form-group" ng-show="Appriamt==true">
+                                                    <label class="control-label col-sm-4"> Paid Amount:</label>
+                                                    <div class="col-sm-8 col-md-8">
+                                                        <input type="text" ng-model="txt_paidAmt" class="form-control" placeholder="Paid Amount " maxlength="10" allow-pattern="[0-9.]" autocomplete="off" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="Appriamt==true">
+                                                    <label class="control-label col-sm-4"> Balance Amount:</label>
+                                                    <div class="col-sm-8 col-md-8">
+                                                        <input type="text" ng-disabled="VTADAA_Id > 0 || VTADAAA_Id > 0 " ng-model="BalanceAmount" class="form-control" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="Appriamt==true">
+                                                    <label class="control-label col-sm-4"></label>
+                                                    <div class="col-sm-8 col-md-8">
+                                                        <input name="lvemp" ng-model="amountchanged" type="checkbox" ng-click="Adavance_Chk()" />
+                                                        <span class="lbl padding-8">
+                                                        </span>
+                                                        <span>
+                                                            Add Amount
+                                                        </span>
+                                                        <!--<div style="display:none;">-->
+                                                        <input name="lvemp" ng-model="amountnegative" type="checkbox" ng-click="Adavance_ChkKk()" />
+                                                        <span class="lbl padding-8">
+                                                        </span>
+                                                        <span>
+                                                            Minus  Amount
+                                                        </span>
+                                                        <!--</div>-->
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="Appriamt==true">
+                                                    <label class="control-label col-sm-4"> Extra Amount:</label>
+                                                    <div class="col-sm-8 col-md-8">
+                                                        <input type="text" ng-model="txt_ApproxAmt" class="form-control" placeholder="Extra Amount " maxlength="10" allow-pattern="[0-9.]" autocomplete="off"
+                                                               ng-change="Apprimate()" ng-disabled="amountchanged == false && amountnegative==false " />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="VTADAAA_Id > 0">
+                                                    <label class="control-label col-sm-4">Total Amount:</label>
+                                                    <div class="col-sm-8 col-md-8">
+                                                        <input type="text" ng-model="txt_amt" class="form-control" placeholder="Totalamount" ng-disabled="txt_approxTotAmount > 0 || Appriamt==true" allow-pattern="[0-9.]" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                                <!--ng-show="VTADAAA_Id > 0"-->
+                                                <div class="form-group" ng-show="VTADAAA_Id > 0 || vtadaA_BalanceHRMS > 0">
+                                                    <label class="control-label col-sm-4">Remaing Paid Amount:</label>
+                                                    <div class="col-sm-8 col-md-8">
+                                                        <input type="text" ng-model="vtadaA_BalanceHRMS" class="form-control active" ng-change="RemainingPaid()" placeholder="Paid Amount" allow-pattern="[0-9]" autocomplete="off" />
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-sm-6 form-horizontal">
+
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Remark:</label>
+                                                    <div class="col-sm-8">
+                                                        <textarea maxlength="250" name="remarks" ng-model="txt_Remarks" class="form-control" resize: none; rows="3" placeholder="Remark" />
+                                                        <div class="error-messages" ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                                            <div ng-message="required">Enter Remark</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="form-group">
+                                                    <label class="control-label col-sm-4">
+                                                        Client List: <a href="javascript:void(0)" ng-click="MultiClient()" data-placement="bottom" data-toggle="tooltip"
+                                                                        title="Upload file">
+                                                            <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                                        </a>
+                                                    </label>
+                                                    <div class="col-sm-8">
+                                                        <textarea ng-model="vtadaaA_ClientMultiple" class="form-control" resize: none; rows="3" placeholder="Client" ng-disabled="true" />
+
+                                                    </div>
+                                                </div>-->
+
+                                            </div>
+
+                                        </div>
+                                        <div class="col-sm-12 box-content clearfix" ng-show="get_allowence.length > 0">
+
+                                            <div class="row margin-top-10">
+                                                <div class="col-sm-12">
+                                                    <table class="table table-bordered table-responsive">
+                                                        <thead>
+                                                            <tr>
+                                                                <td>Select</td>
+                                                                <td>Particular</td>
+                                                                <td>Amount</td>
+                                                                <td>Days</td>
+                                                                <td>Total Slots</td>
+
+                                                                <td>Slots</td>
+                                                                <td>Total Amount</td>
+                                                                <td>
+                                                                    Remark
+                                                                </td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input name="lvemp" ng-model="chk_FoodAmt" type="checkbox" ng-click="Foodamt_Chk()" ng-disabled="txt_amt > 0" />
+                                                                    <span class="lbl padding-8">
+
+                                                                    </span>
+                                                                </td>
+                                                                <td class="text-left">
+                                                                    Food Amount
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    {{vtadacM_FoodAmt}}
+                                                                </td>
+                                                                <td>
+                                                                    {{daydiffrence}}
+                                                                </td>
+
+                                                                <td>
+                                                                    {{foodtotlslots}}
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="form-control" ng-model="txtslot" ng-blur="amtchange()" placeholder="Enter Slot" ng-disabled="foodtotlslots < 0" allow-pattern="[0-9.]" />
+                                                                </td>
+                                                                <td>
+                                                                    {{tOtaL_foodamt}}
+                                                                </td>
+                                                                <td>
+                                                                    <textarea maxlength="250" name="remark" ng-model="Food_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input name="lvemp" ng-model="chk_AccAmt" type="checkbox" ng-click="accMandtionamt_Chk()" ng-disabled="txt_amt > 0" />
+                                                                    <span class="lbl padding-8">
+
+                                                                    </span>
+                                                                </td>
+                                                                <td class="text-left">
+                                                                    Accommodation Amount
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    {{vtadacM_AccommodationAmt}}
+                                                                </td>
+                                                                <td>
+                                                                    {{daydiffrence_two}}
+                                                                </td>
+
+                                                                <td>
+                                                                    {{Acctotolslots}}
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="form-control" ng-model="txtslotAcc" ng-blur="amtchangeACC()" placeholder="Enter Days" ng-disabled="Acctotolslots < 0" allow-pattern="[0-9.]" />
+                                                                </td>
+                                                                <td>
+                                                                    {{totaL_AccmamtTwo}}
+                                                                </td>
+                                                                <td>
+                                                                    <textarea maxlength="250" name="accremark" ng-model="Acc_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input name="lvemp" ng-model="chk_TransAmt" type="checkbox" ng-click="TransAmt_chk()" ng-disabled="txt_amt > 0  || !vtadacM_TravelAmt" />
+                                                                    <span class="lbl padding-8">
+
+                                                                    </span>
+                                                                </td>
+                                                                <td class="text-left">
+                                                                    Travel Amount
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <!--{{vtadacM_TransportAmt}}-->
+                                                                    {{vtadacM_TravelAmt}}
+                                                                </td>
+                                                                <td>
+                                                                    {{daydiffrence_three}}
+
+                                                                </td>
+
+                                                                <td></td>
+                                                                <td>
+                                                                    <input type="text" class="form-control active" allow-pattern="[0-9]" placeholder="Travel Amount" ng-blur="TransAmt_claculation()" ng-model="vtadacM_TransportAmt" ng-disabled="chk_TransAmt==false" />
+                                                                </td>
+                                                                <td>
+                                                                    {{totaL_transTwo}}
+                                                                </td>
+                                                                <td> <textarea maxlength="250" name="remark" ng-model="transport_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" /></td>
+                                                            </tr>
+                                                            <!--<tr>
+                                                                <td class="text-center">
+                                                                    <input name="lvemp" ng-model="chk_OthersAmt" type="checkbox" ng-click="OtheraAmt_chk()" ng-disabled="txt_amt > 0 || !OtherTotal_amt" />
+                                                                    <span class="lbl padding-8">
+
+                                                                    </span>
+                                                                </td>
+                                                                <td class="text-left">
+                                                                    Other Amount
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" class="form-control" allow-pattern="[0-9.]" ng-required="OthersAmt" placeholder="Other Amount" ng-model="OtherTotal_amt" ng-disabled="chk_OthersAmt==true" />
+                                                                </td>
+                                                                <td>
+
+                                                                </td>
+
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td>
+                                                                    {{totaL_otherTwo}}
+                                                                </td>
+                                                                <td>
+                                                                    <textarea maxlength="250" name="remark" ng-model="other_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+                                                                </td>
+
+                                                            </tr>-->
+
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class="form-group">
+                                                        <div class="col-md-6">
+
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="col-sm-3 control-label">Total Approximate Amount</label>
+                                                            <div class="col-sm-8">
+                                                                <input type="text" ng-disabled="Isdisabletxtss" class="form-control" ng-model="txt_approxTotAmount" />
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div>
+                                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sl.No.</th>
+                                                        <th width="350">Client Name</th>
+                                                        <th>Remark's</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="materal1 in clientnames_rem">
+                                                        <td class="text-center">
+                                                            {{$index+1}}
+                                                        </td>
+                                                        <td>
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <select class="form-control" id="sel1" ng-model="materal1.Client_Id" name="client">
+                                                                        <option value="">--Select Client--</option>
+                                                                        <option ng-repeat="option in getClient" value="{{option.ismmclT_Id}}" ng-selected="{{option.ismmclT_Id == materal1.Client_Id}}">
+                                                                            {{option.ismmclT_ClientName}}
+                                                                        </option>
+                                                                    </select>
+                                                                    <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                                                        <div ng-message="required">Enter</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <textarea maxlength="250" name="client_remarks" ng-model="materal1.VTADAMCF_Remarks" class="form-control" resize: none; rows="3" placeholder="Remark" />
+                                                                    <div class="error-messages" ng-if="interacted(myForm.client_remarks)" ng-messages="myForm.client_remarks.$error">
+                                                                        <div ng-message="required">Enter Remark</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span>
+                                                                <a href="" ng-show="$last" ng-click="addgrnrowsclient()">
+                                                                    <i class="fa fa-plus"></i>
+                                                                </a>
+                                                            </span>
+                                                            <span class="" id="remove" ng-hide="clientnames_rem.length ==1">
+                                                                <a href="" ng-click="removeclient($index,objg1)">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </a>
+                                                            </span>
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-12 box-content clearfix">
+
+                                            <div class="margin-top-10">
+                                                <p style="color:red;font-size:14px !important">
+                                                    *  File   Must Be Upload jpeg,Png,pdf, Document
+                                                    <br />
+                                                    * File size should be less than 5 MB
+                                                </p>
+                                                <strong style="font-size:20px !important">
+                                                    <input type="checkbox" ng-model="VTADAA_Finaldocument" />
+                                                    <span class="lbl padding-8">Final Submission </span>
+                                                </strong>
+                                                <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sl.No.</th>
+                                                            <th>Upload</th>
+                                                            <th>View</th>
+                                                            <th>Remark</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="materal in materaldocuupload">
+                                                            <td class="text-center">
+                                                                {{$index+1}}
+                                                            </td>
+                                                            <td>
+                                                                <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                                                    <input type="file" name="impfile" id="document" class="btn btn-success" value="Import" ng-model="ismclT_FilePath" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().materal)" style="padding-top: 1px;padding-bottom: 2px;" />
+                                                                </label>
+
+                                                            </td>
+                                                            <td>
+                                                                <span ng-show="materal.ismclT_FilePath!=null && materal.ismclT_FilePath!=''">
+                                                                    <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.ismclT_FilePath  !=null && materal.ismclT_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.ismclT_FilePath)">
+                                                                        view
+                                                                    </a>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <textarea maxlength="250" name="remark" ng-model="materal.VTADAAF_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+                                                            </td>
+                                                            <td>
+                                                                <span>
+                                                                    <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                                        <i class="fa fa-plus"></i>
+                                                                    </a>
+                                                                </span>
+                                                                <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                                    <a href="" ng-click="removegrnrows($index,objg)">
+                                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br />
+                                    <div class="text-center">
+                                        <input type="text" class="hidden" ng-model="VTADACM_TravelHour" />
+                                        <input type="text" value="{{VTADAA_Id}}" class="hidden" ng-model="VTADAA_Id" />
+                                        <input type="text" value="{{vtadaaaA_Id}}" class="hidden" ng-model="VTADAAA_Id" />
+                                        <md-button type="submit" class="md-raised md-primary" ng-disabled="view" ng-if="OldBalnceflag==false" data-ng-click="savedata()">
+                                            <i class="fa fa-bar-chart" aria-hidden="true"></i> SAVE
+                                        </md-button>
+                                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                        </md-button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="box box-primary" ng-show="get_Report.length>0">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">TA-DA  DETAILS</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    <b> Total Grid Records :</b>
+                                                    <label class="badge">
+                                                        {{presentCountgrid}}
+                                                    </label>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group" ng-if="searchValue!=''">
+                                                <label class="control-label">
+                                                    <b>Total Records Searched : </b>
+                                                    <label class="badge">
+                                                        {{filterValue1.length}}
+                                                    </label>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 pull-right">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">
+                                                        <i class="fa fa-search"></i>
+                                                    </span>
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    SL.No
+                                                </th>
+                                                <th>
+                                                    City
+                                                </th>
+                                                <th>FromDate</th>
+                                                <th>Departure Time</th>
+                                                <th>To Date</th>
+                                                <th>Arrival Time</th>
+                                                <th>Total Applied Amount</th>
+
+                                                <th>
+                                                    Document Updation
+                                                </th>
+                                                <th>
+                                                    Final Submission
+                                                </th>
+                                                <th>
+                                                    Account  Final Submission
+                                                </th>
+                                                <th>
+                                                    Action
+                                                </th>
+                                                <th style="display:none;">View</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="user in filterValue1 = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                                                <td class="hidden">
+                                                    {{user.vtadaA_Id}}
+                                                </td>
+                                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                <td>
+                                                    {{user.ivrmmcT_Name}}
+                                                </td>
+                                                <td class="text-left">{{user.vtadaA_FromDate|date:'dd/MM/yyyy'}}</td>
+                                                <td>
+                                                    {{user.vtadaA_DepartureTime | date : 'shortTime'}}
+
+                                                </td>
+                                                <td class="text-left">
+                                                    {{user.vtadaA_ToDate |date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td>
+                                                    {{user.vtadaA_ArrivalTime | date : 'shortTime'}}
+
+                                                </td>
+                                                <td>
+                                                    {{user.vtadaA_TotalAppliedAmount}}
+                                                </td>
+                                                <td>
+                                                    <span ng-if="user.vtadaA_ApprovedFlg ==true">
+                                                        --
+                                                    </span>
+                                                    <span ng-if="user.vtadaA_ApprovedFlg ==false">
+                                                        <a class="text-primary" ng-click="UpdateDocument(user)">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    <span ng-if="user.vtadaA_Finaldocument ==false" class="ng-scope">
+                                                        <i class="fa fa-times  text-red"></i>
+                                                    </span>
+                                                    <span ng-if="user.vtadaA_Finaldocument ==true" class="ng-scope">
+                                                        <i class="fa fa-check  text-green"></i>
+                                                    </span>
+
+
+
+                                                </td>
+                                                <td>
+                                                    <span ng-if="user.vtadaA_ApprovedFlg ==false" class="ng-scope">
+                                                        <i class="fa fa-times  text-red"></i>
+                                                    </span>
+                                                    <span ng-if="user.vtadaA_ApprovedFlg ==true" class="ng-scope">
+                                                        <i class="fa fa-check  text-green"></i>
+                                                    </span>
+
+
+                                                </td>
+
+
+                                                <td class="text-center">
+                                                    <span ng-if="user.vtadaA_StatusFlg =='Pending' && user.vtadaA_ActiveFlg==true" ng-hide="user.vtadaA_ApprovedFlg ==true">
+                                                        <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                        </a>
+                                                        <a href="" ng-click="Deletedata(user)"
+                                                           class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                            <i> Deactivate</i>
+                                                        </a>
+
+                                                    </span>
+                                                    <span ng-if="user.vtadaA_StatusFlg =='Pending' && user.vtadaA_ActiveFlg==false" ng-hide="user.vtadaA_ApprovedFlg ==true">
+                                                        <a href="" ng-click="Deletedata(user)"
+                                                           class="text-green" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                            <i> Activate</i>
+                                                        </a>
+
+                                                    </span>
+                                                    <span ng-if="user.vtadaA_StatusFlg=='Rejected '">
+                                                        Rejected
+                                                    </span>
+
+                                                    <span ng-if="user.vtadaA_StatusFlg=='InProgress '">
+                                                        InProgress
+                                                    </span>
+                                                    <span ng-if="user.vtadaA_StatusFlg=='Approved'">
+                                                        Approved
+                                                    </span>
+                                                    <span ng-if="user.vtadaA_StatusFlg=='Pending' && user.vtadaA_ApprovedFlg ==true">
+                                                        InProgress
+                                                    </span>
+                                                </td>
+                                                <td style="display:none;">
+                                                    <span ng-if="user.vtadaA_StatusFlg=='Pending' && user.vtadaA_ApprovedFlg ==true">
+                                                        <a class="text-primary" data-placement="bottom" data-title="View Details" ng-click="edit(userOne)">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls max-size="5"
+                                                             direction-links="true"
+                                                             boundary-links="true" pagination-id="xyz">
+                                    </dir-pagination-controls>
+                                </div>
+                            </div>
+                        </md-content>
+                    </md-tab>
+                    <md-tab id="tab2" label="TADA Balance Apply">
+                        <md-content class="md-padding">
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">TADA Adavance Details </h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="col-sm-12 box-content clearfix">
+                                        <div class="margin-top-10">
+                                            <h4>
+                                                <b> NOTE :  </b>
+                                            </h4>
+                                            <p style="color:red;font-size:14px !important">
+                                                *  TA-DA Should Applied Only Below 30  Days
+                                                <br />
+                                                * When Daily Report Not Generate Ta Da Not Avalible For apply
+                                                <br />
+                                                * Old Balance Not Clear Ta Da Not Avalible For apply
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 box-content clearfix">
+                                        <div class="row margin-top-10" ng-show="getdata.length > 0">
+                                            <div class="col-sm-12">
+                                                <table class="table table-bordered table-condensed">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>
+                                                                Sl No
+                                                            </th>
+                                                            <th>
+                                                                City
+                                                            </th>
+                                                            <th>
+                                                                Total Applied Amount
+                                                            </th>
+                                                            <th>
+                                                                Total SactionedAmount
+                                                            </th>
+                                                            <th>
+                                                                Total Paid Amount
+                                                            </th>
+                                                            <th>
+                                                                From Date
+                                                            </th>
+                                                            <th>
+                                                                To Date
+                                                            </th>
+                                                            <th>
+                                                                Action
+                                                            </th>
+                                                            <th>
+                                                                View
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="usertwo in getdata">
+                                                            <td>
+                                                                {{$index + 1}}
+                                                            </td>
+                                                            <td>
+                                                                {{usertwo.ivrmmcT_Name}}
+                                                            </td>
+                                                            <td>
+                                                                {{usertwo.vtadaaA_TotalAppliedAmount}}
+                                                            </td>
+                                                            <td>
+
+                                                                {{usertwo.vtadaaA_TotalSactionedAmount}}
+                                                            </td>
+                                                            <td>
+                                                                {{usertwo.vtadaaA_TotalPaidAmount}}
+                                                            </td>
+                                                            <td>
+                                                                {{usertwo.vtadaaA_FromDate |date:'dd/MM/yyyy'}}
+                                                            </td>
+                                                            <td>
+                                                                {{usertwo.vtadaaA_ToDate |date:'dd/MM/yyyy'}}
+                                                            </td>
+                                                            <td>
+                                                                <span ng-if="usertwo.vtadaaA_StatusFlg=='Pending'">
+                                                                    Pending
+                                                                </span>
+                                                                <span ng-if="usertwo.vtadaaA_StatusFlg=='Rejected'">
+                                                                    Rejected
+                                                                </span>
+                                                                <span ng-if="usertwo.vtadaaA_StatusFlg=='InProgress'">
+                                                                    InProgress
+                                                                </span>
+                                                                <span ng-if="usertwo.vtadaaA_StatusFlg=='Approved'">
+                                                                    <a class="text-aqua" href="" ng-click="select(usertwo)" data-placement="bottom" data-toggle="tooltip" title="PageUp">
+                                                                        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </td>
+                                                            <td class="hidden">
+                                                                {{usertwo.vtadaaA_ClientId}}
+                                                            </td>
+                                                            <td class="hide">
+                                                                {{usertwo.vtadaaA_Id}}
+                                                            </td>
+                                                            <td class="hide">
+                                                                {{usertwo.vtadaaA_Remarks}}
+                                                            </td>
+                                                            <td class="hidden">
+                                                                {{usertwo.vtadaaA_ToAddress}}
+                                                            </td>
+                                                            <td class="hidden">
+                                                                {{usertwo.ivrmmS_Id}}
+                                                            </td>
+                                                            <td class="hidden">
+                                                                {{usertwo.ivrmmcT_Name}}
+                                                            </td>
+                                                            <td class="hidden">
+                                                                {{usertwo.vtadaaA_DepartureTime}}
+                                                            </td>
+                                                            <td class="hidden">
+                                                                {{usertwo.vtadaaA_ArrivalTime}}
+                                                            </td>
+                                                            <td>
+                                                                <span>
+                                                                    <a title="View Allowence Details" class="fa fa-eye text-black" ng-click="getView(usertwo)">
+                                                                    </a>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </md-content>
+
+
+                </md-tabs>
+
+
+
+        </div>
+
+    </div>
+
+</section>
+<!--==================== Image Preview Model ===========================-->
+<!--//viewDeatils//-->
+<div class="modal fade" id="viewDeatils" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">TADA Adavance  Authurization details</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div ng-repeat="level in Getsancationed_List">
+                            <div class="row">
+                                <div class="text-center">
+                                    <h4>{{level.VTADAAA_SanctioningLevel}} level Approved By - {{level.ApprovedBy}}</h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" ng-show="flagone==true">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No</th>
+                                                <th>Expenditure Head</th>
+                                                <th>Applied Date</th>
+                                                <th>Applied Amount</th>
+                                                <th>Approved Amount</th>
+                                                <th>Approve Date</th>
+                                                <th>Remark</th>
+                                                <td> ExpenditureHead Status</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                <td class="text-center">{{$index+1}}</td>
+                                                <td>{{leveldetails.VTADAAAD_ExpenditureHead}}</td>
+                                                <td>{{leveldetails.VTADAAA_AppliedDate |date:'dd/MM/yyyy'}}</td>
+                                                <td class="text-left">{{leveldetails.HeadWiseAppliedAmount}}</td>
+                                                <td class="text-left">{{leveldetails.HeadWiseSactionedAmount}}</td>
+                                                <td>{{leveldetails.VTADAAAA_CreatedDate |date:'dd/MM/yyyy'}}</td>
+                                                <td>{{leveldetails.VTADAAAAH_Remarks}}</td>
+                                                <td class="text-left">{{leveldetails.VTADAAAAH_StatusFlg}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                                <div class="col-md-12" ng-show="flagtwo==true">
+                                    <table class="table table-bordered table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No.</th>
+                                                <th> Total AppliedAmount</th>
+                                                <th>Applied Date</th>
+                                                <th>Head Wise Sanction Amount</th>
+                                                <th>Approved Date</th>
+                                                <th>Remark</th>
+                                                <th>Staus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                <td class="text-center">{{$index+1}}</td>
+                                                <td>
+                                                    {{leveldetails.AdvancedAppliedAmount}}
+                                                </td>
+                                                <td>{{leveldetails.VTADAAA_AppliedDate |date:'dd/MM/yyyy'}}</td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_SactionedAmount}}
+                                                </td>
+
+                                                <td>{{leveldetails.VTADAAAA_CreatedDate |date:'dd/MM/yyyy'}}</td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_Remarks }}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_StatusFlg}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="showclient" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Multiple Client  :<strong style="color:red;">*</strong></label>
+                            <div class="multiselect col-sm-6">
+                                <input class="form-control" ng-model="searchValuetwo" type="text" placeholder="search Multiple Client...">
+                                <label>
+                                    <input name="alitem" value="1" ng-model="allmiddff" type="checkbox" ng-click="allmidd(allmiddff)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="mi in getClientwo | filter : searchValuetwo">
+                                    <input name="mid" ng-model="mi.miiddd" type="checkbox">
+                                    <span class="lbl padding-8">
+                                        {{mi.ismmclT_ClientName}}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <md-button class="md-raised md-primary" data-ng-click="AddClient()">
+                                <i class="fa fa-bar-chart" aria-hidden="true"></i> Add
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade" id="FileviewDeatils" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">TADA Adavance  File details</h5>
+            </div>
+            <div class="modal-body">
+                <strong style="font-size:20px !important">
+                    <input type="checkbox" ng-model="VTADAA_Finaldocumentdoc" />
+                    <span class="lbl padding-8">Final Submission </span>
+                </strong>
+
+                <p style="color:red;font-size:14px !important">
+                    *  File   Must Be Upload jpeg,Png,pdf, Document
+                    <br />
+                    * File size should be less than 5 MB
+                </p>
+
+                <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Upload</th>
+                            <th>View</th>
+                            <th>Remark</th>
+                            <th>Approval  Remark</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="materal in materaldocuuploadtwo">
+                            <td class="text-center">
+                                {{$index+1}}
+                            </td>
+                            <td>
+                                <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                    <input type="file" name="impfile" id="document" class="btn btn-success" value="Import" ng-model="ismclT_FilePath" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().materal)" style="padding-top: 1px;padding-bottom: 2px;" />
+
+                                </label>
+
+                            </td>
+                            <td>
+                                <span ng-show="materal.ismclT_FilePath!=null && materal.ismclT_FilePath!=''">
+                                    <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.ismclT_FilePath  !=null && materal.ismclT_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.ismclT_FilePath)">
+                                        view
+                                    </a>
+                                </span>
+                            </td>
+                            <td>
+                                <textarea maxlength="250" name="remark" ng-model="materal.VTADAAF_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+                            </td>
+                            <td>
+                                {{materal.vtadaaF_VerfieRemarks}}
+                            </td>
+                            <td>
+                                <span>
+                                    <a href="" ng-show="$last" ng-click="addgrnrowsUpdate()">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </span>
+                                <span class="" id="remove" ng-hide="materaldocuuploadtwo.length ==1">
+                                    <a href="" ng-click="removegrfiles($index,objg)">
+                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-sm-12 text-center">
+                    <md-button class="md-raised md-primary" ng-click="FileUploadTada()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                </div>
+                <!--ng-hide="true"-->
+                <div id="documnetapproval" ng-hide="true">
+                    <div ng-repeat="dd in temptada">
+                        <p><b>Kind Attn: </b></p>
+                        <p>Dear Sir /Madam,   </p>
+                        <p>
+                            Kindly Approved My  Document.
+                        </p>
+                        <p>
+                            TADA Apply Document Details:
+                        </p>
+                        <p>
+                            Name: <strong> &nbsp; {{dd.emplYoeeName |uppercase}} </strong>
+                        </p>
+                        <p>
+                            Applied Amount:  <strong>  {{dd.vtadaA_TotalAppliedAmount}} </strong>
+                        </p>
+                        <p>
+                            Applied Dates: <strong> {{dd.vtadaA_FromDate |date:'dd-MM-yyyy'}} &nbsp;TO &nbsp; {{dd.vtadaA_ToDate|date:'dd-MM-yyyy'}}, </strong>
+                        </p>
+                        <p ng-if="dd.ivrmmcT_Name !=''">
+                            City : <strong>{{dd.ivrmmcT_Name |uppercase}}</strong>
+                        </p>
+
+                        <p ng-if="dd.vtadaA_ToAddress !=''">
+                            Adress: <strong>{{dd.vtadaA_ToAddress |uppercase}}</strong>
+                        </p>
+                    </div>
+
+                    <p>
+                        <table class="table" border="1">
+                            <thead>
+                                <tr>
+                                    <th>Sl No</th>
+
+                                    <th>File Name</th>
+                                    <th>Remark</th>
+
+                                    <th>Approval Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="file in materaldocuuploadtwo">
+
+                                    <td class="text-center">
+                                        {{$index + 1}}
+                                    </td>
+
+
+                                    <td class="text-center">
+                                        {{file.vtadaaF_FileName}}
+                                    </td>
+                                    <td class="text-center">
+                                        {{file.vtadaaF_Remarks}}
+                                    </td>
+
+                                    <td>
+                                        {{file.vtadaaF_VerfieRemarks}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </p>
+                    <p>
+                        Thanking you,
+                    </p>
+                    <p>
+                        Regards
+                    </p>
+                    <p>
+                        {{emplYoeeName  |uppercase}}
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 style="color:white"> TADA Apply </h4>
+
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

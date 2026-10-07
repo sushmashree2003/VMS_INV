@@ -1,0 +1,256 @@
+﻿<style>
+    .newstyle {
+        width: 100%;
+    }
+
+        .newstyle:hover {
+            background-color: #FF9900;
+        }
+
+    .newstyle1 {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+        .newstyle1:hover {
+            background-color: #6599FF;
+        }
+</style>
+
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Sales Raw Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" id="sss"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+              
+                <div class="row">
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" required></md-datepicker>
+                                <div class="error-messages" style="text-align: center;" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                    <div ng-message="required">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" md-min-date="startdate" required></md-datepicker>
+                                <div class="error-messages" style="text-align: center;" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                    <div ng-message="required">Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="showreport();">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-show="leaddropdown.length > 0" ng-click="exportToExcel('#employee')" target="_blank">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-show="leaddropdown.length > 0" ng-click="printData()" id="print-btn">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="leaddropdown.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Sales Raw Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <div id="employee">
+                <table class="table  table-bordered table-condensed" >
+                    <thead>
+                        <tr>
+                            <th>SL.NO</th>
+                            <th>Employee Name</th>
+                            <th>Total Raw Lead</th>
+                            <th>Total Raw Approve</th>
+                            <th>Total Raw Reject   </th>
+                            <th>Total  Raw Approve (Telecaller)</th>
+                            <th>Total  Raw Reject (Telecaller)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in leaddropdown  | filter :  searchValue">
+                            <td>{{$index+1}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <!--<td class="text-left" ng-if="">
+                                <button type="button" class="btn btn-outline-secondary newstyle"
+                                        ng-click="" data-target="#myModal1">
+                                    <b>  {{user.LeadCount}}</b>
+                                </button>
+                            </td>-->
+
+                            <td>
+
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGiven(user,'LeadCount')" data-target="#myModal1">
+                                    <b>{{user.LeadCount}}</b>
+                                </button>
+                                <!--<b>{{user.LeadCount}}</b>-->
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGiven(user,'AdminCount')" data-target="#myModal1">
+                                    <b>{{user.Admincount}}</b>
+                                </button>
+                                <!--<b>{{user.Admincount}}</b>-->
+
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGiven(user,'AdminCountReject')" data-target="#myModal1">
+                                    <b>{{user.AdminReject}}</b>
+                                </button>
+                                <!--<b>{{user.AdminReject}}</b>-->
+
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGiven(user,'Telecount')" data-target="#myModal1">
+                                    <b>{{user.Telcount}}</b>
+                                </button>
+                                <!--<b>{{user.Telcount}}</b>-->
+
+                            </td>
+
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGiven(user,'TeleCountReject')" data-target="#myModal1">
+                                    <b>{{user.TelcountReject}}</b>
+                                </button>
+                                <!--<b>{{user.telcountreject}}</b>-->
+
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">
+                                <strong>
+                                    Total
+                                </strong>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGivenTotal('LeadCount')" data-target="#myModal1">
+                                    <b>{{LeadCount}}</b>
+                                </button>
+                                <!--<b>{{LeadCount}}</b>-->
+
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGivenTotal('AdminCount')" data-target="#myModal1">
+                                    <b>{{Admincount}}</b>
+                                </button>
+                                <!--<b>{{Admincount}}</b>-->
+
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGivenTotal('AdminCountReject')" data-target="#myModal1">
+                                    <b>{{AdminReject}}</b>
+                                </button>
+                                <!--<b>{{AdminReject}}</b>-->
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGivenTotal('Telecount')" data-target="#myModal1">
+                                    <b>{{Telcount}}</b>
+                                </button>
+                                <!--<b>{{Telcount}}</b>-->
+
+                            </td>
+
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary newstyle" ng-click="DemoGivenTotal('TeleCountReject')" data-target="#myModal1">
+                                    <b>{{TelcountReject}}</b>
+                                </button>
+                                <!--<b>{{TelcountReject}}</b>-->
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            
+        </div>
+    </div>
+
+
+</section>
+
+<div id="myModal1" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                    <md-button type="submit" class="md-raised md-primary pull-right" style="text-align:center" ng-click="exportToExcels('#ExcelData')" target="_blank">
+                        Export to Excel
+                    </md-button>
+                    <h4 class="modal-title text-white">Lead Details</h4>
+                </div>
+                <div class="box-body" id="ExcelData">
+                    <div id="employee">
+                        <table class="table  table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO</th>
+                                    <th>Lead Name</th>
+                                    <th>Lead Address</th>
+                                    <th>Lead Contact Number</th>
+                                    <th>Lead Email</th>
+                                    <th>Contact Person</th>
+                                    <th>Remarks</th>
+                                    <th>Lead Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ld in Sales_Raw_Report_OnclickGridData  | filter :  searchValue">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{ld.ISMSLERaw_LeadName}}</td>
+                                    <td>{{ld.ISMSLERaw_LeadAddress1}}</td>
+                                    <td>{{ld.ISMSLERaw_ContactNo}}</td>
+                                    <td>{{ld.ISMSLERaw_EmailId}}</td>
+                                    <td>{{ld.Contact_Person}}</td>
+                                    <td>{{ld.Remarks}}</td>
+                                    <td>{{ld.ISMSLERaw_status}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

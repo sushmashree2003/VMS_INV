@@ -1,0 +1,434 @@
+﻿<style>
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+
+    .well {
+        position: relative;
+        border-radius: 3px;
+        background: #ffffff !important;
+        border-top: 3px solid #d2d6de !important;
+        padding: 5px !important;
+        margin-bottom: 5px !important;
+        width: 66%;
+        -webkit-box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+        box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+</style>
+<section class="content" ng-init="LoadHWHealthCheckUpdataApproval()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Health CheckUp Approval</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Institution :<strong class="text-red">*</strong> </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="MI_Id" name="miname" required
+                                        ng-change="OnChangeHwHealthCheckUpInst()" ng-disabled="editable==true">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="dd in getuserinstitution" value="{{dd.mI_Id}}" ng-selected="{{dd.mI_Id==MI_Id}}">
+                                        {{dd.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.miname)" ng-messages="myForm1.miname.$error">
+                                    <div ng-message="required">Select Institution</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-if="getapprovaldetails.length>0">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%">Sl.No</th>
+                                        <th style="width:15%">Client</th>
+                                        <th style="width:15%">Visited Person</th>
+                                        <th style="width: 5%">Visited Date</th>
+                                        <th style="width:20%">Remarks</th>
+                                        <th style="width: 5%">Files</th>
+                                        <th style="width: 20%">Approval Remarks</th>
+                                        <th style="width: 10%">Status</th>
+                                        <th style="width:5%">View Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="dd in getapprovaldetails">
+                                        <td class="text-left">
+                                            <label>
+                                                <input type="checkbox" data-ng-model="dd.selectedvalue" name="leavcheck"
+                                                       ng-required="isOptionsRequired()" ng-click="OnClickLeaveAllInd()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                            {{$index+1}}
+                                        </td>
+                                        <td class="text-left" style="word-wrap:break-word">
+                                            {{dd.ISMMCLT_ClientName}}<br />
+                                            Status : {{dd.HWHCHUP_Stauts}}
+                                        </td>
+                                        <td class="text-left" style="word-wrap:break-word">{{dd.HRME_EmployeeFirstName}}</td>
+                                        <td class="text-center">{{dd.HWHCHUP_Date}}</td>
+                                        <td class="text-left">{{dd.HWHCHUP_Remarks}}</td>
+                                        <td class="text-center">
+                                            <span ng-if="dd.FilesCount>0" ng-click="ViewHealthCheckUpFiles(dd)">
+                                                <i class="fa fa-eye text-black" title="View Files"></i>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <textarea class="form-control" rows="5" ng-model="dd.apprvlremarks" name="t1_{{dd.HWHCHUP_Id}}"
+                                                      ng-required="dd.selectedvalue" style="resize:none"></textarea>
+                                            <div class="error-messages" ng-if="interacted1(myForm1['t1_'+dd.HWHCHUP_Id])"
+                                                 ng-messages="myForm1['t1_'+dd.HWHCHUP_Id].$error">
+                                                <div ng-message="required">Enter Approval Remarks</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <select class="form-control" ng-model="dd.approvalstatus" ng-required="dd.selectedvalue" name="t2_{{dd.HWHCHUP_Id}}">
+                                                <option value="">--Select--</option>
+                                                <option value="Approved">Approved</option>
+                                                <option value="Rejected">Rejected</option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted1(myForm1['t2_'+dd.HWHCHUP_Id])"
+                                                 ng-messages="myForm1['t2_'+dd.HWHCHUP_Id].$error">
+                                                <div ng-message="required">Select Approval Status</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span ng-click="ViewHealthCheckUpComments(dd)">
+                                                <i class="fa fa-eye text-black" title="View Comments"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="error-messages text-center" ng-if="interacted1(myForm1.leavcheck)" ng-messages="myForm1.leavcheck.$error">
+                            <div ng-message="required">Select Atleast One CheckBox To Save The Approval </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row text-center" ng-if="getapprovaldetails.length==0">
+                    <p class="text-red box-title" style="font-weight:bold">No Reocrds Found For Approval</p>
+                </div>
+
+                <hr />
+                <div class="row text-center" ng-if="getapprovaldetails.length>0">
+                    <input type="hidden" ng-model="ismcltprP_Id " value="{{ismcltprP_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="SaveHWHealthChekUpApproval()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="getloaddata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Health CheckUp Approved Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="col-sm-4 pull-right">
+                        <input type="text" class="form-control" ng-model="search4" placeholder="Search Here" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+                                <th>Client Name</th>
+                                <th>Visited Person</th>
+                                <th>Applied Date</th>
+                                <th>Approved Date</th>
+                                <th>Final Status</th>
+                                <th>Approved Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user2 in filterValue2=(getloaddata |filter:search4) |orderBy:sortKey2:sortReverse2
+                            |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page4">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left">{{user2.ISMMCLT_ClientName}}</td>
+                                <td class="text-left">{{user2.HRME_EmployeeFirstName}}</td>
+                                <td class="text-center">{{user2.AppliedDate}}</td>
+                                <td class="text-center">{{user2.ApprovedDate}}</td>
+                                <td class="text-left" style="word-wrap:break-word">{{user2.OverAllStatus}}</td>
+                                <td class="text-left" style="word-wrap:break-word">{{user2.ApprovedStatus}}</td>
+                                
+                                <td class="text-center">
+
+                                    <span ng-if="user2.count>0" ng-click="ViewHealthCheckUpFiles(user2)">
+                                        <i class="fa fa-eye text-black" title="View Files"></i>
+                                        |
+                                    </span>
+
+                                    <span ng-click="ViewHealthCheckUpComments(user2)">
+                                        <i class="fa fa-eye text-black" title="View Comments"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="modalviewfiles" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10%">Sl.No</th>
+                                        <th style="width:40%">File Name</th>
+                                        <th style="width:10%">View/Download</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="userviewreponse in getviewfilesdetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">
+                                            <div class="col-sm-6">
+                                                <span ng-if="userviewreponse.filepath !=null && userviewreponse.filepath !=''">
+                                                    <label>{{userviewreponse.filename}}</label>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span ng-if="userviewreponse.filepath !=null && userviewreponse.filepath !=''">
+                                                <a ng-if="userviewreponse.filetype=='jpg' || userviewreponse.filetype=='png'
+                                                                   || userviewreponse.filetype=='svg'|| userviewreponse.filetype=='jpeg'
+                                                                   || userviewreponse.filetype=='gif'"
+                                                   style="color:red;display:inline; font-weight: bolder;"
+                                                   data-ng-click="showmothersign(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+                                                <a ng-if="userviewreponse.filetype=='pdf'" style="color:blue;display:inline;"
+                                                   ng-click="onviewpdf(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+
+                                                <a ng-if="userviewreponse.filetype=='doc' || userviewreponse.filetype=='docx'"
+                                                   style="color:blue;display:inline;"
+                                                   ng-click="ViewDocExcelfles(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+
+                                                <a ng-if="userviewreponse.filetype=='xls' || userviewreponse.filetype=='xlsx'"
+                                                   style="color:blue;display:inline;"
+                                                   ng-click="ViewDocExcelfles(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+                                            </span>
+
+                                            <span ng-if="userviewreponse.filepath !=null && userviewreponse.filepath !=''">
+                                                |
+                                                <a class="downloadIcon" title="Dowload Template"
+                                                   ng-click="downloaddirectimage(userviewreponse.filepath,userviewreponse.filename,userviewreponse.filetype)">
+                                                    <i class="fa fa-download" title="Download Template"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalviewcomments" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10%">Sl.No</th>
+                                        <th style="width:20%">Approved User</th>
+                                        <th style="width:10%">Date</th>
+                                        <th style="width:20%">Remarks</th>
+                                        <th style="width:10%">Level No.</th>
+                                        <th style="width:10%">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="dd in viewcommens">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">
+                                            {{dd.userName}}
+                                        </td>
+                                        <td class="text-center">
+                                            {{dd.visitedDate | date :'dd/MM/yyyy'}}
+                                        </td>
+                                        <td class="text-left" style="word-wrap:break-word">
+                                            {{dd.remarks}}
+                                        </td>
+                                        <td class="text-left" style="word-wrap:break-word">
+                                            {{dd.status}}
+                                        </td>
+                                        <td class="text-center" style="word-wrap:break-word">
+                                            {{dd.levelNo}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalPreview" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-sm-2 pull-left">
+                            <h4 style="text-align:center">View Document</h4>
+                        </div>
+                        <div class="col-sm-10 pull-right">
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                                <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="pdfviewdd">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="myModaldocx" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <h4 style="text-align:center">View Document</h4>
+                    </div>
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

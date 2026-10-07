@@ -1,0 +1,417 @@
+﻿<style>
+
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+
+    .file-blue:before {
+        content: 'Upload File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .titlecolor {
+        color: white !important;
+    }
+
+    .k-filter-row th, .k-title, .k-grid-header th.k-header {
+        font-weight: bold !important;
+    }
+
+    .k-grid-header .k-link, .k-grid-header .k-link:link, .k-pager-info, .k-scheduler-agendaview .k-scheduler-datecolumn, .k-scheduler-header {
+        color: black !important;
+    }
+
+    .k-pdf-export .k-grid-excel, .k-pdf-export .k-grid-pdf, .k-pdf-export .k-pager-wrap {
+        display: none;
+        width: 20%;
+        margin: auto;
+    }
+
+    .k-filter-row > th:first-child, .k-grid tbody td:first-child, .k-grid tfoot td:first-child, .k-grid-header th.k-header:first-child {
+        color: black;
+    }
+
+    .multiselect {
+        width: 20.7em;
+        height: 9em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 36.1%;
+        padding: 2%;
+        margin-top: -23px;
+    }
+
+    .imgview img {
+        width: 160px;
+        height: 150px !important;
+        margin-bottom: 10px;
+    }
+
+    .imgrmv {
+        margin-top: -198px;
+        margin-left: 151px;
+    }
+
+    .vdoleft {
+        margin-left: -88px;
+    }
+
+    .viewsho {
+        margin-left: 55%;
+        margin-top: -6%;
+    }
+
+    .vdoleft1 {
+        margin-left: 151px;
+    }
+
+    .urltext {
+        margin-left: 83px;
+        margin-top: -37px;
+        width: 127%;
+    }
+
+    .imgrmv1 {
+        color: coral;
+        margin-left: 14px;
+    }
+
+    .lldr {
+        margin-left: 115px;
+        margin-top: -7px;
+    }
+
+
+    .nt {
+        margin-top: -29px;
+        color: #093514;
+    }
+
+    .chcklink {
+        margin-top: -19px;
+        margin-bottom: 12px;
+    }
+
+    .upld {
+        margin-top: -37px;
+        margin-bottom: 7px;
+        margin-left: 142px;
+    }
+
+    .loader {
+        border: 5px solid #87ff9b;
+        border-radius: 50%;
+        border-top: 5px solid #3498db;
+        width: 43px;
+        height: 43px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    .lldrnew {
+        margin-left: -11%;
+        margin-top: -25%;
+    }
+
+    .loadernew {
+        border: 7px solid #87ff9b;
+        border-radius: 135%;
+        border-top: 7px solid #3498db;
+        width: 120px;
+        height: 119px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+</style>
+
+
+
+<div data-ng-init="Onloaddata()">
+    <section class="content">
+        <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" data-ng-submit="savelegalnoticerequest()" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Legal Notice Request</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="well text-center">
+                                <label class="checkbox-inline" ng-repeat="cat in category">
+                                    <input type="radio" value="{{cat.lnC_Id}}" ng-model="obj.catg1" name="employee" ng-click="showw()">
+                                    <span class="lbl padding-8">{{cat.lnC_Category_Name}}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+
+
+                        <div class="form-group" ng-if="obj.catg1=='1'">
+                            <label class="control-label col-sm-4 font-weight-bold">Employee :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <div>
+                                    <ui-select id="sel2" name="employee" ng-model="obj1.catg12" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Candidate" required>
+                                        <ui-select-match placeholder="Select OR Search Employee in the list...">
+                                            {{$select.selected.hrmE_EmployeeFirstName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in employeedropdown | propsFilter: {hrmE_EmployeeFirstName: $select.search}"
+                                                           ng-disabled="editflag==true" value="{{option.hrmE_Id}}" ng-selected="{{option.select == true}}">
+                                            <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                    <div ng-message="required">Select Employee Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--ng-if="catg1=='3'"-->
+                        <div class="form-group" ng-if="obj.catg1 == '2'">
+                            <label class="control-label col-sm-4 font-weight-bold">Client :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel2" name="clientname" ng-model="obj1.catg13" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Client" required>
+                                    <ui-select-match placeholder="Select or Search Client Name">
+                                        {{$select.selected.ismmclT_ClientName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option1 in clientlist | propsFilter: {ismmclT_ClientName: $select.search}"
+                                                       ng-disabled="editflag==true" value="{{option1.ismmclT_Id}}" ng-selected="{{option1.Selected == true}}">
+                                        <div ng-bind-html="option1.ismmclT_ClientName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.clientname)" ng-messages="myForm.clientname.$error">
+                                    <div ng-message="required">Select Client Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--ng-if="catg1=='2'"-->
+                        <div class="form-group" ng-if="obj.catg1 == '3'">
+                            <label class="control-label col-sm-4">Vendor:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel2" name="vendorname" ng-model="obj1.catg14" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Vendor" required>
+                                    <ui-select-match placeholder="Select or Search Vendor Name">
+                                        {{$select.selected.invmS_SupplierName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option2 in vendorlist | propsFilter: {invmS_SupplierName: $select.search}"
+                                                       ng-disabled="editflag==true" value="{{option2.invmS_Id}}" ng-selected="{{option2.Selected == true}}">
+                                        <div ng-bind-html="option2.invmS_SupplierName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.vendorname)" ng-messages="myForm.vendorname.$error">
+                                    <div ng-message="required">Select Vendor Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 active">Remarks<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" required>*</strong></label>
+                                <div class="col-sm-8">
+                                    <textarea name="remarks" data-ng-model="lnR_Remarks" style="height: 150px; width: 438px;"></textarea>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.selrole1)" ng-messages="myForm.selrole1.$error">
+                                    <div ng-message="required">Select Atleast one Checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="col-sm-12 box-content clearfix">
+
+                    <div class="margin-top-10">
+                        <p style="color:red;font-size:14px !important">
+                            *  File   Must Be Upload jpeg,Png,pdf, Document
+                            <br />
+                            * File size should be less than 5 MB
+                        </p>
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No.</th>
+                                    <th>Upload</th>
+                                    <th>View</th>
+                                    <th>Remark</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="materal in materaldocuupload">
+                                    <td class="text-center">
+                                        {{$index+1}}
+                                    </td>
+                                    <td>
+                                        <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                            <input type="file" name="impfile" id="document" class="btn btn-success" value="Import" ng-model="ismclT_FilePath" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().materal)" style="padding-top: 1px;padding-bottom: 2px;" />
+
+                                        </label>
+
+                                    </td>
+                                    <td>
+                                        <span ng-show="materal.ismclT_FilePath!=null && materal.ismclT_FilePath!=''">
+                                            <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.ismclT_FilePath  !=null && materal.ismclT_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.ismclT_FilePath)">
+                                                view
+                                            </a>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <textarea maxlength="250" name="remark" ng-model="materal.VTADAAF_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+                                    </td>
+                                    <td>
+                                        <span>
+                                            <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                            <a href="" ng-click="removegrnrows($index,objg)">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="LNR_Id" value="{{LNR_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData(obj1)" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+            </div>
+
+        </form>
+        <!--==================== Image Preview Model ===========================-->
+        <div id="myimagePreview" class="modal fade" role="dialog">
+            <div class="modal-dialog" style="width:55%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 style="color:white"> Legal Notice </h4>
+
+                    </div>
+                    <div class="modal-body">
+                        <div class="box">
+                            <div class="box-body">
+                                <img id="preview" class="img-responsive" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="griddata.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">LEGAL NOTICE REQUEST DETAILS</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{griddata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('Name')">Name</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('lnC_Category_Name')">Category</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('catg14')">Remarks</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('lnR_Status')">Status</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LNR_CreatedDate')">Created Date</a>
+
+                            </th>
+                            <!--<th>
+                                <a href="" ng-click="sort('LNR_CreatedBy')">Created By</a>
+
+                            </th>-->
+                            <!--<th>
+                                <a href="" ng-click="sort('RequestingFor_id')">Requesting For Id</a>
+
+                            </th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in  griddata">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td>{{user.Name}}</td>
+                            <td>{{user.LNC_Category_Name }}</td>
+                            <td>{{user.LNR_Remarks }}</td>
+                            <td>
+                                <div ng-if="user.LNR_Status=='G'">Generated</div>
+                                <div ng-if="user.LNR_Status=='P'">Pending</div>
+                            </td>
+                            <td>{{user.LNR_CreatedDate | date:"dd/MM/yyyy"}}</td>
+                            <!--<td>{{user.LNR_CreatedBy }}</td>-->
+                            <!--<td>{{user.RequestingFor_id }}</td>-->
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+
+    </section>
+</div>
+
+

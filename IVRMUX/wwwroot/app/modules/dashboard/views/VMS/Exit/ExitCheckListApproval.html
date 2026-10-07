@@ -1,0 +1,717 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+
+    .textareaclass {
+        resize: none !important;
+    }
+
+    .form-horizontal .control-label {
+        padding-top: 5px;
+        margin-bottom: 0;
+        text-align: left;
+        font-size: 14px;
+        padding-left: 35px;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+
+            <div class="well text-center" ng-hide="certificate.length>0">
+                <span style="color:red;font-weight:600">Records not available for approval</span>
+            </div>
+
+            <div class="box-body" ng-if="certificate.length>0">
+                <div class="row">
+                    <hr />
+                    <div class="col-sm-12">
+                        <div class="well">
+                            <di class="box-header with-border">
+                                <h3 class="box-title">Certificate Approval</h3>
+                            </di>
+                            <div class="box-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><a href="">SLNO</a></th>
+                                            <th><a href="">Employee Name</a></th>
+                                            <th><a href="">Requested Date</a></th>
+                                            <th><a href="">Receiving Mode</a></th>
+                                            <th><a href="">Action</a></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in certificate">
+                                            <td class="text-center">{{$index+1}}</td>
+                                            <td class="text-center">{{user.HRME_EmployeeFirstname}}</td>
+                                            <td class="text-center">{{user.ISMCERTREQ_RequestDate | date :'dd/MM/yyyy'}}</td>
+                                            <td class="text-center">{{user.ISMCERTREQ_ReceivingMode}}</td>
+                                            <td>
+                                                <div class="grid-action-cell">
+                                                    <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="GetAllRelData(user)"><i class="fas fa-arrow-down" aria-hidden="true"> </i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="box box-primary" ng-if="getcertificatedata.length>0 && ShowApprovedDetails==false">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Employee Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-sm-6 ">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Employee Name:</label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            {{employeename}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Date of joining:</label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            {{DateOfJoining|date:'dd/MM/yyyy'}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" ng-if="HRME_LeftFlag==true">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Employee Left Date</label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            {{HRME_DOL|date:'dd/MM/yyyy'}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" ng-if="HRME_LeftFlag==true">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Employee Left Reason:</label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            {{DateOfJoining|date:'dd/MM/yyyy'}}
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                    <div class="form-group" ng-if="HRPAON_SanctionLevelNo==maxmumlevel">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Receiving Date:<span style="color:red;font-weight:700">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <md-datepicker name="RequestDate" ng-model="obj.ISMCERTREQAPP_ReceiningDate" md-placeholder="Enter date" ng-required="HRPAON_SanctionLevelNo==maxmumlevel"></md-datepicker>
+                                                            <div class="error-messages  col-sm-offset-5" ng-if="interacted(myForm.RequestDate)" ng-messages="myForm.RequestDate.$error">
+                                                                <div ng-message="required">Select Date</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" ng-if="HRPAON_SanctionLevelNo==maxmumlevel">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Receiving Time:<span style="color:red;font-weight:700">*</span></label>
+
+                                                        </div>
+                                                        <div class="col-sm-6">
+
+                                                            <div uib-timepicker name="sch_time1" ng-model="obj.ReceivingTime" hour-step="hstep" minute-step="mstep" show-meridian="true" ng-required="HRPAON_SanctionLevelNo==maxmumlevel"></div>
+                                                            <div class="error-messages" ng-if="interacted(myForm.sch_time1)" ng-messages="myForm.sch_time1.$error">
+                                                                <div ng-message="required">Select  From Time</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-6 ">
+
+                                                    <div class="form-group">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Department:</label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            {{Department}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Designation:</label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            {{Designation}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            <label>Company Name:</label>
+                                                        </div>
+                                                        <div class="col-sm-6" style="text-align:left">
+                                                            {{mI_Name}}
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+                                                <br />
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr><th colspan="3">Employee Certificates</th></tr>
+                                                    <tr>
+
+                                                        <th class="text-center">SL.No.</th>
+                                                        <th class="text-center">Document Name</th>
+                                                        <th class="text-center">view</th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="user in getcertificatedata">
+                                                        <td class="text-center">{{$index+1}}</td>
+                                                        <td class="text-center">{{user.hrmedS_DocumentName}}</td>
+                                                        <td class="text-center">
+                                                            <a>
+                                                                <i class="fa fa-eye" style="color:black;" data-toggle="modal"
+                                                                   title="View Detais" ng-click="previewimg_new(user.hrmedS_DocumentImageName)"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group" ng-if="ISMCERTREQ_Remarks.length>0">
+                                                    <label class="control-label col-sm-4">Employee Remark</label>
+                                                    <div class="col-sm-8 input-group text-right">
+                                                        <textarea class="form-control textareaclass" name="disc" rows="3" ng-model="ISMCERTREQ_Remarks" id="usrnn" ng-disabled="true"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-if="HRPAON_SanctionLevelNo!=1">
+                                                    <label class="control-label">
+                                                        Previous Approver Remark
+                                                        <a href="javascript:void(0)" class="text-aqua" ng-click="approverRemarks(ismresgmrEId)" data-toggle="modal" data-placement="bottom" data-target="#ApproverRemarks" title="View">
+                                                            <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                        </a>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Approver Remark</label>
+                                                    <div class="col-sm-8 input-group text-right">
+                                                        <textarea class="form-control textareaclass" name="disc" rows="3" ng-model="obj.ISMCERTREQAPP_Remarks" id="usrnn"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" ng-if="HRPAON_FinalFlg==true">
+                                            <div class="col-sm-6 col-sm-offset-3">
+                                                <div class="form-group">
+                                                    <!--<label class="control-label col-sm-4"><b>Attachment :</b></label>-->
+                                                    <table class="table table-hover table-responsive table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Upload File<span style="color:red;font-weight:700">*</span></th>
+                                                                <th>File Name</th>
+                                                                <th>View</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="col-sm-12 UploadEmpDoc1">
+                                                                        <div class="form-group text-center">
+                                                                            <label class="custom-file-input file-bluenew" style="width:100%;margin:auto;">
+                                                                                <input type="file" name="doc" accept="image/*, application/pdf" data-ng-model="ismcertreQ_FilePath" onchange="angular.element(this).scope().selectFileforUploadzdOtherDetail(this, angular.element(this).scope().other)" ng-required="HRPAON_FinalFlg==true">
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="error-messages" ng-if="interacted(myForm.doc)" ng-messages="myForm.doc.$error">
+                                                                            <div ng-message="required">Upload Doc</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="form-control" ng-model="ismcertreQ_FileName" disabled />
+                                                                </td>
+                                                                <td>
+                                                                    <a ng-if="ismcertreQ_FilePath  !=null && ismcertreQ_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(ismcertreQ_FilePath)"> view</a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    <span style="color:red;font-size:medium;font-weight:700;margin-left: 18%;">Acknowledgement Should Be Uploaded Here</span>
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="text-center">
+                                            <input type="hidden" ng-model="ISMCERTREQ_Id" />
+                                            <input type="hidden" ng-model="hrmE_Id" />
+
+                                            <md-button type="button" class="md-raised md-primary" ng-click="approvedreject('Approved')" id="save-btn">
+                                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                Approve
+                                            </md-button>
+                                            <md-button type="button" class="md-raised md-primary" ng-click="approvedreject('Rejected')" id="save-btn">
+                                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                Reject
+                                            </md-button>
+                                            <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                                <i class="fa fa-times" aria-hidden="true"></i>
+                                                Cancel
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-if="ShowApprovedDetails==true">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-6 ">
+                                <div class="form-group">
+                                    <div class="col-sm-6" style="text-align:left">
+                                        <label>Employee Name:</label>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align:left">
+                                        {{employeename}}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-6" style="text-align:left">
+                                        <label>Date of joining:</label>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align:left">
+                                        {{DateOfJoining|date:'dd/MM/yyyy'}}
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="HRME_LeftFlag==true">
+                                    <div class="col-sm-6" style="text-align:left">
+                                        <label>Employee Left Date</label>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align:left">
+                                        {{HRME_DOL|date:'dd/MM/yyyy'}}
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="HRME_LeftFlag==true">
+                                    <div class="col-sm-6" style="text-align:left">
+                                        <label>Employee Left Reason:</label>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align:left">
+                                        {{DateOfJoining|date:'dd/MM/yyyy'}}
+                                    </div>
+                                </div>
+
+
+
+
+
+                            </div>
+                            <div class="col-sm-6 ">
+
+                                <div class="form-group">
+                                    <div class="col-sm-6" style="text-align:left">
+                                        <label>Department:</label>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align:left">
+                                        {{Department}}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-6" style="text-align:left">
+                                        <label>Designation:</label>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align:left">
+                                        {{Designation}}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-6" style="text-align:left">
+                                        <label>Company Name:</label>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align:left">
+                                        {{mI_Name}}
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-if="ISMCERTREQ_Remarks.length>0">
+                                    <label class="control-label col-sm-4">Employee Remark</label>
+                                    <div class="col-sm-8 input-group text-right">
+                                        <textarea class="form-control textareaclass" name="disc" rows="3" ng-model="ISMCERTREQ_Remarks" id="usrnn" ng-disabled="true"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <br />
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="text-center" ng-if="ISMCERTREQAPP_ReceiningDate.length>0">
+                    <span style="color:red;font-weight:700;font-size:larger">Certificate Collection Date & Time {{ISMCERTREQAPP_ReceiningDate}}</span><br />
+                    <span style="color:red;font-weight:700;font-size:larger" ng-if="ISMCERTREQAPP_ACK.length>0">Acknowledgement Copy</span>
+                    <span ng-if="ISMCERTREQAPP_ACK.length>0">
+                        <a>
+                            <i class="fa fa-eye" style="color:black;" data-ng-click="previewimg_new(ISMCERTREQAPP_ACK)"
+                               title="View Detais" ng-click="viewaproval(user);"></i>
+                        </a>
+
+                    </span>
+                </div>
+
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr><th colspan="3">Employee Certificates</th></tr>
+                                <tr>
+
+                                    <th class="text-center">SL.No.</th>
+                                    <th class="text-center">Document Name</th>
+                                    <th class="text-center">view</th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in getcertificatedata">
+
+
+                                    <td class="text-center">{{$index+1}}</td>
+
+                                    <td class="text-center">{{user.hrmedS_DocumentName}}</td>
+
+
+                                    <td class="text-center">
+
+                                        <a>
+                                            <i class="fa fa-eye" style="color:black;" data-toggle="modal"
+                                               title="View Detais" ng-click="previewimg_new(user.hrmedS_DocumentImageName)"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label">
+                                Previous Approver Remark
+                                <a href="javascript:void(0)" class="text-aqua" ng-click="approverRemarks(ismresgmrEId)" data-toggle="modal" data-placement="bottom" data-target="#ApproverRemarks" title="View">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                </a>
+                            </label>
+                            <div class="col-sm-8 input-group text-right">
+
+                                <!--<textarea class="form-control textareaclass" name="disc" rows="3" ng-model="ISMRESGAB_Remarks" ng-disabled="true" id="usrnn"></textarea>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-sm-6">
+
+                    </div>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+    </form>
+
+    <div class="box box-primary" ng-show="getloaddata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Certificate Approval</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="" ng-click="sortBy('HRME_EmployeeFirstname')">Employee Name</a></th>
+                        <th><a href="" ng-click="sortBy('ISMCERTREQ_RequestDate')">Requested Date</a></th>
+                        <th><a href="" ng-click="sortBy('ISMCERTREQAPP_ApprovedDate')">Approved Date</a> </th>
+                        <th><a href="" ng-click="sortBy('ISMCERTREQAPP_AppRejFlag')">Status</a> </th>
+                        <!--<th>Certificate</th>-->
+                        <th>View</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue=(getloaddata | filter : filterValue1) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage"
+                        current-page="currentPage">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{user.HRME_EmployeeFirstName}}</td>
+                        <td class="text-center">{{user.ISMCERTREQ_RequestDate  | date:'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.ISMCERTREQAPP_ApprovedDate  | date:'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.ISMCERTREQAPP_AppRejFlag}}</td>
+                        <td class="text-center">
+                            <a ng-if="user.ISMCERTREQ_FilePath !=null && user.ISMCERTREQ_FilePath.length>0">
+                                <i class="fa fa-eye" style="color:black;" data-toggle="modal"
+                                   title="View Detais" ng-click="previewimg_new(user.ISMCERTREQ_FilePath)"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <div class="grid-action-cell">
+                                <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="GetAllRelDatagrid(user)"><i class="fas fa-arrow-up" aria-hidden="true"> </i></a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+</section>
+
+<div id="mymodalviewdetailsthirdtab" ng-show="getcertificatedata.length>0" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Documents </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.No.</th>
+                                    <th>Document Name</th>
+                                    <th>view</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in getcertificatedata">
+
+
+                                    <td class="text-center">{{$index+1}}</td>
+
+                                    <td class="text-center">{{user.hrmedS_DocumentName}}</td>
+
+
+                                    <td class="text-center">
+                                        <a ng-if="user.hrmedS_DocumentImageName  !=null && user.hrmedS_DocumentImageName .length>0">
+                                            <i class="fa fa-eye" style="color:black;" data-toggle="modal"
+                                               title="View Detais" ng-click="previewimg_new(user.hrmedS_DocumentImageName )"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--=====approvar Remarks=======-->
+<div id="ApproverRemarks" class="modal fade" role="dialog" data-backdrop="false" name="formm">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>Approvar Remarks</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th class="text-center">Approver Name</th>
+                            <th class="text-center">Approved Date</th>
+                            <th class="text-center">Status</th>
+                            <!--<th class="text-center">Approved Working Last Date</th>-->
+                            <th class="text-center">Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user1 in aprovedlist">
+                            <td>{{$index+1}}</td>
+                            <td class="text-center">{{user1.hrmE_EmployeeFirstName}}</td>
+                            <td class="text-center">{{user1.ismcertreqapP_ApprovedDate|date:'dd/MM/yyyy'}}</td>
+                            <!--<td class="text-center">{{user1.ismcertreqapP_ReceiningDate|date:'dd/MM/yyyy'}}</td>-->
+                            <td class="text-center">{{user1.ismcertreqapP_AppRejFlag}}</td>
+                            <td class="text-center">{{user1.ismcertreqapP_Remarks}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center" style="color:red" ng-if="aprovedlist.length==0"><p><b>Application Still Not Approved From 1st Level</b></p></div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mymodalviewdetailsdoctab" ng-show="getdocumentdata.length>0" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+
+                <h4 class="modal-title text-white">Documents </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+
+                        <img src="{{getdocumentdata}}" alt="doc" style="width:100%;">
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mymodalviewdetailssecondtab" ng-show="getviewdata.length>0" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+
+                <h4 class="modal-title text-white">Approved Details </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+
+                        <img src="{{getviewdata}}" alt="baldwin" style="width:100%;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+
+
+                <div id="pdfIdzz">
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{filenames}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

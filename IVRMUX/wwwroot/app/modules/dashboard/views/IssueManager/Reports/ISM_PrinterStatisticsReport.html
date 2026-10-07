@@ -1,0 +1,347 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PRINTER STATISTICS REPORT </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="form-group">
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Department Name :<span style="color:red;">*</span></label>
+
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="hrmD_Id" name="dept" required>
+                                        <option value=""> Select Department</option>
+                                        <option value="0">All</option>
+                                        <option ng-repeat="name in get_department" value="{{name.hrmD_Id}}" ng-selected="{{name.Selected===true}}">
+                                            {{name.hrmD_DepartmentName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required">Select Department</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="control-label col-sm-4">Type:</label>
+                            <div class="col-sm-8">
+                                <label class="radio-inline">
+                                    <input type="checkbox" name="select" value="Color" ng-model="checkboxval">
+                                    <span class="lbl padding-8">Color</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" name="select" value="BlackWhite" ng-model="checkboxval1">
+                                    <span class="lbl padding-8">Black & White</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="start_Date" ng-disabled="plannerflg" name="startdate" id="date1" onkeydown="return false" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                    <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="end_Date" name="endate" ng-disabled="plannerflg" md-min-date="start_Date" onkeypress="return false" md-placeholder="Enter Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                    <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button type="button"  class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+                <md-button ng-show="get_printdata1.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printDeviation')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button ng-if="get_printdata1.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+                <md-button type="submit" class="md-raised md-warn" ng-if="showbutton == true" id="print-btn" ng-click="btnclick();">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Send Email
+                </md-button>
+
+            </div>
+        </div>
+    </form>
+
+
+    <div class="box box-primary" ng-show="get_printdata.length>0" id="get_printdetail">
+        <div class="box-header with-border">
+            <h3 class="box-title">Printed  Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="all" ng-model="stdall" ng-click="toggleAllstd()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th class="text-left">
+                                <a href="" ng-click="sort('sno')">SL.No.</a>
+                            </th>
+                            <th class="text-left">
+                                Printer Name
+                            </th>
+                            <th class="text-left"><a href="" ng-click="sort('hrmD_DepartmentName')"> Department </a></th>
+                            <th class="text-left"> <a href="" ng-click="sort('vmspoD_PODate')"> Date</a> </th>
+                            <th class="text-left"><a href="" ng-click="sort('vmspoD_Remarks')"> Remark </a></th>
+                            <th class="text-left"><a href="" ng-click="sort('vmspoD_NoOfPages')">No of Pages</a></th>
+                            <th class="text-left"><a href="" ng-click="sort('vmspoD_Type')">Type </a></th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in filterValue=(get_printdata  | filter : search) | orderBy:predicate:default | filter:search |orderBy:sortKey:reverse">
+
+                            <!--<tr dir-paginate="user in filterValue = (get_printdata | filter : searchValue)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.stdselected" value="{{user.vmspoD_Id}}" ng-change="optionToggledstd(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td class="text-left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-left"> {{user.vmsmpR_Name}}</td>
+                            <td class="text-left">{{user.hrmD_DepartmentName}}</td>
+                            <td class="text-left">{{user.vmspoD_PODate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-left">{{user.vmspoD_Remarks}}</td>
+                            <td class="text-left">{{user.vmspoD_NoOfPages}}</td>
+                            <td class="text-left">{{user.vmspoD_Type}}</td>
+
+
+                            <!--<td ng-hide="true">
+                        {{user.vmspoD_ActiveFlag}}
+                    </td>-->
+                            <td ng-hide="true">
+                                {{user.hrmD_Id}}
+                            </td>
+
+
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group" id="printDeviation" ng-show="printerdet">
+                <h3>Printed  Details</h3>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            
+                            <th class="text-left">
+                                <a href="" ng-click="sort('sno')">SL.No.</a>
+                            </th>
+                            <th class="text-left">
+                                Printer Name
+                            </th>
+                            <th class="text-left"> Department</th>
+                            <th class="text-left">  Date </th>
+                            <th class="text-left"> Remark </th>
+                            <th class="text-left">No of Pages</th>
+                            <th class="text-left">Type </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in filterValue=(get_printdata1  | filter : search) | orderBy:predicate:default | filter:search |orderBy:sortKey:reverse">
+
+                         
+                            <td class="text-left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-left"> {{user.vmsmpR_Name}}</td>
+                            <td class="text-left">{{user.hrmD_DepartmentName}}</td>
+                            <td class="text-left">{{user.vmspoD_PODate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-left">{{user.vmspoD_Remarks}}</td>
+                            <td class="text-left">{{user.vmspoD_NoOfPages}}</td>
+                            <td class="text-left">{{user.vmspoD_Type}}</td>
+
+
+                 
+
+
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+       
+    </div>
+
+
+    <!--</div>-->
+
+
+    <div id="myModalswal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:80%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="">
+                        <button id="modelClosee" type="button" data-dismiss="modal" style="color: #d02626;float: right;font-size: 21px;font-weight: 700;line-height: 1;color: #da1b1b;text-shadow: 0 1px 0 #fff;">
+                            X
+                        </button>
+
+                        <div class="box-body" id="empmail">
+
+                            <div style='width: 100%; margin: 0 auto; background-size: 100% 100%; background-repeat: no-repeat;'>  
+                                <table width='80%' border='0' cellspacing='0' cellpadding='0'>
+                                <table width='100%' border='0' cellspacing='0' cellpadding='0' style='font-size:15px; '>    
+                                <tr><td style='padding-top: 10px;width:2%'>  <left> <img src="https://dcampusstrg.blob.core.windows.net/logos/LogoVTSl.png" height="120" width="100"></left>
+                                    </td>   <td style='padding-top: 10px;width:100%;'>  <center><b><h2> VAPS Technosoft Pvt ltd</h2></b><h4> New No. 58, Old No. 20, 1st Main, KHB 1st Stage,
+                                    <br />Kamakshipalya, Basaveshwaranagar, Bangalore-560079.<br />Tel: +080-68112900 / 901-903, Email: contact@vapstech.com, www.vapstech.com</h3>
+                                    </td></tr>     
+                                </table>
+                                </table>
+                               
+
+
+                                <center>
+                                    <p><h4>Printer Statistics</h4></p>
+
+
+
+                                </center>
+                          
+
+
+                                <table border="1" style="border:1px solid;width:100%;">
+                                    <thead>
+                                        <tr>
+
+                                            <th>
+                                                SL.No.
+                                            </th>
+                                            <th>
+                                                Printer Serial No
+                                            </th>
+                                            <th> Department </th>
+                                            <th> Date </th>
+                                            <th>Total No Of Pages</th>
+                                            <th> Remark </th>
+
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in printdatatable">
+                                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                            <td> {{user.vmsmpR_Name}}</td>
+                                            <td>{{user.hrmD_DepartmentName}}</td>
+                                            <td>{{user.vmspoD_PODate |  date:'MMMM,y'}}</td>
+                                            <td>{{user.vmspoD_NoOfPages}}</td>
+                                            <td>{{user.vmspoD_Remarks}}</td>
+
+
+
+
+
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <p>
+
+                                    </br>
+                                    </br>
+                                    Regards,</br>
+                                    IT TEAM
+
+                                </p>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                <div>
+                    
+                    <br />
+                    <div style="text-align:center">
+                        <md-button type="button" class="md-raised md-primary" ng-click="SendMail()" ng-disabled="otpcheck" id="save-btn">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                            Send E-mail
+                        </md-button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>

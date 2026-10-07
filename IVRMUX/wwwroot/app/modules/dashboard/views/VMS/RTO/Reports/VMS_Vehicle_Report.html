@@ -1,0 +1,410 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<style>
+    .multiselect {
+        width: 92%;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">VEHICLE KEY  REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="multiselect col-sm-12">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search Vehical here..." />
+                            <label>
+                                <input name="alitem" ng-model="allmi" type="checkbox" ng-click="all_miid(allmi)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </label>
+                            <label ng-model="MI_Id" ng-repeat="mi in vehicale | filter : searchValue">
+                                <input name="mi" ng-model="mi.miid" type="checkbox" ng-click="mi_click();" ng-required="isRequiredmi()">
+                                <span class="lbl padding-8">
+                                    {{mi.trmV_VehicleName}} /{{mi.trmV_VehicleNo}}
+                                </span>
+                            </label>
+
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.mi)" ng-messages="myForm.mi.$error">
+                            <div ng-message="required"> Select  One checkbox</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From Date<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="payment_date" onkeypress="return false" data-ng-model="FromDate" md-placeholder="Enter Date" ng-paste="$event.preventDefault()" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.payment_date)" ng-messages="myForm.payment_date.$error">
+                                    <div ng-message="required">Select  Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> To Date<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="payment_datdde" md-min-date="FromDate" onkeypress="return false" data-ng-model="ToDate" md-placeholder="Enter Date" ng-paste="$event.preventDefault()" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.payment_datdde)" ng-messages="myForm.payment_datdde.$error">
+                                    <div ng-message="required">Select  Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+                <md-button ng-show="vehicalList.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printed')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button ng-if="vehicalList.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+
+
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="vehicalList.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">vehicle KEY REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{vehicalList.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" style="overflow:auto ">
+
+
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>Vehicle Name</th>
+                            <th>Driver Name</th>
+                            <th>Issued Entered By</th>
+                            <th> Key Issued </th>
+
+                            <th>Issued Date</th>
+                            <th>Issued Time</th>
+                            <th>Key   Received</th>
+                            <th>Received Date</th>
+                            <th>Received Time</th>
+                            <th>KM Reading</th>
+                            <th>Remark</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1=(vehicalList |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                            current-page="currentPage" pagination-id="page1">
+                            <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td style="text-align:left">
+                                {{user.TRMV_VehicleName}} /{{user.TRMV_VehicleNo}}
+                            </td>
+                            <td>
+                                {{user.EMPNAME}}
+                            </td>
+                            <td>
+                                {{user.Applicationuser}}
+                            </td>
+
+                            <td>
+
+                                <span ng-if="user.VMSVKEYS_KeyReceivedHandedOverFlg=='Issued'">
+                                    <i class="fa fa-check  text-green"></i>
+                                </span>
+                                <span ng-if="user.VMSVKEYS_KeyReceivedHandedOverFlg !='Issued'">
+                                    <i class="fa fa-times  text-red"></i>
+                                </span>
+
+                            </td>
+
+                            <td>
+                                {{user.VMSVKEYS_RecivedDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{user.VMSVKEYS_RecivedTime | date  : 'shortTime'}}
+
+                            </td>
+
+                            <td>
+                                <span ng-if="user.VMSVKEYS_KeyHandedOverFlg=='Received'">
+                                    <i class="fa fa-check  text-green"></i>
+                                </span>
+                                <span ng-if="user.VMSVKEYS_KeyHandedOverFlg !='Received'">
+                                    <i class="fa fa-times  text-red"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-if="user.VMSVKEYS_KeyHandedOverFlg != null  &&  user.VMSVKEYS_KeyHandedOverFlg!=''">
+                                    {{user.VMSVKEYS_DateTime  |date:'dd/MM/yyyy'}}
+                                </span>
+
+                            </td>
+                            <td>
+                                <span ng-if="user.VMSVKEYS_KeyHandedOverFlg != null  &&  user.VMSVKEYS_KeyHandedOverFlg!=''">
+                                    {{user.VMSVKEYS_Time  | date  : 'shortTime'}}
+                                </span>
+                            </td>
+                            <td>
+                                {{user.VMSVKEYS_OdometerReading}}
+                            </td>
+                            <td>
+                                {{user.VMSVKEYS_Remarks}}
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="10" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+           
+
+
+
+            <div class="col-sm-12" style="display: none !important" id="printed">
+               
+
+                    <div class="text-center">
+                        <img src="{{milogo}}" alt="Institution Logo" class="img-responsive" style="width:97%; margin: auto">
+                        <!--<img class="text-center" alt="vts commpany" src="https://dcampusstrg.blob.core.windows.net/files/1/InstitutionLogo/8cbb50ea-cc86-4e9c-bfff-0a553bbfacea.jpg" style="width:755px" />-->
+
+                        <h4 class="text-center"> VMS VEHICLE KEY REPORT {{FromDate |date:'dd/MM/yyyy'}} TO  {{ToDate |date:'dd/MM/yyyy'}}</h4>
+                  
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th>Vehicle Name</th>
+                                <th>Driver Name</th>
+                                <th>Issued Entered By</th>
+                                <th> Key Issued </th>
+
+                                <th>Issued Date</th>
+                                <th>Issued Time</th>
+                                <th>Key   Received</th>
+                                <th>Received Date</th>
+                                <th>Received Time</th>
+                                <th>KM Reading</th>
+                                <th>Remark</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-repeat="user in vehicalList">
+                                <td style="width:1%;">{{$index+1}}</td>
+
+                                <td style="text-align:left">
+                                    {{user.TRMV_VehicleName}} /{{user.TRMV_VehicleNo}}
+                                </td>
+                                <td>
+                                    {{user.EMPNAME}}
+                                </td>
+                                <td>
+                                    {{user.Applicationuser}}
+                                </td>
+
+                                <td>
+
+                                    <span ng-if="user.VMSVKEYS_KeyReceivedHandedOverFlg=='Issued'">
+                                        <span>&#10004</span>
+                                    </span>
+                                    <span ng-if="user.VMSVKEYS_KeyReceivedHandedOverFlg !='Issued'">
+                                        <span>&#10060</span>
+                                    </span>
+
+                                </td>
+
+                                <td>
+                                    {{user.VMSVKEYS_RecivedDate |date:'dd/MM/yyyy'}}
+                                </td>
+                                <td>
+                                    {{user.VMSVKEYS_RecivedTime | date  : 'shortTime'}}
+
+                                </td>
+
+                                <td>
+                                    <span ng-if="user.VMSVKEYS_KeyHandedOverFlg=='Received'">
+                                        <span>&#10004</span>
+                                    </span>
+                                    <span ng-if="user.VMSVKEYS_KeyHandedOverFlg !='Received'">
+                                        <span>&#10060</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span ng-if="user.VMSVKEYS_KeyHandedOverFlg != null  &&  user.VMSVKEYS_KeyHandedOverFlg!=''">
+                                        {{user.VMSVKEYS_DateTime  |date:'dd/MM/yyyy'}}
+                                    </span>
+
+                                </td>
+                                <td>
+                                    <span ng-if="user.VMSVKEYS_KeyHandedOverFlg != null  &&  user.VMSVKEYS_KeyHandedOverFlg!=''">
+                                        {{user.VMSVKEYS_Time  | date  : 'shortTime'}}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{user.VMSVKEYS_OdometerReading}}
+                                </td>
+                                <td>
+                                    {{user.VMSVKEYS_Remarks}}
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+
+    <!--<div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title"> REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body" >
+            <div class="row" >
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{MasterChecks.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+
+
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+
+                            <tr>
+                                <th>SL.No.</th>
+                                <th>Vehicle Name</th>
+                                <th>Employee Name</th>
+                                <th>DateTime</th>
+                                <th>Time</th>
+                                <th>Status</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1=(GetReport |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                                current-page="currentPage" pagination-id="page1">
+                                <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                                <td>
+                                    {{user.TRMV_VehicleName}} /  {{user.TRMV_VehicleNo}}
+                                </td>
+
+                                <td>
+                                    {{user.HRME_EmployeeFirstName}}
+                                </td>
+
+                                <td>
+                                    {{user.VMSVKEYS_DateTime |date:'dd/MM/yyyy'}}
+                                </td>
+
+                                <td>
+                                    {{user.VMSVKEYS_Time}}
+                                </td>
+
+                                <td>
+                                    {{user.VMSVKEYS_KeyReceivedHandedOverFlg}}
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5" pagination-id="page1"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+
+            </div>
+
+
+
+
+
+
+        </div>
+    </div>-->
+    <!--</div>-->
+
+
+
+
+</section>

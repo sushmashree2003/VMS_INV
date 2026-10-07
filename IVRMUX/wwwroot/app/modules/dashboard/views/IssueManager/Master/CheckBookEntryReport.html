@@ -1,0 +1,875 @@
+﻿<style>
+    .multiselect {
+        width: 22.5em;
+        height: 11em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: -10.3%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .mul {
+        width: 22.1em;
+        height: 14em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .inst {
+        margin-left: -71px;
+    }
+
+    .taglbl {
+        margin-left: -15px;
+    }
+
+    .taglbl1 {
+        margin-left: -99px;
+    }
+   
+    
+</style>
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">chequebook Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <div class="text-center">
+                                    <label class="radio-inline" ng-init="issuertype1='ALL'">
+                                        <input name="optradio3" type="radio" data-ng-model="issuertype1" value="ALL" required ng-change="transtypechange();">
+                                        <span class="lbl padding-8">ALL</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio3" type="radio" data-ng-model="issuertype1" value="PENDING" required ng-change="transtypechange();">
+                                        <span class="lbl padding-8">APPROVAL PENDING</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio3" type="radio" data-ng-model="issuertype1" value="Approved" required ng-change="transtypechange();">
+                                        <span class="lbl padding-8">APPROVED</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio3" type="radio" data-ng-model="issuertype1" value="Rejected" required ng-change="transtypechange();">
+                                        <span class="lbl padding-8">REJECTED</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio3" type="radio" data-ng-model="issuertype1" value="PR" required ng-change="transtypechange();">
+                                        <span class="lbl padding-8">CHECK PRINTED</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio3" type="radio" data-ng-model="issuertype1" value="NPR" required ng-change="transtypechange();">
+                                        <span class="lbl padding-8">CHECK NOT PRINTED</span>
+                                    </label>
+
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.optradio3)" ng-messages="myForm.optradio3.$error">
+                                    <div ng-message="required">Select any one of the radio button</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="staffcheck=='Staff'">
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="Allw" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> ALL </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="PIno" name="Allw" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">SUPPLIER</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="PV" name="Allw" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Voucher No</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9" ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" md-max-date="mxdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" md-max-date="mxdate" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ======================= PI No. ============================ -->
+                            <div class="form-group" ng-if="optionflag=='PIno'">
+                                <label class="control-label col-sm-4">Select or Search Supplier:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_PI_details.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search PI No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="piall" type="checkbox" ng-click="all_check(piall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMS_Id" ng-repeat="pi in get_PI_details | filter : searchValue">
+                                            <input name="PIno" ng-model="pi.pick" type="checkbox" ng-click="togchkbxG();" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                {{pi.INVMS_SupplierName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.PIno)" ng-messages="myForm.PIno.$error">
+                                        <div ng-message="required">Please Select Atleast One ChequeBook</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===========================ITEMS========================== -->
+                            <div class="form-group" ng-if="optionflag=='PV'">
+                                <label class="control-label col-sm-4">Select or Search Voucher No :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_PI_details.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMI_Id" ng-repeat="itm in get_PI_details | filter : searchValue">
+                                            <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                            <span class="lbl padding-8">
+                                                {{itm.INVMI_ItemName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-hide="staffcheck=='Staff'">
+
+                        <div class="col-sm-12">
+                            <div class="col-sm-4">
+                                <div class="col-sm-8 col-lg-offset-2" ng-hide="staffcheck=='Staff'">
+                                    <label for="sel2" class="control-label col-sm-3 inst">Company: <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8 mul">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search Item here...">
+                                            <label>
+                                                <input name="alitem" value="1" ng-model="allmi" type="checkbox" ng-click="all_miid(allmi)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-model="MI_Id" ng-repeat="mi in get_mi_list | filter : searchValue">
+                                                <input name="mi" ng-model="mi.miid" type="checkbox" ng-click="mi_click();" ng-required="isRequiredmi()">
+                                                <span class="lbl padding-8">
+                                                    {{mi.MI_Name}}
+                                                </span>
+                                            </label>
+
+                                        </div>
+                                        <div class="error-messages" ng-if="interacted(myForm.mi)" ng-messages="myForm.mi.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+                              
+
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="col-sm-8 col-lg-offset-2">
+                                    <div class="well">
+                                        <div class="text-center" ng-init="optionflag='All'">
+                                            <label class="radio-inline">
+                                                <input type="radio" value="All" name="All1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8"> All </span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="PIno" name="PIno1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">Supplier</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="PV" name="item1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">Voucher No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 col-lg-offset-2">
+
+
+                                    <!-- ======================= PI No. ============================ -->
+                                    <div class="form-group" ng-if="optionflag=='PIno'">
+                                        <label class="control-label col-sm-3">Select Supplier:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <div class="multiselect col-sm-8">
+                                                <span ng-show="get_PI_details.length>0">
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="Search PI No. here...">
+                                                </span>
+                                                <label>
+                                                    <input name="classes" value="1" ng-model="piall" type="checkbox" ng-click="all_check(piall)">
+                                                    <span class="lbl padding-8">
+                                                        All
+                                                    </span>
+                                                </label>
+
+                                                <label ng-model="INVMS_Id" ng-repeat="pi in get_PI_details | filter : searchValue">
+                                                    <input name="PIno" ng-model="pi.pick" type="checkbox" ng-click="togchkbxG();" ng-required="isOptionsRequired()">
+                                                    <span class="lbl padding-8">
+                                                        {{pi.INVMS_SupplierName}}
+                                                    </span>
+                                                </label>
+                                            </div>
+
+                                            <div class="error-messages" ng-if="interacted(myForm.PIno)" ng-messages="myForm.PIno.$error">
+                                                <div ng-message="required">Please Select Atleast One checkbox</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ===========================ITEMS========================== -->
+                                    <div class="form-group" ng-if="optionflag=='PV'">
+                                        <label class="control-label col-sm-3">Select Voucher :<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <div class="multiselect col-sm-8">
+                                                <span ng-show="get_PI_details.length>0">
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+                                                </span>
+                                                <label>
+                                                    <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                                    <span class="lbl padding-8">
+                                                        All
+                                                    </span>
+                                                </label>
+
+                                                <label ng-model="VPAYVOU_Id" ng-repeat="itm in get_PI_details | filter : searchValue">
+                                                    <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                                    <span class="lbl padding-8">
+                                                        {{itm.VPAYVOU_VoucherNo}} /{{itm.VPAYVOU_ChequeNo}}
+                                                    </span>
+                                                </label>        
+                                            </div>
+
+                                            <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                                <div ng-message="required">Please Select Atleast One checkbox</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <div class="col-sm-3">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                            <span class="lbl padding-4">Between Dates </span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-9" ng-show="bw_dates">
+                                        <div class="col-sm-5">
+                                            <md-datepicker ng-model="startdate" md-max-date="mxdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                                <div ng-message="required">Select Start Date</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <md-datepicker ng-model="enddate" md-max-date="mxdate" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                                <div ng-message="required">Select End Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            </div>
+
+                        
+
+                    </div>
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="get_PIreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="get_PIreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printpi')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="get_PIreport.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">chequebook REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{get_PIreport.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>View Voucher</th>
+                            <th><a href="" ng-click="sort('VPAYVOU_VoucherNo')">Company Name</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_VoucherNo')">Voucher No</a></th> 
+                            <th><a href="" ng-click="sort('VPAYVOU_ChequeNo')">Cheque No</a></th>
+                            <th><a href="" ng-click="sort('INVMS_SupplierName')">Party Name</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_PaymentDate')">Entry Date</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_PaymentDate')">Bank Details</a></th>
+                            <!--<th><a href="" ng-click="sort('VPAYVOU_BankBalalnce')">Bank Balance </a></th>-->
+                            <th><a href="" ng-click="sort('VPAYVOU_AppliedAmount')">Applied Amount </a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_AppliedAmount')">Approved Amount </a></th>
+
+                            <th><a href="" ng-click="sort('VPAYVOU_StatusFlg')">Status</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_Remarks')">Remarks</a></th>
+                            <th>Approval Remark</th>
+                            <!--<th><a href="" ng-click="sort('ismcltprP_InstallmentAmt')">Total Amount</a></th>
+                    <th><a href="" ng-click="sort('ismcltprP_ReceivedAmt')">Remarks</a></th>-->
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1=(get_PIreport |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                            current-page="currentPage" pagination-id="page1">
+                            <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center">
+                                <a href="javascript:void(0)" ng-click="reschedule(user);"> <i class="fa fa-print" aria-hidden="true"></i></a>
+                            </td>
+                            <td style="text-align:left">{{user.MI_Name}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_VoucherNo}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_ChequeNo}}</td>
+                            <td style="text-align:left">
+                                <span ng-if="user.INVMS_SupplierName!=null && user.INVMS_SupplierName!=''">
+                                    {{user.INVMS_SupplierName}}
+                                </span>
+                                <span ng-if="user.VPAYVOU_PaymentTo!=null && user.VPAYVOU_PaymentTo!=''">
+                                    {{user.VPAYVOU_PaymentTo}}
+                                </span>
+
+                            </td>
+                            <td style="text-align:left">{{user.VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}</td>
+                            <td style="text-align:left">
+                                {{user.HRMBD_BankName}}<br />A/c No
+                                {{user.HRMBD_BankAccountNo}}
+                            </td>
+                            <!--<td style="text-align:left">{{user.VPAYVOU_BankBalalnce | number:2}}</td>-->
+                          
+                            <td style="text-align:left">{{user.VPAYVOU_AppliedAmount | number:2}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_ApprovedAmount | number:2}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_StatusFlg}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_Remarks}}</td>
+                            <td class="hidden">{{user.mI_Logo}}</td>
+                            <td>
+                                <a href="javascript:void(0)" ng-click="viewdetailsTWO(user)" data-placement="bottom" data-toggle="tooltip"
+                                   title="viewdetails" data-target="#myModalfile">
+                                    <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+        <div ng-hide="true">
+            <div id="printpi">
+
+                <!--<div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                </div>-->
+                <h4 class="text-center">CHECKBOOK ENTRY REPORT</h4>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th>Company Name</th>
+                            <th>Voucher No</th>
+                            <th>Cheque No</th>
+                            <th>Party Name</th>
+                            <th>Entry Date</th>
+                            <th>Bank Details</th>
+                            <!--<th>Bank Balance </th>-->
+                            <th>Applied Amount </th>
+                            <th>Approved Amount </th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_PIreport">
+                            <td style="text-align:left">{{$index+1}}</td>
+                          
+                            <td style="text-align:left">{{user.MI_Name}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_VoucherNo}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_ChequeNo}}</td>
+                            <td style="text-align:left">
+                                <span ng-if="user.INVMS_SupplierName!=null && user.INVMS_SupplierName!=''">
+                                    {{user.INVMS_SupplierName}}
+                                </span>
+                                <span ng-if="user.VPAYVOU_PaymentTo!=null && user.VPAYVOU_PaymentTo!=''">
+                                    {{user.VPAYVOU_PaymentTo}}
+                                </span>
+
+                            </td>
+                            <td style="text-align:left">{{user.VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}</td>
+                            <td style="text-align:left">
+                                {{user.HRMBD_BankName}}<br />A/c No
+                                {{user.HRMBD_BankAccountNo}}
+                            </td>
+                            <!--<td style="text-align:left">{{user.VPAYVOU_BankBalalnce | number:2}}</td>-->
+                            <td style="text-align:left">{{user.VPAYVOU_AppliedAmount | number:2}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_ApprovedAmount | number:2}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_StatusFlg}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_Remarks}}</td>
+                        </tr>
+                       
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Payment Voucher  DETAILS
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printData1()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div class="row">
+                                <div class="col-md-8" ng-if="imagenew!=null && imagenew!=''">
+                                    <img src="{{imagenew}}" class="img-responsive" alt="vaps" />
+                                </div>
+                            </div>
+                            <div class="row">
+
+
+                                <br />
+                                <br />
+                                <div class="col-sm-12" style="text-align:center">
+                                    <h3>  <b>Payment Voucher</b></h3>
+                                </div>
+
+
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive" style="border:none !important" width="100%">
+                                        <tr>
+                                            <td style="float:left">Cheque No.:&nbsp; {{chno1}}</td>
+                                            <td>  &nbsp; </td>
+                                            <td style="float:right"> Dated:&nbsp; {{pdate|date:'dd/MM/yyyy'}}</td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:75%">Particulars </td>
+                                            <td style="width:25%;"> Amount</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:75%;text-align:left">
+                                                <b>Account :</b>
+                                                <p style="padding-left:60px">{{supldetails}}</p>
+                                                <b>Through : </b>
+                                                <p style="padding-left:60px">{{bankname}} A/c No:{{bbacc}}</p>
+
+                                                <b>On Account of : </b>
+                                                <p style="padding-left:60px">{{rmrk}} </p>
+                                                <b>Amount (in words) : </b>
+                                                <p style="padding-left:60px">Indian Rupees {{words}} Only </p>
+
+                                            </td>
+                                            <td style="width:25%;text-align:right;vertical-align:top;padding-top:15px">{{amtt | number:2}}</td>
+                                        </tr>
+
+                                        <tr>
+
+
+                                            <td style="width:75%;text-align:left">
+                                                &nbsp;
+                                                &nbsp; &nbsp;
+                                            </td>
+
+                                            <td style="width:25%;text-align:right"><b>{{amtt | number:2}}</b></td>
+                                        </tr>
+
+
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Receiver's Signature : </h5>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Authorised Signatory</h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Prepared by </h5>
+                                    <strong> {{crby}}</strong>
+                                </div>
+
+                                <div class="col-sm-4" style="text-align:center">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Checked by  </h5>
+                                    <strong>Govindaiah M</strong>   
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Verified by </h5>
+                                    <strong>Siddesh Kumar</strong>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="popup123" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Master ChequeBook  Numbers
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printDatatwo()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+
+                <div class="box-body margin-top-10" id="asdftt">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div class="row">
+                                <div style="text-align:center">
+                                    <h4> Cheque Details </h4>
+                                </div>
+                            </div>
+                            <div class="row" style="padding-left:20% !important">
+
+                                <img src="{{imagename}}" class="img-responsive img-fluid" />
+
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:50%;text-align:left">ChequeNo : &nbsp;  <strong> {{VPAYVOU_ChequeNo}}  </strong>  </td>
+                                            <td style="width:50%;text-align:left"> <span>Party Name:&nbsp; <strong> {{partyname}} </strong> </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:50%;text-align:left" rowspan="2">
+                                                <span>
+                                                    <b>
+                                                        Voucher CreateBy : {{VoucherCreateby}}
+                                                    </b>
+                                                </span>
+                                                <br />
+                                                <span>
+                                                    <b>
+                                                        Payment Date : {{VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}
+                                                    </b>
+                                                </span>
+                                            </td>
+                                            <td style="width:50%;text-align:left">
+                                                <b>
+                                                    Remark :&nbsp; {{VPAYVOU_Remarks}}
+                                                </b>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:50%;text-align:left">
+                                                <b>
+                                                    Status &nbsp;{{VPAYVOU_StatusFlg}}
+                                                </b>
+
+
+                                            </td>
+                                        </tr>
+
+
+
+                                    </table>
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:65px"><b>NO.</b></td>
+                                            <td><b>Bank Name/ Account Number</b></td>
+                                            <td><b>Voucher Number</b></td>
+                                            <td><b>Applied Amount</b></td>
+                                            <td><b>Applied Date</b></td>
+                                            <td>
+                                                <b>Approved Amount</b>
+
+                                            </td>
+                                            <td ng-if="VPAYVOU_StatusFlg=='Approved'"><b>Approved Date</b></td>
+                                            <td><b>Checque Printed</b> </td>
+                                        </tr>
+                                        <tr ng-repeat="it in checkDetails">
+                                            <td>{{$index+1}}</td>
+                                            <td style="text-align:left">{{it.HRMBD_BankName}} / {{it.HRMBD_BankAccountNo}}</td>
+                                            <td>{{it.VPAYVOU_VoucherNo}}</td>
+                                            <td>{{it.VPAYVOU_AppliedAmount}}</td>
+                                            <td>{{it.VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}</td>
+                                            <td>{{it.VPAYVOU_ApprovedAmount}}</td>
+                                            <td ng-if="VPAYVOU_StatusFlg=='Approved'">{{it.VPAYVOU_UpdatedDate |date:'dd/MM/yyyy'}}</td>
+                                            <td>
+                                                <span ng-if="it.VPAYVOU_ChequePrintedFlg==true" style="color:green">
+                                                    &#9746;
+                                                </span>
+                                                <span ng-if="it.VPAYVOU_ChequePrintedFlg==false" style="color:red">
+                                                    &#9745;
+                                                </span>
+
+                                            </td>
+                                        </tr>
+
+
+                                    </table>
+                                    <table class="table table-responsive table-bordered" width="100%" ng-if="GRnDetails.length > 0">
+                                        <tr>
+                                            <th>
+                                                Sl No
+                                            </th>
+
+                                            <th>
+                                                GRN Number
+                                            </th>
+                                            <th>
+                                                Purchase Date
+                                            </th>
+
+                                            <th>Grn Actual Amount</th>
+                                            <th>Paid Amount</th>
+                                            <th>Grn Running Balance Amount</th>
+
+                                            <th>Voucher Balance</th>
+
+                                            <th>Remark</th>
+                                        </tr>
+                                        <tbody>
+                                            <tr ng-repeat="grn in GRnDetails">
+                                                <td style="width:1%;">{{$index+1}}</td>
+                                                <td>
+                                                    {{grn.INVMGRN_GRNNo}}
+                                                </td>
+                                                <td>
+                                                    {{grn.INVMGRN_PurchaseDate  |date:'dd/MM/yyyy'}}
+                                                    <span class="hidden">{{grn.INVMGRN_Id}}</span>
+
+                                                </td>
+                                                <td>
+                                                    {{grn.INVMGRN_ActualTotalAmount}}
+                                                </td>
+                                                <td>
+                                                    {{grn.INVMGRN_PaidAmount}}
+                                                </td>
+                                                <td>
+                                                    {{grn.RunningGRN_BalanceAmount}}
+                                                </td>
+                                                <td>
+                                                    {{grn.Voucherbalance}}
+                                                </td>
+                                                <td>
+                                                    {{grn.VPAYVOU_RemarksGRN}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                                <div class="col-sm-12">
+                                    <h5 class="text-center"> Approval Remark</h5>
+                                    <table class="table table-bordered table-condensed" width="100%" ng-if="projectlistTWO.length > 0">
+
+                                        <tr>
+                                            <th>
+                                                Sl NO
+                                            </th>
+                                            <th>
+                                                Approve By
+                                            </th>
+                                            <th>
+                                                Sanction Amount
+                                            </th>
+                                            <th>
+                                                Approval Remark
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
+                                        </tr>
+
+
+                                        <tbody>
+                                            <tr ng-repeat="user in projectlistTWO">
+                                                <td>
+                                                    {{$index+1}}
+                                                </td>
+                                                <td>
+                                                    {{user.IVRMSTAUL_UserName}}
+                                                </td>
+                                                <td>
+                                                    {{user.VPAYVOUAUT_SanctionedAmount}}
+                                                </td>
+                                                <td>
+                                                    {{user.VPAYVOUAUT_Remarks}}
+                                                </td>
+                                                <td>
+                                                    {{user.VPAYVOUAUT_StatusFlg}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

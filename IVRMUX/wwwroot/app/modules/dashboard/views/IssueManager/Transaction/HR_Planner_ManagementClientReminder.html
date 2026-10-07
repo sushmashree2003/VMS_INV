@@ -1,0 +1,1085 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+        .lessonplanner .file-blue:before {
+            content: 'Browse';
+            font-size: 13px;
+            text-align: center
+        }
+    </style>
+</head>
+<body>
+    <section class="content">
+        <div data-ng-init="loaddata()">
+            <form class="form-horizontal" role="form" name="myForm" novalidate>
+                <div class="box box-primary" ng-app="MyModule">
+                    <div class="box-header with-border">
+                        <div class="col-sm-4">
+                            <h3 class="box-title">
+                                GENERAL REMAINDER SETTINGS
+                            </h3>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox">
+                                <input type="checkbox" data-ng-model="setremind" ng-disabled="true" ng-click="clickreminder();">
+                                <span class="lbl padding-8"><b style="color:red">SET REMINDER</b></span>
+                            </label>
+                        </div>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+
+
+                                <div class="form-group" ng-show="setremind==true">
+                                  
+                                    <div>
+                                        <label class="control-label col-sm-4">Client Name:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <ui-select id="sel1" name="clientRaw" ng-model="$parent.ISMMCLT_Id" theme="bootstrap"
+                                                       ng-keyup="searchfilter($select,ts.optradio);" title="Select Client Name" ng-change="get_clientDetails(ISMMCLT_Id)"  ng-disabled="editflag==true" required>
+                                                <ui-select-match ng-trim="false" placeholder="Select Or Search Client Name">
+                                                    {{$select.selected.ISMMCLT_ClientName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="client in Clientlist | filter: $select.search" value="{{client.ISMMCLT_Id}}"
+                                                                   ng-selected="{{client.Selected == true}}">
+                                                    <div ng-bind-html="client.ISMMCLT_ClientName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.clientRaw)"
+                                                 ng-messages="myForm.clientRaw.$error">
+                                                <div ng-message="required">select Client Name</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==true">
+                                    <label class="control-label col-sm-4"> Invoice No.:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ISMPRINC_Id" ng-change="OnchageInvoice(ISMPRINC_Id)" name="cp_name" required>
+                                            <option value="">--Select Invoice No.--</option>
+                                            <option ng-repeat="cp in Performadetails" value="{{cp.ISMPRINC_Id}}" ng-selected="{{cp.ISMPRINC_Id==ISMPRINC_Id}}">
+                                                {{cp.ISMPRINC_PrInviceNo}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cp_name)" ng-messages="myForm.cp_name.$error">
+                                        <div ng-message="required">Select Invoice No.</div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="setremind==true">
+                                    <label class="control-label col-sm-4"> Template Name :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="VMSMOUT_Id" ng-change="OnTemplatename()" name="cp_nadme" ng-disabled="!hrplmG_MeetingDateTime" required>
+                                            <option value="">--Select Template Name.--</option>
+                                            <option ng-repeat="cp in Templatedetails" value="{{cp.VMSMOUT_Id}}" ng-selected="{{cp.VMSMOUT_Id==VMSMOUT_Id}}">
+                                                {{cp.VMSMOUT_Name}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cp_nadme)" ng-messages="myForm.cp_nadme.$error">
+                                        <div ng-message="required">Select Template Name.</div>
+                                    </div>
+                                </div>
+                                <!--<div class="form-group" ng-show="setremind==true">
+                                    <label class="control-label col-sm-4"> Template Name :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="VMSMOUT_Id" ng-change="OnchageInvoice()"  name="cp_snccame" required>
+                                            <option value="">--Select Template.--</option>
+                                            <option ng-repeat="cp in Templatedetails" value="{{cp.VMSMOUT_Id}}" ng-selected="{{cp.VMSMOUT_Id==VMSMOUT_Id}}">
+                                                {{cp.VMSMOUT_Name}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cp_snccame)" ng-messages="myForm.cp_snccame.$error">
+                                        <div ng-message="required">Select Template Name.</div>
+                                    </div>
+                                </div>-->
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" ng-show="setremind==false">Planner Name :<span style="color:Red">*</span></label>
+                                    <label class="control-label col-sm-4" ng-show="setremind==true">Remainder Name :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="plannername" placeholder="Enter  Name" maxlength="70" ng-model="hrplmG_PlannerName" required>
+                                        <div class="error-messages" ng-if="interacted(myForm.plannername)" ng-messages="myForm.plannername.$error">
+                                            <div ng-message="required" ng-show="setremind==false">Please Enter  Name</div>
+                                            <div ng-message="required" ng-show="setremind==true">Please Enter  Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label class="control-label col-sm-4">Meeting Person Name:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="persionname" placeholder="Enter Meeting Person Name" maxlength="70" ng-model="hrplmG_MeetingPersonName" ng-required="setremind==false">
+                                        <div class="error-messages" ng-if="interacted(myForm.persionname)" ng-messages="myForm.persionname.$error">
+                                            <div ng-message="required">Please Enter Meeting Person Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label class="control-label col-sm-4">Meeting Address :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="address" placeholder="Enter Meeting Address" ng-maxlength="70" ng-model="hrplmG_MeetingAddress" ng-required="setremind==false">
+                                        <div class="error-messages" ng-if="interacted(myForm.address)" ng-messages="myForm.address.$error">
+                                            <div ng-message="required">Please Enter Meeting Address</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label class="control-label col-sm-4">Meeting Purpose :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="purpose" placeholder="Enter Meeting Purpose" ng-maxlength="70" ng-model="hrplmG_MeetingPurpose" ng-required="setremind==false">
+                                        <div class="error-messages" ng-if="interacted(myForm.purpose)" ng-messages="myForm.purpose.$error">
+                                            <div ng-message="required">Please Enter Meeting Purpose</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Entry Date: <strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker name="sch_date" ng-model="hrplmG_EntryDateTime" ng-disabled="true" md-placeholder="Entry date" onkeydown="return false" required> </md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==false">
+                                    <div>
+                                        <div class="col-sm-4">
+                                            <label class="control-label">Remainder Schedule Period:<span style="color:red;">*</span></label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" name="schedule" ng-model="hrplmG_ReminderSchedule" ng-required="setremind==false">
+                                                <option value="">--Select Scheduler Period--</option>
+                                                <option value="0">None</option>
+                                                <option value="1">On Time</option>
+                                                <option value="15">15 mins before </option>
+                                                <option value="1800">30 hours before </option>
+                                                <option value="7200">5 days before </option>
+
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.schedule)" ng-messages="myForm.schedule.$error">
+                                                <div ng-message="required">Please Select Remainder Schedule Period</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==true">
+                                    <div>
+                                        <div class="col-sm-4">
+                                            <label class="control-label">Remainder  Day:<span style="color:red;">*</span></label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <input type="number" class="form-control" ng-model="reminderdays" name="dddddd" ng-required="setremind==true" />
+                                            <div class="error-messages" ng-if="interacted(myForm.dddddd)" ng-messages="myForm.dddddd.$error">
+                                                <div ng-message="required">Remainder  Day</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">Repeat Flag :<span style="color:red;">*</span></label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="repeat" ng-model="hrplmG_RepeatFlag" ng-change="onflagchange(hrplmG_RepeatFlag)" required>
+                                            <option value="">--Select Repeat Flag--</option>
+                                            <option value="Never">Never</option>
+                                            <option value="Daily up to start date" ng-show="setremind==false">Daily up to start date</option>
+                                            <option value="Daily up to end date" ng-show="setremind==false">Daily up to end date</option>
+                                            <option value="Repeat" ng-show="setremind==true">Repeat</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.repeat)" ng-messages="myForm.repeat.$error">
+                                            <div ng-message="required">Please Select Repeat Flag</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label class="control-label col-sm-4">Meeting Start Time :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div uib-timepicker name="Ml_time" ng-model="hrplmG_MeetingStartTime" show-meridian="ismeridian1" ng-required="setremind==false"></div>
+                                        <div class="error-messages" ng-if="interacted(myForm.Ml_time)" style="width: 100px;" ng-messages="myForm.Ml_time.$error">
+                                            <div ng-message="required">Enter Meeting Start Time</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label class="control-label col-sm-4">Meeting End Time :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div uib-timepicker name="ME_time" ng-model="hrplmG_MeetingEndTime" show-meridian="ismeridian1" ng-required="setremind==false"></div>
+                                        <div class="error-messages" ng-if="interacted(myForm.ME_time)" style="width: 100px;" ng-messages="myForm.ME_time.$error">
+                                            <div ng-message="required">Enter Meeting End Time</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label for="sel2" class="control-label col-sm-4">Select Employee Name: <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <label class="checkbox-inline padding-left-none">
+                                            <input type="checkbox" name="Typeemp" ng-model="employeeck" data-ng-click="all_check_Emp()">
+                                            <span class="lbl padding-8">All</span>
+                                        </label>
+                                        <div class="multiselect col-sm-8">
+                                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                            <label data-ng-model="hrmEId" ng-repeat="emp in employeelist| filter:search" value="{{emp.hrmE_Id}}">
+                                                <input name="lvemp" value="1" ng-model="emp.selected" type="checkbox" ng-required="isOptionsRequired();" ng-click="emptogchkbx();">
+                                                <span class="lbl padding-8">
+                                                    {{emp.hrmE_EmployeeFirstName}} {{emp.hrmE_EmployeeMiddleName}} {{emp.hrmE_EmployeeLastName}}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="error-messages" ng-if="interacted(myForm.lvemp)" ng-messages="myForm.lvemp.$error">
+                                            <div ng-message="required">Please Select Employee Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--<div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">Employee :<span style="color:red;">*</span></label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="employee" ng-model="hrmE_Id" required>
+                                            <option value="">--Select Employee--</option>
+                                            <option ng-repeat="emp in employeelist" ng-selected="{{emp.Selected == true}}" value="{{emp.hrmE_Id}}">
+                                                {{emp.hrmE_EmployeeFirstName}} {{emp.hrmE_EmployeeMiddleName}} {{emp.hrmE_EmployeeLastName}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                            <div ng-message="required">Please Select Employee</div>
+                                        </div>
+                                    </div>
+                                </div>-->
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" ng-show="setremind==false"> Details :<span style="color:Red">*</span></label>
+                                    <label class="control-label col-sm-4" ng-show="setremind==true"> Remainder Subject :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="plannerdetails" placeholder="Enter  Details" maxlength="70" ng-model="hrplmG_PlannerDetails" required>
+                                        <div class="error-messages" ng-if="interacted(myForm.plannerdetails)" ng-messages="myForm.plannerdetails.$error">
+                                            <div ng-message="required">Please Enter  Details</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label class="control-label col-sm-4">Contact No. :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="contact" placeholder="Enter Contact No." maxlength="10" ng-minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d" ng-model="hrplmG_ContactNo" ng-required="setremind==false">
+                                        <div class="error-messages" ng-if="interacted(myForm.contact)" ng-messages="myForm.contact.$error">
+                                            <div ng-message="required">Please Enter Contact No.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" ng-show="setremind==false">Meeting Date:<strong style="color:red;">*</strong></label>
+                                    <label class="control-label col-sm-4" ng-show="setremind==true">Due Date:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker name="g_date" ng-model="hrplmG_MeetingDateTime" md-placeholder=" Date" md-min-date="mindate" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.g_date)" ng-messages="myForm.g_date.$error">
+                                            <div ng-message="required">Select Date</div>
+                                            <div ng-message="valid">The entered value is not a date!</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="setremind==false">
+                                    <label class="control-label col-sm-4">Persons Accompanying :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="accompanying" placeholder="Enter Persons Accompanying" ng-maxlength="70" ng-model="hrplmG_PersonsAccompanying" ng-required="setremind==false">
+                                        <div class="error-messages" ng-if="interacted(myForm.accompanying)" ng-messages="myForm.accompanying.$error">
+                                            <div ng-message="required">Please Enter Persons Accompanying</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Remarks :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="remarks" placeholder="Enter Remarks" ng-maxlength="70" ng-model="hrplmG_Remarks" required>
+                                        <div class="error-messages" ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                            <div ng-message="required">Please Enter Remarks</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">Remainder Flag :<span style="color:red;">*</span></label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="reminder" ng-model="hrplmG_ReminderFlag" required>
+                                            <option value="">--Select Remainder Flag--</option>
+                                            <option value="Day" ng-show="setremind==false">Day</option>
+                                            <option value="Hr" ng-show="setremind==false">Hr</option>
+                                            <option value="Min" ng-show="setremind==false">Min</option>
+                                            <option value="Daily" ng-show="setremind==true && hrplmG_RepeatFlag!='Never'">Daily</option>
+                                            <!--<option value="Weekly" ng-show="setremind==true">Weekly</option>-->
+                                            <option value="Monthly" ng-show="setremind==true && hrplmG_RepeatFlag!='Never'">Monthly</option>
+                                            <option value="Quarterly" ng-show="setremind==true && hrplmG_RepeatFlag!='Never'">Quarterly</option>
+                                            <option value="Half Yearly" ng-show="setremind==true && hrplmG_RepeatFlag!='Never'">Half Yearly</option>
+                                            <option value="Yearly" ng-show="setremind==true && hrplmG_RepeatFlag!='Never'"> Yearly</option>
+                                            <option value="None" ng-show="setremind==true && hrplmG_RepeatFlag=='Never'"> None</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.reminder)" ng-messages="myForm.reminder.$error">
+                                            <div ng-message="required">Please Select Remainder Flag</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" style="font-weight:600">Last Payment Date/Remainder Completed Date: </label>
+                                    <div class="col-sm-4">
+                                        <md-datepicker name="sch_datess" ng-model="HRPLMG_PaidDate" md-placeholder="Payment date" md-max-date="today" onkeydown="return false"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sch_datess)" ng-messages="myForm.sch_datess.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="setremind==false">
+                            <div class="col-sm-12">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title"> Documents Upload </h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body margin-top-10">
+                                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>SL.NO.</th>
+                                                    <th style="width:21%">UPLOAD</th>
+                                                    <!--<th>DOCUMENT NAME</th>
+                                                    <th>DESCRIPTION</th>-->
+                                                    <th>VIEW</th>
+                                                    <th>ACTION</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="materal in materaldocuupload" ng-class-odd="'odd'">
+                                                    <td class="text-center">{{ $index + 1 }}</td>
+
+                                                    <td class="text-center lessonplanner">
+                                                        <input class="custom-file-input file-blue text-center" id="{{materal.cfilepath}}"
+                                                               data-ng-model="materal.cfilepath" type="file"
+                                                               accept="image/*, application/pdf,application/msword,video/mp4,application/vnd.ms-powerpoint,
+                                                               application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                               application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                                               application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                               application/vnd.ms-excel"
+                                                               name="filetypematerial{{$index}}"
+                                                               onchange="angular.element(this).scope().uploadmateraldocuments(this, angular.element(this).scope().materal)">
+                                                        <div class="error-messages" ng-if="interacted(myForm['filetypematerial'+$index])"
+                                                             ng-messages="myForm['filetypematerial'+$index].$error">
+                                                            <div ng-message="required">Upload File</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span ng-if="materal.cfilepath !=null && materal.cfilepath !=''">
+                                                            <a ng-if="materal.filetype=='jpg' || materal.filetype=='png' ||
+                                                               materal.filetype=='svg'|| materal.filetype=='jpeg'
+                                                               || materal.filetype=='gif'"
+                                                               style="color:red;display:inline; font-weight: bolder;"
+                                                               data-ng-click="showmothersign(materal.cfilepath,materal.cfilename)">
+                                                                Image
+                                                            </a>
+                                                            <a ng-if="materal.filetype=='mp4' || materal.filetype=='mp4'"
+                                                               style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                                               ng-click="showGuardianPhotonew(materal)">
+                                                                Video
+                                                            </a>
+                                                            <a ng-if="materal.filetype=='pdf'" style="color:blue;display:inline;" ng-click="onview(materal.cfilepath,materal.cfilename)">
+                                                                <!--ng-click="downloadview(materal.cfilepath,materal.cfilename)">-->
+
+                                                                <b style="color:orangered;display:inline; ">Pdf</b>
+                                                            </a>
+                                                            <a ng-if="materal.filetype=='doc'|| materal.filetype=='docx'"
+                                                               style="color:blue;display:inline;"
+                                                               href="{{materal.document_Pathnew}}" target="_blank">
+                                                                <b style="color:orangered;display:inline;">Document</b>
+                                                            </a>
+                                                            <a ng-if="materal.filetype=='ppt'|| materal.filetype=='pptx'"
+                                                               style="color:blue;display:inline;"
+                                                               href="{{materal.document_Pathnew}}" target="_blank">
+                                                                <b style="color:orangered;display:inline;">PPT</b>
+                                                            </a>
+                                                            <a ng-if="materal.filetype=='xls'|| materal.filetype=='xlsx'"
+                                                               style="color:blue;display:inline;"
+                                                               href="{{materal.document_Pathnew}}" target="_blank">
+                                                                <b style="color:orangered;display:inline;">Excel</b>
+                                                            </a>
+                                                        </span>
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        <span class="" ng-hide="materaldocuupload.length > 99">
+                                                            <a href="" ng-show="$last" ng-click="addmateral()">
+                                                                <i class="fa fa-plus"></i>
+                                                            </a>
+                                                        </span>
+                                                        <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                            <a href="" ng-click="removemateral($index)">
+                                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="setremind==true">
+                            <div class="col-sm-12">
+                                <md-subheader>REMAINDER DETAILS</md-subheader>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-11" style="font-weight:bold">Remainder Details/Description:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-11">
+                                            <textarea type="text" class="form-control active" name="cccc" placeholder="Enter Remainder Content" ng-model="HRPLMG_ReminderContent" rows="10" ng-required="setremind==true"></textarea>
+                                            <div class="error-messages" ng-if="interacted(myForm.cccc)" ng-messages="myForm.cccc.$error">
+                                                <div ng-message="required">Remainder Content</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group" data-ng-repeat="mobilestd in mobilesstd  track by $index|filter:nameText">
+                                        <!--ng-form="myForm1"--> <!--ng-disabled="!myForm1"-->
+                                        <label class="control-label col-sm-4">
+                                            Mobile No:<!--<strong style="color:red;">*</strong>-->
+                                        </label>
+                                        <div class="col-sm-8 input-group" style="">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-tablet"></i>
+                                            </div>
+                                            <input name="stumobno" type="text" id="reservation" class="form-control"
+                                                   ng-model="mobilestd.hrmemnO_MobileNo" maxlength="10" ng-minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d" ng-blur="chkdup_mob(mobilesstd[$index],$index)">
+                                            <span ng-show="$last" class="input-group-addon" ng-hide="mobilesstd.length ==100">
+                                                <a href="" ng-click="addNewMobile1std(curval1std)" style="color:#000;">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="input-group-addon" id="remove" ng-hide="mobilesstd.length ==1">
+                                                <a href="" ng-click="removeNewMobile1std($index,mobilesstd[$index])" style="color:#000;">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-8  col-sm-offset-4 error-messages" ng-if="interacted1(myForm1.stumobno)" ng-messages="myForm1.stumobno.$error">
+                                            <div ng-message="pattern">Enter Valid Mobile number</div>
+                                            <div ng-message="required">Enter mobile number</div>
+                                            <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                            <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                            <div ng-message="show">Both are Same</div>
+                                            <div class="col-sm-12  col-sm-offset-9 error-messages" ng-if="interacted1(myForm1.type)" ng-messages="myForm1.type.$error">
+                                                <div ng-message="required">Select Type</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-group" data-ng-repeat="emailstd in emailsstd track by $index|filter:nameText" ng-form="myForm1">
+                                        <label class="control-label col-sm-4">
+                                            Email Id:<!--<strong style="color:red;">*</strong>-->
+                                        </label>
+                                        <div class="col-sm-8 input-group" style="">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-envelope-o"></i>
+                                            </div>
+                                            <input class="form-control active" name="EmailId" id="reservation" type="email"
+                                                   data-ng-model="emailstd.hrmeM_EmailId" maxlength="50"
+                                                   ng-blur="chkdup_email(emailsstd[$index],$index)"
+                                                   ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/">
+                                            <span ng-show="$last" ng-disabled="!myForm1" class="input-group-addon" ng-hide="emailsstd.length ==100">
+                                                <a href="" ng-show="showAddEmail1std(emailstd)" ng-click="addNewEmail1std()" style="color:#000;">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="input-group-addon" id="remove" ng-hide="emailsstd.length ==1">
+                                                <a href="" ng-click="removeNewEmail1std($index,emailsstd[$index])" style="color:#000;">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-8  col-sm-offset-4 error-messages" ng-if="interacted1(myForm1.EmailId)" ng-messages="myForm1.EmailId.$error">
+                                            <div ng-message="required">Enter Email-Id</div>
+                                            <div ng-message="pattern">Enter Valid Email-id</div>
+                                            <div ng-message="show">Both are Same</div>
+                                        </div>
+                                        <div class="col-sm-12  col-sm-offset-10 error-messages" ng-if="interacted1(myForm1.type)" ng-messages="myForm1.type.$error">
+                                            <div ng-message="required">Select Type</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-condensed table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL.No</th>
+                                            <th>Employee Name<span style="color:Red">*</span></th>
+                                            <th>Employee Email<span style="color:Red">*</span></th>
+                                            <th>Remainder days<span style="color:Red">*</span></th>
+                                            <th>Level<span style="color:Red">*</span></th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="data in multipleuserlevel" ng-class-odd="'odd'">
+                                            <td class="text-center">
+                                                {{$index+1}}
+                                            </td>
+                                            <td>
+                                                <select class="form-control" name="empname" ng-model="data.userId" ng-change="getmailid(data.userId,data)">
+                                                    <option value="">--Select Employee--</option>
+                                                    <option ng-repeat="option in data.employeelistdata" value="{{option.userId}}" ng-selected="{{option.userId == data.userId}}">
+                                                        {{option.hrmE_EmployeeFirstName}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted(myForm.empname)" ng-messages="myForm.empname.$error">
+                                                    <div ng-message="required">Please Select Employee</div>
+                                                </div>
+                                                <!--<div class="multiselect col-sm-8" style="text-align: left;">
+                                                    <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                                    <label class="checkbox-inline text-left ">
+                                                        <b>
+                                                            <input type="checkbox" name="Typeemp" ng-model="obj.employeeck1" data-ng-click="all_check_Emp1()">
+                                                            <span class="lbl padding-6">All</span>
+                                                        </b>
+                                                    </label>
+                                                    <label ng-model="data.userId" ng-repeat="emp in employeelistdata| filter:search" value="{{emp.userId}}">
+                                                        <input name="lvemp1" value="1" ng-model="emp.selected" type="checkbox" ng-required="isOptionsRequired1();" ng-click="emptogchkbx1();">
+                                                        <span class="lbl padding-8">
+                                                            {{emp.hrmE_EmployeeFirstName}}
+                                                        </span>
+                                                    </label>
+                                                </div>-->
+                                            </td>
+                                            <td>
+                                                <input class="form-control" name="days" id="catgry2" type="text" ng-model="data.employeeEmail" ng-disabled="true">
+
+                                            </td>
+                                            <td>
+                                                <input class="form-control" name="days" id="catgry2" type="text" ng-model="data.hrplmgapP_MaxApprovalDays" placeholder="Enter No Of Days" maxlength="3" ng-change="reminderdaysmincheck(data)" allow-pattern="\d" required>
+                                                <div class="error-messages" ng-if="interacted(myForm.days)" ng-messages="myForm.days.$error">
+                                                    <div ng-message="required">Please Enter No Of Days</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <!--<input class="form-control" name="days" id="catgry2" type="text" ng-model="data.hrplmgapP_ApprovalAlevel" maxlength="3" allow-pattern="\d">-->
+                                                <select class="form-control" name="levels" ng-model="data.hrplmgapP_ApprovalAlevel" required>
+                                                    <option value="">--Select Level--</option>
+                                                    <option value="1">Level 1</option>
+                                                    <option value="2">Level 2</option>
+                                                    <option value="3">Level 3</option>
+                                                    <option value="4">Level 4</option>
+                                                    <option value="5">Level 5</option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted(myForm.levels)" ng-messages="myForm.levels.$error">
+                                                    <div ng-message="required">Please Select Levels</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    <a href="" ng-show="$last" ng-click="addgrnrows(data)">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="" id="remove" ng-hide="multipleuserlevel.length ==1">
+                                                    <a href="" ng-click="removegrnrows($index,objg)">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="text-center">
+                            <input type="hidden" ng-model="hrplmG_Id" value="{{hrplmG_Id}}" />
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <!--ng-show='setremind==true && griddata.length>0'-->
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="box box-primary" ng-show="disabledata && setremind==false">
+            <div class="box-header with-border">
+                <h3 class="box-title">Planner Details</h3>
+                <div class="box-tools pull-right">
+
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-condensed table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sort('sno')">SL.No.</a>
+                            </th>
+                            <th width="15%"><a href="" ng-click="sort('hrmE_EmployeeFirstName')">Employee Name</a></th>
+                            <th width="15%"><a href="" ng-click="sort('hrplmG_PlannerName')">Planner Name</a></th>
+                            <th><a href="" ng-click="sort('hrplmG_PlannerDetails')">Planner Details</a> </th>
+                            <th width="8%"><a href="" ng-click="sort('hrplmG_MeetingPersonName')">Meeting Person Name</a> </th>
+                            <th><a href="" ng-click="sort('hrplmG_ContactNo')">Contact No</a></th>
+                            <th><a href="" ng-click="sort('hrplmG_MeetingDateTime')">Meeting Date</a> </th>
+                            <th><a href="" ng-click="sort('hrplmG_MeetingDateTime')">Files</a> </th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue = (griddata | filter : searchValue)| orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td hidden="hidden">{{user.hrplmG_Id}}</td>
+                            <td class="text-left">{{user.hrmE_EmployeeFirstName}}</td>
+                            <td class="text-left">{{user.hrplmG_PlannerName}}</td>
+                            <td class="text-left">{{user.hrplmG_PlannerDetails}}</td>
+                            <td class="text-left">{{user.hrplmG_MeetingPersonName}}</td>
+                            <td class="text-left">{{user.hrplmG_ContactNo}}</td>
+                            <td class="text-left">{{user.hrplmG_MeetingDateTime|date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="viewdocument(user);"> <i class="fa fa-eye text-blue"></i></a>
+                            </td>
+                            <td class="text-center">
+                                <span ng-if="user.hrplmG_ActiveFlag === true">
+                                    <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                    <a href="javascript:void(0)" ng-click="Deletedata(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show='setremind==true && griddata.length>0'>
+            <div class="box-header with-border">
+                <h3 class="box-title">Planner Details</h3>
+                <md-button type="button" style="margin-left:20px" ng-click="exportToExcel();" target="_blank" class="md-raised md-primary" ng-show="setremind==true && griddata.length > 0">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export to Excel
+                </md-button>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <!-----excel------>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sort('sno')">SL.No.</a>
+                            </th>
+                            <th width="15%"><a href="" ng-click="sort('hrplmG_PlannerName')">Remainder Name</a></th>
+                            <th><a href="" ng-click="sort('hrplmG_PlannerDetails')"> Details</a> </th>
+                            <!--<th><a href="" ng-click="sort('hrplmG_ReminderContent')"> Content</a> </th>-->
+                            <th width="12%"><a href="" ng-click="sort('hrplmG_ReminderFlag')"> Remainder Details</a> </th>
+                            <!--<th><a href="" ng-click="sort('hrplmG_ReminderFlag')"> Reminder Type</a> </th>
+                            <th><a href="" ng-click="sort('hrplmG_RepeatFlag')"> Reminder Flag</a> </th>-->
+                            <th width="8%"><a href="" ng-click="sort('hrplmG_ReminderToEmailid')">Email Id's</a> </th>
+                            <th><a href="" ng-click="sort('hrplmG_ReminderToMobileNo')">Mobile Numbers</a></th>
+                            <th><a href="" ng-click="sort('hrplmG_MeetingDateTime')">Due Date</a> </th>
+                            <th><a href="" ng-click="sort('hrplmG_ReminderContent')"> Content</a> </th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue = (griddata | filter : searchValue)| orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-left">{{user.hrplmG_PlannerName}}</td>
+                            <td class="text-left">{{user.hrplmG_PlannerDetails}}</td>
+                            <!--<td class="text-left">{{user.hrplmG_ReminderContent}}</td>-->
+                            <td class="text-left">
+                                Days :{{ user.hrplmG_ReminderSchedule}}<br /><br />
+                                Type :{{ user.hrplmG_ReminderFlag}}<br /><br />
+                                Flag :{{ user.hrplmG_RepeatFlag}}
+                            </td>
+
+                            <!--<td class="text-left">{{user.hrplmG_ReminderFlag}}</td>
+                            <td class="text-left">{{user.hrplmG_RepeatFlag}}</td>-->
+                            <td class="text-left">
+
+                                <span ng-repeat="x in user.hrplmG_ReminderToEmailid.split(',')">
+
+                                    {{x}}<br />
+                                </span>
+                            </td>
+                            <td class="text-left">
+                                <span ng-repeat="x in user.hrplmG_ReminderToMobileNo.split(',')">
+                                    {{x}}<br />
+                                </span>
+                            </td>
+                            <td class="text-left">{{user.hrplmG_MeetingDateTime|date:'dd/MM/yyyy'}}</td>
+                            <td class="text-left">
+                                <a class="text-primary" data-placement="bottom" data-="" title="View Details" ng-click="ViewContent(user)">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <span ng-if="user.hrplmG_ActiveFlag === true">
+                                    <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                &nbsp;
+                                <span ng-if="user.hrplmG_ActiveFlag === false">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.hrplmG_ActiveFlag === true">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+                <div ng-show="false">
+                    <table id="printDeviation" class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Sl No
+                                </th>
+
+                                <th width="15%">Remainder Name</th>
+                                <th> Details</th>
+                                <!--<th>Content </th>-->
+                                <th>Remainder Days </th>
+                                <th> Remainder Type </th>
+                                <th>Remainder Flag</th>
+                                <th width="8%">EMAIL ID's </th>
+                                <th>Mobile Numbers</th>
+                                <th>Due Date </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in griddata">
+                                <td class="text-left">{{$index+1}}</td>
+                                <td class="text-left">{{user.hrplmG_PlannerName}}</td>
+                                <td class="text-left">{{user.hrplmG_PlannerDetails}}</td>
+                                <!--<td class="text-left">{{user.hrplmG_ReminderContent}}</td>-->
+                                <td class="text-left">{{user.hrplmG_ReminderSchedule}}</td>
+                                <td class="text-left">{{user.hrplmG_ReminderFlag}}</td>
+                                <td class="text-left">{{user.hrplmG_RepeatFlag}}</td>
+                                <td class="text-left">{{user.hrplmG_ReminderToEmailid}}</td>
+                                <td class="text-left">{{user.hrplmG_ReminderToMobileNo}}</td>
+                                <td class="text-left">{{user.hrplmG_MeetingDateTime|date:'dd/MM/yyyy'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                    <h4 class="modal-title text-white">VIEW UPLOADED FILE</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body margin-top-10">
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO</th>
+                                    <th>FILE NAME</th>
+                                    <th>VIEW</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="documents in uploaddocfiles">
+                                    <td class="text-center">{{ $index + 1 }}</td>
+                                    <td class="text-left">{{documents.cfilename}}</td>
+                                    <!--<td class="text-left">{{documents.cfiledesc}}</td>-->
+                                    <td class="text-center">
+                                        <span ng-if="documents.cfilepath !=null && documents.cfilepath !=''">
+                                            <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||                                                 documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                               style="color:red;display:inline; font-weight: bolder;"
+                                               data-ng-click="showmothersign(documents.cfilepath,documents.cfilename)">
+                                                <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" />
+                                            </a>
+                                            <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                               style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                               ng-click="showGuardianPhotonew(documents)">
+                                                <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" />
+                                            </a>
+                                            <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                               ng-click="onview(documents.cfilepath,documents.cfilename)">
+                                                <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" />
+                                            </a>
+                                            <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                               href="{{documents.document_Pathnew}}" target="_blank">
+                                                <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" />
+                                            </a>
+                                            <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                               href="{{documents.document_Pathnew}}" target="_blank">
+                                                <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" />
+                                            </a>
+                                            <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                               style="color:blue;display:inline;"
+                                               href="{{documents.document_Pathnew}}" target="_blank">
+                                                <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" />
+                                            </a>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span>
+                                            <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal"
+                                               ng-click="deleteuploadfile(documents)">
+                                                <img class="imgpfgdownload" src="/images/Naac/delete.png" title="Delete" />
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myModalimg" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img id="preview1" class="img-responsive" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade modal-small" id="popup15" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            </div>
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div ng-repeat="vi1 in view_videos" style="padding-bottom:20px">
+                        <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                            <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                            Your browser does not support HTML5 video.
+                        </video>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="clearpopupgrid15()" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="showpdf" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <!--<embed ng-src="{{content}}" style="width: 100%;" height="1000" />
+                <div class="modal-body" oncontextmenu="return false"></div>-->
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--updated excel-->
+    <div ng-show="false">
+        <table id="printDeviation" class="table table-hover table-responsive table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        SL.No.
+                    </th>
+
+                    <th width="15%">Remainder Name</th>
+                    <th> Details</th>
+                    <!--<th>Content </th>-->
+                    <th>Remainder Days </th>
+                    <th> Remainder Type </th>
+                    <th>Remainder Flag</th>
+                    <th width="8%">EMAIL ID's </th>
+                    <th>Mobile Numbers</th>
+                    <th>Due Date </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in griddata">
+                    <td class="text-left">{{$index+1}}</td>
+                    <td class="text-left">{{user.hrplmG_PlannerName}}</td>
+                    <td class="text-left">{{user.hrplmG_PlannerDetails}}</td>
+                    <!--<td class="text-left">{{user.hrplmG_ReminderContent}}</td>-->
+                    <td class="text-left">{{user.hrplmG_ReminderSchedule}}</td>
+                    <td class="text-left">{{user.hrplmG_ReminderFlag}}</td>
+                    <td class="text-left">{{user.hrplmG_RepeatFlag}}</td>
+                    <td class="text-left">{{user.hrplmG_ReminderToEmailid}}</td>
+                    <td class="text-left">{{user.hrplmG_ReminderToMobileNo}}</td>
+                    <td class="text-left">{{user.hrplmG_MeetingDateTime|date:'dd/MM/yyyy'}}</td>
+
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>
+
+
+<div id="myModal1" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width:1300px !important">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+
+            </div>
+            <div class="modal-body">
+                <div id="LeadIntimate" contenteditable="true">
+
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="SaveModal()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    SAVE
+                </md-button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="popup1111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">VIEW CONTENT</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                   
+                    <div ng-bind-html="htmlText"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

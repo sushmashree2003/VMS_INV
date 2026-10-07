@@ -1,0 +1,280 @@
+﻿<style>
+    .multiselect {
+        width: 21.8em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+    }
+</style>
+
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Task Category Check List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Department<span style="color:Red">*</span> :</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="HRMD_Id" name="dnm" ng-change="getcategory(HRMD_Id)" required>
+                                    <option value="">--Select Department Name--</option>
+                                    <option ng-repeat="option in departmentlist" ng-selected="{{option.hrmD_Id==HRMD_Id}}" value="{{option.hrmD_Id}}">{{option.mI_Name}} :: {{option.hrmD_DepartmentName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.dnm)" ng-messages="myForm.dnm.$error">
+                                    <div ng-message="required" style="color:red">Select Department Name</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Category<span style="color:red">*</span> :</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="ISMMTCAT_Id" name="catname" required>
+                                    <option value="">--Select Category Name--</option>
+                                    <option ng-repeat="cat in categorylist" ng-selected="{{cat.ismmtcaT_Id==ISMMTCAT_Id}}" value="{{cat.ismmtcaT_Id}}">{{cat.ismmtcaT_TaskCategoryName}}</option>
+                                </select>
+
+                                <div class="error-messages" ng-if="interacted(myForm.catname)" ng-messages="myForm.catname.$error">
+                                    <div ng-message="required" style="color:red">Please Select Category</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3"></div>
+                </div>
+                <hr />
+                <div class="well">
+                    <div class="text-center">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">SL.NO.</th>
+                                    <th style="width: 300px;">CheckList Name</th>
+                                    <th style="width: 300px;">Upload Flag</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="obj in transrows" ng-form="dataform1">
+                                    <td>{{$index+1}}</td>
+                                    <td>
+                                        <input class="form-control" type="text" ng-model="obj.ISMMTCATCL_CheckListName" name="ckname" required />
+                                        <div class="error-messages" ng-if="interacted(dataform1.ckname)" ng-messages="dataform1.ckname.$error">
+                                            <div ng-message="required">Enter CheckList Name</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" value="false" ng-model="obj.ISMMTCATCL_UploadEnterFlg" name="upflag" />
+                                        <span class="lbl padding-8"></span>
+                                        <div class="error-messages" ng-if="interacted(dataform1.upflag)" ng-messages="dataform1.upflag.$error">
+                                            <div ng-message="required">Select Upload Check Box </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="" ng-hide="prrows.length > 4 || editflag==true">
+                                            <span ng-show="!addro && !edits">
+                                                <a href="" ng-show="$last" ng-click="addprrows(obj)">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span ng-show="addro || edits">
+                                                <a href="">
+                                                    <i class="fa fa-ban"></i>
+                                                </a>
+                                            </span>
+                                            <span ng-show="!edits">
+                                                <span class="" id="remove" ng-hide="transrows.length ==1">
+                                                    <a href="" ng-click="removeprrows($index,objg)" ng-disabled="edits">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </td>
+                                    <td hidden="hidden">{{user.invtpR_Id}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="ISMMTCATCL_Id" />
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="save()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="showgridsave" ng-click="exportToExcel('#printareaId1')" ng-show="alldata1.length>0">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Master Task Category Check List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-primary" id="save-btn" ng-click="exportToExcel()">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>Export To Excel
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{checklist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <!--<div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>-->
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search.$" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-responsive table-bordered" style="margin-bottom: 5px !important;">
+                <thead>
+                    <tr style="background: aliceblue;">
+                        <th>
+                            <input class="form-control" ng-model="search.mI_Name" type="text" placeholder="Filter Institution">
+                        </th>
+                        <th>
+                            <input class="form-control" ng-model="search.hrmD_DepartmentName" type="text" placeholder="Filter Department">
+                        </th>
+                        <th>
+                            <input class="form-control" ng-model="search.ismmtcaT_TaskCategoryName" type="text" placeholder="Filter Task Category">
+                        </th>
+                        <th>
+                            <input class="form-control" ng-model="search.ismmtcatcL_CheckListName" type="text" placeholder="Filter Check List">
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th>Institution</th>
+                        <th>Department</th>
+                        <th>Task Category Name</th>
+                        <th>Check List Name</th>
+                        <th>Upload Flag</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (checklist | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td style="text-align:left">{{user.mI_Name}}</td>
+                        <td style="text-align:left">{{user.hrmD_DepartmentName}}</td>
+                        <td style="text-align:left">{{user.ismmtcaT_TaskCategoryName}}</td>
+                        <td style="text-align:left">{{user.ismmtcatcL_CheckListName}}</td>
+
+                        <td class="text-center">
+                            <span ng-if="user.ismmtcatcL_UploadEnterFlg==true">
+                                <a class="text-green" data-placement="bottom" data-toggle="tooltip">
+                                    <i class="fa fa-check text-green" title="Upload Required"></i>
+                                </a>
+                            </span>
+                            <span ng-if="user.ismmtcatcL_UploadEnterFlg==false">
+                                <a class="text-danger" data-placement="bottom" data-toggle="tooltip">
+                                    <i class="fa fa-times text-green" title="Upload Not Required"></i>
+                                </a>
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-if="!user.ismmtcatcL_ActiveFlag">
+                                <a href="" ng-click="deactivYTab1(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="activate">
+                                    <i class="fa fa-toggle-off" title="Active Record"></i>
+                                </a>
+                            </span>
+                            <span ng-if="user.ismmtcatcL_ActiveFlag">
+                                <a href="" ng-click="deactivYTab1(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="deactivate">
+                                    <i class="fa fa-toggle-on" title="Deactive Record"></i>
+                                </a>
+                            </span>
+                            |
+                            <a class="text-aqua" href="" ng-click="edittab1(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+            <table class="table table-bordered table-responsive" ng-hide="true" id="exportotexcel">
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>Sl.No.</th>
+                        <th>Institution</th>
+                        <th>Department</th>
+                        <th>Task Category Name</th>
+                        <th>Check List Name</th>
+                        <th>Upload Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border:0.5px solid black" ng-repeat="user in filterValue1 = (checklist_report | filter : search)  | orderBy:propertyName:reverse">
+                        <td>{{$index+1}}</td>
+                        <td style="text-align:left ; word-wrap:break-word">{{user.mI_Name}}</td>
+                        <td style="text-align:left; word-wrap:break-word">{{user.hrmD_DepartmentName}}</td>
+                        <td style="text-align:left; word-wrap:break-word">{{user.ismmtcaT_TaskCategoryName}}</td>
+                        <td style="text-align:left; word-wrap:break-word">{{user.ismmtcatcL_CheckListName}}</td>
+                        <td class="text-center">
+                            <span ng-if="user.ismmtcatcL_UploadEnterFlg==true">
+                                <b style="color:green">Upload Required</b>
+                            </span>
+                            <span ng-if="user.ismmtcatcL_UploadEnterFlg==false">
+                                <b style="color:brown">Text/Remarks Required</b>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

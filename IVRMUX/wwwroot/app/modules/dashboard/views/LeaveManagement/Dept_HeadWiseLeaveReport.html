@@ -1,0 +1,279 @@
+﻿
+
+<style>
+    .badge-success {
+        color: #fff;
+        background-color: #28a745;
+    }
+
+    .badge-primary {
+        color: #fff;
+        background-color: #007bff;
+    }
+
+    .badge-warning {
+        color: #1f2d3d;
+        background-color: #ffc107;
+    }
+
+    .badge-danger {
+        color: #fff;
+        background-color: #dc3545;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Department Wise Leave Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="col-sm-6">
+                        <div class="text-center">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 font-weight-bold">From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="getfromdate" name="date" onkeypress="return false" required></md-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="text-center">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 font-weight-bold">To Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="gettodate" name="date" onkeypress="return false" ng-change="getpresentabsentdetails()" required></md-datepicker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Admin Wise-->
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData()" ng-show="GetReport.length > 0">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+                <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel('#BankCash')" ng-show="GetReport.length > 0">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export To Excel
+                </md-button>
+            </div>
+
+            <!--Deaptment Wise-->
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData1()" ng-show="department.length > 0">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+                <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel1('#BankCash1')" ng-show="department.length > 0">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export To Excel
+                </md-button>
+            </div>
+
+            <!--Employeee Wise-->
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData1()" ng-show="employee.length > 0">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+                <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel2('#BankCash2')" ng-show="employee.length > 0">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export To Excel
+                </md-button>
+            </div>
+
+        </div>
+
+    </form>
+
+    <div class="box box-primary" ng-show="GetReport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Department wise Report list</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+     
+        <div class="box-body">
+
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="BankCash">
+                <div id="printDeviation" style="height:400px;overflow-x:auto;">
+                     <table class="table table-hover table-responsive table-bordered" >
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>Company Name</th>
+                            <th>Department</th>
+                            <th>Employee Name</th>
+                            <th>Leave Type</th>
+                            <th>Leave Reason</th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Leave Status</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in lengthval = (employeeid | filter : searchValueU)  | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.MI_Name}}</b></td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.HRMD_DepartmentName}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.EmployeeName}}</td>
+                        </tr>
+                        <tr ng-repeat="planner in user.plannerdetails">
+                           
+                            <td class="text-left">{{planner.HRML_LeaveName}}</td>
+                            <td class="text-left">{{planner.HRELAP_LeaveReason}}</td>
+                            <td class="text-left">{{planner.HRELAP_FromDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{planner.HRELAP_ToDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{planner.HRELAPD_LeaveStatus}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="department">
+        <div class="box-header with-border">
+            <h3 class="box-title">Department Wise Report list</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+     
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="BankCash1">
+               <div id="printDeviation1" style="height:400px;overflow-x:auto;">
+                   <table class="table table-hover table-responsive table-bordered">
+                       <thead>
+                           <tr>
+                               <th>SL.No.</th>
+                               <th>Employee Name</th>
+                               <th>Leave Type</th>
+                               <th>Leave Reason</th>
+                               <th>From Date</th>
+                               <th>To Date</th>
+                               <th>Leave Status</th>
+                           </tr>
+                       </thead>
+
+                       <tbody ng-repeat="user in lengthval = (employeeid1 | filter : searchValueU)  | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                           <tr>
+                               <td class="text-center" rowspan="{{user.plannerdetails1.length+1}}">{{$index+1}}</td>
+                               <td class="text-left" rowspan="{{user.plannerdetails1.length+1}}"><b>{{user.EmployeeName}}</b></td>
+                               <td class="text-left" rowspan="{{user.plannerdetails1.length+1}}">{{user.HRML_LeaveName}}</td>
+                           </tr>
+                           <tr ng-repeat="planner in user.plannerdetails1">
+                               <td class="text-left">
+                                   <span ng-if="planner.HRELT_LeaveReason == planner.HRELT_LeaveReason">
+                                       {{planner.HRELT_LeaveReason}}
+                                   </span>
+
+                                   <span ng-if="planner.HRELT_LeaveReason != planner.HRELT_LeaveReason || planner.HRELT_LeaveReason == null">
+                                       ----
+                                   </span>
+                               </td>
+                               <td class="text-left">{{planner.HRELAPD_FromDate | date:'dd-MM-yyyy'}}</td>
+                               <td class="text-left">{{planner.HRELAPD_ToDate | date:'dd-MM-yyyy'}}</td>
+                               <td class="text-left">{{planner.HRELAPD_LeaveStatus}}</td>
+                           </tr>
+                       </tbody>
+                   </table>
+               </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="employee">
+        <div class="box-header with-border">
+            <h3 class="box-title">Leave Report list</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+ 
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="BankCash2">
+                <div id="printDeviation2" style="height:400px;overflow-x:auto;">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>Leave Type</th>
+                            <th>Leave Reason</th> 
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Leave Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody ng-repeat="user in lengthval = (employee | filter : searchValueU)  | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                        <tr>
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left">{{user.HRML_LeaveName}}</td>
+                            <td class="text-left">{{user.HRELAP_LeaveReason}}</td>
+                            <td class="text-left">{{user.HRELAP_FromDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{user.HRELAP_ToDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{user.HRELAPD_LeaveStatus}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

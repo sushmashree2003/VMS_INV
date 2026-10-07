@@ -1,0 +1,1244 @@
+﻿<style>
+    input[type="file"] {
+        display: none !important;
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e97a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+    element.style {
+        width: 100%;
+        padding-left: 29px;
+    }
+
+    .col-sm-5 {
+        width: 99.666667%;
+        border-radius: 40%;
+    }
+</style>
+<SCRIPT language=Javascript>
+      <!--
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+</SCRIPT>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" data-ng-init="load_date()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Lead Creation</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" value="1" ng-model="checkoruncheck" ng-checked="oncheck()">
+                            <span class="lbl padding-8">Channel Partner</span>
+                        </label>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="MI_Id" name="cmp" ng-change="getproduct(MI_Id)" required>
+                                    <option value="">--Select Company Name-- </option>
+                                    <option ng-repeat="cm in companylist" value="{{cm.mI_Id}}" ng-selected="{{cm.mI_Id==MI_Id}}">
+                                        {{cm.mI_Name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.cmp)" ng-messages="myForm.cmp.$error">
+                                <div ng-message="required">Select Company Name</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Raw Lead:</label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="clientRaw" ng-model="$parent.ISMSLERaw_Id" theme="bootstrap"
+                                                   ng-keyup="searchfilter($select,ts.optradio);" title="Select raw Lead Name" ng-change="get_rawDetails()" ng-disabled="validate==true" ng-required="validate==false">
+                                            <ui-select-match ng-trim="false" placeholder="Select Or Search raw Lead Name">
+                                                {{$select.selected.ISMSLERaw_LeadName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="catgry in finalleadlist | filter: $select.search" value="{{catgry.ISMSLERaw_Id}}"
+                                                               ng-selected="{{catgry.Selected == true}}">
+                                                <div ng-bind-html="catgry.ISMSLERaw_LeadName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.clientRaw)"
+                                             ng-messages="myForm.clientRaw.$error">
+                                            <div ng-message="required">select Raw Lead</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Source:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="source" ng-model="ISMSMSO_Id" ng-change="onchangesource(ISMSMSO_Id)" ng-disabled="ISMSLERaw_Id.ISMSLERaw_Id > 0 && ISMSMSO_Id > 0" required>
+                                            <option value="">--Select Source--</option>
+                                            <option ng-repeat="src in source_dd" value="{{src.ismsmsO_Id}}" ng-selected="{{src.ismsmsO_Id==ISMSMSO_Id}}">
+                                                {{src.ismsmsO_SourceName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.source)" ng-messages="myForm.source.$error">
+                                        <div ng-message="required">Select Source </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="checkoruncheck">
+                                    <label class="control-label col-sm-3">Channel Partner:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ISMSMCP_Id" ng-init="ISMSMCP_Id = checkoruncheck ? ISMSMCP_Id : 0" name="cp_name" required>
+                                            <option value="0">--Select Channel Partner--</option>
+                                            <option ng-repeat="cp in channalPatnerList" value="{{cp.ismsmcP_Id}}" ng-selected="{{cp.Selected}}">
+                                                {{cp.ismsmcP_ChannelPartnerName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.cp_name)" ng-messages="myForm.cp_name.$error">
+                                        <div ng-message="required">Select Channel Partner</div>
+                                    </div>
+                                </div>
+
+                                <!--ng-disabled="ISMSLERaw_Id.ISMSLERaw_Id > 0"-->
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Name of the Lead:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="LeadName" placeholder="Enter Lead Name" class="form-control" ng-model="ISMSLE_LeadName" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.LeadName)" ng-messages="myForm.LeadName.$error">
+                                        <div ng-message="required">Enter Name of the Lead</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Sales Lead Code:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <!--<input type="text" name="LeadNameCode" placeholder="Enter Lead Code" class="form-control" ng-model="ISMSLE_LeadCode" ng-disabled="ISMSLERaw_Id.ISMSLERaw_Id > 0" required />-->
+                                        <input type="text" name="LeadNameCode" placeholder="Enter Lead Code" class="form-control" ng-model="ISMSLE_LeadCode" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.LeadNameCode)"
+                                         ng-messages="myForm.LeadNameCode.$error">
+                                        <div ng-message="required">Enter Lead Code</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Telecaller:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="HRME_Id" name="tel" required>
+                                            <option value="">--Select Telecaller-- </option>
+                                            <option ng-repeat="tel in telecaller" value="{{tel.hrmE_Id}}" ng-selected="{{tel.hrmE_Id==HRME_Id}}">
+                                                {{tel.hrmE_EmployeeFirstName}}
+                                            </option>
+                                        </select>
+
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.tel)" ng-messages="myForm.tel.$error">
+                                        <div ng-message="required">Select Telecaller</div>
+                                    </div>
+                                </div>
+
+                                <!--<div class="form-group">
+                <label class="control-label col-sm-3">Telecaller:<span style="color:Red">*</span></label>
+
+                <div class="col-sm-8">
+                    <ui-select id="sel1" name="clientRaw" ng-model="$parent.HRME_IDS" theme="bootstrap"
+                               ng-keyup="searchfilter($select,ts.optradio);" title="Select Telecaller" ng-change="get_rawDetails()" ng-disabled="validate==true" ng-required="validate==false">
+                        <ui-select-match ng-trim="false" placeholder="Select Or Search Telecaller">
+                            {{$select.selected.hrmE_EmployeeFirstName}}
+                        </ui-select-match>
+                        <ui-select-choices repeat="catgry in telecaller  | filter: $select.search" value="{{catgry.hrmE_Id}}"
+                                           ng-selected="{{catgry.Selected == true}}">
+                            <div ng-bind-html="catgry.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                        </ui-select-choices>
+                    </ui-select>
+                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.clientRaw)"
+                         ng-messages="myForm.clientRaw.$error">
+                        <div ng-message="required">select Telecaller</div>
+                    </div>
+                </div>
+            </div>-->
+                                <div class="form-group">
+                                    <!--<label class="control-label col-sm-3">Visited Date</label>-->
+                                    <label class="control-label col-sm-3">Created Date:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker name="demodate1" ng-model="ISMSLE_VisitedDate" md-placeholder="Enter Date" onkeydown="return false" required></md-datepicker>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.demodate1)" ng-messages="myForm.demodate1.$error">
+                                        <!--<div ng-message="required">Select Visited Date </div>-->
+                                        <div ng-message="required">Select Created Date </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Contact Person:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" rows="4" placeholder="Enter Contact Person" name="personName" id="comment" ng-model="ISMSLE_ContactPerson" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.personName)" ng-messages="myForm.personName.$error">
+                                        <div ng-message="required">Enter Contact Person name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Designation:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" rows="4" placeholder="Enter Designation" name="ContactDesignation" class="form-control" ng-model="ISMSLE_ContactDesignation" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.ContactDesignation)" ng-messages="myForm.ContactDesignation.$error">
+                                        <div ng-message="required">Enter Designation</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <!--ng-disabled="ISMSLERaw_Id.ISMSLERaw_Id > 0"-->
+                                    <label class="control-label col-sm-3">Contact No:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" rows="4" placeholder="Enter Contact No" name="contact" ng-model="ISMSLE_ContactNo" maxlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.contact)" ng-messages="myForm.contact.$error">
+                                        <div ng-message="required">Enter Contact No</div>
+                                        <div ng-message="pattern">Enter Valid Mobile No.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="form-group" ng-form="myForm1">
+            <label class="control-label col-sm-4">
+                Email-ID:<strong style="color:red;">*</strong>
+            </label>
+            <div class="col-sm-8 input-group" style="">
+                <div class="input-group-addon">
+                    <i class="fa fa-envelope-o"></i>
+                </div>
+                <input name="stuemailid" type="email" id="reservation" class="form-control" data-ng-model="emailsstd[$index].emaild"
+                       ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._-]+@[A-Za-z0-9]+\.[A-Za-z.]{2,5}$/" required>
+            </div>
+            <div class="error-messages text-center" ng-if="interacted(myForm1.stuemailid)" ng-messages="myForm1.stuemailid.$error">
+                <div ng-message="pattern">Enter Valid email-id</div>
+                <div ng-message="required">Enter Email -Id</div>
+
+            </div>
+        </div>-->
+                            <!--<div class="col-sm-6">
+            <div class="form-group">
+                <label class="control-label col-sm-3">Email:<span style="color:Red">*</span></label>
+                <div class="col-sm-8">
+                    <input type="text" name="email" placeholder="Enter Email" class="form-control" ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._-]+@[A-Za-z0-9]+\.[A-Za-z.]{2,5}$/" ng-model="ISMSLE_EmailId" required />
+                </div>
+                <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.email)" ng-messages="myForm.email.$error">
+                    <div ng-message="required">Enter Email</div>
+                </div>
+            </div>
+        </div>-->
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Email:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               name="email"
+                                               placeholder="Enter Email"
+                                               class="form-control"
+                                               ng-pattern="/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|edu\.in|org|org\.com|net|in|co\.in|info|gov|mil|biz|edu)$/"
+                                               ng-model="ISMSLE_EmailId"
+                                               required />
+                                    </div>
+                                    <!-- ng-pattern="/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/" -->
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.email)" ng-messages="myForm.email.$error">
+                                        <div ng-message="required">Enter Email</div>
+                                        <div ng-message="pattern">Enter a valid email</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Category:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ISMSMCA_Id" name="cat" required>
+                                            <!--ng-disabled="ISMSLERaw_Id.ISMSLERaw_Id > 0 && ISMSMCA_Id > 0"-->
+                                            <option value="">--Select Category-- </option>
+                                            <option ng-repeat="cat in category_dd" value="{{cat.ismsmcA_Id}}" ng-selected="{{cat.ismsmcA_Id==ISMSMCA_Id}}">
+                                                {{cat.ismsmcA_CategoryName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                        <div ng-message="required">Select Category</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="col-sm-6">
+
+        </div>-->
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Reference:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="Reference" placeholder="Enter Reference" class="form-control" ng-model="ISMSLE_Reference" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Health:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ISMSMST_Id" name="hel" ng-disabled="ISMSLERaw_Id.ISMSLERaw_Id > 0 && ISMSMST_Id > 0" required>
+                                            <option value="">--Select Health-- </option>
+                                            <option ng-repeat="sts in status_dd" value="{{sts.ismsmsT_Id}}" ng-selected="{{sts.ismsmsT_Id==ISMSMST_Id}}">
+                                                {{sts.ismsmsT_StatusName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.hel)" ng-messages="myForm.hel.$error">
+                                        <div ng-message="required">Select Health</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Address1:<span style="color:red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" rows="4" placeholder="Enter Address1" name="add1" id="comment" ng-model="ISMSLE_LeadAddress1" required />
+                                    </div>
+                                    <div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.add1)" ng-messages="myForm.add1.$error">
+                                        <div ng-message="required">Enter Address</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Address2:</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Address2" rows="4" name="add2" id="comment" ng-model="ISMSLE_LeadAddress2" />
+                                    </div>
+                                    <!--<div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.add2)" ng-messages="myForm.add2.$error">
+                    <div ng-message="required">Enter Address 2</div>
+                </div>-->
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Address3:</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" rows="4" placeholder="Enter Address3" name="add3" id="comment" ng-model="ISMSLE_LeadAddress3" />
+                                    </div>
+                                    <!--<div class="col-sm-4 col-sm-offset-3 error-messages" ng-if="interacted(myForm.add3)" ng-messages="myForm.add3.$error">
+                     <div> ng-message="required">Enter Address 3</div>
+                 </div>-->
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Pincode:<span style="color:red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" rows="4" placeholder="Enter Pincode" name="pin" id="comment" minlength="6" maxlength="6" ng-model="ISMSLE_Pincode" allow-pattern="\d" ng-paste="$event.preventDefault()" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.pin)" ng-messages="myForm.pin.$error">
+                                        <div ng-message="required">Enter Pincode </div>
+                                        <div ng-message="minlength">Pincode must be 6 digits</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Product:<span style="color:Red">*</span></label>
+                                    <div class="multiselect col-sm-8" style="width:22em  !important;">
+                                        <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here...">
+                                        <label>
+                                            <input name="stdd" value="1" ng-model="usercheck" type="checkbox" ng-click="all_check()">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="pro in product_dd |filter:searchchkbx1">
+                                            <input value="{{pro.ismsmpR_Id}}" data-ng-model="pro.selectedd2" type="checkbox" name="secoption1" ng-true-value="true" ng-false-value="false" ng-click="togchkbx();" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">{{pro.ismsmpR_ProductName}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.secoption1)" ng-messages="myForm.secoption1.$error">
+                                        <div ng-message="required">Select Product</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Country:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="IVRMMC_Id" name="country" ng-change="select_state(IVRMMC_Id)" required>
+                                            <option value="">--Select Country--</option>
+                                            <option ng-repeat="country in country_dd" value="{{country.ivrmmC_Id}}" ng-selected="{{country.ivrmmC_Id==IVRMMC_Id}}">
+                                                {{country.ivrmmC_CountryName }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.country)" ng-messages="myForm.country.$error">
+                                        <div ng-message="required">Select Country</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Staff Strength:<span style="color:red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Staff Strength" ng-model="ISMSLE_StaffStrength" type="text" name="staffs" allow-pattern="[0-9]" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.staffs)" ng-messages="myForm.staffs.$error">
+                                        <div ng-message="required">Enter Staff Strength </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">State:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="IVRMMS_Id" name="state" ng-change="select_District(IVRMMS_Id)" ng-disabled="ISMSLERaw_Id.ISMSLERaw_Id > 0 && IVRMMS_Id > 0" required>
+                                            <option value="">--Select State--</option>
+                                            <option ng-repeat="state in state_dd" value="{{state.ivrmmS_Id}}" ng-selected="{{state.ivrmmS_Id==IVRMMS_Id}}">
+                                                {{state.ivrmmS_Name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.state)" ng-messages="myForm.state.$error">
+                                        <div ng-message="required">Select State</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">City:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="IVRMMCT_Id" name="city" required>
+                                            <option value="">--Select city--</option>
+                                            <option ng-repeat="city in district_dd" value="{{city.ivrmmcT_Id}}" ng-selected="{{city.ivrmmcT_Id==IVRMMCT_Id}}">
+                                                {{city.ivrmmcT_Name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.city)" ng-messages="myForm.city.$error">
+                                        <div ng-message="required">Select city</div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <!--allow-pattern="[0-9]"-->
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Student Strength:<span style="color:red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="number" placeholder="Enter Student Strength" class="form-control" data-ng-model="ISMSLE_StudentStrength" name="strngth"
+                                               ng-pattern="/^[0-9]+$/"
+                                               ng-minlength="3"
+                                               ng-disabled="leadTempList.length<= 0"
+                                               required />
+
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.strngth)" ng-messages="myForm.strngth.$error">
+                                        <div ng-message="required">Enter Student Strength </div>
+                                        <div ng-message="minlength">Student strength should be atleast 100</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3"> No. of Institutions:<span style="color:red">*</span> </label>
+                                    <div class="col-sm-8">
+
+
+                                        <input type="text" allow-pattern="[0-9]" placeholder="Enter No. of Institutions" class="form-control" ng-model="ISMSLE_NoOfInstitutions" name="noofins" required />
+
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.noofins)" ng-messages="myForm.noofins.$error">
+                                        <div ng-message="required">Enter No. of Institutions </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Remark:</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Remark" ng-model="ISMSLE_Remarks" type="text" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--<div class="row">
+        <div class="col-sm-2">
+            <label class="checkbox-inline">
+                <input type="checkbox" value="1" ng-model="ISMSLE_DedicatedHostingFlg" ng-checked="oncheck()">
+                <span class="lbl padding-8">Dedicated Hosting</span>
+            </label>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label col-sm-3">Hosting Server:</label>
+                <div class="col-sm-8">
+                    <input class="form-control" placeholder="Enter Hosting Server" ng-model="ISMSLE_HostingServer" type="text" />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+
+            <div class="form-group">
+                <label class="control-label col-sm-3">Quotation Value:</label>
+                <div class="col-sm-8">
+                    <input type="text" placeholder="Enter Quotation Value" class="form-control" data-ng-model="ISMSLE_QuotationValue" name="strngth" allow-pattern="\d" required />
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <label class="checkbox-inline">
+                <input type="checkbox" value="1" ng-model="ISMSLE_DedicatedMobileAppFlg" ng-checked="oncheck()">
+                <span class="lbl padding-8">Dedicated Mobile</span>
+            </label>
+        </div>
+
+    </div>-->
+                    </div>
+                </div><br />
+                <div class="text-center" ng-if="saveupdate">
+                    <input type="hidden" ng-model="id" value="{{ismslE_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" data-ng-click="saveLeadnew(false)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-primary" ng-disabled="emailbtn==true" id="savebtn" data-ng-click="saveLeadnew(true)">
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        Yes,Save and Send email
+                    </md-button>-->
+                    <md-button type="button" class="md-raised md-warn" ng-click="swalcancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                </div>
+                <div class="text-center" ng-if="!saveupdate">
+                    <input type="hidden" ng-model="id" value="{{ismslE_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" data-ng-click="saveLeadnew(false)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Update
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-primary" ng-disabled="emailbtn==true" id="savebtn" data-ng-click="saveLeadnew(true)">
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        Update and Send email
+                    </md-button>-->
+                    <md-button type="button" class="md-raised md-warn" ng-click="swalcancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+
+                    </md-button>
+
+
+                </div>
+                <!--<div class="text-center">
+                    <input type="hidden" ng-model="id" value="{{ismslE_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" data-ng-click="saveLead()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>-->
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary">
+        <!--<div class="box-header with-border">
+            <h3 class="box-title">Lead List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="col-sm-6">
+                    <div class="box-label" style="width:100%;">
+                        <a class="small-box-footer" ng-model="notassigned" title="Total Task">
+                            All Lead
+                            <span class="label pull-right bg-green" style="font-size: 100%;">{{presentCountgrid}}</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="box-label" style="width:100%;">
+                        <a class="small-box-footer" ng-model="notassigned" title="Total Task">
+                            Assign by Me
+                            <span class="label pull-right bg-green" style="font-size: 100%;">{{presentCountgrid}}</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="box-label" style="width:100%;">
+                        <a class="small-box-footer" ng-model="notassigned" title="Total Task">
+                            InProgress
+                            <span class="label pull-right bg-green" style="font-size: 100%;">{{presentCountgrid}}</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="box-label" style="width:100%;">
+                        <a class="small-box-footer" ng-model="notassigned" title="Total Task">
+                            Assign to Me
+                            <span class="label pull-right bg-green" style="font-size: 100%;">{{presentCountgrid}}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+        <div class="box-header with-border">
+            <h3 class="box-title">LEAD CREATION LIST</h3>
+            <md-button type="button" ng-click="exportToExcel('#tableexcell')" target="_blank" class="md-raised md-primary">
+                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                Export to Excel
+            </md-button>
+            <md-button class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" data-ng-model="buspassdetails" data-target="#MyView">
+                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                View
+            </md-button>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <!--<div class="col-sm-4 pull-right">
+        <div class="form-group">
+            <div class="input-group">
+                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                <span class="input-group-addon">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
+        </div>
+    </div>-->
+
+                <div class="col-sm-4">
+                    <div class="form-group searchbox">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here..." ng-change="onchange(search)">
+
+                            <span class="input-group-addon">
+                                <button class="btn" type="submit" ng-click="searchByColumn(search,searchColumn)"><i class="fa fa-search"></i></button>
+                            </span>
+                            <!--ng-change="getcolumnId(searchColumn)"-->
+                            <select class="form-control" id="sel1" ng-model="searchColumn">
+                                <option value="" ng-selected="true">--Select-</option>
+                                <option value="1">Name of the Lead</option>
+                                <option value="2">Contact Person</option>
+                                <option value="3">Contact Number</option>
+                                <option value="4">Lead Email</option>
+                                <option value="5">Contact Designation</option>
+                                <option value="6">Reference</option>
+                                <option value="7">Student Strength</option>
+                                <option value="8">Lead Address1</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th class="text-left"><a href="" ng-click="sort('')">Name of the Lead</a></th>
+                        <th class="text-left"><a href="" ng-click="sort('')">Lead Created By </a></th>
+                        <th class="text-left"><a href="" ng-click="sort('')">Source</a></th>
+                        <th class="text-left"><a href="" ng-click="sort('')">Category</a></th>
+                        <th class="text-left"><a href="" ng-click="sort('')">Health</a></th>
+                        <th class="text-left"><a href="" ng-click="sort('')">Remarks</a></th>
+                        <th> Update Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="lead in filterValue1 = (lead_list | filter : search)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{lead.ISMSLE_LeadName}}</td>
+                        <td class="text-center">{{lead.HRME_EmployeeFirstName}}</td>
+                        <td class="text-center">{{lead.ISMSMSO_SourceName}}</td>
+                        <td class="text-center">{{lead.ISMSMCA_CategoryName}}</td>
+                        <td class="text-center">{{lead.ISMSMST_StatusName}}</td>
+                        <td class="text-center">{{lead.ISMSLE_Remarks}}</td>
+                        <td>
+                            <input type="checkbox" ng-model="lead.selected" data-target="#updatemail" ng-change="updateEmail(lead)">
+                            <span class="lbl padding-8"></span>
+                            <!--<a class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" ng-click="updateEmail(lead)">
+                              <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" data-ng-model="buspassdetails" data-target="#updatemail" ng-click="updateEmail(lead)">
+                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                            </a>-->
+                        </td>
+                        <td>
+                            <a class="text-aqua" href="" ng-click="edit(lead)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" data-ng-model="buspassdetails" data-target="#myModalgetclasslist" ng-click="view(lead)">
+                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+
+    <div id="myModalswal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="">
+                        <center>
+                            <p><h4 style="color:red;">Do you want to send Auto Email to the lead??</h4></p>
+                        </center>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <input type="hidden" ng-model="id" value="{{ismslE_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" data-ng-click="saveLeadnew(true)">
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        Yes,Save and Send email
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" data-ng-click="saveLeadnew(false)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save without email
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="swalcancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="updatemail1" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 95%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom" style="font-size: x-large;"> Sales Lead List</h4></center>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.NO</th>
+                            <th>Email</th>
+                            <th>Mobile Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="sibling in siblings">
+                            <!--<td>{{itemsPerPages *(currentPages-1)+$index+1}}</td>-->
+                            <td>{{$index+1}}</td>
+                            <td><input class="form-control" id="usr" type="text" data-ng-model="sibling.pasrS_SiblingsClass" maxlength="40"></td>
+                            <td><input class="form-control" id="usxxr" type="text" data-ng-model="sibling.pasrS_SiblingsSection" maxlength="40"></td>
+                            <td class="text-center">
+                                <span class="input-group-addon" ng-hide="siblings.length > 4">
+                                    <a href="" ng-show="$last" ng-click="addNewsibling()" style="color:#000;">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </span>
+                                <span class="input-group-addon" id="remove" ng-hide="siblings.length ==1">
+                                    <a href="" ng-click="removeNewsibling($index)" style="color:#000;">
+                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="updatemail" class="modal fade" role="dialog" data-backdrop="false">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" method="post" novalidate>
+            <div class="modal-dialog modal-lg" style="width: 95%;">
+                <div class="modal-content">
+                    <div class="model-header custom-header">
+                        <center><h4 class="modal-title custom" style="font-size: x-large;"> Sales Lead List</h4></center>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO</th>
+                                    <th>Email</th>
+                                    <th>Mobile Number</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emailandmob in EmaiAndMobs">
+                                    <td>{{$index+1}}</td>
+                                    <td>
+                                        <input name="email" class="form-control" id="usxxr" type="text" data-ng-model="emailandmob.email" placeholder="Enter Email" ng-pattern="/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|edu\.in|org|org\.com|net|in|co\.in|info|gov|mil|biz|edu)$/" required>
+                                        <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted1(myForm1.email)" ng-messages="myForm1.email.$error">
+                                            <div ng-message="required">Enter Email</div>
+                                            <div ng-message="pattern">Enter a valid email</div>
+                                        </div>
+                                    </td>
+                                    <!--ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/"-->
+                                    <td>
+                                        <input name="contact" class="form-control" id="usr" type="text" data-ng-model="emailandmob.mobnum" placeholder="Enter Contact No" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d" maxlength="10" required>
+                                        <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted1(myForm1.contact)" ng-messages="myForm1.contact.$error">
+                                            <div ng-message="required">Enter Contact No</div>
+                                            <div ng-message="pattern">Enter Valid Mobile No.</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="input-group-addon" ng-hide="EmaiAndMobs.length > 4">
+                                            <a href="" ng-show="$last" ng-click="addNewEmaiAndMob()" style="color:#000;">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="input-group-addon" id="remove" ng-hide="EmaiAndMobs.length ==1">
+                                            <a href="" ng-click="removeNewEmaiAndMob($index)" style="color:#000;">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer custom-footer" style="display: flex; justify-content: center; align-items: center;">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="savemailmob(fll)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancelNew()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancel()">Close</button>
+                </div>
+               
+                
+            </div>
+         </form>
+    </div>
+
+
+
+    <div id="myModalgetclasslist" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 95%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom" style="font-size: x-large;"> Sales Lead List</h4></center>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Name of the Lead</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{
+ISMSLE_LeadName_s
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Contact Person</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_ContactPerson_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">
+                                    <b>No.of Institutions</b>
+                                </label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_NoOfInstitutions_s}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Category</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ismsmcA_CategoryName_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Contact No</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_ContactNo_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Student Strength</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_StudentStrength_s}}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Health</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ismsmsT_StatusName_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Email</b></label>
+                                <div class="col-sm-6 text-left">
+                                    :{{ISMSLE_EmailId_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Staff Strength</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_StaffStrength_s}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--<div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Designation</b></label>
+                                <div class="col-sm-6 text-left">
+                                    {{ISMSLE_ContactDesignation_s}}
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+
+                                <label class="control-label col-sm-6"><b>Source</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ismsmsO_SourceName_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">
+                                    <b>
+                                        Address
+                                    </b>
+                                </label>
+
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_LeadAddress_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Remark</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_Remarks_s}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Reference</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ISMSLE_Reference_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>Country</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ivrmmC_CountryName_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><b>State</b></label>
+                                <div class="col-sm-6 text-left">
+                                    : {{ivrmmS_Name_s}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4>Product Details</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SLNo</th>
+                                <th>Product Name</th>
+                                <th>Status</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="crd in filterValue3 = (product_dd_s)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+
+                                <td>{{ $index + 1 }}</td>
+                                <td class="text-center">{{crd.ismsmpR_ProductName}}</td>
+
+                                <td>
+                                    <span ng-if="crd.ismslepR_ActiveFlag === true">
+                                        <a href="" ng-click="deactiv_prde(crd)"
+                                           class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                            Deactivate
+                                        </a>
+                                    </span>
+                                    <span ng-if="crd.ismslepR_ActiveFlag === false">
+                                        <a href="" ng-click="deactiv_prde(crd)"
+                                           class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                            Activate
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tableexcell" ng-hide="true">
+        <table class="table table-hover table-responsive table-bordered">
+            <thead>
+                <tr>
+                    <th>SL NO</th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Name of the Lead</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Lead Created By </a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Source</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Category</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">ContactPerson</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">ContactNo</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Designation</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">EmailId</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">LeadAddress1</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Health</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">states </a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Remarks</a></th>
+                    <th class="text-left"><a href="" ng-click="sort('')">Create Date </a></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="lead in lead_list">
+                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                    <td class="text-left">{{lead.ISMSLE_LeadName}}</td>
+                    <td class="text-center">{{lead.HRME_EmployeeFirstName}}</td>
+                    <td class="text-center">{{lead.ISMSMSO_SourceName}}</td>
+                    <td class="text-center">{{lead.ISMSMCA_CategoryName}}</td>
+                    <td class="text-center">{{lead.ISMSLE_ContactPerson}}</td>
+                    <td class="text-center">{{lead.ISMSLE_ContactNo}}</td>
+                    <td class="text-center">{{lead.ISMSLE_ContactDesignation}}</td>
+                    <td class="text-center">{{lead.ISMSLE_EmailId}}</td>
+                    <td class="text-center">{{lead.ISMSLE_LeadAddress1}}</td>
+                    <td class="text-center">{{lead.ISMSMST_StatusName}}</td>
+                    <td class="text-center">{{lead.IVRMMS_Name}}</td>
+                    <td class="text-center">{{lead.ISMSLE_Remarks}}</td>
+                    <td class="text-center">{{lead.CreatedDate  |date:"dd-MM-yyyy" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
+<div id="MyView" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="model-header custom-header">
+                <center><h4 class="modal-title custom" style="font-size: x-large;"> Sales Lead List</h4></center>
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValueNew!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValueNew" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th class="text-left"><a href="" ng-click="sort('')">Lead Name</a></th>
+                            <th class="text-left"><a href="" ng-click="sort('')">State </a></th>
+                            <th class="text-left"><a href="" ng-click="sort('')">City</a></th>
+                            <th class="text-left"><a href="" ng-click="sort('')">Created By</a></th>
+                            <!--<th class="text-left"><a href="" ng-click="sort('')">Category</a></th>-->
+                            <th class="text-left"><a href="" ng-click="sort('')">Contact Person</a></th>
+                            <th class="text-left"><a href="" ng-click="sort('')">Contact No.</a></th>
+                            <th class="text-left"><a href="" ng-click="sort('')">Email Id</a></th>
+                            <th class="text-left"><a href="" ng-click="sort('')">Lead Address</a></th>
+                            <!--<th class="text-left"><a href="" ng-click="sort('')">Status</a></th>-->
+                            <th class="text-left"><a href="" ng-click="sort('')">Student Strength</a></th>
+                            <th class="text-left"><a href="" ng-click="sort('')">Staff Strength</a></th>
+                            <!--<th class="text-left"><a href="" ng-click="sort('')">Country</a></th>-->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="lead in filterValue2 = (viewdetails | filter : searchValueNew)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'" pagination-id="page4">
+                            <td class="text-center">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td ng-hide="true">{{lead.ISMSLE_Id}}</td>
+                            <td class="text-left">{{lead.ISMSLE_LeadName}}</td>
+                            <td class="text-center">{{lead.State}}</td>
+                            <td class="text-center">{{lead.City}}</td>
+                            <td class="text-center">{{lead.Created_employeeName}}</td>
+                            <!--<td class="text-center">{{lead.ISMSMCA_CategoryName}}</td>-->
+                            <td class="text-center">{{lead.ISMSLE_ContactPerson}}</td>
+                            <td class="text-center">{{lead.ISMSLE_ContactNo}}</td>
+                            <td class="text-center">{{lead.ISMSLE_EmailId}}</td>
+                            <td class="text-center">{{lead.ISMSLE_LeadAddress1}}</td>
+                            <td class="text-center">{{lead.ISMSLE_StudentStrength}}</td>
+                            <td class="text-center">{{lead.ISMSLE_StaffStrength}}</td>
+                            <!--<td class="text-center">{{lead.ISMSMST_StatusName}}</td>-->
+                            <!--<td class="text-center">{{lead.Country}}</td>-->
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="page4">
+                
+
+            </dir-pagination-controls>
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+
+</div>
+

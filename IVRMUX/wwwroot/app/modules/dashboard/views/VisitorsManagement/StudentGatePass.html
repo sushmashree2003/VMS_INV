@@ -1,0 +1,673 @@
+﻿<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" ng-init="BindData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Gate Pass</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmaY_Id" name="acdYear" ng-change="get_class()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="val in yearlist" value="{{val.asmaY_Id}}" ng-selected="val.Selected==true">
+                                        {{val.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdYear)" ng-messages="myForm.acdYear.$error">
+                                    <div ng-message="required">Please Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section :<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmS_Id" data-ng-change="get_student()" name="sec" required>
+                                    <option value="">Select Section:</option>
+                                    <option ng-repeat="section in sectionDropdown" value="{{section.asmS_Id}}" ng-selected="section.asmS_Id==asmS_Id">{{section.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                    <div ng-message="required" style="color:red">Please Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="sch_date" onkeydown="return false" ng-model="gphS_DateTime"
+                                               md-placeholder="Enter date..." required disable md-min-date="gphS_DateTime" md-max-date="gphS_DateTime"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                    <div ng-message="required" style="color:red">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Receiver Name:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="cardno" ng-model="GPHS_ReceiverName" allow-pattern="(\s|[a-zA-Z ])" placeholder="Enter Receiver Name." ng-maxlength="100">
+                                <div class="error-messages" ng-if="interacted(myForm.cardno)" ng-messages="myForm.cardno.$error">
+                                    <div ng-message="required">Enter Receiver Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Receiver Phone No:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="cardno" ng-model="GPHS_ReceiverPhoneNo" placeholder="Enter Receiver Phone No." maxlength="10" minlength="10" allow-pattern="\d">
+                                <div class="error-messages" ng-if="interacted(myForm.cardno)" ng-messages="myForm.cardno.$error">
+                                    <div ng-message="required">Enter Receiver Phone No</div>
+                                    <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                    <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                    <div ng-message="pattern"> Mobile number will accept only numerics </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmcL_Id" ng-change="get_section()" name="cls" required>
+                                    <option value="">Select Class:</option>
+                                    <option ng-repeat="class in classList" value="{{class.asmcL_Id}}" ng-selected="class.asmcL_Id==asmcL_Id">
+                                        {{class.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                    <div ng-message="required" style="color:red">Please Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Student Name :<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="amsT_Id" name="stdt" required>
+                                    <option value="">Select Student:</option>
+                                    <option ng-repeat="student in studentList" value="{{student.amsT_Id}}" ng-selected="student.amsT_Id==amsT_Id">
+                                        {{student.studentname}} :{{student.amsT_AdmNo}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.stdt)" ng-messages="myForm.stdt.$error">
+                                    <div ng-message="required">Please Select Student</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Card No:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="cardno" ng-model="gphS_IDCardNo" allow-pattern="(\s|[a-zA-Z-0-9])" placeholder="Enter Card No." ng-maxlength="100">
+                                <div class="error-messages" ng-if="interacted(myForm.cardno)" ng-messages="myForm.cardno.$error">
+                                    <div ng-message="required">Enter Card No</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Receiver Id Proof:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="cardno" ng-model="GPHS_ReceiverIdProof" placeholder="Enter Receiver Id Proof.">
+                                <div class="error-messages" ng-if="interacted(myForm.cardno)" ng-messages="myForm.cardno.$error">
+                                    <div ng-message="required">Enter Receiver Id Proof</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Remarks :</label>
+                            <div class="col-sm-8">
+                                <textarea type="text" name="rmrk" ng-model="gphS_Remarks" class="form-control" maxlength="250" rows="3" />
+                                <div class="error-messages" ng-if="interacted(myForm.rmrk)" ng-messages="myForm.rmrk.$error">
+                                    <div ng-message="required">Please fill Remarks</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="gphS_Id" value="{{gphS_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="savedata()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save & Send SMS
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="alldata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Gate Pass List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{alldata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue23!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="searchValue23" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">
+                            SL. No.
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('studentname')"> Student Name</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('asmcL_ClassName')"> Class </a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('asmC_SectionName')"> Section</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('amsT_AdmNo')"> Adm_No</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('gphS_GatePassNo')"> Gate Pass No</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('gphS_ReceiverName')">Receiver Name</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('gphS_IDCardNo')"> Card No</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('gphS_DateTime')"> Date</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sort('gphS_Remarks')"> Remark</a>
+                        </th>
+                        <th>OTP Flag</th>
+                        <th>Print</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="newuser1 in filterValue1 = (alldata | filter : searchValue23) | orderBy:sortKey:sortReverse  | itemsPerPage:itemsPerPage"
+                        current-page="currentPage">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{newuser1.studentname}}</td>
+                        <td>{{newuser1.asmcL_ClassName}}</td>
+                        <td>{{newuser1.asmC_SectionName}}</td>
+                        <td>{{newuser1.amsT_AdmNo}}</td>
+                        <td>{{newuser1.gphS_GatePassNo}}</td>
+                        <td>{{newuser1.gphS_ReceiverName}}</td>
+                        <td>{{newuser1.gphS_IDCardNo}}</td>
+                        <td>{{newuser1.gphS_DateTime | date:'dd-MM-yyyy'}}</td>
+                        <td>{{newuser1.gphS_Remarks}}</td>
+                        <td>
+                            <span ng-if="newuser1.gphS_SentFlg!= true ">
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="OTP Verification" data-ng-model="buspassdetails" data-target="#otpverification" ng-click="checkstudent(newuser1)">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        <td>
+                            <span>
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Print Student Receipt" data-ng- data-target="#myModal1" ng-click="printbutton(newuser1)">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-if="!newuser1.gphS_ActiveFlg">
+                                <a href="" ng-click="deactivate(newuser1)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                            <span ng-if="newuser1.gphS_ActiveFlg">
+                                <a href="" ng-click="deactivate(newuser1)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    De-Activate
+                                </a>
+                            </span>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="student_gate_pass">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Gate Pass</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="border" id="printSectionId">
+            <br />
+            <center>
+                <table class="table" style="height: 300px;width: 450px;">
+                    <thead style="background-color:white;">
+                        <tr>
+                            <th> <img style="height: 100px;width: 150px;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                            <th colspan="2">
+                                <label style="font-size:20px;">Gate Pass Slip</label>
+                                <br /><hr />
+                                <label style="font-size:15px;">{{SchollName}}</label>
+                                <br />
+                                <label style="font-size:10px;text-align:center">{{SchollAdd}}</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="vss in currentstuddata" style="padding-bottom: 100px;">
+                        <tr>
+                            <td align="left"><a href="">Sr. No.</a></td>
+                            <td align="left" colspan="2">{{vss.gphS_Id}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Student Name</a></td>
+                            <td align="left" colspan="2">{{vss.studentname}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Adm No</a></td>
+                            <td align="left" colspan="2">{{vss.amsT_AdmNo}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Class </a></td>
+                            <td align="left" colspan="2">{{vss.asmcL_ClassName}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Section</a></td>
+                            <td align="left" colspan="2">{{vss.asmC_SectionName}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Mobile No</a></td>
+                            <td align="left" colspan="2">{{vss.amsT_MobileNo}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Gate Pass No</a></td>
+                            <td align="left" colspan="2">{{vss.gphS_GatePassNo}}</td>
+                        </tr>
+
+                        <tr>
+                            <td align="left"><a href="">Card No</a></td>
+                            <td align="left" colspan="2">{{vss.gphS_IDCardNo}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Date & Time</a></td>
+                            <td align="left" colspan="2">{{vss.gphS_DateTime| date:"dd-MM-yyyy & HH:mm:ss"}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Remark.</a></td>
+                            <td align="left" colspan="2">{{vss.gphS_Remarks}}</td>
+                        </tr>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td align="left">Signature</td>
+                            <td align="center">sign.Off Sup</td>
+                            <td align="right">sign.Principal</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </center>
+        </div>
+    </div>
+    <div id="otpverification" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 50%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom box-title" style="background-color:darkorange; color: #d9dde5 !important;">OTP VERIFICATION</h4></center>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal ng-pristine ng-valid" name="myForm2" role="form" novalidate>
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 col-sm-offset-1">Enter OTP:<span style="color:red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="otpvalid" ng-model="GPHS_OTP" allow-pattern="[0-9]" placeholder="Please Enter OTP Number" maxlength="8" required>
+                                    <div class="error-messages" ng-if="interacted2(myForm2.otpvalid)" ng-messages="myForm2.otpvalid.$error">
+                                        <div ng-message="required">Enter OTP No</div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-10 col-sm-offset-2">
+                                        <p style="font-size:14px;color:darkblue">
+                                            <i class="fa fa-hand-o-right" style="font-size:18px;color:red"></i>&nbsp; : &nbsp;
+                                            OTP number will be expired within 15 min.If it is expired please resend the OTP
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <br />
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <input type="hidden" ng-model="gphS_Id" value="{{gphS_Id}}" />
+                                <button type="button" class="btn btn-primary btn-xs text-center" ng-click="get_otpverification(gphS_Id)" ng-show="Veributton1">
+                                    OTP Verification
+                                </button>
+                                &nbsp;&nbsp; &nbsp;&nbsp;
+                                <button type="button" class="btn btn-primary btn-xs text-center" ng-click="get_otpverification22(gphS_Id)" ng-show="Veributton2">
+                                    OTP Verification
+                                </button>
+                                &nbsp;&nbsp; &nbsp;&nbsp;
+                                <button type="button" class="btn btn-primary btn-xs text-center" ng-click="resendotp(gphS_Id)">
+                                    Resend OTP
+                                </button>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="modal-footer custom-footer" style="background:#1c334b;height:50px;">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" style="padding-bottom:1px; padding-top:0px;">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-----Print For Student Details-->
+    <div id="printSectionId23" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 100%;">
+            <div class="modal-content">
+                <!--<div class="model-header custom-header">
+                    <center><h4 class="modal-title custom box box-title">Student Receipt</h4></center>
+                </div>-->
+                <div class="modal-body">
+                    <div class="border">
+                        <!--id="studentReceipt"-->
+                        <br />
+                        
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <table class="table table-borderless" style="height: 300px;width: 100%;">
+                                    <thead style="background-color:white;">
+                                        <tr>
+                                            <th> <img style="height: 80px;width: 160px;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                                            <th colspan="2">
+                                                <label style="font-size:20px;">Gate Pass Slip</label>
+                                                <br /><hr />
+                                                <label style="font-size:15px;">{{SchollName}}</label>
+                                                <br />
+                                                <label style="font-size:10px;text-align:center">{{SchollAdd}}</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="vss in currentstuddata" style="padding-bottom: 100px;">
+                                        <tr>
+                                            <td align="left"><a href="">Sr. No.</a></td>
+                                            <td align="left">{{vss.gphS_Id}}</td>
+                                            <td rowspan="10" style="padding-bottom:200px"> <img style="height: 105px;width: 73px;" src="{{amsT_Photoname}}" class="img-responsive"></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Student Name</a></td>
+                                            <td align="left">{{vss.studentname}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Adm No</a></td>
+                                            <td align="left">{{vss.amsT_AdmNo}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Class </a></td>
+                                            <td align="left">{{vss.asmcL_ClassName}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Section</a></td>
+                                            <td align="left">{{vss.asmC_SectionName}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Mobile No</a></td>
+                                            <td align="left">{{vss.amsT_MobileNo}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Gate Pass No</a></td>
+                                            <td align="left">{{vss.gphS_GatePassNo}}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td align="left"><a href="">Card No</a></td>
+                                            <td align="left">{{vss.gphS_IDCardNo}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Date & Time</a></td>
+                                            <td align="left">{{vss.gphS_DateTime| date:"dd-MM-yyyy & HH:mm:ss"}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Remark.</a></td>
+                                            <td align="left">{{vss.gphS_Remarks}}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td align="left">Signature</td>
+                                            <td></td>
+                                            <td align="right">Principal</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                                <table class="table table-borderless" style="height: 300px;width: 100%;">
+                                    <thead style="background-color:white;">
+                                        <tr>
+                                            <th> <img style="height: 80px;width: 160px;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                                            <th colspan="2">
+                                                <label style="font-size:20px;">Gate Pass Slip</label>
+                                                <br /><hr />
+                                                <label style="font-size:15px;">{{SchollName}}</label>
+                                                <br />
+                                                <label style="font-size:10px;text-align:center">{{SchollAdd}}</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="vss in currentstuddata" style="padding-bottom: 100px;">
+                                        <tr>
+                                            <td align="left"><a href="">Sr. No.</a></td>
+                                            <td align="left">{{vss.gphS_Id}}</td>
+                                            <td rowspan="10" style="padding-bottom:200px"> <img style="height: 105px;width: 73px;" src="{{amsT_Photoname}}" class="img-responsive"></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Student Name</a></td>
+                                            <td align="left">{{vss.studentname}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Adm No</a></td>
+                                            <td align="left">{{vss.amsT_AdmNo}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Class </a></td>
+                                            <td align="left">{{vss.asmcL_ClassName}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Section</a></td>
+                                            <td align="left">{{vss.asmC_SectionName}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Mobile No</a></td>
+                                            <td align="left">{{vss.amsT_MobileNo}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Gate Pass No</a></td>
+                                            <td align="left">{{vss.gphS_GatePassNo}}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td align="left"><a href="">Card No</a></td>
+                                            <td align="left">{{vss.gphS_IDCardNo}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Date & Time</a></td>
+                                            <td align="left">{{vss.gphS_DateTime| date:"dd-MM-yyyy & HH:mm:ss"}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left"><a href="">Remark.</a></td>
+                                            <td align="left">{{vss.gphS_Remarks}}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td align="left">Signature</td>
+                                            <td></td>
+                                            <td align="right">Principal</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer custom-footer text-center">
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Close
+                        </md-button>
+                        &nbsp; &nbsp;
+                        <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="Print()">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal1" class="modal fade feetransaction" role="dialog" data-backdrop="static">
+        <div class="modal-content">
+            <div id="test" ng-if="htmldata!=null && htmldata!=''">
+
+            </div>
+            <div ng-if="htmldata==null || htmldata==''" id="test2">
+                <center>
+                    <table class="table" style="height: 300px;width: 450px;">
+                        <thead style="background-color:white;">
+                            <tr>
+                                <th> <img style="height: 100px;width: 150px;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                                <th colspan="2">
+                                    <label style="font-size:20px;">Gate Pass Slip</label>
+                                    <br /><hr />
+                                    <label style="font-size:15px;">{{SchollName}}</label>
+                                    <br />
+                                    <label style="font-size:10px;text-align:center">{{SchollAdd}}</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="vss in currentstuddata" style="padding-bottom: 100px;">
+                            <tr>
+                                <td align="left"><a href="">Sr. No.</a></td>
+                                <td align="left" colspan="2">{{vss.gphS_Id}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Student Name</a></td>
+                                <td align="left" colspan="2">{{vss.studentname}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Adm No</a></td>
+                                <td align="left" colspan="2">{{vss.amsT_AdmNo}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Class </a></td>
+                                <td align="left" colspan="2">{{vss.asmcL_ClassName}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Section</a></td>
+                                <td align="left" colspan="2">{{vss.asmC_SectionName}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Mobile No</a></td>
+                                <td align="left" colspan="2">{{vss.amsT_MobileNo}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Gate Pass No</a></td>
+                                <td align="left" colspan="2">{{vss.gphS_GatePassNo}}</td>
+                            </tr>
+
+                            <tr>
+                                <td align="left"><a href="">Card No</a></td>
+                                <td align="left" colspan="2">{{vss.gphS_IDCardNo}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Date & Time</a></td>
+                                <td align="left" colspan="2">{{vss.gphS_DateTime| date:"dd-MM-yyyy & HH:mm:ss"}}</td>
+                            </tr>
+                            <tr>
+                                <td align="left"><a href="">Remark.</a></td>
+                                <td align="left" colspan="2">{{vss.gphS_Remarks}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td align="left">Signature</td>
+                                <td align="center">sign.Off Sup</td>
+                                <td align="right">sign.Principal</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </center>
+            </div>
+
+
+            <div class="modal-footer custom-footer text-center">
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Close
+                </md-button>
+                &nbsp; &nbsp;
+                <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="Print()">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+
+
+
+

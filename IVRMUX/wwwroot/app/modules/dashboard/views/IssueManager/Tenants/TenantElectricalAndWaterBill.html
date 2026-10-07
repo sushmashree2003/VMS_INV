@@ -1,0 +1,244 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="loaddata()" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Tenant Electrical Bill  & Other's Charges </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12 form-horizontal col-sm-offset-2">
+                    <div class="col-sm-8">
+                        <div class="text-center well" ng-init="radioval='WaterBill'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="radioval" name="radioval" value="Water" ng-click="onclickloaddata()" required>
+                                <span class="lbl padding-8">Water Bill</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="radioval" name="radioval" value="Electrical" ng-click="onclickloaddata()" required>
+                                <span class="lbl padding-8">Electrical Bill</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="radioval" name="radioval" value="Other" ng-click="onclickloaddata()" required>
+                                <span class="lbl padding-8">Other Charges</span>
+                            </label>
+                            <div class="error-messages" ng-if="interacted(myForm.radioval)" ng-messages="myForm.radioval.$error">
+                                <div ng-message="required">Select Electrical/Other Charges .</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Tenant Name:</label>
+                    <div class="col-sm-8">
+                        <ui-select id="sel2" name="tenant" ng-model="$parent.tenantagR_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Tenant">
+                            <ui-select-match placeholder="Select or Search Tenant">
+                                {{$select.selected.tenantagR_TenantName}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="option in tenant_array | propsFilter: {tenantagR_TenantName: $select.search}"
+                                               value="{{option.tenantagR_Id}}" ng-selected="{{option.Selected == true}}">
+                                <div ng-bind-html="option.tenantagR_TenantName | highlight: $select.search"></div>
+                            </ui-select-choices>
+                        </ui-select>
+                        <div class="error-messages" ng-if="interacted(myForm.tenant)" ng-messages="myForm.tenant.$error">
+                            <div ng-message="required">Select Tenant</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Month:<span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="sel1" ng-model="TENANTEBWB_Month" name="month" required>
+                            <option value="" label="">--Select Month--</option>
+                            <option ng-repeat="option in monthnames" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                {{option.ivrM_Month_Name}}
+                            </option>
+                        </select>
+                        <div class="error-messages" ng-if="interacted(myForm.month)" ng-messages="myForm.month.$error">
+                            <div ng-message="required">Select Month</div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="sel1" ng-model="TENANTEBWB_Year" name="year" required>
+                            <option value="" label="">--Select Year--</option>
+                            <option ng-repeat="option in years" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                {{option.hrmlY_LeaveYear}}
+                            </option>
+                        </select>
+                        <div class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                            <div ng-message="required">Select Year</div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label class="control-label col-sm-4">Amount:<span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <input class="form-control" placeholder="Enter Amount" name="n" id="usr" type="text" ng-paste="$event.preventDefault()" data-ng-model="TENANTEBWB_Amount" required allow-pattern="[0-9.]">
+                        <div class="error-messages" ng-if="interacted(myForm.n)" ng-messages="myForm.n.$error">
+                            <div ng-message="required">Enter Amount</div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">Remarks :<span style="color:Red">*</span></label>
+                        <div class="col-sm-8" style="padding-left:10%">
+                            <textarea class="form-control" name="remark" type="text" placeholder="Enter Remarks .... " ng-model="tenantebwB_Remarks" rows="5" style="resize:none" required></textarea>
+                            <div class="error-messages" ng-if="interacted(myForm.remark)" ng-messages="myForm.remark.$error">
+                                <div ng-message="required"> Enter Remarks </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="TENANTEBWB_Id" value="{{TENANTEBWB_Id}}" />
+                        <md-button type="button" class="md-raised md-primary" ng-click="Save()"
+                                   ng-disabled="btn">
+                            <i class="fa fa-save" aria-hidden="true"></i> Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-click="SendEmail()" ng-show="sendsmsemail"
+                                   ng-disabled="btn">
+                            <i class="fa fa-save" aria-hidden="true"></i> SendEmail
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" ng-click="cleartabl1()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Tenant Electrical Bill  & Other's Charges </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+
+                    <table class="table table-hover table-responsive table-bordered clearfix " style="overflow:auto !important">
+                        <thead>
+                            <tr style="background: aliceblue;">
+                                <th>
+                                    <input class="form-control" ng-model="search.hrmB_BuildingName" type="text" placeholder="Building Name">
+                                </th>
+                                <th>
+                                    <input class="form-control" ng-model="search.hrmR_RoomName" type="text" placeholder="Flat No.">
+                                </th>
+                                <th>
+                                    <input class="form-control" ng-model="search.tenantagR_TenantName" type="text" placeholder="Tenant Name">
+                                </th>
+
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <table class="table table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="all" ng-model="stdall" ng-click="toggleAllstd()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Building Name</th>
+                            <th>Flat No </th>
+                            <th>Tenant Name</th>
+                            <th> Type</th>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (tenants | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <!--<tr ng-repeat="user in tenants | filter : search">-->
+                            <!--<td>{{$index+1}}</td>-->
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.stdselected" value="{{user.tenantebwB_Id}}" ng-change="optionToggledstd(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{user.hrmB_BuildingName}}</td>
+                            <td>{{user.hrmR_RoomName}}</td>
+                            <td>{{user.tenantagR_TenantName}}</td>
+                            <td>{{user.tenantebwB_Flg}}</td>
+                            <td>{{user.tenantebwB_Month}}</td>
+                            <td>{{user.tenantebwB_Year}}</td>
+                            <td>{{user.tenantebwB_Amount}}</td>
+                            <td hidden="hidden">
+                                {{user.tenantebwB_Id}}
+                            </td>
+                            <td>
+
+                                <span ng-if="user.tenantebwB_ActiveFlag === true">
+                                    <a class="text-aqua" href="" ng-click="editdetails(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                &nbsp;
+                                <span ng-if="user.tenantebwB_ActiveFlag === false">
+                                    <a href="" ng-click="deleterecord(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.tenantebwB_ActiveFlag === true">
+                                    <a href="" ng-click="deleterecord(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+                </dir-pagination-controls>
+
+
+            </div>
+
+
+
+        </div>
+
+    </form>
+
+
+</section>
+
+
+
+

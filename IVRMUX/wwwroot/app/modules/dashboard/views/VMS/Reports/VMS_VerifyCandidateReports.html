@@ -1,0 +1,185 @@
+﻿<style>
+    .newstyle {
+        width: 100%;
+    }
+
+        .newstyle:hover {
+            background-color: #FF9900;
+        }
+
+    .newstyle1 {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+        .newstyle1:hover {
+            background-color: #6599FF;
+        }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata();" novalidate>
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Candidate's Document's Verify Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <!-- Radio buttons for Approved / Rejected -->
+                <div class="row text-center">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <label class="radio-inline">
+                            <input type="radio" value="A" name="all2" ng-model="all2" required>
+                            <span class="lbl padding-8">Approved</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" value="R" name="all2" ng-model="all2" required>
+                            <span class="lbl padding-8">Rejected</span>
+                        </label>
+                        <div class="error-messages" ng-if="interacted(myForm.all2)" ng-messages="myForm.all2.$error">
+                            <div ng-message="required">Select any one of the radio button</div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+
+                <!-- Date Range Selection -->
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <br />
+                        <br />
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">B/W Dates :</label>
+                            <div class="col-sm-4">
+                                <md-datepicker id="FromDate" ng-model="fromdate" onkeydown="return false" name="fdate" md-placeholder="From Date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                    <div ng-message="required">Select from date</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <md-datepicker id="ToDate" name="tdate" ng-model="todate" onkeydown="return false" md-placeholder="To Date" md-min-date="fromdate" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                    <div ng-message="required">Select To date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+                <!-- Checkboxes for report selection -->
+                <div class="row">
+                    <div ng-repeat="report in lead_list2">
+                        <label>
+                            <input type="checkbox" ng-model="report.checked"> {{ report.Fromdate }} - {{ report.Todate }}
+                        </label>
+                    </div>
+                </div>
+                <br />
+
+                <!-- Submit and Action Buttons -->
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="VerifyReports()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#tableexcell')" target="_blank" ng-show="DemoCancelReportNew.length > 0 ">
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-warn" ng-click="printData();" ng-show="DemoCancelReportNew.length > 0 ">
+                        Print
+                    </md-button>
+                </div>
+                <hr />
+            </div>
+
+
+        </div>
+        <div class="box box-primary" ng-if="getreport && getreport.length > 0">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Demo Cancel Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" >
+                <div class="">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{getreport.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div >
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL.NO.</th>
+                                <th>Approver Name</th>
+                                <th>Candidate Name</th>
+                                <th>Status</th> 
+                                <th>Remarks</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                              <!--<tr dir-paginate="data1 in filterValue = (getreport | filter : searchValue1)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page" ng-class-odd="'odd'">
+                        <tr class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</tr>-->
+                            <tr ng-repeat="data1 in getreport | filter:searchValue">
+                                <td class="text-center">{{$index + 1}}</td> 
+                                <td class="text-left">{{ data1.ApproverName }}</td> 
+                                <td class="text-left">{{ data1.CandidateName }}</td> 
+                                <td class="text-center">
+                                    <span ng-if="data1.HRCDDV_RejectedFlg === 'A'">Approved</span>
+                                    <span ng-if="data1.HRCDDV_RejectedFlg === 'R'">Rejected</span>
+                                    <span ng-if="data1.HRCDDV_RejectedFlg !== 'A' && data1.HRCDDV_RejectedFlg !== 'R'">Pending</span>
+                                </td>
+
+                                <td class="text-center">{{data1.HRCDDV_Remarks}}</td> 
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--<dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>-->
+                <hr />
+            </div>
+        </div>
+
+    </form>
+</section>
+
+
+
+
+
+
+
+

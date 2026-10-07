@@ -1,0 +1,238 @@
+﻿
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">VMS Audit Reports</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-sm-12 form-horizontal">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="multiselect">
+                                        <input class="form-control" ng-model="obj.searchmiid" type="text" placeholder="Search Comapany here...">
+                                        <label>
+                                            <input name="all" value="1" ng-model="companyselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkMIname(companyselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Company</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in companydropdown ">
+                                            <input name="company" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxminame(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>{{user.MI_Name}}</b>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.company)" ng-messages="myForm.company.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="multiselect" style="width: 90% !important;">
+                                        <input class="form-control" ng-model="obj.searchValueDeptd" type="text" placeholder="Search Department here...">
+                                        <label>
+                                            <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Department</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in departmentdropdown">
+                                            <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.HRMDC_Name}} </b>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="start_Date" onkeypress="return false" name="startdate" md-placeholder="Enter Date"  required>
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Select Start Date</div>
+                                        <div ng-message="valid">The entered value is not Valid!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" md-min-date="start_Date" md-max-date="getMaxDate" md-placeholder="Enter Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                    <div ng-message="required">Select End Date</div>
+                                    <div ng-message="valid">The entered value is not Valid!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+
+
+                        <md-button type="submit" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            GET REPORT
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            CANCEL
+                        </md-button>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">VMS Audit Reports</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="getadvancetada.length>0">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{getadvancetada.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <!--<th>
+                            <label>
+                                <input type="checkbox" value="" ng-click="toggleAll(all)" ng-model="all">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>-->
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th>View Voucher</th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_VoucherNo')">Voucher No</a></th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_ChequeNo')">Cheque No</a></th>
+                        <th><a href="" ng-click="sortBy('MI_Name')">Company Name</a></th>
+
+                        <th><a href="" ng-click="sortBy('CityName')">Bank Details</a></th>
+                        <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier</a></th>
+
+                        <th><a href="" ng-click="sortBy('VPAYVOU_PaymentDate')">Applied Date</a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_BankBalalnce')">Bank Balance </a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_AppliedAmount')">Applied Amount </a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_ApprovedAmount')">Sanctioned Amount </a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_Remarks')">Remarks </a> </th>
+                        <th>Approve/Reject</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (getadvancetada | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" ng-class-odd="'odd'" pagination-id="xyz">
+
+                        <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="reschedule(user);"> <i class="fa fa-print" aria-hidden="true"></i></a>
+                        </td>
+                        <td>{{user.VPAYVOU_VoucherNo}}</td>
+                        <td>{{user.VPAYVOU_ChequeNo}}</td>
+                        <td>{{user.MI_Name}}</td>
+
+                        <td>
+                            {{user.HRMBD_BankName}}<br />A/c No
+                            {{user.HRMBD_BankAccountNo}}
+                        </td>
+                        <td>{{user.INVMS_SupplierName}}</td>
+                        <td>{{user.VPAYVOU_PaymentDate | date:'dd-MM-yyyy'}}</td>
+                        <td>{{user.VPAYVOU_BankBalalnce}}</td>
+                        <td>{{user.VPAYVOU_AppliedAmount}}</td>
+                        <td>{{user.VPAYVOU_ApprovedAmount}}</td>
+                        <td>{{user.VPAYVOU_Remarks}}</td>
+                        <td class="hidden">{{user.MI_Logo}}</td>
+                        <td class="text-center">
+
+                            <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Approve/Reject">
+
+                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                            </a>
+
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="xyz">
+            </dir-pagination-controls>
+
+
+        </div>
+
+        <div class="box-body" ng-show="pppfl==true">
+            <div class="text-center"><b style="color:red">CHEQUEBOOK ENTRY  REQUEST IS NOT AVAILABLE FOR APPROVAL </b></div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+</section>
+
+
+
+
+<!--=====imgpriviwew=========-->

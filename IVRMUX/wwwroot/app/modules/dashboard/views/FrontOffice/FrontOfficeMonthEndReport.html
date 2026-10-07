@@ -1,0 +1,1885 @@
+<link href="/css/print/Fees/MonthEndReport.css" rel="stylesheet" />
+
+<style>
+    .lateinearly {
+        background-color: #c535359c;
+        color: white;
+    }
+
+    .tscroll {
+        width: 100%;
+        overflow-x: scroll;
+        margin-bottom: 10px;
+        border: solid black 1px;
+    }
+    /*.tscroll tables td:first-child {
+            position: sticky;
+            left: 0;
+
+        }
+        .tscroll tables td:nth-child(2) {
+            position: sticky;
+            left: 0;
+        }
+        .tscroll tables td:nth-child(3) {
+            position: sticky;
+            left: 0;
+        }*/
+
+
+    /*.tscroll td, .tscroll th {
+            border-bottom: dashed #888 1px;
+        }*/
+
+    .myBtn:hover {
+        background-color: #555;
+    }
+
+    #scrollToTop, #scrollToBottom {
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    #myBtn {
+        display: none;
+        position: fixed;
+        top: 60px;
+        right: 15px;
+        z-index: 99;
+        outline: none;
+        color: black;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: x-large;
+        font-weight: bold;
+        border: red 1px solid;
+    }
+
+    #myBtntop {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 15px;
+        z-index: 99;
+        border: none;
+        outline: none;
+        color: black;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: x-large;
+        font-weight: bold;
+        border: red 1px solid;
+    }
+
+    #myBtn:hover {
+        background-color: #555;
+    }
+
+    .paddtab1 {
+        padding-right: 1px !important;
+        padding-left: 0px !important;
+    }
+
+    .paddtab2 {
+        padding-right: 1px !important;
+        padding-left: 1px !important;
+    }
+
+    .control-label1 {
+        padding-top: 0px !important;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        $('#myBtn').bind("click", function () {
+            $('html, body').animate({ scrollTop: $(document).height() }, 1200);
+            return false;
+        });
+        $('#myBtntop').bind("click", function () {
+            $('html, body').animate({ scrollTop: 0 }, 1200);
+            return false;
+        });
+    });
+</script>
+<script>
+    var mybutton1 = document.getElementById("myBtntop");
+    var mybutton = document.getElementById("myBtn");
+    window.onscroll = function () { scrollFunction1() };
+    function scrollFunction1() {
+        if (document.body.scrollTop > 10 || document.documentElement.scrollTop > 10) {
+            mybutton1.style.display = "block";
+            mybutton.style.display = "block";
+        } else {
+            mybutton1.style.display = "none";
+            mybutton.style.display = "none";
+        }
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loadData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">ATTENDANCE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="well" ng-show="pagePrivilege.length==0 ">
+
+                    <div class="text-center">
+                        <span style="color:red;font-weight:700">Page Is Not Mapped To This User</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body" ng-show="pagePrivilege.length>0 ">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well text-center" data-ng-init="allind ='Month'">
+                            <input type="radio" value="Month" name="allind" ng-disabled="disablemonth" ng-change="optionchange()" data-ng-model="allind">
+                            <span class="lbl padding-8">Month Wise</span>
+                            <input type="radio" value="Day" name="allind" ng-disabled="disablemonth" ng-change="optionchange()" data-ng-model="allind">
+                            <span class="lbl padding-8">Date Wise</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='Month'">
+                    <div class="col-sm-6 text-center">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="year1" ng-disabled="disablemonth" ng-model="year" ng-change="getchanged(year,month);" ng-required="allind=='Month'">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                    <div ng-message="required">Please Select the Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 text-center">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="month1" ng-disabled="disablemonth" ng-model="month" ng-change="getchanged(year,month);" ng-required="allind=='Month'">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in fillmonth" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.ivrM_Month_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                    <div ng-message="required">Please Select the month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='Day'">
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="fromdate" onkeydown="return false" ng-disabled="disablemonth" name="From_Date" md-max-date="maxDatemf" ng-change="gettodate()" id="date1" md-placeholder="From Date" ng-required="allind=='Day'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required">Please Select From date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="todate" onkeydown="return false" ng-disabled="disablemonth" name="To_Date" md-min-date="minDatemf" md-max-date="maxDatemf" id="date2" md-placeholder="To Date" ng-required="allind=='Day'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required">Please Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="submit" ng-click="ShowReportdata()" class="md-raised md-primary" id="save-btn">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-click="Clear_Details();" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+                        <md-button type="button" ng-if="allind=='Day' || hrcommentflag==true" ng-show="report" class="md-raised md-primary" id="excel-btn" ng-click="exptoex()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" ng-if="allind=='Day' || hrcommentflag==true" ng-show="report" class="md-raised md-primary" id="print-btn" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="button" ng-if="allind=='Month' && hrcommentflag==true" ng-show="report" class="md-raised md-primary" id="mail-btn" ng-click="sendmail()">
+                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                            Send Mail
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="report">
+            <div class="box-header with-border">
+                <h3 class="box-title">ATTENDANCE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" style="">
+                <div class="text-center">
+                    <label class="text-center" style="color:red;font-weight:700;font-size:medium" ng-if="Freezeattendence==true">{{ivrM_Month_Name}} - {{yearname}} Month Salary Is Calculated</label>
+                    <!--<strong class="text-center" style="color:red">{{ivrM_Month_Name}} Month Attendence Report Already Generated</strong>-->
+                </div>
+                <div class="MonthEndReport" id="the_canvas_element_id">
+                    <h3 class="text-center" ng-if="allind=='Month'">{{institutename}} – {{ivrM_Month_Name}} - {{yearname}} - Attendance Report</h3>
+                    <h3 class="text-center" ng-if="allind!='Month'">{{institutename}} – {{from_date |date:'dd-MM-yyyy'}} TO {{to_date |date:'dd-MM-yyyy'}} -Attendance Report</h3>
+                    <div class="tscroll">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr style="text-align:center;">
+                                    <th width="310px" style=" position: sticky;left: 0;background-color: #0463c2;">
+                                        <label style="margin-left:5px;float:left !important">
+                                            <input type="checkbox" ng-model="SelectedAll" ng-true-value="true" ng-false-value="false" ng-disabled="Freezeattendence==true" ng-change="chkSelectedall(SelectedAll)">
+                                            <span class="lbl padding-8"></span>
+                                        </label> SL.NO - Employee Name
+                                    </th>
+                                    <!--<th width="50px" style=" position: sticky;left: 0;background-color: #0463c2;">SL.NO</th>
+                                    <th width="200px" style=" position: sticky;left: 0;background-color: #0463c2;">Employee Name</th>-->
+                                    <!--<th width="120px">DOJ</th>-->
+                                    <!--<th width="120px">Designation</th>-->
+                                    <!--<th width="200px">Leave Count</th>-->
+                                    <th width="200px">Month/Working Days</th>
+                                    <!--<th width="120px">No. of Working Days</th>-->
+                                    <th width="300px">S/W LOP Details</th>
+                                    <th width="200px">S/W Late/Early (After 180)</th>
+                                    <th width="200px">S/W LOP</th>
+                                    <th width="200px">Approved Leave Details</th>
+                                    <th width="150px">S/W Total</th>
+                                    <!--<th width="200px">HR Updates</th>-->
+                                    <th width="350px">Final Total</th>
+                                    <th width="200px">Salary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="val in monthendreport" style="text-align:center;">
+                                    <td style=" position: sticky;left: 0;background-color: #f1f1f1;border: solid 0.5px #b5a5a5;">
+                                        <table class="table table-bordered">
+                                            <tr>
+                                                <td width="30px" style="height: 205px;">
+                                                    <label style="margin-left:5px;">
+                                                        <input type="checkbox" ng-model="val.selected" ng-change="optionToggled()" ng-true-value="true" ng-false-value="false">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <td width="30px">{{ $index+1 }}</td>
+                                                <td width="200px">
+                                                    <span style="font-size:medium"><b>{{val.ename}}</b></span><br />
+                                                    <span ng-if="val.newjoin" style="color:red;font-weight:bold">( New joinee )</span><br />
+                                                    <span ng-if="val.leftflag" style="color:red;font-weight:bold">( Left Employee )</span><br />
+                                                    <span><b>{{val.desgname}}</b></span><br /><br />
+                                                    <span style="display: block;" ng-repeat="rr in val.emprating">Rating:&nbsp;&nbsp;<b>{{rr.Month1}}-{{rr.Point}}</b></span><br />                                                   
+                                                    <span style="display: block;">
+                                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Proxy Details" data-ng-model="Proxydetails" data-target="#employeeproxy" ng-click="pdetails(val.hrmE_Id)">
+                                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;">Proxy Name</i>
+                                                        </a>
+                                                    </span><br />
+                                                    <span style="display: block;">Emp Code: {{val.ecode}}</span><br />
+                                                    <span>DOJ:  {{val.vmscrT_DOJ|date:'dd-MM-yyyy'}}</span><br /><br />
+                                                    <span ng-if="val.leftflag" style="color:red;">DOL:  {{val.dol|date:'dd-MM-yyyy'}}</span><br /><br />
+                                                    <span ng-if="val.ISMCLMER_Id>0 && val.ieflag==true" style="color:red;">
+                                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Month End Report " data-ng-model="monthenddetail" data-target="#iemonthendreport" ng-click="iemonthendreport(val.ISMCLMER_Id)">
+                                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;">Client Month End Report</i>
+                                                        </a>
+                                                    </span>
+                                                    <span style="display: block;">
+                                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Evaluation Details" data-ng-model="Edetails" data-target="#employeeEvaluation" ng-click="Evaldetails(val.hrmE_Id)">
+                                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;">Evaluation Details</i>
+                                                        </a>
+                                                    </span><br />
+                                                    <span ng-if="val.ISMCLMER_Id==0 && val.ieflag==true" style="color:red;">
+                                                        <b>Client Month End Report Not Uploaded</b>
+                                                    </span>
+                                                    <br /><br />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <!--<td width="100px">{{val.ecode}}</td>-->
+                                    <!--<td width="120px">{{val.vmscrT_DOJ|date:'dd-MM-yyyy'}}</td>-->
+                                    <!--<td width="120px">{{val.desgname}}</td>-->
+                                    <td width="150px" style="vertical-align: baseline;">
+                                        <br />
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Punch Details" data-ng-model="Punchdetails" data-target="#employeeorder" data-ng-click="getlateinearlyout(val.hrmE_Id,val.ename)">
+                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;"> Attendance Details</i>
+                                        </a>
+                                        <br /><br />
+                                        <table class="table table-responsive table-bordered" style="text-align:left">
+
+                                            <tr>
+
+                                                <td>Month Days </td>
+                                                <td>{{numberofdays}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Working Days</td>
+                                                <td>
+                                                    <span width="120px" ng-if="val.worksdaycount==0">0</span>
+                                                    <span width="120px" ng-if="val.worksdaycount!=0 && val.leftflag==false">{{((numberofdays - val.leavecount) - val.latejoin)}}</span>
+                                                    <span width="120px" ng-if="val.worksdaycount!=0 && val.leftflag==true">{{((val.dolnumberofdays - val.leavecount) - val.latejoin)}} <b>({{val.dolnumberofdays}})</b></span>
+                                                </td>
+                                            </tr>
+                                        </table><br />
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Month End Report " data-ng-model="monthenddetail" data-target="#employeereport" ng-click="getemployeemonthendreport(val.hrmE_Id)">
+                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;"> Month End Report</i>
+                                        </a>
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Notice and Memo Report " data-ng-model="noticememodetail" data-target="#empnoticememodetail" ng-click="getempnoticememodetailreport(val.hrmE_Id)">
+                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;"> Notice and Memo Report</i>
+                                        </a>
+                                        <a href="javascript:void(0)" class="text-primary" ng-if="val.ecode=='69' || val.ecode=='71' || val.ecode=='318'" data-placement="bottom" data-toggle="modal" title="Management Attendance Report" data-ng-model="managementdetail" data-target="#empmanagementdetail" ng-click="getempmanagementdetailreport(val.hrmE_Id)">
+                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;"> Management Attendance Report</i>
+                                        </a>
+                                    </td>
+                                    <!--<td width="120px" ng-if="val.worksdaycount==0">0</td>
+                                    <td width="120px" ng-if="val.worksdaycount!=0">{{((numberofdays - val.leavecount) - val.latejoin)}}</td>-->
+                                    <!--<td width="100px">{{val.empdate[0].earlyout}}</td>
+                                    <td width="100px">{{val.drcount}}</td>
+                                    <td width="100px">{{val.empdate[0].latecoming}}</td>
+                                    <td width="100px">{{val.leavecount}}</td>-->
+
+                                    <td width="300px">
+                                        <table class="table table-hover table-responsive table-bordered" style="text-align:left">
+                                            <tr><td>LC (Dates)</td><td>{{val.empdate[0].latedates}}</td></tr>
+                                            <tr><td>EO (Dates)</td><td>{{val.empdate[0].earlydates}}</td></tr>
+                                            <tr ng-if="val.worksdaycount==0"><td>UL (Dates)</td><td><span style="color:red">( All Days )</span></td></tr>
+
+                                            <tr ng-if="val.worksdaycount!=0"><td>UL (Dates)</td><td>{{val.leavedates}}</td></tr>
+                                            <tr><td>DrN (Dates)</td><td>{{val.drdates}}</td></tr>
+                                            <!--<tr><td>DrHlf (Dates)</td><td>{{val.halfdrdates}}</td></tr>-->
+                                            <tr><td>DrBlock (Dates)</td><td>{{val.blkdrdates}}</td></tr>
+                                            <tr><td>DrRejected (Dates)</td><td>{{val.rejdrdates}}</td></tr>
+                                            <tr>
+                                                <td>
+                                                    Con Call (Extention)
+                                                </td>
+                                                <td>
+                                                    {{val.concallexdates}}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Con Call (Dates)
+                                                    <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="viewcomment(val)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                </td>
+                                                <td>
+                                                    {{val.addinallopdates}}
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <br />
+                                        <a ng-show="val.rccount!=0" href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Leave Details" data-ng-model="RcLeave" data-target="#RcLeaveView" data-ng-click="RcLeaveDetails(val.hrmE_Id,val.ename)">
+                                            <i class="fa fa-eye fa-1x" aria-hidden="true" style="font-weight: 600;">Re-Consideration Leave</i>
+                                        </a>
+                                        <br />
+
+
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered" style="text-align:left">
+                                            <tr><td>LC (After {{val.hrmE_Relaxtime}})</td><td>{{val.empdate[0].latedateafter}}</td></tr>
+                                            <tr><td>EO (After {{val.hrmE_Relaxtime}})</td><td>{{val.empdate[0].earlydateafter}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered" style="text-align:left">
+                                            <tr><td>LC LOP</td><td>{{val.empdate[0].latecoming * 0.5}}</td></tr>
+                                            <tr><td>EO LOP</td><td>{{val.empdate[0].earlyout * 0.5}}</td></tr>
+                                            <tr ng-if="val.worksdaycount==0"><td>UL LOP</td><td>{{val.totlop}}</td></tr>
+                                            <tr ng-if="val.worksdaycount!=0"><td>UL LOP</td><td>{{val.leavecount}}</td></tr>
+                                            <tr><td>DrN LOP</td><td>{{val.drcount * 0.5}}</td></tr>
+                                            <tr><td>DrR LOP</td><td>{{val.rdrcount * 0.5}}</td></tr>
+
+                                            <!--<tr><td>DrHlf LOP</td><td>{{val.halfdrcount * 0.5}}</td></tr>-->
+                                            <!--<tr><td>DrBlock </td><td>{{val.blkdrcount * 0.5}}</td></tr>-->
+                                            <tr><td>Addinal LOP </td><td>{{val.addinallop}}</td></tr>
+
+                                        </table>
+                                    </td>
+
+                                    <!--<td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr>
+                                                <td>HR EO</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hreo_{{$index}}" rows="1"
+                                              ng-model="val.HR_EO" id="comment1{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hreo_{{$index}})"
+                                                         ng-messages="myForm.hreo_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR EO</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>HR DR</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hrdr_{{$index}}" rows="1"
+                                              ng-model="val.HR_DR" id="comment2{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hrdr_{{$index}})"
+                                                         ng-messages="myForm.hrdr_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR DR</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>HR LC</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hrlc_{{$index}}" rows="1"
+                                                              ng-model="val.HR_LC" id="comment3{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hrlc_{{$index}})"
+                                                         ng-messages="myForm.hrlc_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR LC</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>HR UL</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hrul_{{$index}}" rows="1"
+                                             ng-model="val.HR_UL" id="comment4{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hrul_{{$index}})"
+                                                         ng-messages="myForm.hrul_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR UL</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>-->
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr ng-if="val.leave_arraytemp.length>0">
+
+                                                <th>Type</th>
+                                                <!--<th>Days</th>-->
+                                                <th>Date</th>
+
+                                            </tr>
+                                            <tr ng-repeat="data in val.leave_arraytemp">
+                                                <td>{{data.approvedleavetype}}</td>
+                                                <!--<td>{{data.approvedleavedays}}  </td>-->
+                                                <td style="word-wrap: break-word;">{{data.leavedate}} </td>
+                                            </tr>
+                                        </table><br />
+                                        <table class="table table-hover table-responsive table-bordered text-center" ng-if="val.compoffadjestdate.length>0">
+                                            <tr>
+                                                <td>
+                                                    <span style="color:orangered;font-weight:800;font-size:12px" ng-click="compoffadjesteddetails(val)">CompOff Adjusted Dates</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="150px">
+                                        <table class="table table-hover table-responsive table-bordered" style="text-align:left">
+                                            <tr><td>Total LOP</td><td>{{val.totlop}}</td></tr>
+                                            <tr>
+                                                <td>Total Payable Days</td>
+                                                <td>
+                                                    <span ng-if="numberofdays!=val.latejoin && val.leftflag==false">
+
+                                                        {{((numberofdays - val.totlop) - val.latejoin)}}
+                                                    </span>
+                                                    <span ng-if="numberofdays==val.latejoin && val.leftflag==false">
+                                                        {{((numberofdays - val.totlop))}}
+                                                    </span>
+                                                    <span ng-if="val.leftflag==true">
+                                                        {{((val.dolnumberofdays - val.totlop))}}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>No Of Compoff Adjested
+                                                <td>{{val.nooffcompoffadjested}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+
+                                            <tr>
+                                                <td width="30%">Final LOP</td>
+                                                <td>
+                                                    <input class="form-control textareaclass" ng-pattern="/^[0-9]+(\.[0,5]{1})?$/" ng-blur="checklopmatch(val,val.totlop,val.HR_LOP,$index)" name="hrlop_{{$index}}" rows="1" ng-disabled="true" title="{{ val.selected ? '' : 'Select '+val.ename+' to update!'}}" ng-required="val.selected==true"
+                                                           ng-model="val.HR_LOP" style="font-size:large" ng-change="makesubit()" id="comment5{{$index}}">
+                                                    <div class="error-messages" ng-if="interacted(myForm['hrlop_'+$index])"
+                                                         ng-messages="myForm['hrlop_'+$index].$error">
+                                                        <div ng-message="required">Enter Final LOP</div>
+                                                        <div ng-message="pattern">Please Enter valid input format e.g., 15.5, 10.5,10 </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Final Payable
+                                                </td>
+                                                <td style="color:green;font-size: 20px;font-weight:bold;text-align: left;padding-left: 5%;">
+                                                    <span ng-if="numberofdays!=val.latejoin && val.leftflag==false">
+                                                        {{((numberofdays - val.HR_LOP) - val.latejoin)}}
+                                                    </span>
+                                                    <span ng-if="numberofdays==val.latejoin && val.leftflag==false">
+                                                        {{((numberofdays - val.HR_LOP))}}
+                                                    </span>
+                                                    <span ng-if="val.leftflag==true">
+                                                        {{((val.dolnumberofdays - val.HR_LOP))}}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>HR Remark</td>
+                                                <td>
+                                                    <textarea ng-disabled="val.selected!=true" class="form-control textareaclass" name="hrrem_{{$index}}" rows="6" title="{{ val.selected ? '' : 'Select '+val.ename+' to update!'}}"
+                                                              ng-model="val.HR_REM" id="comment6{{$index}}" ng-required="val.totlop!=val.HR_LOP && val.selected==true"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm['hrrem_'+$index])"
+                                                         ng-messages="myForm['hrrem_'+$index].$error">
+                                                        <div ng-message="required">Kindly enter remarks as software calculated LOP not match with manually entered LOP!</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr ng-repeat="data in val.salarydetails">
+                                                <td>{{data.salaryhead}}</td>
+                                                <td>{{data.headamount}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="text-center">
+                    <md-button class="md-raised md-primary" id="save-btns" ng-click="Savedata();" type="submit" ng-disabled="Freezeattendence==true" ng-if="allind=='Month' || allind=='Day'">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" ng-click="Clear_Details();" ng-if="allind=='Month'" target="_blank" class="md-raised md-warn">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                </div>
+            </div>
+            <div ng-show="false">
+                <div class="MonthEndReport" id="tablegrp">
+                    <h3 class="text-center" ng-if="allind=='Month'">{{institutename}} – {{ivrM_Month_Name}} - {{yearname}} - Attendance Report</h3>
+                    <h3 class="text-center" ng-if="allind!='Month'">{{institutename}} – {{from_date |date:'dd-MM-yyyy'}} TO {{to_date |date:'dd-MM-yyyy'}} - Attendance Report</h3>
+                    <div class="">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr style="text-align:center;">
+                                    <th width="50px">Sl.No</th>
+                                    <th width="70px">Emp Code</th>
+                                    <th width="150px">Employee Name</th>
+                                    <th width="120px">DOJ</th>
+                                    <th width="120px">Designation</th>
+                                    <!--<th width="200px">Leave Count</th>-->
+                                    <th width="120px">No. of Days in Month</th>
+                                    <th width="120px">No. of Working Days</th>
+                                    <th width="300px">S/W LOP Details</th>
+                                    <th width="200px">S/W Late/Early (After 180)</th>
+                                    <th width="200px">S/W LOP</th>
+                                    <th width="200px">Approved Details</th>
+                                    <th width="150px">S/W Total</th>
+                                    <th width="200px">Final Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="val in monthendreport" style="text-align:center;">
+                                    <td width="50px">{{ $index+1 }}</td>
+                                    <td width="100px">{{val.ecode}}</td>
+                                    <td width="200px">
+                                        <span></span>{{val.ename}}<br />
+                                        <span ng-if="val.newjoin==true" style="color:red;font-weight:bold">( New joinee )</span>
+                                        <span ng-if="val.leftflag" style="color:red;font-weight:bold">( Left Employee )</span><br />
+                                        <span ng-if="val.ISMCLMER_Id==0 && val.ieflag==true" style="color:red;font-weight:bold">IE Month End Report Not Uploaded</span>
+                                        <span ng-if="val.ISMCLMER_Id>0 && val.ieflag==true" style="color:green;font-weight:bold">IE Month End Report Submited</span>
+                                    </td>
+                                    <td width="120px">
+                                        {{val.vmscrT_DOJ|date:'dd-MM-yyyy'}} <br />
+                                        <span style="color:red;font-weight:bold" ng-if="val.leftflag">{{val.dol|date:'dd-MM-yyyy'}}</span>
+                                    </td>
+                                    <td width="120px">{{val.desgname}}</td>
+                                    <td width="120px" style="color:brown;font-size:small;font-weight:bold">{{numberofdays}}</td>
+                                    <td width="120px" ng-if="val.worksdaycount==0" style="color:green;font-size:small;font-weight:bold">0</td>
+                                    <td width="120px" ng-if="val.worksdaycount!=0 && val.leftflag==false" style="color:green;font-size:small;font-weight:bold">{{((numberofdays - val.leavecount) - val.latejoin)}}</td>
+                                    <td width="120px" ng-if="val.worksdaycount!=0 && val.leftflag==true" style="color:green;font-size:small;font-weight:bold">{{((val.dolnumberofdays - val.leavecount) - val.latejoin)}} <b>({{val.dolnumberofdays}})</b></td>
+                                    <!--<td width="100px">{{val.empdate[0].earlyout}}</td>
+                                    <td width="100px">{{val.drcount}}</td>
+                                    <td width="100px">{{val.empdate[0].latecoming}}</td>
+                                    <td width="100px">{{val.leavecount}}</td>-->
+
+                                    <td width="300px">
+
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+
+                                            <tr><td>LC (Dates)</td><td>{{val.empdate[0].latedates}}</td></tr>
+                                            <tr><td>EO (Dates)</td><td>{{val.empdate[0].earlydates}}</td></tr>
+                                            <tr ng-if="val.worksdaycount==0"><td>UL (Dates)</td><td>( All Days )</td></tr>
+                                            <tr ng-if="val.worksdaycount!=0"><td>UL (Dates)</td><td>{{val.leavedates}}</td></tr>
+                                            <tr><td>DrN (Dates)</td><td>{{val.drdates}}</td></tr>
+                                            <!--<tr><td>DrHlf (Dates)</td><td>{{val.halfdrdates}}</td></tr>-->
+                                            <tr><td>DrBlock (Dates)</td><td>{{val.blkdrdates}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>LC (After 180)</td><td>{{val.empdate[0].latedateafter}}</td></tr>
+                                            <tr><td>EO (After 180)</td><td>{{val.empdate[0].earlydateafter}}</td></tr>
+                                        </table>
+                                    </td>
+
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><td>LC LOP</td><td>{{val.empdate[0].latecoming * 0.5}}</td></tr>
+                                            <tr><td>EO LOP</td><td>{{val.empdate[0].earlyout * 0.5}}</td></tr>
+                                            <tr ng-if="val.worksdaycount==0"><td>UL LOP</td><td>{{val.totlop}}</td></tr>
+                                            <tr ng-if="val.worksdaycount!=0"><td>UL LOP</td><td>{{val.leavecount}}</td></tr>
+                                            <tr><td>DrN LOP</td><td>{{val.drcount * 0.5}}</td></tr>
+                                            <!--<tr><td>DrHlf LOP</td><td>{{val.halfdrcount * 0.5}}</td></tr>-->
+                                            <!--<tr><td>DrBlock LOP</td><td>{{val.blkdrcount * 0.5}}</td></tr>-->
+                                        </table>
+                                    </td>
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr ng-if="val.leave_arraytemp.length>0">
+                                                <th>Type</th>
+                                                <!--<th>Days</th>-->
+                                                <th>Date</th>
+                                            </tr>
+                                            <tr ng-repeat="data in val.leave_arraytemp">
+                                                <td>{{data.approvedleavetype}}</td>
+                                                <!--<td>{{data.approvedleavedays}}  </td>-->
+                                                <td style="word-wrap: break-word;">{{data.leavedate}} </td>
+                                            </tr>
+                                        </table>
+                                        <br />
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr><th>Approved Missing Punch</th></tr>
+                                            <tr ng-if="val.missingpunchApproveddates.length>0">
+                                                <th>Dates</th>
+                                            </tr>
+                                            <tr ng-repeat="data in val.missingpunchApproveddates">
+                                                <td style="word-wrap: break-word;">{{data.missingpunchdate}} </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="150px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr>
+                                                <td>Total LOP</td>
+                                                <td><span ng-if="val.totlop==0 || val.totlop=='0'" style="color:green;font-size:medium;font-weight:bold">{{val.totlop}}</span><span ng-if="val.totlop!=0" style="color:red;font-size:medium;font-weight:bold">{{val.totlop}}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Total Payable Days
+                                                </td>
+                                                <td style="color:green;font-size:medium;font-weight:bold">
+                                                    <span ng-if="numberofdays!=val.latejoin && val.leftflag==false">
+                                                        {{((numberofdays - val.totlop) - val.latejoin)}}
+                                                    </span>
+                                                    <span ng-if="numberofdays==val.latejoin && val.leftflag==false">
+                                                        {{((numberofdays - val.totlop))}}
+                                                    </span>
+                                                    <span ng-if="val.leftflag==true">
+                                                        {{((val.dolnumberofdays - val.totlop))}}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+
+                                    <!--<td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr>
+                                                <td>HR EO</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hreo_{{$index}}" rows="1"
+                                                              ng-model="val.HR_EO" id="comment1{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hreo_{{$index}})"
+                                                         ng-messages="myForm.hreo_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR EO</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>HR DR</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hrdr_{{$index}}" rows="1"
+                                                              ng-model="val.HR_DR" id="comment2{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hrdr_{{$index}})"
+                                                         ng-messages="myForm.hrdr_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR DR</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>HR LC</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hrlc_{{$index}}" rows="1"
+                                                              ng-model="val.HR_LC" id="comment3{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hrlc_{{$index}})"
+                                                         ng-messages="myForm.hrlc_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR LC</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>HR UL</td>
+                                                <td>
+                                                    <textarea class="form-control textareaclass" name="hrul_{{$index}}" rows="1"
+                                                              ng-model="val.HR_UL" id="comment4{{$index}}"></textarea>
+                                                    <div class="error-messages" ng-if="interacted(myForm.hrul_{{$index}})"
+                                                         ng-messages="myForm.hrul_{{$index}}.$error">
+                                                        <div ng-message="required">Enter HR UL</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>-->
+                                    <td width="200px">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <tr>
+                                                <td><b>Final LOP</b></td>
+                                                <td>
+                                                    <span ng-if="val.HR_LOP==0 || val.HR_LOP=='0'" style="color:green;font-size:medium;font-weight:bold">{{val.HR_LOP}}</span>
+                                                    <span ng-if="val.HR_LOP!=0" style="color:red;font-size:medium;font-weight:bold">{{val.HR_LOP}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <b>Final Payable</b>
+                                                </td>
+                                                <td style="color:green;font-size: medium;font-weight:bold;">
+                                                    <span ng-if="numberofdays!=val.latejoin && val.leftflag==false">
+                                                        {{((numberofdays - val.HR_LOP) - val.latejoin)}}
+                                                    </span>
+                                                    <span ng-if="numberofdays==val.latejoin && val.leftflag==false">
+                                                        {{((numberofdays - val.HR_LOP))}}
+                                                    </span>
+                                                    <span ng-if="val.leftflag==true">
+                                                        {{((val.dolnumberofdays - val.HR_LOP))}}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>HR Remark</td>
+                                                <td style="text-align:left">{{val.HR_REM}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="false">
+                <div class="MonthEndReport" id="tablegrpprint">
+                    <div ng-repeat="val in monthendreport" style="text-align:center;page-break-after:always !important;">
+                        <div id="html_{{val.hrmE_Id}}">
+                            <h3 class="text-center" style="color:#3a5999 !important" ng-if="allind=='Month'">{{institutename| uppercase}} – {{ivrM_Month_Name| uppercase}} - {{yearname| uppercase}} - ATTENDANCE REPORT</h3>
+                            <h3 class="text-center" style="color:#3a5999 !important" ng-if="allind!='Month'">{{institutename| uppercase}} – {{from_date |date:'dd-MM-yyyy'}} TO {{to_date |date:'dd-MM-yyyy'}} - ATTENDANCE REPORT</h3>
+                            <div class="row col-sm-12">
+                                <div>
+                                    <table class="table col-sm-12 table-bordered" style="text-align:left">
+                                        <tr>
+                                            <td>
+                                                Employee Name :<b>{{val.ename}}</b>
+                                                <span ng-if="val.newjoin==true" style="color:red;font-weight:bold">( New joinee )</span>
+                                                <span ng-if="val.leftflag" style="color:red;font-weight:bold">( Left Employee )</span>
+                                            </td>
+                                            <td>
+                                                Employee Code :
+                                            </td>
+                                            <td>{{val.ecode}}</td>
+                                            <td>DOJ:</td>
+                                            <td>{{val.vmscrT_DOJ|date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="val.leftflag" style="color:red;">DOl:</td>
+                                            <td ng-if="val.leftflag" style="color:red;">{{val.dol |date:'dd-MM-yyyy'}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Designation :{{val.desgname}}
+                                            </td>
+                                            <td>
+                                                Month Days:
+                                            </td>
+                                            <td>{{numberofdays}}</td>
+                                            <td> Working Days:</td>
+                                            <td>
+                                                <span width="120px" ng-if="val.worksdaycount==0" style="color:green;font-size:large;font-weight:bold">0</span>
+                                                <span width="120px" ng-if="val.worksdaycount!=0 && val.leftflag==false">{{((numberofdays - val.leavecount) - val.latejoin)}}</span>
+                                                <span width="120px" ng-if="val.worksdaycount!=0 && val.leftflag==true">{{((val.dolnumberofdays - val.leavecount) - val.latejoin)}} <b>({{val.dolnumberofdays}})</b></span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="margin-top-10">
+                                <table class="table table-bordered" style="width: 100%;">
+                                    <thead>
+                                        <tr style="text-align:center;background: #0463c2;color: white;font-weight: bold;height: 25px;">
+                                            <th>S/W LOP Details</th>
+                                            <th>Late/Early(After 180)</th>
+                                            <th>S/W LOP</th>
+                                            <th ng-if="val.leave_arraytemp.length>0">Approved Leave Details</th>
+                                            <th ng-if="val.leave_arraytemp==null || val.leave_arraytemp.length==0">Leave Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td width="300px">
+                                                <table style="text-align:left;width: 100%;" class="table  table-hover table-responsive table-bordered">
+                                                    <tr><td>LC (Dates)</td><td style="min-width:50px">{{val.empdate[0].latedates}}</td></tr>
+                                                    <tr><td>EO (Dates)</td><td style="min-width:50px">{{val.empdate[0].earlydates}}</td></tr>
+                                                    <tr ng-if="val.worksdaycount==0"><td style="min-width:50px">UL (Dates)</td><td>( All Days )</td></tr>
+                                                    <tr ng-if="val.worksdaycount!=0"><td style="min-width:50px">UL (Dates)</td><td>{{val.leavedates}}</td></tr>
+                                                    <tr><td>DrN (Dates)</td><td style="min-width:50px">{{val.drdates}}</td></tr>
+                                                    <!--<tr><td>DrHlf (Dates)</td><td style="min-width:50px">{{val.halfdrdates}}</td></tr>-->
+                                                    <tr><td>DrBlock (Dates)</td><td style="min-width:50px">{{val.blkdrdates}}</td></tr>
+                                                </table>
+                                            </td>
+
+                                            <td width="250px">
+                                                <table style="text-align:left;width: 100%;" class="table table-hover table-responsive table-bordered text-center">
+                                                    <tr><td width="50%">LC (After 180)</td><td width="50%">{{val.empdate[0].latedateafter}}</td></tr>
+                                                    <tr><td width="50%">EO (After 180)</td><td width="50%">{{val.empdate[0].earlydateafter}}</td></tr>
+                                                </table>
+                                            </td>
+
+                                            <td width="200px">
+                                                <table style="text-align:left;width: 100%;" class="table table-hover table-responsive table-bordered text-center">
+                                                    <tr><td>LC LOP</td><td>{{val.empdate[0].latecoming * 0.5}}</td></tr>
+                                                    <tr><td>EO LOP</td><td>{{val.empdate[0].earlyout * 0.5}}</td></tr>
+                                                    <tr ng-if="val.worksdaycount==0"><td>UL LOP</td><td>{{val.totlop}}</td></tr>
+                                                    <tr ng-if="val.worksdaycount!=0"><td>UL LOP</td><td>{{val.leavecount}}</td></tr>
+                                                    <tr><td>DrN LOP</td><td>{{val.drcount * 0.5}}</td></tr>
+                                                    <!--<tr><td>DrHlf LOP</td><td>{{val.halfdrcount * 0.5}}</td></tr>-->
+                                                    <!--<tr><td>DrBlock LOP</td><td>{{val.blkdrcount * 0.5}}</td></tr>-->
+                                                </table>
+                                            </td>
+                                            <td width="200px" ng-if="val.leave_arraytemp.length>0">
+                                                <table style="text-align:left;width: 100%;" class="table table-hover table-responsive table-bordered text-center">
+                                                    <tr ng-if="val.leave_arraytemp.length>0">
+                                                        <th>Type</th>
+                                                        <th>Date</th>
+                                                    </tr>
+                                                    <tr ng-repeat="data in val.leave_arraytemp">
+                                                        <td>{{data.approvedleavetype}}</td>
+                                                        <td style="word-wrap: break-word;">{{data.leavedate}} </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                            <td width="100px" ng-if="val.leave_arraytemp==null || val.leave_arraytemp.length==0">
+                                                <p style="text-align:center">No Leave Details!!</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <br />
+                                <div>
+                                    <table class="table col-sm-12 table-bordered">
+                                        <tr>
+                                            <td width="25%">
+                                                <b>Total LOP :</b>
+                                            </td>
+                                            <td width="25%"><span ng-if="val.totlop==0 || val.totlop=='0'" style="color:green;font-size:x-large;font-weight:bold">{{val.totlop}}</span><span ng-if="val.totlop!=0" style="color:red;font-size:x-large;font-weight:bold">{{val.totlop}}</span></td>
+                                            <td width="25%"><b>Total Payable Days:</b></td>
+                                            <td width="25%" style="color:darkgreen;font-size:x-large;font-weight:bold">
+                                                <span ng-if="numberofdays!=val.latejoin && val.leftflag==false">
+                                                    {{((numberofdays - val.totlop) - val.latejoin)}}
+                                                </span>
+                                                <span ng-if="numberofdays==val.latejoin && val.leftflag==false">
+                                                    {{((numberofdays - val.totlop))}}
+                                                </span>
+                                                <span ng-if="val.leftflag==true">
+                                                    {{((val.dolnumberofdays - val.totlop))}}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div ng-if="val.totlop!=val.HR_LOP">
+                                    <table class="table col-sm-12 table-bordered margin-top-5">
+                                        <tr>
+                                            <td width="12%">
+                                                <b> Final LOP :</b>
+                                            </td>
+                                            <td width="10%">
+                                                <span ng-if="val.HR_LOP==0 || val.HR_LOP=='0'" style="color:green;font-size:x-large;font-weight:bold">{{val.HR_LOP}}</span>
+                                                <span ng-if="val.HR_LOP!=0" style="color:red;font-size:x-large;font-weight:bold">{{val.HR_LOP}}</span>
+                                            </td>
+                                            <td width="12%">
+                                                <b> Final Payable</b>
+                                            </td>
+                                            <td width="10%" style="color:green;font-size: 24px;font-weight:bold;text-align: left;">
+                                                <span ng-if="numberofdays!=val.latejoin && val.leftflag==false">
+                                                    {{((numberofdays - val.HR_LOP) - val.latejoin)}}
+                                                </span>
+                                                <span ng-if="numberofdays==val.latejoin && val.leftflag==false">
+                                                    {{((numberofdays - val.HR_LOP))}}
+                                                </span>
+                                                <span ng-if="val.leftflag==true">
+                                                    {{((val.dolnumberofdays - val.HR_LOP))}}
+                                                </span>
+                                            </td>
+                                            <td width="12%"><b>HR Remark:</b></td>
+                                            <td width="70%" style="text-align:left"> {{val.HR_REM}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <p style="font-size: larger;">Note: Kindly Contact FO / HR Department for any clarifications.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="Notapprovedleave" class="modal fade" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            <h4 class="modal-title text-white">Pending Leave Approval Details</h4>
+                        </div>
+                        <div class="modal-body">
+                            <h5 style="color:red !important">Below Employee Leave Approval is pending</h5>
+                            <h5 style="color:red !important">Declare Perticular Status Of Thease Employee Leave (Approve/Reject)</h5>
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Application ID
+                                        </th>
+                                        <th>
+                                            Department
+                                        </th>
+                                        <th>
+                                            Leave Name
+                                        </th>
+                                        <th>
+                                            Data of Leave
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in Notapprovedsts">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{ user.EmpName}}</td>
+                                        <td>{{ user.HRELAP_ApplicationID}}</td>
+                                        <td>{{ user.HRMD_DepartmentName}}</td>
+                                        <td>{{ user.HRML_LeaveName}}</td>
+                                        <td>{{ user.HRELAP_FromDate | date:'dd/MM/yyyy'}} TO {{user.HRELAP_ToDate | date:'dd/MM/yyyy'}}</td>
+                                        <td>{{ user.HRELAP_ApplicationStatus}} </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="employeeproxy" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Proxy Details</h4>
+                        <div class="modal-body">
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Employee Code
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in proxydetails">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{ user.HRME_EmployeeLastName}}</td>
+                                        <td>{{ user.HRME_EmployeeCode}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="employeeEvaluation" role="dialog">
+                <div class="modal-dialog modal-lg" style="width:1000px;">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Evaluation Details</h4>
+                        <div class="modal-body">
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <!--<th>
+                                            Employee Code
+                                        </th>-->
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Evaluation Questions
+                                        </th>
+                                        <th>
+                                            Point
+                                        </th>
+                                        <th>
+                                            Average
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in evaluationdetails">
+                                        <td class="handle">{{$index + 1}}</td>
+                                        <td ng-if="$index === 0" rowspan="{{evaluationdetails.length}}">{{Employee_Name}}</td>
+                                        <td>{{user.Questions}}</td>
+                                        <td>{{user.Point}}</td>
+                                        <td ng-if="$index === 0" rowspan="{{evaluationdetails.length}}">{{Average}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="employeeorder" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Attendance Details</h4>
+                        <div class="row modal-header" style="padding: 5px !important;">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <h4 class="modal-title text-center" style="color:#fff !important;">{{emppunchname}}</h4>
+                            </div>
+                            <div class="col-sm-3">
+                                <!--<button type="button" class="close" data-dismiss="modal">
+                                    <i class="fa fa-times" aria-hidden="true" style="color:#fff !important;"></i>
+                                </button>-->
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-center" style="font-size: medium;text-align:left;font-weight:bold">{{lateinminute}} Used</p>
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            Punch Date
+                                        </th>
+                                        <th>
+                                            In Time
+                                        </th>
+                                        <th>
+                                            Out Time
+                                        </th>
+                                        <th>
+                                            Working Hours
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in punchdetails">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{ user.punchdate}}</td>
+                                        <td class="{{user.lateclass}}">{{ user.intime}} <span style="color:red;font-weight:800">{{user.gpsintime}}</span> </td>
+                                        <td class="{{user.earlyclass}}">{{ user.outtime}} <span style="color:red;font-weight:800">{{user.gpsouttime}}</span></td>
+                                        <td class="handle">{{ user.workingtime}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<div class="modal fade" id="RcLeaveView" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Re-Consideration Leave Approval</h4>
+                        <div class="modal-body">
+                            <p class="text-center" style="font-size: medium;text-align:left;font-weight:bold"></p>
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Leave Reason
+                                        </th>
+                                        <th>
+                                            From Date
+                                        </th>
+                                        <th>
+                                            To Date
+                                        </th>
+                                        <th>
+                                            Total Days
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>
+                                            Remark
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in rcleavedetails">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td hidden>{{ user.HRERLAP_Id}}</td>
+                                        <td>{{ user.EmployeeName}}</td>
+                                        <td>{{ user.HRERLAP_LeaveReason}}</td>
+                                        <td>{{ user.HRERLAP_FromDate | date: dd/MM/yyyy}}</td>
+                                        <td>{{ user.HRERLAP_ToDate | date: dd/MM/yyyy}}</td>
+                                        <td>{{ user.HRERLAP_TotalDays}}</td>
+                                        <td>
+                                            <select class="form-control" id="sel233" ng-model="user.HRERLAP_ApplicationStatus" name="status">
+                                                <option value="Pending">Pending</option>
+                                                <option value="Approved">Approved</option>
+                                                <option value="Rejected">Rejected</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <textarea type="text" name="Remark" class="form-control active" ng-model="user.HRERLAP_Remarks" placeholder="Remark" rows="2"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="text-center" ng-show="rcleavedetails.length > 0">
+
+                                <md-button type="button" class="md-raised md-accent" ng-click="SaveRc(user)">
+                                    Save
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+
+            <div id="RcLeaveView" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg" style="width: 95%;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <i class="fa fa-times text-white"
+                                   aria-hidden="true" ng-click="closemodal()"></i>
+                            </button>
+                            <h4 class="modal-title text-white">
+                                Re-Consideration Leave Apply
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <from class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" method="post" novalidate>
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="row" ng-show="rcleavedetails.length>0">
+                                            <div class="col-sm-12">
+                                                <table class="table table-hover table-responsive table-bordered text-center">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>
+                                                                <a href="">SL.NO</a>
+                                                            </th>
+                                                            <th class="hdTH">
+                                                                <label>
+                                                                    <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                                                    <span class="lbl padding-8"></span>
+                                                                </label>
+                                                            </th>
+                                                            <th>Employee Name</th>
+                                                            <th>Leave Reason</th>
+                                                            <th>From Date</th>
+                                                            <th>To Date</th>
+                                                            <th>Total Days</th>
+                                                            <th>Status</th>
+                                                            <th>Remark</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="rcuser in rcleavedetails">
+                                                            <td class="handle">{{$index+1}}</td>
+                                                            <td class="text-center  hdTD">
+                                                                <label>
+                                                                    <input type="checkbox" ng-model="rcuser.selected" value="{{rcuser.HRERLAP_Id}}" ng-change="optionToggled1(rcuser)">
+                                                                    <span class="lbl padding-8"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td hidden>{{ rcuser.HRERLAP_Id}}</td>
+                                                            <td>{{ rcuser.EmployeeName}}</td>
+                                                            <td>{{ rcuser.HRERLAP_LeaveReason}}</td>
+                                                            <td>{{ rcuser.HRERLAP_FromDate | date: dd/MM/yyyy}}</td>
+                                                            <td>{{ rcuser.HRERLAP_ToDate | date: dd/MM/yyyy}}</td>
+                                                            <td>{{ rcuser.HRERLAP_TotalDays}}</td>
+                                                            <td>
+                                                                <select class="form-control" id="sel233" ng-model="rcuser.HRERLAP_ApplicationStatus" name="status" ng-disabled="!rcuser.selected">
+                                                                    <option value="Panding">Panding</option>
+                                                                    <option value="Approved">Approved</option>
+                                                                    <option value="Rejected">Rejected</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <textarea type="text" name="Remark" class="form-control active" ng-model="rcuser.HRERLAP_Remarks" placeholder="Remark"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="text-center" ng-show="rcleavedetails.length > 0">
+                                            <md-button type="button" class="md-raised md-accent" ng-click="SaveRc(rcuser)">
+                                                save
+                                            </md-button>
+                                            <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                                <i class="fa fa-times" aria-hidden="true"></i>
+                                                Cancel
+                                            </md-button>
+                                        </div>
+                                        <div class="box-body" ng-show="rcleavedetails.length==0">
+                                            <div class="text-center"><b style="color:red">LEAVE ARE NOT AVAILABLE FOR APPROVAL </b></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </from>
+
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"
+                                    ng-click="closemodal()">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="myAdditionallopdetails" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Employee Addinal Lop Details</h4>
+                        <div class="row modal-header" style="padding: 5px !important;">
+                            <div class="col-sm-6 col-sm-offset-3">
+
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <!--<div class="row" ng-if="additionallopdetails !=null && additionallopdetails.lenght <=0">
+                                <span style="color:red;font-weight:600">
+                                    No Additional Lop Found
+                                </span>
+                            </div>-->
+
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            LOP Type
+                                        </th>
+                                        <th>
+                                            LOP Date
+                                        </th>
+                                        <th>
+                                            Document
+                                        </th>
+                                        <th>
+                                            Reason
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="mer in additionallopdetails">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{ mer.hralD_Type}}</td>
+                                        <td>{{ mer.hralD_Date |date: dd/MM/yyyy}}</td>
+                                        <td>
+                                            <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="mer.hralD_File  !=null && mer.hralD_File !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(mer.hralD_File)">
+                                                view
+                                            </a>
+                                        </td>
+                                        <td>{{ mer.hralD_Remarks}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="modal fade" id="iemonthendreport" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">IE Month End Report</h4>
+                        <div class="row modal-header" style="padding: 5px !important;">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <h4 class="modal-title text-center" style="color:#fff !important;">{{emppunchname}}</h4>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-center" style="font-size: medium;text-align:left;font-weight:bold">Client: {{ClientName}}</p>
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            File Name
+                                        </th>
+                                        <th>
+                                            Document
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="mer in monthendreportotherdata">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{ mer.ISMCLMERFL_FileName}}</td>
+                                        <td>
+                                            <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="mer.ISMCLMERFL_FilePath  !=null && mer.ISMCLMERFL_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(mer.ISMCLMERFL_FilePath)">
+                                                view
+                                            </a>
+                                        </td>
+                                        <td class="handle">
+                                            <a href="" ng-if="mer.ISMCLMERFL_ApprovedFlg ==true" class="text-green">
+                                                <i class="fa fa-check text-green" title="approved"></i>
+                                            </a>
+                                            <a href="" ng-if="mer.ISMCLMERFL_ApprovedFlg ==false" class="text-red">
+                                                <i class="fa fa-times text-red" title="Not approved"></i>
+                                            </a>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="modal fade" id="compoffadjesteddetailsshow" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Compoff Adjusted Details</h4>
+                        <div class="row modal-header" style="padding: 5px !important;">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <h4 class="modal-title text-center" style="color:#fff !important;">{{emppunchname}}</h4>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            Type
+                                        </th>
+                                        <th>
+                                            Date
+                                        </th>
+                                        <th>
+                                            LOP Adjusted
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="mer in compoffadjestdate">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{ mer.Type}}</td>
+                                        <td>{{ mer.Date}}</td>
+                                        <td>{{ mer.LOP}}</td>
+                                        <td>
+                                            <span style="color:forestgreen;font-weight:600" ng-if="mer.Status=='Approved'">Adjusted</span>
+                                            <span style="color: #ff3131;font-weight:600" ng-if="mer.Status=='Applied'">Requested</span>
+                                            <!--<span ng-if="mer.Status!='Approved'"> {{ mer.Status}}</span>-->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br />
+
+                            <div class="row">
+                                <div class="text-center">
+                                    <div class="col-sm-6">
+                                        <!--<span style="font-weight:600">
+                                            Total Compoff Balance:{{Totalcompoffbalance}}
+                                        </span>-->
+                                    </div>
+                                    <div class="col-sm-6">
+                                        -s
+                                        <span style="font-weight:600">
+                                            Total Compoff Adjusted:{{nooffcompoffadjested}}
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- Consolidated Month End Report -->
+            <div class="modal fade" id="employeereport" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg" style="width:95%">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Employee Month End Report</h4>
+                        <div class="modal-header" style="padding: 0px !important;">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <h3 class="text-center" ng-if="allind=='Month'">{{institutename}} – {{ivrM_Month_Name}} - {{yearname}} - Employee Month End Report</h3>
+                            <h3 class="text-center" ng-if="allind!='Month'">{{institutename}} – {{from_date |date:'dd-MM-yyyy'}} TO {{to_date |date:'dd-MM-yyyy'}} -Employee Month End Report</h3>
+                            <h4 class="text-left" style="margin-left:10px"> Employee Name : {{employeename}}</h4>
+                            <h4 class="text-left" style="margin-left:10px"> Employee Code : {{empcode}}</h4>
+                            <div class="box-body" style="overflow:auto">
+                                <table class="table table-hover table-responsive table-bordered" id="table">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" colspan="4">Client</th>
+                                            <th rowspan="2" colspan="4" ng-if="$parent.Dept.hrmD_Id==0">Department</th>
+                                            <th rowspan="2" ng-click="totemppening(1)">Pending <br /><b>{{totinterdeppending}}</b> </th>
+                                            <th rowspan="2" ng-click="totemppclose(1)">Close <br /><b>{{totinterdepclose}}</b></th>
+                                            <th rowspan="2" ng-click="totemptotal(1)">Total <br /><b>{{totinterdeptot}}</b></th>
+                                            <th ng-repeat="status in statusfilteredlistemp">
+                                                <span ng-click="onclickstatus(status.status)">{{status.status}} ({{status.count}})</span>
+                                            </th>
+                                            <th rowspan="2">Total Pending % </th>
+                                            <th rowspan="2">Total Close % </th>
+                                        </tr>
+                                        <tr>
+                                            <th ng-repeat="status in statusfilteredlistemp">
+                                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th ng-repeat="priority in priorityfilteredlistemp">{{priority}}</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="issues in statuswiseemployeesemp | orderBy:'-pendingcount'">
+                                        <tr>
+                                            <td style="text-align:left" colspan="4">{{issues.name}}</td>
+                                            <td style="text-align:left" colspan="4" ng-if="$parent.Dept.hrmD_Id==0">{{issues.department}}</td>
+                                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emppening(issues.empid,issues.departid,1)">{{issues.pendingcount}}</b></td>
+                                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emppclose(issues.empid,issues.departid,1)">{{issues.closecount}}</b></td>
+                                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emptotal(issues.empid,issues.departid,1)">{{issues.count}}</b></td>
+                                            <td ng-repeat="status in statusfilteredlistemp">
+                                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="text-align:center" ng-repeat="priority in priorityfilteredlistemp" width="50px" height="35px">
+                                                                <span ng-repeat="sub in issues.subarray" ng-if="sub.priority==priority && sub.status==status.status">
+                                                                    <b ng-model="sub.hrme_id" ng-click="oncountclick(sub.hrme_id,sub.priority,sub.status,sub.departid)" style="font-size: 16px !important;cursor: pointer;">{{sub.rcount}}</b>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emptotal(issues.empid,issues.departid,1)">{{issues.pendingpecentage}}%</b></td>
+                                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emptotal(issues.empid,issues.departid,1)">{{issues.closepercentage}}%</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table> <br />
+
+                                <table class="table table-hover table-responsive table-bordered" id="table" style="width:50%">
+                                    <tbody ng-repeat="issues in temp_overallempissuesall">
+
+                                        <tr>
+
+                                            <td> 1 </td>
+                                            <th>Total no of working Days</th>
+                                            <td>{{issues.TOTALNOOF_WORKINGDAYS}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2 </td>
+                                            <th>Total No of days Presnt</th>
+                                            <td>{{issues.TOTALNOOF_DAYSPRESENT}}</td>
+                                        </tr>
+                                        <tr ng-if="issues.TOTALNOOF_DAYSABSENT != null ">
+                                            <td> 3 </td>
+                                            <th>Total no of days absent</th>
+                                            <td>{{issues.TOTALNOOF_DAYSABSENT}}</td>
+                                        </tr>
+                                        <tr ng-if="issues.TOTALNOOF_DAYSABSENT == null ">
+                                            <td> 3 </td>
+                                            <th>Total no of days absent</th>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 4 </td>
+                                            <th>Total no of days leave applied</th>
+                                            <td>{{issues.TOTALNOOF_LEAVEAPPLIED}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 5 </td>
+                                            <th>Total no of days leave approved</th>
+                                            <td>{{issues.TOTALNOOF_LEAVEAPPROVED}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 6 </td>
+                                            <th>Total no of days leave rejected</th>
+                                            <td>{{issues.TOTALNOOF_LEAVEREJECTED}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 7 </td>
+                                            <th>Total no of comp off applied</th>
+                                            <td>{{issues.TOTAL_COMPOFFAPPLIES}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 8 </td>
+                                            <th>Total no of comp off approved</th>
+                                            <td>{{issues.TOTAL_COMPOFFAPPROVEDD}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 9 </td>
+                                            <th>Total no of comp off rejected</th>
+                                            <td>{{issues.TOTAL_COMPOFFREJECTED}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 10 </td>
+                                            <th>Total no of Memos</th>
+                                            <td>{{issues.TOTALMEMOS}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 11 </td>
+                                            <th>Total no of Notices</th>
+                                            <td>{{issues.TOTALNOTICES}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 12 </td>
+                                            <th>Total Deviation</th>
+                                            <td>{{issues.Deviation_Percentage}}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 13 </td>
+                                            <th>Total DR Generated</th>
+                                            <td>{{issues.DRGENERATED}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> 14 </td>
+                                            <th>Total DR Not Generated</th>
+                                            <td>{{issues.DRNOTGENERATED}}</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="empmanagementdetail" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg" style="width:50%">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Management attendence Report</h4>
+                        <div class="modal-header" style="padding: 0px !important;">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body" ng-if="empmanagementdetailreport.length>0">
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Total Working Hours for the Month
+                                        </th>
+                                        <th>
+                                            Working Hours
+                                        </th>
+                                        <th>
+                                            Balance Hours
+                                        </th>
+                                        <th>
+                                            No. of LOP
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user12 in empmanagementdetailreport">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{user12.EmployeeName}}</td>
+                                        <td>{{user12.TotalWorkingHours}}</td>
+                                        <td>{{user12.Employeeworkinghours}}</td>
+                                        <td>{{user12.EmployeenonWorkingHours}}</td>
+                                        <td>{{user12.LopDays}}</td>
+                                        <!--<td>{{ mer12.LopDays | date:'dd-MM-yyyy'}}</td>-->
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-body" ng-hide="empmanagementdetailreport.length>0">
+                            <h4 class="modal-title text-center">
+                                Management attendence not received.
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="empnoticememodetail" role="dialog" data-backdrop="static">
+                <div class="modal-dialog modal-lg" style="width:60%">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <h4 class="modal-title text-center">Notice and Memo Report</h4>
+                        <div class="modal-header" style="padding: 0px !important;">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body" ng-show="overallempmemonotice.length>0">
+                            <table class="table table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl. No.
+                                        </th>
+                                        <th>
+                                            Type
+                                        </th>
+                                        <th>
+                                            Date
+                                        </th>
+                                        <th>
+                                            Reference No.
+                                        </th>
+                                        <th>
+                                            Subject
+                                        </th>
+                                        <th>
+                                            Description
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="mer12 in overallempmemonotice">
+                                        <td class="handle">{{$index+1}}</td>
+                                        <td>{{ mer12.ISMEMN_Type}}</td>
+                                        <td>{{ mer12.ISMEMN_Date | date:'dd-MM-yyyy'}}</td>
+                                        <td>{{ mer12.ISMEMN_No}}</td>
+                                        <td>{{ mer12.FMSCOR_Subject}}</td>
+                                        <td>{{ mer12.ISMEMN_Description}}</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-body" ng-hide="overallempmemonotice.length>0">
+                            <h4 class="modal-title text-center">
+                                The staff has not received any notice or memo.
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</section>
+
+
+
+<!--==================== Image Preview Model ===========================-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{filenames}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+
+
+                <div id="pdfIdzz">
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<button id="myBtn" title="Go to top"><i class="fas fa-angle-double-down" aria-hidden="true"> </i></button>
+<button id="myBtntop" title="Go to top"><i class="fas fa-angle-double-up" aria-hidden="true"></i></button>

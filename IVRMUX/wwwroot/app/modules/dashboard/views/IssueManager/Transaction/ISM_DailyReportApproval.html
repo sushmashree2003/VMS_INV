@@ -1,0 +1,1628 @@
+﻿<style>
+    .red {
+        background-color: red;
+    }
+
+    .darkred {
+        background-color: darkRed;
+    }
+
+    .green {
+        background-color: green;
+    }
+
+    .text-body {
+        font-family: FontAwesome;
+        font-weight: 600;
+        overflow-x: hidden;
+        overflow-y: auto;
+        font-size: 15px;
+        color: #0d4073;
+    }
+
+    .textareaclassd {
+        margin: 0px -170.609px 0px 0px;
+        width: 499px;
+        height: 174px;
+        resize: none !important;
+    }
+
+    .textareaclass {
+        resize: none !important;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .borderemployee {
+        border: 2px solid black;
+        border-style: ridge;
+        border-radius: 15px;
+        margin-top: 10px;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    h4, .h4 {
+        font-family: 'Source Sans Pro', sans-serif !important;
+        color: #3a5999 !important;
+        font-weight: 700 !important;
+        font-size: 18px !important;
+        text-transform: none !important;
+    }
+
+    .md-tooltip {
+        color: white !important;
+    }
+
+    .remarksstyle {
+        width: 90% !important;
+        padding-left: 15% !important;
+    }
+</style>
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Daily Report Approval</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-primary" ng-click="OnClickNotApprovedBtn()">
+                        <i class="fa fa-eye" aria-hidden="true"></i> &nbsp; View Month Wise Not Approved List
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-3 padding-left-2px">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 8px;width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueDeptd" type="text" placeholder="Search Department here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                    <label>
+                                        <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox"
+                                               ng-click="all_checkdept(departmentselectedAll)">
+                                        <span class="lbl padding-8">
+                                            <b> All Department</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                        <input name="dept" ng-model="user.selected" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee"
+                                               ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueDesgd" type="text" placeholder="Search Designation here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                    <label>
+                                        <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                        <span class="lbl padding-8">
+                                            <b> All Designation</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                        <input name="desg" ng-model="user.selected" type="checkbox" ng-click="togchkbxdesg(user);" title="Select Employee"
+                                               ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 padding-left-none">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                        <span class="lbl padding-8">
+                                            <b>  All Employees</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                        <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="start_Date" onkeypress="return false" name="startdate" md-placeholder="Enter Date"
+                                                   ng-change="onchangestartdate()" required md-max-date="maxdate">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Select Start Date</div>
+                                        <div ng-message="valid">The entered value is not Valid!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="end_Date" name="endate" disabled md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                    <div ng-message="required">Select End Date</div>
+                                    <div ng-message="valid">The entered value is not Valid!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="GetSavedDetails()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Search
+                </md-button>
+
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div ng-show="getsaveddetails.length>0">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Daily Report Details </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div ng-repeat="user in emp_list" class="borderemployee">
+                        <div class="row">
+                            <div class="col-sm-4 text-left">
+                                <h4>{{user.employeename}} : {{user.employeecode }} </h4>
+                            </div>
+                            <div class="col-sm-4 text-left">
+                                <div ng-if="user.totalpunchedhrs!=''">
+                                    <h4>
+                                        Worked Hours :- {{user.totalpunchedhrs}}
+                                        <i class="fa fa-question" style="color:red;"></i>
+                                        <md-tooltip md-direction="down">
+                                            <p>Punch In : {{user.starttime}}<br>Punch Out : {{user.endtime}}</p>
+                                        </md-tooltip>
+                                    </h4>
+                                </div>
+                                <div ng-if="user.totalpunchedhrs==''">
+                                    <h4> Worked Hours :- NA</h4>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4 text-right">
+                                <h4>DR Sent: {{user.totalhrs}} </h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered" style="table-layout:fixed">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%;">
+                                                Sl.No
+                                                <!--<label>
+                                                    <input type="checkbox" name="adcheckt" ng-model="user.All" ng-click="OnClickAll(user,user.All)">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>-->
+                                            </th>
+                                            <th style="width: 20%;">Task DR Details</th>
+                                            <th style="width: 30%;">DR Response </th>
+                                            <!--<th style="width: 160px;">Status </th>-->
+                                            <th style="width: 9%;">Effort</th>
+                                            <th style="width: 15%;">Change Efforts</th>
+                                            <th style="width: 16%;">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="plnr in user.emp_drdates">
+                                            <td class="text-center">
+                                                {{$index+1}}
+                                                <!--<label>
+                                                    <input type="checkbox" name="adcheckt" ng-model="plnr.Approvedflag" ng-click="OnchangeApproved(plnr,user)">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>-->
+                                            </td>
+                                            <td class="text-left" style="word-wrap:break-word">
+                                                <div class="row">
+                                                    <div class="col-sm-12 text-left">
+                                                        <label class="control-label text-body text-left" ng-if="plnr.ISMTCR_Id_rejected==0">
+                                                            {{plnr.ISMTCR_TaskNo}}
+                                                        </label>
+                                                        <label class="control-label text-body text-left" style="color:red !important" ng-if="plnr.ISMTCR_Id_rejected>0">
+                                                            {{plnr.ISMTCR_TaskNo}}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 text-left">
+                                                        <label title="View Task Details" class="control-label text-body text-left " ng-model="plnr.ISMTCR_Id"
+                                                               data-toggle="modal" data-target="#myModalResponse" data-ng-click="viewresponse(plnr)">
+                                                            {{plnr.ISMTCR_Title}}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 text-left">
+                                                        <label class="control-label text-body">DR Date : {{plnr.ISMDRPT_Date}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 text-left">
+                                                        <label class="control-label text-body">DR Status : {{plnr.ISMDRPT_Status}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 text-left">
+                                                        <label class="control-label text-body">Task Category : {{plnr.ISMMTCAT_TaskCategoryName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <label ng-if="plnr.ISMTAPL_Periodicity !=null && plnr.ISMTAPL_Periodicity !=''
+                                                           && plnr.ISMTAPL_Periodicity !='DRTask'"
+                                                               class="control-label text-body text-left"
+                                                               ng-model="plnr.ISMTAPL_Periodicity" style="font-size:14px;">
+                                                            Periodicity :{{plnr.ISMTAPL_Periodicity}}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row" ng-if="plnr.COUNTCHECKLIST>0">
+                                                    <div class="col-sm-12">
+                                                        <label class="control-label text-body text-left">View Checklist :</label>
+                                                        <label class="control-label text-body text-left">
+                                                            <a href="" ng-click="ViewCheckListSavedDetails(plnr,user)">
+                                                                <i class="fa fa-eye text-black" title="View Check List Details"></i>
+                                                            </a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row" ng-if="plnr.COUNTCHECKLIST==0 && plnr.effhrs >0.99">
+                                                    <div class="col-sm-12">
+                                                        <label class="control-label text-body text-left">View Checklist :</label>
+                                                        <label class="control-label text-body text-left">
+                                                            <a href="" ng-click="ViewCheckListSavedDetails(plnr,user)">
+                                                                <i class="fa fa-eye text-black" title="View Check List Details"></i>
+                                                            </a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                              
+                                            </td>
+
+                                            <td class="text-left" style="word-wrap:break-word">
+                                                <textarea class="form-control" rows="6" style="resize:none" disabled ng-model="plnr.drremarks"></textarea>
+                                            </td>
+
+                                            <td class="text-left" style="word-wrap:break-word">
+                                                <div class="row">
+                                                    <div class="col-sm-12 text-center ">
+                                                        <b> Actual Effort : </b> <br /> {{plnr.ISMTPLTA_EffortInHrs}}
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row">
+                                                    <div class="col-sm-12 text-center ">
+                                                        <b>Time Taken : </b> <br /> {{plnr.ISMDRPT_TimeTakenInHrs}}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="row">
+                                                    <div class="col-sm-12" style="padding-left: 7% !important;">
+                                                        <table>
+                                                            <tr>
+                                                                <td>
+                                                                    <input type="number" onkeydown="javascript: return event.keyCode == 69 ? false : true"
+                                                                           class="form-control active" allow-patten="[0-9]" min="0" max="24"
+                                                                           name="t1_efforthr_{{plnr.index}}" ng-pattern="/^[0-9]{1,2}$/"
+                                                                           ng-model="plnr.effhrs" style="width:75px"
+                                                                           required>
+                                                                </td>
+                                                                <td style="padding-left:5px">
+                                                                    <input type="number" onkeydown="javascript: return event.keyCode == 69 ? false : true"
+                                                                           class="form-control active" allow-patten="[0-9]" min="0" max="59"
+                                                                           name="t1_effortmins_{{plnr.index}}" ng-pattern="/^[0-9]{1,2}$/"
+                                                                           ng-model="plnr.effmin" style="width:75px" required>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    HH
+                                                                    <div class="error-messages" ng-if="interacted1(myForm1['t1_efforthr_'+$index])"
+                                                                         ng-messages="myForm1['t1_efforthr_'+plnr.index].$error">
+                                                                        <div ng-message="required">Enter Hours</div>
+                                                                        <div ng-message="max">Max Is 24 Hours</div>
+                                                                        <div ng-message="max">Min Is 0 Hours</div>
+                                                                        <div ng-message="pattern">Enter 0 to 24</div>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    MM
+                                                                    <div class="error-messages"
+                                                                         ng-if="interacted1(myForm1['t1_effortmins_'+plnr.index])"
+                                                                         ng-messages="myForm1['t1_effortmins_'+$index].$error">
+                                                                        <div ng-message="required">Enter Minutes</div>
+                                                                        <div ng-message="max">Max Is 59 Mins</div>
+                                                                        <div ng-message="min">Max Is 0 Mins</div>
+                                                                        <div ng-message="pattern">Enter 0 to 60</div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="row" ng-if="plnr.ISMMTCAT_TaskCategoryName.toUpperCase()==='CON CALL'">
+                                                    <div class="col-sm-12 remarksstyle">
+                                                        <div class="form-group">
+
+                                                            <hr />
+                                                            <p><b> Con Call Attendance </b></p>
+                                                            <hr />
+                                                            <p><b>Date  :{{start_Date | date:'dd-MM-yyyy'}} </b></p>
+
+                                                            <!--ng-init="plnr.Concallattendance='1'"-->
+                                                            <select class="form-control" ng-model="plnr.Concallattendance" name="concallstatus_{{plnr.index}}"
+                                                                    id="concallatt{{plnr.index}}"
+                                                                    required>
+
+                                                                <option value="1">Approved</option>
+                                                                <option value="0">Rejected</option>
+                                                            </select>
+                                                            <div class="error-messages" ng-if="interacted1(myForm1['concallstatus_'+$index])"
+                                                                 ng-messages="myForm1['concallstatus_'+plnr.index].$error">
+                                                                <div ng-message="required">Please Update The Con Call Attendance</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="row">
+                                                    <div class="col-sm-12 remarksstyle">
+                                                        <div class="form-group">
+                                                            <select class="form-control" ng-model="plnr.status" name="t1_status_{{plnr.index}}"
+                                                                    id="t1_statusid_{{plnr.index}}" ng-change="OnChangeAppRejStatus(plnr)"
+                                                                    required>
+                                                                <option value="">--Select Status--</option>
+                                                                <option value="1">Approved</option>
+                                                                <option value="0">Rejected</option>
+                                                            </select>
+                                                            <div class="error-messages" ng-if="interacted1(myForm1['t1_status_'+$index])"
+                                                                 ng-messages="myForm1['t1_status_'+plnr.index].$error">
+                                                                <div ng-message="required">Select Status</div>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="form-group" ng-if="plnr.TASK_CREATED_BY>0 && plnr.periodicitydailyflag==1">
+                                                            <select class="form-control" ng-model="plnr.empstatus" name="t1_empstatus_{{plnr.index}}"
+                                                                    id="t1_empstatusid_{{plnr.index}}" ng-disabled="plnr.status=='0'">
+                                                                <option value="">--Select Status--</option>
+                                                                <option value="Close">Close</option>
+                                                                <!--<option ng-repeat="empstatus in user. status_list" value="{{empstatus.ISMMISTS_StatusName}}">
+                                                                    {{empstatus.ISMMISTS_StatusName}}
+                                                                </option>-->
+                                                            </select>
+                                                            <div class="error-messages" ng-if="interacted1(myForm1['t1_empstatus_'+$index])"
+                                                                 ng-messages="myForm1['t1_empstatus_'+plnr.index].$error">
+                                                                <div ng-message="required">Select Status</div>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="form-group">
+                                                            <textarea ng-model="plnr.Remarks" class="form-control textareaclass" name="tl_remarks_{{plnr.index}}"
+                                                                      required rows="6"></textarea>
+                                                            <div class="error-messages" ng-if="interacted1(myForm1['tl_remarks_'+plnr.index])"
+                                                                 ng-messages="myForm1['tl_remarks_'+plnr.index].$error">
+                                                                <div ng-message="required">Enter Remarks </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Over All Remarks : </label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control textareaclass" rows="5" ng-model="user.overallremarks" required
+                                                  name="t1remarks{{user.HRME_Id}}"></textarea>
+                                        <div class="error-messages text-center" ng-if="interacted1(myForm1['t1remarks'+user.HRME_Id])"
+                                             ng-messages="myForm1['t1remarks'+user.HRME_Id].$error">
+                                            <div ng-message="required">Enter Over All Remarks </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="SaveApprovalDetails()" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                                <i class="fa fa-times" aria-hidden="true"></i> Clear
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- View Saved Daily Report Check List -->
+<div id="viewfiles" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width:85%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-10 text-center">
+                            <h4 class="modal-title text-white">Checklist Details</h4>
+                        </div>
+                        <div class="col-sm-2 pull-right">
+                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6 text-left">
+                            <label class="col-sm-12 text-bold text-white" style="font-size:20px!important">Employee Name : {{checklist_employeename}}</label>
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <label class="col-sm-12 text-bold text-white" style="font-size:20px!important">Task No. : {{checklist_taskno}}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="printSectionId">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div style="overflow-x:scroll;" class="clearfix" id="style-4">
+                                <table class="table table-hover table-responsive table-bordered" id="table5">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center">SLNO</th>
+                                            <th style="text-align:center">Checklist Name</th>
+                                            <th style="text-align:center">File Name</th>
+                                            <!--<th style="text-align:center">File Details</th>-->
+                                            <th style="text-align:center">Ref.No</th>
+                                            <th style="text-align:center">Remarks</th>
+                                            <th style="text-align:center">File Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="user in bomids">
+                                        <tr>
+                                            <td class="text-center" rowspan="{{user.datadetails.length+1}}">{{$index+1}}</td>
+                                            <td class="text-center" rowspan="{{user.datadetails.length+1}}">{{user.ismmtcatcL_CheckListName}}</td>
+                                            <td class="text-center" rowspan="{{user.datadetails.length+1}}">{{user.ismdrptfL_FileName}}</td>
+                                            <td class="text-center" rowspan="{{user.datadetails.length+1}}">{{user.ismdrptfL_RefNo}}</td>
+                                            <td class="text-left" rowspan="{{user.datadetails.length+1}}">
+                                                <textarea class="form-control" ng-model="user.ismdrptfL_Remarks" disabled style="resize:none" rows="6"
+                                                          ng-if="user.ismdrptfL_Remarks!=null && user.ismdrptfL_Remarks!=''"></textarea>
+                                            </td>
+                                           
+                                        <tr ng-repeat="data in user.datadetails | filter : search">
+                                            <td class="text-center">
+                                                <span ng-if="data.ismdrptfL_FilePath !=null && data.ismdrptfL_FilePath !=''">
+                                                    <a ng-if="data.filetype=='jpg' || data.filetype=='png' || data.filetype=='svg'|| data.filetype=='jpeg'
+                                                                   || data.filetype=='gif'"
+                                                       style="color:red;display:inline; font-weight: bolder;"
+                                                       data-ng-click="showmothersign(data.ismdrptfL_FilePath,data.ismdrptfL_FileName)">
+                                                        <i class="fa fa-eye text-black" title="View File"></i>
+                                                    </a>
+                                                    <a ng-if="data.filetype=='pdf'" style="color:blue;display:inline;"
+                                                       ng-click="onviewpdf(data.ismdrptfL_FilePath,data.ismdrptfL_FileName)">
+                                                        <i class="fa fa-eye text-black" title="View File"></i>
+                                                    </a>
+
+                                                    <a ng-if="data.filetype=='doc' || data.filetype=='docx'" style="color:blue;display:inline;"
+                                                       href="{{data.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-black" title="View File"></i>
+                                                    </a>
+
+                                                    <a ng-if="data.filetype=='xls' || data.filetype=='xlsx'" style="color:blue;display:inline;"
+                                                       href="{{data.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-black" title="View File"></i>
+                                                    </a>
+                                                </span>
+                                                <span ng-if="data.ismdrptfL_FilePath !=null && data.ismdrptfL_FilePath !=''">
+                                                    |
+                                                    <a class="downloadIcon" title="Dowload Template"
+                                                       ng-click="downloaddirectimage(data.ismdrptfL_FilePath,data.ismdrptfL_FileName)">
+                                                        <i class="fa fa-download" title="Download Template"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                          
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-warn" aria-disabled="false" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- View Image Preview -->
+<!-- View DR Response -->
+<div id="showdresponse" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg" style="width:85%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title text-white">Daily Report Response</h4>
+            </div>
+            <div class="modal-body">
+                <div id="printSectionId">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <label class="control-label col-sm-4">DR Response :</label>
+                            <div class="col-sm-8">
+                                <textarea ng-model="drresponse" rows="10" class="form-control textareaclassd"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-warn" aria-disabled="false" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Task Response Details -->
+<div id="myModalResponse" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title text-white">	Task Details </h4>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6" style="padding-left:4%">
+                            <div class="form-group">
+                                <span class="text-head  text-left" style="font-size:20px;" ng-model="ISMTCR_Id">{{tasktitle}}</span><br />
+                                <label class="control-label  text-body text-left" style="font-size:15px;">{{taskno}} </label><br />
+                                <label class="control-label  text-body text-left" style="font-size:15px;">
+                                    {{tasktype}} &nbsp;&nbsp;
+                                    <span ng-if="(tsakpriority=='High')|| (tsakpriority=='HIGH')"><label style="color:red;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Normal')||(tsakpriority=='NORMAL')"><label style="color:orange;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Low')||(tsakpriority=='LOW')"><label style="color:green;"><b>{{tsakpriority}}</b></label></span>
+                                </label><br />
+                                <label class="control-label  text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Created By :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{createdby}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label  text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Date :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{taskdate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Status :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{taskstatus}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Task Start Date :   {{startdate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Task End Date &nbsp; :   {{enddate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-6">
+                                    <label class="control-label  text-body"><b>Description :</b> </label>
+                                </div>
+                                <div class="col-sm-12 margin-top-10">
+                                    <textarea class="form-control textareaclass" name="response" type="text" placeholder="Task Description" ng-disabled="true"
+                                              ng-model="taskdescription" rows="10"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12" ng-if="taskAttatchment.length>0" style="padding-left:5%">
+                        <hr />
+                        <div class="form-group margin-top-5">
+                            <span>
+                                <label class="control-label text-body" style="font-size:18px;">
+                                    Attachments : <b>
+                                        <span ng-repeat="objtfr in taskAttatchment track by $index">
+                                            <span ng-if="objtfr.ISMTCRAT_Attatchment!=null && objtfr.ISMTCRAT_Attatchment!=''">
+                                                {{$index+1}})
+                                                <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                    <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr.ISMTCRAT_Attatchment);"> View  </i>
+                                                    - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                </span>
+                                                <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png'">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRAT_Attatchment}}" full-frame=""> Download </a> - <i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </b>
+                                </label>
+                            </span>
+                        </div>
+                        <hr />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-7 margin-top-10">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">Comments :</label>
+                                <div class="box-content col-sm-12 margin-top-10" style="max-height: 250px;  overflow:auto;">
+                                    <div class="margin-top-10" ng-repeat="response in get_taskresponse">
+                                        <label class="control-label  text-body" style="font-size:14px;">
+                                            {{get_taskresponse.length-$index}}) Response By : {{response.responseby}} - {{response.ISMTCRRES_ResponseDate | date:'dd/MM/yyyy'}}
+                                        </label>
+                                        <span>
+                                            <br /><label class="control-label text-body" style="font-size:14px;margin-left: 3%;">
+                                                Attachments : <b>
+                                                    <span ng-repeat="objtfr in get_responseattachments track by $index" style="font-size:medium">
+                                                        <span ng-if="objtfr.ISMTCRRES_Response==response.ISMTCRRES_Response && objtfr.ISMTCRRES_ResponseAttachment!=null && objtfr.ISMTCRRES_ResponseAttachment!=''">
+                                                            -{{objtfr.slno}}) <i class="fa fa-file-image-o" aria-hidden="true"></i> -
+                                                            <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                                <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr.ISMTCRRES_ResponseAttachment);"> View</i>
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png'">
+                                                                <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRRES_ResponseAttachment}}" full-frame=""> Download</a>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </b>
+                                            </label>
+                                        </span>
+                                        <span ng-if="response.ISMTCRRES_Status!=null && response.ISMTCRRES_Status!=''">
+                                            <br /> <label class="control-label text-left" style="margin-left: 3%">
+                                                <span class="control-label text-body" style="font-size:14px;">Status</span> : <b>{{response.ISMTCRRES_Status}}</b>
+                                            </label>
+                                        </span> <br />
+                                        <label class="control-label text-left" style="margin-left: 3%;"><span class="control-label text-body" style="font-size:14px;">Response</span> : {{response.ISMTCRRES_Response}}</label>
+                                        <span class="margin-top-5"></span><hr />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" data-dismiss="modal">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Close
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalPreview" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View PDF Preview -->
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfviewdd">
+            </div>
+
+
+
+            <!--<embed ng-src="{{content}}" style="width: 100%;" height="1000" />-->
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Report Not Approved List For TL -->
+<div id="viewdrnotapproveddetails" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width:90% !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title text-white">Daily Report Not Approved Details</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myformdrdatesnotapproved" novalidate>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Month :<strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="MonthId" required name="month" ng-change="OnChangeMonth()">
+                                        <option value="">--Select Month--</option>
+                                        <option ng-repeat="dd in Monthlist" value="{{dd.ivrM_Month_Id}}">
+                                            {{dd.ivrM_Month_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacteddr(myformdrdatesnotapproved.month)" ng-messages="myformdrdatesnotapproved.month.$error">
+                                        <div ng-message="required" class="col-sm-8">Select Month</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Year :<strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="YearId" required name="Year" ng-change="OnChangeYear()">
+                                        <option value="">--Select Year--</option>
+                                        <option ng-repeat="dd in  Yearlist" value="{{dd.hrmlY_LeaveYear}}">
+                                            {{dd.hrmlY_LeaveYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacteddr(myformdrdatesnotapproved.Year)" ng-messages="myformdrdatesnotapproved.Year.$error">
+                                        <div ng-message="required" class="col-sm-8">Select Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-click="GetDRNotApprovedList()" id="save-btn">
+                                <i class="fa fa-search-minus" aria-hidden="true"></i>
+                                Search
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-click="PrintData()" id="print-btn" ng-if="TempEmployee.length>0">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                        </div>
+                    </div>
+
+                    <div ng-if="TempEmployee.length>0">
+                        <div id="printdetails">
+                            <div class="row">
+                                <div class="col-sm-8 text-left">
+                                    <h3> Daily Report Not Approved Details For {{monthname}} - {{yearname}} </h3>
+                                </div>
+                                <div class="col-sm-4 text-left">
+                                    <h3>Generated Date : {{newdate | date :'dd/MM/yyyy'}} </h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-hover table-responsive table-bordered" id="table5">
+                                        <thead>
+                                            <tr>
+                                                <th>SLNO</th>
+                                                <th>Employee Name /Employee Code</th>
+                                                <th>Department</th>
+                                                <th>Approval By</th>
+                                                <th>DR Date</th>
+                                                <th>DR Generated Date Time</th>
+                                                <th>Others Date Flag</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-repeat="user in TempEmployee">
+                                            <tr>
+                                                <td style="text-align:center" rowspan="{{user.DatesDetails.length+1}}">{{$index+1}}</td>
+                                                <td class="text-left" rowspan="{{user.DatesDetails.length+1}}">
+                                                    {{user.EmployeeName}}/ {{user.HRME_EmployeeCode}}
+                                                </td>
+                                                <td class="text-left" rowspan="{{user.DatesDetails.length+1}}">
+                                                    {{user.HRMD_DepartmentName}}
+                                                </td>
+                                                <td class="text-left" rowspan="{{user.DatesDetails.length+1}}">
+                                                    {{user.ApprovalBy}}
+                                                </td>
+                                            </tr>
+                                            <tr ng-repeat="dd in  user.DatesDetails">
+                                                <td class="text-center">{{dd.Dr_Date}}</td>
+                                                <td class="text-center">{{dd.DR_GDate}}</td>
+                                                <td class="text-center">
+                                                    <span ng-if="dd.ISMDRPT_OrdersDateFlg==true" style='font-size:20px; color:green '>&#10004;</span>
+                                                    <span ng-if="dd.ISMDRPT_OrdersDateFlg==false" style='font-size:20px; color:red'>&#10006;</span>
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="TempEmployee.length==0" class="row text-center">
+                        <p style="color:red ; font-size:16px ; font-weight:bolder">No Records Found</p>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-warn" aria-disabled="false" data-dismiss="modal">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Close
+                            </md-button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="TadaReport" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-white">
+                    TA-DA DETAILS
+                </h4>
+
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <strong style="color:red;font-size:20px">
+                                    <marquee width="100%" direction="left">  Kindly Approved TA-DA List, Then only  can Approved DR</marquee>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" ng-if="AdavanceList.length > 0" style="overflow:scroll !important; max-height:300px;">
+                            <h4>TA-DA ADAVANCE LIST</h4>
+                            <hr />
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl No
+                                        </th>
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Applied Date
+                                        </th>
+                                        <th>
+                                            From Date
+                                        </th>
+                                        <th>
+                                            Departure Time
+                                        </th>
+                                        <th>
+                                            To Date
+                                        </th>
+                                        <th>
+                                            Arrival Time
+                                        </th>
+                                        <th>
+                                            Applied Amount
+                                        </th>
+                                        <th>
+                                            State
+                                        </th>
+                                        <th>
+                                            City
+                                        </th>
+                                        <th>
+                                            Address
+                                        </th>
+                                        <th>
+                                            Remark
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in AdavanceList">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{user.EmpName}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAAA_AppliedDate |date:'dd/MM/yyyy'}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAAA_FromDate |date:'dd/MM/yyyy'}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAAA_DepartureTime}}
+                                        </td>
+
+                                        <td>
+                                            {{user.VTADAAA_ToDate |date:'dd/MM/yyyy'}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAAA_ArrivalTime}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAAA_TotalAppliedAmount}}
+                                        </td>
+                                        <td>
+                                            {{user.IVRMMS_Name}}
+                                        </td>
+                                        <td>
+                                            {{user.IVRMMCT_Name}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAAA_ToAddress}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAAA_Remarks}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+
+                        </div>
+                        <div class="col-sm-4 pull-right" ng-if="AdavanceList.length > 0">
+
+                            <button style="background-color:lightblue !important">
+                                <a href="http://localhost:57606/#/app/TADAAdvanceApproval/731" target="_blank">
+
+                                    <strong>
+                                        Adavance Approval <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                    </strong>
+                                </a>
+                            </button>
+
+
+                        </div>
+                        <div class="col-sm-12" ng-if="ApplyList.length > 0" style="overflow:scroll !important; max-height:300px;">
+                            <h4>TA-DA  LIST</h4>
+                            <hr />
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl No
+                                        </th>
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Applied Date
+                                        </th>
+                                        <th>
+                                            From Date
+                                        </th>
+                                        <th>
+                                            Departure Time
+                                        </th>
+                                        <th>
+                                            To Date
+                                        </th>
+                                        <th>
+                                            Arrival Time
+                                        </th>
+                                        <th>
+                                            Applied Amount
+                                        </th>
+                                        <th>
+                                            State
+                                        </th>
+                                        <th>
+                                            City
+                                        </th>
+                                        <th>
+                                            Address
+                                        </th>
+                                        <th>
+                                            Remark
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="user in ApplyList">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{user.EmpName}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAA_AppliedDate |date:'dd/MM/yyyy'}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAA_FromDate |date:'dd/MM/yyyy'}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAA_DepartureTime}}
+                                        </td>
+
+                                        <td>
+                                            {{user.VTADAA_ToDate |date:'dd/MM/yyyy'}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAA_ArrivalTime}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAA_TotalAppliedAmount}}
+                                        </td>
+                                        <td>
+                                            {{user.IVRMMS_Name}}
+                                        </td>
+                                        <td>
+                                            {{user.IVRMMCT_Name}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAA_ToAddress}}
+                                        </td>
+                                        <td>
+                                            {{user.VTADAA_Remarks}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+
+                            </table>
+
+                        </div>
+
+                        <div class="col-sm-4 pull-right" ng-if="ApplyList.length > 0">
+                            <button style="background-color:lightblue !important">
+                                <a href="http://localhost:57606/#/app/TADAApproval/731" target="_blank">
+
+                                    <strong>
+                                        TA-DA Approval <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                    </strong>
+                                </a>
+                            </button>
+
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--========= Leave Approval Is Pending ========-->
+<div id="LeaveApproval" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-white">
+                    Leave Approval Details
+                </h6>
+                <button type="button" class="btn btn-default" ng-click="closed()">
+
+                    <a href="http://localhost:57606/#/app/ISMDashboard/731">
+                        Close
+                    </a>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <strong style="color:red;font-size:20px">
+                                    <marquee width="100%" direction="left">  Kindly update Leave Status, Then only  can Approve Daily Report</marquee>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-10 col-sm-offset-1">
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl NO</th>
+                                            <th>Employee Name</th>
+                                            <th>Leave Name</th>
+                                            <th>From Date</th>
+                                            <th>To Date</th>
+                                            <th>Total Days</th>
+                                            <th>Reason</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in get_leaveDetails">
+                                            <td>
+                                                {{$index + 1}}
+                                            </td>
+                                            <td>
+                                                {{user.HRME_EmployeeFirstName}}
+                                            </td>
+                                            <td>
+                                                {{user.HRML_LeaveName}}
+                                            </td>
+                                            <td>
+                                                {{user.HRELAP_FromDate |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                {{user.HRELAP_ToDate |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                {{user.HRELAP_TotalDays}}
+                                            </td>
+                                            <td>
+                                                <p ng-bind-html="trustAsHtml(user.HRELAP_LeaveReason)"></p>
+                                                <!--{{user.HRELAP_LeaveReason}}-->
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <div class="col-sm-4 pull-right">
+                                    <button style="background-color:lightblue !important;width:70%;">
+                                        <a href="http://localhost:57606/#/app/LeaveApproval/731" target="_blank">
+                                            <strong>
+                                                Leave Approval  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                            </strong>
+                                        </a>
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!--========= Comp Off Approval Is Pending ========-->
+<div id="CompoffApproval" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-white">
+                    Comp Off Details
+                </h6>
+                <button type="button" class="btn btn-default" ng-click="closed()">
+
+                    <a href="http://localhost:57606/#/app/ISMDashboard/731">
+                        Close
+                    </a>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <strong style="color:red;font-size:20px">
+                                    <marquee width="100%" direction="left">  Kindly update Leave Status, Then only  can Approve Daily Report</marquee>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+
+                            <div class="col-sm-10 col-sm-offset-1" style="margin-top:5px" ng-if="compoffdetails.length>0">
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl NO</th>
+                                            <th>Employee Name</th>
+                                            <th>Date</th>
+                                            <th>Reason</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in compoffdetails">
+                                            <td>
+                                                {{$index + 1}}
+                                            </td>
+                                            <td>
+                                                {{user.HRME_EmployeeFirstName}}
+                                            </td>
+                                            <td>
+                                                {{user.HRELAP_FromDate |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                <p ng-bind-html="trustAsHtml(user.HRELAP_LeaveReason)"></p>
+                                                <!--{{user.HRELAP_LeaveReason}}-->
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+
+                                <div class="col-sm-4 pull-right">
+                                    <button style="background-color:lightblue !important;width:70%;">
+                                        <a href="http://localhost:57606/#/app/compoffODApproval/731" target="_blank">
+
+                                            <strong>
+                                                CompOff Approval  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                            </strong>
+                                        </a>
+                                    </button>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!--========= Certificate Approval Is Pending ========-->
+<div id="certificateApproval" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-white">
+                    Certificate Approval Details
+                </h6>
+                <button type="button" class="btn btn-default" ng-click="closed()">
+
+                    <a href="http://localhost:57606/#/app/ISMDashboard/731">
+                        Close
+                    </a>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <strong style="color:red;font-size:20px">
+                                    <marquee width="100%" direction="left">  Kindly update Certificate Status, Then only  can Approve Daily Report</marquee>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-10 col-sm-offset-1">
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl NO</th>
+                                            <th>Employee Name</th>
+                                            <th>Request Date</th>
+                                            <th>Receving Mode</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in Cerfificatelist">
+                                            <td>
+                                                {{$index + 1}}
+                                            </td>
+                                            <td>
+                                                {{user.HRME_EmployeeFirstname}}
+                                            </td>
+                                            <td>
+                                                {{user.ISMCERTREQ_RequestDate |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                {{user.ISMCERTREQ_ReceivingMode}}
+                                            </td>
+                                            <td>
+                                                {{user.ISMCERTREQ_Remarks}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <div class="col-sm-4 pull-right">
+                                    <button style="background-color:lightblue !important;width:70%;">
+                                        <a href="http://localhost:57606/#/app/ISM_Certificate_Approval/731" target="_blank">
+                                            <strong>
+                                                Certificate Approval  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                            </strong>
+                                        </a>
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!--========= NOC Approval Is Pending ========-->
+<div id="nocApproval" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-white">
+                    NOC Approval Details
+                </h6>
+                <button type="button" class="btn btn-default" ng-click="closed()">
+
+                    <a href="http://localhost:57606/#/app/ISMDashboard/731">
+                        Close
+                    </a>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <strong style="color:red;font-size:20px">
+                                    <marquee width="100%" direction="left">  Kindly update NOC Status, Then only  can Approve Daily Report</marquee>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-10 col-sm-offset-1">
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl NO</th>
+                                            <th>Employee Name</th>
+                                            <th>Request Date</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in NOCdetails">
+                                            <td>
+                                                {{$index + 1}}
+                                            </td>
+                                            <td>
+                                                {{user.HRME_EmployeeFirstName}}
+                                            </td>
+                                            <td>
+                                                {{user.ISMCERTREQ_RequestDate |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                {{user.ISMCERTREQ_Remarks}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <div class="col-sm-4 pull-right">
+                                    <button style="background-color:lightblue !important;width:70%;">
+                                        <a href="http://localhost:57606/#/app/HR_NOC_Approval/731" target="_blank">
+                                            <strong>
+                                                NOC Approval  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                            </strong>
+                                        </a>
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--========= Employee Rating Is Pending List========-->
+<div id="employeerating" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-white">
+                    Employee Rating Not Entered List
+                </h6>
+                <button type="button" class="btn btn-default pull-right" ng-click="closed()">
+
+                    <a href="http://localhost:57606/#/app/ISMDashboard/731">
+                        Close
+                    </a>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <strong style="color:red;font-size:20px">
+                                    <marquee width="100%" direction="left">  Kindly update Employee Rating, Then only  can Approve Daily Report</marquee>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-10 col-sm-offset-1">
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl NO</th>
+                                            <th>Employee Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in get_unratedemployeelist">
+                                            <td>
+                                                {{$index + 1}}
+                                            </td>
+                                            <td>
+                                                {{user.hrmE_EmployeeFirstName}}
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <div class="col-sm-4 pull-right">
+                                    <button style="background-color:lightblue !important;width:70%;">
+                                        <a href="http://localhost:57606/#/app/Rating_Transaction/991" target="_blank">
+                                            <strong>
+                                                Employee Rating  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                            </strong>
+                                        </a>
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,203 @@
+﻿<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Trainee Attendace Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                    <div class="row">
+                    </div>
+                    <div class="row" ng-hide="chkfo">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> From Date :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="frmdate" ng-model="myDate_from" md-placeholder="From Date"
+                                                   ng-required="chkfo==false"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.frmdate)" ng-messages="myForm.frmdate.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="tdate" ng-model="myDate_to" md-placeholder="To Date" ng-change="compdate()"
+                                                   ng-required="chkfo==false"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <hr />
+            <div class="text-center">
+                <input type="hidden" ng-model="" />
+                <md-button type="submit" ng-disabled="form.$invalid" ng-click="get_report()" class="md-raised md-primary">
+                    <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                </md-button>
+                <md-button type="button" ng-disabled="form.$invalid" class="md-raised md-warn" ng-click="cleardata()">
+                    <i class="fa fa-print" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary">
+        <!--<div class="box-header with-border">
+            <h3 class="box-title">Client Project Documents List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>-->
+        <!-- /.box-header -->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Daily Attendence Submission List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" ng-if="induction_training_report.length > 0">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label" ng-if="searchValue!=''">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th>Date</th>
+                            <th>File Name</th>
+                            <th>View File</th>
+                            <th>Remarks</th>
+                            <!--<th>Status</th>-->
+                            <!--<th>Action</th>-->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+                        <tr dir-paginate="bm in filterValue1 = (induction_training_report | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}
+                            <td class="text-center">{{ bm.AFU_Date | date:'yyyy-MM-dd' }}</td>
+                            <td class="text-center">{{bm.AFU_Filename}}</td>
+                            <td class="text-center">{{bm.afu_HRRemarks}}</td>
+
+                            <td class="text-center">
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11"
+                                   data-backdrop="static" ng-click="ViewDocExcelfles(bm.AFU_FilePath, bm.AFU_Filename, bm.filetype)">
+                                    <i class="fa fa-eye text-blue"></i>
+                                </a>
+                            </td>
+
+
+                            <!--<td class="text-center">-->
+                            <!--<span ng-if="bm.ISMCLTPRDOC_ActiveFlag === true">
+        <a href="" ng-click="deactive(bm)"
+           class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+            Deactivate
+        </a>
+    </span>
+    <span ng-if="bm.ISMCLTPRDOC_ActiveFlag === false">
+        <a href="" ng-click="deactive(bm)"
+           class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+            Activate
+        </a>
+    </span>-->
+                            <!-- Check if HRETF_Status is "R" (Rejected) -->
+                            <!--<span ng-if="bm.HRETF_Status === 'R'">
+        Rejected
+    </span>-->
+                            <!-- Check if HRETF_Status is "A" (Approved) -->
+                            <!--<span ng-if="bm.HRETF_Status === 'A'">
+        Approved
+    </span>-->
+                            <!-- If neither "R" nor "A", show Pending -->
+                            <!--<span ng-if="bm.HRETF_Status !== 'R' && bm.HRETF_Status !== 'A'">
+        Pending
+    </span>-->
+                            <!--</td>-->
+                            <!--<td class="text-center">
+        <a class="text-aqua" href="" ng-click="edit(bm)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        </a>
+    </td>-->
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="myModaldocx" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <h4 style="text-align:center">View Document</h4>
+                    </div>
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

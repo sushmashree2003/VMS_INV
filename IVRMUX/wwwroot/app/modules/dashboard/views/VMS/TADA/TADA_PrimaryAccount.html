@@ -1,0 +1,206 @@
+﻿<section class="content">
+    <div class="box box-primary" data-ng-init="onLoadGetData()">
+        <form class="form-horizontal" role="form" name="myForm" novalidate>
+            <div class="box-header with-border">
+                <h3 class="box-title">TADA Primary Account</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-8">Primary Account Employee Name:<span style="color:red;">*</span></label>
+                            <div class="col-sm-10">
+                                <div>
+                                    <ui-select id="sel2" name="employee" ng-model="$parent.HRME_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Candidate" required>
+                                        <ui-select-match placeholder="Select OR Search Employee in the list...">
+                                            {{$select.selected.HRME_EmployeeFirstName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="emp in GetEmployeeList | propsFilter: {HRME_EmployeeFirstName: $select.search}"
+                                                           value="{{emp.HRME_Id}}" ng-selected="{{emp.Selected == true}}">
+                                            <div ng-bind-html="emp.HRME_EmployeeFirstName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted1(myForm.employee)" ng-messages="myForm.employee.$error">
+                                    <div ng-message="required">Select Employee Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-8">Primary Account Type:<span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" ng-model="usercheckC" type="checkbox" ng-click="all_checkC(usercheckC)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="option in tADA_PrimaryAccountList | filter:searchchkbx1" value="{{ISMSMSO_Id}}">
+                                    <input type="checkbox" ng-model="option.selected" ng-click="togchkbxC()" ng-required="isOptionsRequired()" name="Primary" />
+                                    <span class="lbl padding-8">{{option.ISMSMSO_SourceName}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted1(myForm.Primary)" ng-messages="myForm.Primary.$error">
+                                <div ng-message="required">Please Select Any One Tour Name</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <input type="hidden" ng-model="IRPA_ID" value="{{IRPA_ID}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-click="savedata()" id="save-btn">
+                            <i class="fa fa-save" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <!--<md-button type="button" class="md-raised md-primary" data-toggle="modal" data-target="#myModal">
+                            Set  order
+                        </md-button>-->
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary" ng-show="primarytypeCount.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">TADA PRIMARY ACCOUNT LIST</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{Route_PrimaryDetails.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-3 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.NO</th>
+                        <th class="center"><a href="" ng-click="sort('HRME_EmployeeFirstName')">Employee Name</a></th>
+                        <th class="center"><a href="" ng-click="sort('ISMSMSO_SourceName')">PrimaryAccount Type</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="primary in  filterValue1 = (primarytypeCount | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                        <td class="text-center" style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-centert">{{ primary.Name}}</td>
+                        <td class="text-center">
+                            {{primary.Source_Count}}
+                            <span>
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal" data-backdrop="static"
+                                   ng-click="SetOrder(primary);"><i class="fa fa-eye text-purple"></i></a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+    <!---Order Set -->
+    <div class="modal fade modal-medium" id="myModal" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="onLoadGetData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                    <h4 class="modal-title text-white">Primaryaccount</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SLNO
+                                </th>
+                                <th>
+                                    Account type
+                                </th>
+
+                                <th>
+                                    Set Order
+                                </th>
+                                <th>
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody ui-sortable="sortableOptions" ng-model="primarytypelist">
+                            <tr ng-repeat="user in primarytypelist">
+                                <td class="handle">{{$index+1}}</td>
+                                <td class="handle">{{ user.ISMSMSO_SourceName}}</td>
+                                <td class="handle">{{ user.IRPA_order}}</td>
+                                <td style="text-align:center">
+                                    <span ng-if="!user.IRPA_status">
+                                        <a href="" ng-click="ActivatePrimary(user)"
+                                           class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                            Activate
+                                        </a>
+                                    </span>
+                                    <span ng-if="user.IRPA_status">
+                                        <a href="" ng-click="ActivatePrimary(user)"
+                                           class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                            Deactivate
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="getOrder(primarytypelist);">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="onLoadGetData()">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+

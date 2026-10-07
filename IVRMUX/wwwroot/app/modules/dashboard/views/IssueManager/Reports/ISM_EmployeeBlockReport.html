@@ -1,0 +1,160 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Block Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="start_Date" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=true name="block" data-ng-model="blockflg">
+                                <span class="lbl padding-4">Blocked </span>
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value=true name="unblock" data-ng-model="unblockflg">
+                                <span class="lbl padding-4">Un-Blocked</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Department/Company :<span style="color:Red">*</span></label>
+                        <div class="col-sm-8">
+                            <ui-select id="sel1" name="dept" ng-model="$parent.obj.HRMD_Id" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onDeptchange(obj)" title="Department/Company">
+                                <ui-select-match ng-trim="false" placeholder="Select or search Department/Company in the list...">{{$select.selected.MI_Name}} : {{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                <ui-select-choices repeat="option in get_companyDeptist | filter: $select.search " value="{{option.HRMD_Id}}" ng-selected="{{option.Selected == true}}">
+                                    <div ng-bind-html="option.HRMD_DepartmentName +' : '+  option.MI_Name | highlight: $select.search"></div>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="get_employeelist.length>0">
+                        <label class="control-label col-sm-4">Employee Name :<span style="color:Red">*</span></label>
+                        <div class="multiselect col-sm-8">
+                            <span ng-show="get_employeelist.length>0">
+                                <input class="form-control" ng-model="searchValueE" type="text" placeholder="search Employee here...">
+                            </span>
+                            <label>
+                                <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </label>
+                            <label ng-repeat="user in get_employeelist | filter : searchValueE">
+                                <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.employeeName}}</b> : {{user.HRME_EmployeeCode}}
+                                </span>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="empblockReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="get_empblockReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button ng-show="get_empblockReport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printEB')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button type="button" ng-if="get_empblockReport.length>0" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+
+        </div>
+    </form>
+
+
+    <div class="box box-primary" ng-show="get_empblockReport.length>0">
+
+        <div id="printEB">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-4">
+                        <div class="form-group">
+                            <h4>  Employee Block REPORT</h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>No.of days</b></a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Blocked Date</b></a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Un-blocked Date</b></a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Reason</b></a> </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in employeeid">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.blockdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.blockdetails.length+1}}"><b>{{user.employeename}} : {{user.HRME_EmployeeCode}}</b></td>
+                        </tr>
+                        <tr ng-repeat="block in user.blockdetails">
+                            <td class="text-left">
+                                <span ng-if="block.nofDays!=null">{{block.nofDays}}</span>
+                                <span ng-if="block.nofDays==null">0</span>
+                                
+                            </td>
+
+                            <td class="text-left">{{block.ISMBE_BlockDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">
+                                <span ng-if="block.ISEBE_UnblockDate!=null">{{block.ISEBE_UnblockDate | date:'dd-MM-yyyy'}}</span>  
+                              <span ng-if="block.ISEBE_UnblockDate==null">----</span>  
+                            </td>
+                            <td class="text-left">{{block.ISMBE_Reason}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>

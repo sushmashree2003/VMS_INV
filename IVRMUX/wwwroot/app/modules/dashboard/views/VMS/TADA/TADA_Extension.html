@@ -1,0 +1,283 @@
+﻿
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Extension</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="roleflag==true">
+                <div class="text-center"><b style="color:red">EXTENSION  REQUEST  AVAILABLE FOR ONLY ADMIN  </b></div>
+            </div>
+
+            <div class="box-body" ng-show="roleflag==false">
+                <div class="box-content">
+                    <div class="col-sm-12">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <div class="text-center" ng-init="extensiontype='TADA'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="TADA" name="planner" ng-model="extensiontype" ng-change="radiochange()">
+                                        <span class="lbl padding-8">TADA Extension</span>
+                                    </label>
+                                    <label class="radio-inline" ng-hide="true">
+                                        <input type="radio" value="TAADA" name="daily" ng-model="extensiontype" ng-change="radiochange()">
+                                        <span class="lbl padding-8"> Apply Advance TADA Extension </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2 col-sm-offset-2">Select Employee  :<span style="color:Red">*</span></label>
+                                <div class="col-sm-4">
+                                    <ui-select id="sel1" name="empl" ng-model="$parent.obj.HRME_Id" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onEmpchange(obj)" title="Employee" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Employee in the list...">{{$select.selected.employeeName}} : {{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_Emplist | filter: $select.search " value="{{option.HRME_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.employeeName +' : '+  option.HRMD_DepartmentName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                                <div class="error-messages col-sm-6 col-sm-offset-4" ng-if="interacted(myForm.empl)" ng-messages="myForm.empl.$error">
+                                    <div ng-message="required"> Select Employee </div>
+                                </div>
+                            </div>
+
+                            <!--<div ng-if="extensiontype=='TAADA'">
+                                <div class="form-group">
+                                    <div class="col-sm-2 col-sm-offset-2">
+                                        <label class="control-label">Month :<span style="color:red;">*</span></label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" name="month" ng-model="obj.ivrM_Month_Id" ng-change="onmonthchange()" ng-required="extensiontype=='D'">
+                                            <option value="">--Select Month--</option>
+                                            <option ng-repeat="option in get_month" ng-selected="{{option.Selected == true}}" value="{{option.ivrM_Month_Id}}">
+                                                {{option.ivrM_Month_Name}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.month)" ng-messages="myForm.month.$error">
+                                            <div ng-message="required">Select Month</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-if="dflg">
+                                    <div class="col-sm-12 text-center" ng-if="totalotherdays>0"> <h4>No.of Daily Report Generated In Other's Days : {{totalotherdays}}</h4></div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2 col-sm-offset-2">Extension(No. of Days):<span style="color:red;">*</span></label>
+                                        <div class="col-sm-4">
+                                            <input type="number" class="form-control active" name="noofdays" min="0" max="100" maxlength="2" placeholder="Enter No of Days" ng-model="obj.ismodE_Noofdays" ng-required="extensiontype=='D'">
+                                        </div>
+                                        <div class="error-messages col-sm-6 col-sm-offset-4" ng-if="interacted(myForm.noofdays)" ng-messages="myForm.noofdays.$error">
+                                            <div ng-message="required"> Enter Number of days </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div> <!--ng-if="extensiontype=='TADA'"-->
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 col-sm-offset-1 text-right" style="text-align:right">Extension Valid From Date:<span style="color:red;">*</span></label>
+                                    <div class="col-sm-2">
+                                        <md-datepicker ng-model="obj.start_Date" name="startdate" id="date1" md-placeholder="From date" md-max-date="start_Date" ng-required="extensiontype=='P'"></md-datepicker>
+                                    </div>
+
+                                    <!--<label class="control-label col-sm-1">To:<span style="color:red;">*</span></label>-->
+                                    <div class="col-sm-2 padding-left-5">
+                                        <md-datepicker ng-model="obj.end_Date" name="enddate" id="date1" ng-disabled="obj.start_Date==null || obj.start_Date==undefined" md-placeholder="To date" ng-change="enddatechange()" md-min-date="start_Date" ng-required="extensiontype=='P'"></md-datepicker>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="error-messages col-sm-6 text-right" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                            <div ng-message="required">Select From Date</div>
+                                        </div>
+                                        <div class="error-messages col-sm-6" ng-if="interacted(myForm.enddate)" ng-messages="myForm.enddate.$error">
+                                            <div ng-message="required">Select To Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-sm-offset-5" ng-if="dflg"> <h4>Number of Days : {{dayDiff}}</h4></div>
+                            </div>
+                            <div class="form-group" ng-if="dflg">
+                                <label class="control-label col-sm-2 col-sm-offset-2">Reason :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-4">
+                                    <textarea name="reason" id="E" class="form-control" rows="3" data-ng-model="obj.extensionReason" placeholder="Enter Reason for Extension" required></textarea>
+                                    <div class="error-messages" ng-if="interacted(myForm.reason)" ng-messages="myForm.reason.$error">
+                                        <div ng-message="required">Enter Reason</div>
+                                    </div>
+                                </div>
+                                <div class="row text-center col-sm-12">
+                                    <div class="form-group">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="optradio_stud" ng-model="obj.notifi_chk" value="1">
+                                            <span class="lbl padding-8">Notification</span>
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="optradio_oldstud" ng-model="obj.email_chk" value="1">
+                                            <span class="lbl padding-8">Email</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="save()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Approve
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="box box-primary" ng-show="roleflag==false">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Extension Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <md-content>
+                    <md-tabs md-dynamic-height md-border-bottom md-selected="myTabIndex" flex layout="column" md-stretch-tabs="always">
+                        <!-- Planner -->
+                        <md-tab label="TADA" flex ng-click="clicktabs()">
+                            <md-content class="md-padding">
+                                <div class="box-body">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                <b> Total Grid Records :</b>
+                                                <label class="badge">
+                                                    {{presentCountgridP}}
+                                                </label>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4" ng-if="searchValueP!=null && searchValueP!=''">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                <b> Searched Records :</b>
+                                                <label class="badge">
+                                                    {{filterValuep.length}}
+                                                </label>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 pull-right">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-search"></i>
+                                                </span>
+                                                <input class="form-control" ng-model="searchValueP" type="text" placeholder="search here...">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <table class="table table-hover table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th><a href="" ng-click="sort('sno')">SL.No.</a></th>
+                                                <th width="20%"><a href="" ng-click="sort('employeename')">Employee </a></th>
+                                                <th><a href="" ng-click="sort('hrmE_EmployeeCode')">Emp.Code</a> </th>
+                                                <th><a href="" ng-click="sort('TADAPLE_FromDate')">From Date</a></th>
+                                                <th><a href="" ng-click="sort('TADAPLE_ToDate')">To Date</a> </th>
+                                                <th><a href="" ng-click="sort('TADAPLE_Reason')">Reason </a> </th>
+                                                <th width="20%"><a href="" ng-click="sort('bymployeename')">Given By </a> </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!--<tr dir-paginate="user in filterValue = (get_PlannerExtension | filter : searchValueP)  | orderBy:propertyName:reverse3 |itemsPerPage:itemsPerPageP" pagination-id="page2" current-page="currentPageP" ng-class-odd="'odd'">-->
+                                            <tr dir-paginate="user in filterValuep = ( tADA_Extension | filter : searchValueP) |orderBy:sortKey3:reverse3  | itemsPerPage: itemsPerPage3" pagination-id="page3" current-page="currentPage3" ng-class-odd="'odd'">
+                                                <td class="text-center">{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+                                                <td class="text-left">{{user.employeename}}</td>
+                                                <td class="text-left">{{user.hrmE_EmployeeCode}}</td>
+                                                <td class="text-left">{{user.TADAPLE_FromDate | date:'dd/MM/yyyy'}}</td>
+                                                <td class="text-left">{{user.TADAPLE_ToDate | date:'dd/MM/yyyy'}}</td>
+                                                <td class="text-left">{{user.TADAPLE_Reason}}</td>
+                                                <td class="text-left">{{user.bymployeename}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls pagination-id="page3"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <!-- Other Days -->
+                        <md-tab label="Advance TADA" flex ng-click="clicktabs()">
+                            <md-content class="md-padding">
+                                <div class="box-body">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                <b> Total Grid Records :</b>
+                                                <label class="badge">
+                                                    {{presentCountgridD}}
+                                                </label>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4" ng-if="searchValueD!=null && searchValueD!=''">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                <b> Searched Records :</b>
+                                                <label class="badge">
+                                                    {{filterValue.length}}
+                                                </label>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 pull-right">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-search"></i>
+                                                </span>
+                                                <input class="form-control" ng-model="searchValueD" type="text" placeholder="search here...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table class="table table-hover table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th><a href="" ng-click="sort('sno')">SL.No.</a></th>
+                                                <th width="20%"><a href="" ng-click="sort('employeename')">Employee </a></th>
+                                                <th><a href="" ng-click="sort('hrmE_EmployeeCode')">Emp.Code</a> </th>
+                                                <th><a href="" ng-click="sort('TADAPLE_FromDate')">From Date</a></th>
+                                                <th><a href="" ng-click="sort('TADAPLE_ToDate')">To Date</a> </th>
+                                                <th><a href="" ng-click="sort('TADAPLE_Reason')">Reason </a> </th>
+                                                <th width="20%"><a href="" ng-click="sort('bymployeename')">Given By </a> </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="user in filterValue = (tAADA_Extension | filter : searchValueD)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" pagination-id="page1" current-page="currentPage" ng-class-odd="'odd'">
+                                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                <td class="text-left">{{user.employeename}}</td>
+                                                <td class="text-left">{{user.hrmE_EmployeeCode}}</td>
+                                                <td class="text-left">{{user.TADAPLE_FromDate | date:'dd/MM/yyyy'}}</td>
+                                                <td class="text-left">{{user.TADAPLE_ToDate | date:'dd/MM/yyyy'}}</td>
+                                                <td class="text-left">{{user.TADAPLE_Reason}}</td>
+                                                <td class="text-left">{{user.bymployeename}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+
+                                </div>
+                            </md-content>
+                        </md-tab>
+                    </md-tabs>
+                </md-content>
+            </div>
+        </div>
+    </form>
+</section>

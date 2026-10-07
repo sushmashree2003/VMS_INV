@@ -1,0 +1,676 @@
+﻿<style>
+    .file-blue:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .imgpfgdownload {
+        width: 30px;
+        height: 30px;
+    }
+
+    .wellmargintop20 {
+        margin-top: 20px !important;
+    }
+</style>
+
+<section class="content admission">
+    <form class="form-horizontal" role="form" name="myForm2" novalidate>
+        <div class="box box-primary" ng-app="MyModule">
+            <div class="box-header with-border">
+                <h3 class="box-title">Correspondence Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="from_sch_date" ng-model="From_FMSCOR_Date"
+                                                   onkeydown="return false" placeholder="Select Date" required
+                                                   md-max-date="fromdate2" ng-change="OnChangeFromDateFile()">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.from_sch_date)"
+                                         ng-messages="myForm.from_sch_date.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="to_sch_date" ng-model="To_FMSCOR_Date"
+                                                   onkeydown="return false" placeholder="Select Date" required
+                                                   md-max-date="fromdate2" ng-change="OnChangeToDateFile()">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.to_sch_date)"
+                                         ng-messages="myForm.to_sch_date.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="CountReport()">
+                                <i class="fa fa-search" aria-hidden="true"></i>Search
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="getclear()">
+                                <i class="fa fa-times" aria-hidden="true"></i>Clear
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="getreport.length==0" id="excel-btn" aria-disabled="false"
+                                       ng-click="exportToExceldetails()">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>Export to Excel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-click="printDatadetails();" ng-disabled="getreport.length==0">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>print
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-if="getreport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Correspondence Report  </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="overflow-x:scroll ; width:100%">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.No</th>
+                            <th ng-click="sort('MI_Name')">Organization</th>
+                            <th ng-click="sort('IMFY_FinancialYear')">Year</th>
+                            <th ng-click="sort('FMSMFC_FileCategoryName')">File Category</th>
+                            <th ng-click="sort('IMFY_FinancialYear')">Created By</th>
+                            <th ng-click="sort('Catcount')">Count</th>
+                            <th>View Details</th>                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in getreport | filter:search">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left">{{ user.MI_Name }}</td>
+                            <td class="text-left">{{ user.IMFY_FinancialYear}}</td>
+                            <td class="text-left">{{ user.FMSMFC_FileCategoryName }}</td>
+                            <td class="text-left">
+                                Employee Name :  {{ user.EmpName }}<br />
+                                Department : {{user.HRMD_DepartmentName}}
+                            </td>
+                            <td class="text-left">{{ user.Catcount }}</td>
+                            <td>
+                                <a href="">
+                                    <i class="fa fa-eye" style="color:black;" title="View Details" ng-click="ViewRefernceNoDetails(user);"></i>
+                                </a>
+                            </td>                             
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="mymodalviewdetailsfirsttab" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Reference No.Details :  {{refernceno}}</h4>
+            </div>
+            <div class="modal-body">
+                <div id="printreferncenode">
+                    <div class="row" ng-if="getcabintdetails.length>0">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <table>
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <h3>Cabinet Details For Reference No. {{refernceno}}</h3>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL.No</th>
+                                            <th>Physical File Name</th>
+                                            <th>Cabinet Name</th>
+                                            <th>Row Name</th>
+                                            <th>Column Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="userclient in getcabintdetails">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{userclient.FMSMPFN_PhysicalFileName}}</td>
+                                            <td>{{userclient.FMSMFCBT_FileCabinetName}}</td>
+                                            <td>{{userclient.FMSMFCR_CabinetRowName}}</td>
+                                            <td>{{userclient.FMSMFCC_CabinetColumnName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="getfilesdetails.length>0">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <table>
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <h3>Files Details For Reference No. {{refernceno}}</h3>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL.No</th>
+                                            <th>File Name</th>
+                                            <th>Document</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="userclient in getfilesdetails">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{userclient.FMSCORFL_SoftCopyFileName}}</td>
+                                            <td>
+                                                <span ng-if="userclient.FMSCORFL_SoftCopyFilePath !=null && userclient.FMSCORFL_SoftCopyFilePath !=''">
+                                                    <a ng-if="userclient.filetype=='jpg' || userclient.filetype=='png'|| userclient.filetype=='svg'
+                                               || userclient.filetype=='jpeg' || userclient.filetype=='gif'"
+                                                       style="color:red;display:inline; font-weight: bolder;"
+                                                       data-ng-click="showmothersign(userclient.FMSCORFL_SoftCopyFilePath,userclient.FMSCORFL_SoftCopyFileName)">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='mp4' || userclient.filetype=='mp4'"
+                                                       style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                                       ng-click="showGuardianPhotonew(userclient)">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='pdf'" style="color:blue;display:inline;"
+                                                       ng-click="onview(userclient.FMSCORFL_SoftCopyFilePath,userclient.FMSCORFL_SoftCopyFileName)">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='doc'|| userclient.filetype=='docx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{userclient.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='ppt'|| userclient.filetype=='pptx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{userclient.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='xls'|| userclient.filetype=='xlsx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{userclient.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                                |
+                                                <span>
+                                                    <a ng-if="userclient.FMSCORFL_SoftCopyFilePath!=''" href="javascript:void(0)"
+                                                       ng-click="downloaddirectimage(userclient.FMSCORFL_SoftCopyFilePath,userclient.FMSCORFL_SoftCopyFileName,'Files',userclient.filetype)"
+                                                       data-toggle="tooltip" title="Download"><i class="fa fa-download text-primary" aria-hidden="true"></i></a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="getmodedetails.length>0">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <table>
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <h3>Mode Details For Reference No. {{refernceno}}</h3>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL.No</th>
+                                            <th>Transaction No.</th>
+                                            <th>Sent Date</th>
+                                            <th>File Name</th>
+                                            <th>Document</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="userclient in getmodedetails">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{userclient.FMSCORMD_ReferenceNo}}</td>
+                                            <td>{{userclient.FMSCORMD_SentDate | date :'dd/MM/yyyy'}}</td>
+                                            <td>{{userclient.FMSCORMD_FileName}}</td>
+
+                                            <td>
+                                                <span ng-if="userclient.FMSCORMD_FilePath !=null && userclient.FMSCORMD_FilePath !=''">
+                                                    <a ng-if="userclient.filetype=='jpg' || userclient.filetype=='png'|| userclient.filetype=='svg'
+                                               || userclient.filetype=='jpeg' || userclient.filetype=='gif'"
+                                                       style="color:red;display:inline; font-weight: bolder;"
+                                                       data-ng-click="showmothersign(userclient.FMSCORMD_FilePath,userclient.FMSCORMD_FileName)">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='mp4' || userclient.filetype=='mp4'"
+                                                       style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                                       ng-click="showGuardianPhotonew(userclient)">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='pdf'" style="color:blue;display:inline;"
+                                                       ng-click="onview(userclient.FMSCORMD_FilePath,userclient.fmscormD_FileName)">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='doc'|| userclient.filetype=='docx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{userclient.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='ppt'|| userclient.filetype=='pptx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{userclient.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a ng-if="userclient.filetype=='xls'|| userclient.filetype=='xlsx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{userclient.document_Pathnew}}" target="_blank">
+                                                        <i class="fa fa-eye text-primary" title="View" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                                |
+                                                <span>
+                                                    <a ng-if="userclient.FMSCORMD_FilePath!=''" href="javascript:void(0)"
+                                                       ng-click="downloaddirectimage(userclient.FMSCORMD_FilePath,userclient.FMSCORMD_FileName,'Mode',userclient.filetype)"
+                                                       data-toggle="tooltip" title="Download"><i class="fa fa-download text-primary" aria-hidden="true"></i></a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="excel-btn" aria-disabled="false"
+                                   ng-click="exportToExceldetails1()" ng-if="getmodedetails.length>0 || getfilesdetails.length>0 || getcabintdetails.length>0">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-click="printDatadetails1();"
+                                   ng-if="getmodedetails.length>0 || getfilesdetails.length>0 || getcabintdetails.length>0">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                            print
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Close
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalimg" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="preview" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-small" id="popup15" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div ng-repeat="vi1 in view_videos" style="padding-bottom:20px">
+                    <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                        <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="pauseOrPlay()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfviewdd"></div>
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>
+
+<div id="printreferncenode" ng-show="datataaa">
+    <div class="row" ng-if="getcabintdetails.length>0">
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <h3>Cabinet Details For Reference No. {{refernceno}}</h3>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No</th>
+                        <th>Physical File Name</th>
+                        <th>Cabinet Name</th>
+                        <th>Row Name</th>
+                        <th>>Column Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="userclient in getcabintdetails">
+                        <td>{{$index+1}}</td>
+                        <td>{{userclient.FMSMPFN_PhysicalFileName}}</td>
+                        <td>{{userclient.FMSMFCBT_FileCabinetName}}</td>
+                        <td>{{userclient.FMSMFCR_CabinetRowName}}</td>
+                        <td>{{userclient.FMSMFCC_CabinetColumnName}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-if="getfilesdetails.length>0">
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <h3>Files Details For Reference No. {{refernceno}}</h3>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No</th>
+                        <th>File Name</th>
+                        <th>Document</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="userclient in getfilesdetails">
+                        <td>{{$index+1}}</td>
+                        <td>{{userclient.FMSCORFL_SoftCopyFileName}}</td>
+                        <td>
+                            <span ng-if="userclient.FMSCORFL_SoftCopyFilePath!=null && userclient.FMSCORFL_SoftCopyFilePath!=''">
+                                <a style="color:blue" href="userclient.FMSCORFL_SoftCopyFilePath">File Document</a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-if="getmodedetails.length>0">
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <h3>Mode Details For Reference No. {{refernceno}}</h3>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No</th>
+                        <th>Transaction No.</th>
+                        <th>Sent Date</th>
+                        <th>File Name</th>
+                        <th>Document</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="userclient in getmodedetails">
+                        <td>{{$index+1}}</td>
+                        <td>{{userclient.FMSCORMD_ReferenceNo}}</td>
+                        <td>{{userclient.FMSCORMD_SentDate | date :'dd/MM/yyy'}}</td>
+                        <td>{{userclient.FMSCORMD_FileName}}</td>
+
+                        <td>
+                            <span ng-if="userclient.FMSCORMD_FilePath!=null && userclient.FMSCORMD_FilePath!=''">
+                                <a style="color:blue" href="userclient.FMSCORMD_FilePath">Mode Document</a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="excelreferncenode" ng-show="datataaa">
+    <div class="row" ng-if="getcabintdetails.length>0">
+        <div class="form-group">
+            <table>
+                <tr style="border : 0.5px solid black">
+                    <td colspan="5" class="text-center">
+                        <h3>Cabinet Details For Reference No. {{refernceno}}</h3>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr style="border: 0.5px solid black">
+                        <th>SL.No</th>
+                        <th>Physical File Name</th>
+                        <th>Cabinet Name</th>
+                        <th>Row Name</th>
+                        <th>Column Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border : 0.5px solid black" ng-repeat="userclient in getcabintdetails">
+                        <td>{{$index+1}}</td>
+                        <td>{{userclient.FMSMPFN_PhysicalFileName}}</td>
+                        <td>{{userclient.FMSMFCBT_FileCabinetName}}</td>
+                        <td>{{userclient.FMSMFCR_CabinetRowName}}</td>
+                        <td>{{userclient.FMSMFCC_CabinetColumnName}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-if="getfilesdetails.length>0">
+        <div class="form-group">
+            <table>
+                <tr style="border : 0.5px solid black">
+                    <td colspan="3" class="text-center">
+                        <h3>Files Details For Reference No. {{refernceno}}</h3>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr style="border : 0.5px solid black">
+                        <th>SL.No</th>
+                        <th>File Name</th>
+                        <th>Document</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border : 0.5px solid black" ng-repeat="userclient in getfilesdetails">
+                        <td>{{$index+1}}</td>
+                        <td>{{userclient.FMSCORFL_SoftCopyFileName}}</td>
+                        <td>
+                            <span ng-if="userclient.FMSCORFL_SoftCopyFilePath!=null && userclient.FMSCORFL_SoftCopyFilePath!=''">
+                                <a style="color:blue" href="userclient.FMSCORFL_SoftCopyFilePath">File Document</a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-if="getmodedetails.length>0">
+        <div class="form-group">
+            <table>
+                <tr style="border : 0.5px solid black">
+                    <td colspan="5" class="text-center">
+                        <h3>Mode Details For Reference No. {{refernceno}}</h3>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr style="border : 0.5px solid black">
+                        <th>SL.No</th>
+                        <th>Transaction No.</th>
+                        <th>Sent Date</th>
+                        <th>File Name</th>
+                        <th>Document</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border : 0.5px solid black" ng-repeat="userclient in getmodedetails">
+                        <td>{{$index+1}}</td>
+                        <td>{{userclient.FMSCORMD_ReferenceNo}}</td>
+                        <td>{{userclient.FMSCORMD_SentDate | date :'dd/MM/yyy'}}</td>
+                        <td>{{userclient.FMSCORMD_FileName}}</td>
+
+                        <td>
+                            <span ng-if="userclient.FMSCORMD_FilePath!=null && userclient.FMSCORMD_FilePath!=''">
+                                <a style="color:blue" href="userclient.FMSCORMD_FilePath">Document</a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="printdetail" ng-show="dfdfdfs">
+    <center>FMS Details Report </center>
+    <br />
+    <table class="table table-hover table-responsive table-bordered">
+        <thead>
+            <tr>
+                <th>SL.No</th>
+                <th ng-click="sort('FMSCOR_RefernceNo')">Reference No.</th>
+                <th ng-click="sort('FMSMFC_FileCategoryName')">File Category</th>
+                <th ng-click="sort('IMFY_FinancialYear')">Financial Year</th>
+                <th ng-click="sort('FMSCOR_Date')">Date</th>
+                <th ng-click="sort('FMSCOR_ClientSupplierFlg')">Type</th>
+                <th ng-click="sort('FMSCOR_Subject')">Subject</th>
+                <th ng-click="sort('DETAILS')">Details</th>
+                <th ng-click="sort('FMSCOR_ToName')">To Name</th>
+                <th ng-click="sort('FMSCOR_Description')">Description</th>
+                <th ng-click="sort('CREATEDBY')">Created By</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in getreport | filter:search">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left">{{ user.FMSCOR_RefernceNo }}</td>
+                <td class="text-center">{{ user.FMSMFC_FileCategoryName }}</td>
+                <td class="text-left">{{ user.IMFY_FinancialYear }}</td>
+                <td class="text-center">{{ user.FMSCOR_Date | date:"dd-MM-yyyy"}}</td>
+                <td class="text-left">{{ user.FMSCOR_ClientSupplierFlg}}</td>
+                <td class="text-left">{{ user.FMSCOR_Subject }}</td>
+                <td class="text-left">
+                    {{ user.DETAILS }}<br />
+                    {{user.ProjectName}}
+                </td>
+                <td class="text-left">{{ user.FMSCOR_ToName }}</td>
+                <td class="text-left">{{ user.FMSCOR_Description }}</td>
+                <td class="text-left">{{ user.CREATEDBY }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="exceldetail" ng-show="dfdfdfs">
+    <table class="table table-hover table-responsive table-bordered">
+        <thead>
+            <tr style="border:0.5px solid black">
+                <th>SL.No</th>
+                <th ng-click="sort('FMSCOR_RefernceNo')">Reference No.</th>
+                <th ng-click="sort('FMSMFC_FileCategoryName')">File Category</th>
+                <th ng-click="sort('IMFY_FinancialYear')">Financial Year</th>
+                <th ng-click="sort('FMSCOR_Date')">Date</th>
+                <th ng-click="sort('FMSCOR_ClientSupplierFlg')">Type</th>
+                <th ng-click="sort('FMSCOR_Subject')">Subject</th>
+                <th ng-click="sort('DETAILS')">Details</th>
+                <th ng-click="sort('FMSCOR_ToName')">To Name</th>
+                <th ng-click="sort('FMSCOR_Description')">Description</th>
+                <th ng-click="sort('CREATEDBY')">Created By</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border:0.5px solid black" ng-repeat="user in getreport | filter:search">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left">{{ user.FMSCOR_RefernceNo }}</td>
+                <td class="text-center">{{ user.FMSMFC_FileCategoryName }}</td>
+                <td class="text-left">{{ user.IMFY_FinancialYear }}</td>
+                <td class="text-center">{{ user.FMSCOR_Date | date:"dd-MM-yyyy"}}</td>
+                <td class="text-left">{{ user.FMSCOR_ClientSupplierFlg}}</td>
+                <td class="text-left">{{ user.FMSCOR_Subject }}</td>
+                <td class="text-left">
+                    {{ user.DETAILS }}<br />
+                    {{user.ProjectName}}
+                </td>
+                <td class="text-left">{{ user.FMSCOR_ToName }}</td>
+                <td class="text-left">{{ user.FMSCOR_Description }}</td>
+                <td class="text-left">{{ user.CREATEDBY }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

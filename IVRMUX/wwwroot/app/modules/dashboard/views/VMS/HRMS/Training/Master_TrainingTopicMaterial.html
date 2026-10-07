@@ -1,0 +1,256 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+
+    .UploadEmpDoc .file-blue:before {
+        content: 'Upload Document';
+        font-size: 12px;
+    }
+</style>
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Training Topic Material</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 ">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Topic:<strong style="color:Red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel12" name="trainingtopic" rows="5" ng-model="hrmtT_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="meet in training" value="{{meet.hrmtT_Id}}" ng-selected="{{meet.Selected===true}}">
+                                        {{meet.hrmtT_Topic}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.trainingtopic)" ng-messages="myForm.trainingtopic.$error">
+                                    <div ng-message="required">Enter Topic Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL NO</th>
+                                            <th>Upload File</th>
+                                            <th>File Name</th>
+                                            <th>View</th>
+                                            <th>Action </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="other in documentListOtherDetails track by $index" ng-form="myForm">
+                                            <td>{{$index+1}}</td>
+
+                                            <td>
+                                                <div class="col-sm-12 UploadEmpDoc1">
+                                                    <div class="form-group text-center">
+                                                        <label class="custom-file-input file-bluenew" style="width:100%;margin:auto;">
+                                                            <input type="file" name="doc" accept="image/*, application/pdf" data-ng-model="documentListOtherDetails[$index].FilePath" onchange="angular.element(this).scope().selectFileforUploadzdOtherDetail(this, angular.element(this).scope().other)">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="other.FileName" disabled />
+                                            </td>
+                                            <td>
+                                                <a ng-if="other.FilePath  !=null && other.FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(other.FilePath)"> view</a>
+                                            </td>
+                                            <td>
+                                                <span class="input-group-addon" ng-hide="documentListOtherDetails.length > 30">
+                                                    <a href="" ng-show="$last" ng-click="addNewDocumentOtherDetail()" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="documentListOtherDetails.length ==1">
+                                                    <a href="" ng-click="removeNewDocumentOtherDetail($index,other)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 ">
+                        <div class="form-group ">
+                            <label class="control-label col-sm-4">Topic Content:<strong style="color:Red">*</strong></label>
+                            <div class="col-sm-8">
+                                <div id="myP">
+                                    <pre class="form-control" contenteditable="true" style="height:150px; overflow-y: scroll;" name="Purpos" required> </pre>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.Purpos)" ng-messages="myForm.Purpos.$error">
+                                    <div ng-message="required">Enter Topic Content</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <input type="hidden" ng-model="HRMETRTYTOPM_Id" value="{{HRMETRTYTOPM_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="getmasterdata.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Topic-Content LIST</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{getmasterdata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Name')">Topic Name</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Agenda')">Topic Content</a>
+
+                            </th> 
+                            <th>
+                                Documents
+                            </th>                         
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue=(getmasterdata | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.hrmtT_Topic}}</td>
+                            <td>
+                                <span>
+                                    <a class="text-primary" data-placement="bottom" data-toggle="modal" data-target="#agendadetails" data- title="VIEW Details" ng-click="agendadetails(user)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span>
+                                    
+                                    <a href="javascript:void(0)" data-toggle="modal"  data-backdrop="static" ng-click="previewimg_new(user.hrmetrtytopM_StudyMaterials)"> <i class="fa fa-eye text-blue"></i></a>
+                                </span>
+                            </td>                           
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+
+<div class="modal fade" id="agendadetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">Topic</h5>
+            </div>
+            <div class="modal-body">
+                <p id="ada">
+                </p>                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{FileName}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

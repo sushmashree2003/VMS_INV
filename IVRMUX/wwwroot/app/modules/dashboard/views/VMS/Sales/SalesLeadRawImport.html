@@ -1,0 +1,683 @@
+﻿
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Raw Data Import</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body import">
+                <div class="col-sm-6 col-sm-offset-3">
+
+                    <div class="well text-center">
+                        <strong style="color:green;display:inline; font-weight: bolder; margin-left: 7px;">
+                            ** Kindly Select Only One Excel Sheet To Import
+                        </strong>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <a href="https://dcampusstrg.blob.core.windows.net/files/17/ISM_Attachments/fad1e84e-e35a-4222-92b8-e2e1fe21531f.xlsx" target="_blank"><b style="color:red">DOWNLOAD SAMPLE EXCEL FORMAT</b></a>
+                    </div>
+
+                    <!-- Radio Buttons for Selection -->
+                    <div class="col-sm-12" ng-init="optionflag='ExcelImport'">
+                        <div class="well text-center">
+                            <!--<div class="form-group">-->
+                            <label class="radio-inline">
+                                <input type="radio" value="ExcelImport" name="ExcelImport" ng-model="optionflag">
+                                <span class="lbl padding-8">Excel Import</span>
+                            </label>
+
+                            <label class="radio-inline">
+                                <input type="radio" value="Raw Data Entry" name="Raw Data Entry" ng-model="optionflag">
+                                <span class="lbl padding-8">Raw Data Entry</span>
+                            </label>
+                            <!--</div>-->
+                        </div>
+                        <div class="error-messages" ng-if="interactedradio(myForm.all11)" ng-messages="myForm.all11.$error">
+                            <div ng-message="required">Select any one of the radio button</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary" ng-if="optionflag=='ExcelImport'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Imported Data From Excel</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body" style="overflow:scroll;">
+                    <div class="">
+                        <div class="col-sm-2 pull-left padding-left-none">
+                            <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                <input type="file" name="impfile" class="btn btn-success" value="Import" ng-model="imp.file" accept=".xlsx" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().vm.gridOptions)" style="padding-top: 1px;padding-bottom: 2px;" fileread="" opts="vm.gridOptions" />
+                            </label>
+
+                            <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.impfile)" ng-messages="myForm.impfile.$error">
+                                <div ng-message="required">Select Input Flie</div>
+                            </div>
+                        </div>
+                        <div><strong style="color:red !important ;">NOTE : To Import the data, Please Select an Excel file.</strong></div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr ng-repeat="item in vm.gridOptions.data  | limitTo:1">
+                                    <th>
+                                        <a href="" ng-click="order('sno')">SLNO</a>
+                                    </th>
+
+                                    <th ng-repeat="key in item | keys">
+                                        <a href="" ng-click="order(key)">{{key}}</a>
+
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in vm.gridOptions.data |orderBy:sortKey:reverse| filter:search ">
+                                    <td>{{ $index + 1}}</td>
+                                    <td ng-repeat="key in item | keys " ng-init="value = item[key]">{{value}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <pagination total-items="totalItems" ng-model="currentPage"
+                                    max-size="5" boundary-links="true"
+                                    items-per-page="numPerPage" class="pagination-sm">
+                        </pagination>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="savedata(vm.gridOptions.data)">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-show="DuplicateDataArray.length > 0" ng-click="exportToExcel()" target="_blank">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Duplicate Data Export to Excel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-show="InvalidData.length > 0" ng-click="exportToExcelInvalidData()" target="_blank">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Invalid Data Export to Excel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+
+    <!-- Raw Data Entry Form Section -->
+    <form class="form-horizontal ng-pristine ng-valid" name="myFormNew" role="form" novalidate ng-show="optionflag == 'Raw Data Entry'">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Raw Data Entry Form</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Raw Lead Created By  : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-9">
+                                <ui-select id="id2" name="supname" ng-model="$parent.HRME_EmployeeCode" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Employee "
+                                           ng-change="OnChangeBehaviourEmployee('Appearance')"
+                                           ng-disabled="empflag" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">
+                                        {{$select.selected.EmployeeName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in Master_Employee_List | filter: $select.search"
+                                                       value="{{catgry.HRME_EmployeeCode}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.EmployeeName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted2(myForm.supname)" ng-messages="myForm.supname.$error">
+                                    <div ng-message="required">Select Created By Employee </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12" style="overflow:auto !important">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Sl No.
+                                </th>
+                                <th>
+                                    Raw Lead Name
+                                </th>
+                                <th>
+                                    Raw Lead Contact No
+                                </th>
+                                <th>
+                                    Raw Lead Email ID
+                                </th>
+                                <th>
+                                    Raw Lead Address
+                                </th>
+                                <th>
+                                    Raw Lead Source
+                                </th>
+                                <th>
+                                    Category
+                                </th>
+                                <th style="width:100px">
+                                    Helth
+                                </th>
+                                <th>
+                                    Contact Person
+                                </th>
+                                <th>
+                                    Designation
+                                </th>
+                                <th>
+                                    Remarks
+                                </th>
+                                <th>
+                                    State
+                                </th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="materal in materaldocuupload" ng-class-odd="'odd'">
+                                <td>
+                                    {{$index+1}}
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Lead Name" ng-model="materal.ISMSLERaw_LeadName" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" placeholder="Contact Number" ng-model="materal.ISMSLERaw_ContactNo" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control " placeholder="Email Id" ng-model="materal.ISMSLERaw_EmailId" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Address" ng-model="materal.ISMSLERaw_LeadAddress1" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Source" ng-model="materal.Source" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Category" ng-model="materal.Category" />
+                                </td>
+
+                                <td >
+                                    <select class="form-control" ng-model="materal.Health" name="flag" required>
+                                        <option value="">-Select-</option>
+                                        <option value="HOT">HOT</option>
+                                        <option value="WARM">WARM</option>
+                                        <option value="COLD">COLD</option>
+                                    </select>
+                                </td>
+                               
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Contact Person" ng-model="materal.Contact_Person" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Designation" ng-model="materal.Designation" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="Remarks" ng-model="materal.Remarks" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="State" ng-model="materal.State" />
+                                </td>
+                                <td class="text-center">
+
+                                    <span class="" ng-hide="materaldocuupload.length > 9">
+                                        <a href="" ng-show="$last" ng-click="addmateral()">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                                    </span>
+                                    <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                        <a href="" ng-click="removemateral($index)">
+                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-footer">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="saveRawdataLead()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                    </div>
+                </div>
+
+
+
+                <div class="row" ng-hide="true">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Raw Lead Name: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="Raw Lead Name" type="text" name="Name" ng-model="ISMSLERaw_LeadName" required />
+                                </div>
+                                <div class="col-sm-offset-4 error-messages" ng-if="interacteds(myFormNew.Name)" ng-messages="myFormNew.Name.$error">
+                                    <div ng-message="required">Enter Raw Lead Name</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Raw Lead Contact No: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="Contact No" name="contact" ng-model="ISMSLERaw_ContactNo" maxlength="10" ng-pattern="/^[6-9]{1}[0-9]{9}$/" required />
+                                </div>
+                                <div class="col-sm-offset-4 error-messages" ng-if="interacteds(myFormNew.contact)" ng-messages="myFormNew.contact.$error">
+                                    <div ng-message="required">Enter Contact No</div>
+                                    <div ng-message="pattern">Enter Valid Mobile No.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Raw Lead Email ID: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._]+@[A-Za-z0-9]+\.[A-Za-z.]{2,5}$/" placeholder="Enter Raw Lead Email ID" type="text" name="Email" ng-model="ISMSLERaw_EmailId" required />
+
+
+                                </div>
+                                <div class="col-sm-offset-4 error-messages" ng-if="interacteds(myFormNew.Email)" ng-messages="myFormNew.Email.$error">
+                                    <div ng-message="pattern">Enter valid Email ID</div>
+                                    <div ng-message="required">Enter Raw Lead Email ID</div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Raw Lead Address: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="Lead Address" type="text" name="Address" ng-model="ISMSLERaw_LeadAddress1" required />
+                                </div>
+                                <div class="col-sm-offset-4 error-messages" ng-if="interacteds(myFormNew.Address)" ng-messages="myFormNew.Address.$error">
+                                    <div ng-message="required">Enter Raw Lead Address</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Raw Lead Source: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="Source" placeholder="Source" class="form-control" ng-model="Source" required />
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.Source)" ng-messages="myFormNew.Source.$error">
+                                        <div ng-message="required">Enter Raw Lead Source</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Raw Lead Category: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="Category" placeholder="Category" class="form-control" ng-model="Category" required />
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.Category)" ng-messages="myFormNew.Category.$error">
+                                        <div ng-message="required">Enter Raw Lead Category</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Helth:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select id="priorityLevel" ng-model="Health" class="form-control" name="stsss" required>
+                                        <option value="">--Select--</option>
+                                        <option value="HOT">HOT</option>
+                                        <option value="WARM">WARM</option>
+                                        <option value="COLD">COLD</option>
+
+                                    </select>
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.stsss)" ng-messages="myFormNew.stsss.$error">
+                                        <div ng-message="required">Select Health</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <!--<div class="form-group">
+                    <label class="control-label col-sm-4">Status: <span style="color:red;">*</span></label>
+                    <div class="col-sm-8">
+                        <input class="form-control" placeholder="Status" type="text" name="Status" ng-model="Status" required />
+                        <div class="error-messages" ng-if="interacteds(myForm11.Status)" ng-messages="myForm11.Status.$error">
+                            <div ng-message="required">Please Enter Status .</div>
+                        </div>
+                    </div>
+                </div>-->
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Lead Created By(Employee Code):<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="Lead Created By" type="text" name="created" ng-model="Lead_Created_By" required />
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.created)" ng-messages="myFormNew.created.$error">
+                                        <div ng-message="required"> Enter Lead Created By</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Contact Person:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="Contact Person" type="text" name="Person" ng-model="Contact_Person" required />
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.Person)" ng-messages="myFormNew.Person.$error">
+                                        <div ng-message="required"> Enter Contact Person:</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Raw Lead Designation:<span style="color:red;">*</span> </label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="Designation" type="text" name="designation" ng-model="Designation" value="15" required />
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.designation)" ng-messages="myFormNew.designation.$error">
+                                        <div ng-message="required"> Enter Contact Person:</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Remark: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="Remark" type="text" name="Remark" data-ng-model="Remarks" required />
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.Remark)" ng-messages="myFormNew.Remark.$error">
+                                        <div ng-message="required">Please Enter Remark</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">State: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" placeholder="State" type="text" name="State" ng-model="State" required />
+                                    <div class="error-messages" ng-if="interacteds(myFormNew.State)" ng-messages="myFormNew.State.$error">
+                                        <div ng-message="required">Please Enter State</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="text-center">
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveRawdataLead()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- Raw Data Entry Form Section -->
+
+    <div class="box box-primary" ng-show="components_list.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">SALES LEAD Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-12 well">
+                <div class="">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </div>
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here..">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="col-sm-12">
+                        <table class="table table-responsive table-bordered text-left">
+                            <thead>
+                                <tr>
+                                    <th>SL. No</th>
+
+
+
+                                    <th><a href="" ng-click="sortTableData('ismslE_LeadName')">Lead Name</a></th>
+                                    <th><a href="" ng-click="sortTableData('EmployeeFirstName')"> Created By</a></th>
+
+                                    <th><a href="" ng-click="sortTableData('ismslE_ContactNo')">Contact No.</a></th>
+                                    <th><a href="" ng-click="sortTableData('ismslE_EmailId')">Email-Id</a></th>
+                                    <th><a href="" ng-click="sortTableData('ismsle_Id')">Date</a></th>
+                                    <th>Admin Status</th>
+                                    <th><a href="" ng-click="sortTableData('ismsle_Id')">Admin Remark</a></th>
+                                    <th>Telecaller Status</th>
+                                    <th><a href="" ng-click="sortTableData('ismsle_Id')">Telecaller Remark</a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in components_list  |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+
+
+
+                                    <td class="text-left" hidden="hidden">{{user.ismslE_Id}}</td>
+                                    <td class="text-left">{{user.ismslE_LeadName}}</td>
+                                    <td class="text-left">{{user.EmployeeFirstName}}</td>
+                                    <td class="text-left">{{user.ismslE_ContactNo}}</td>
+                                    <td class="text-left">{{user.ismslE_EmailId}}</td>
+                                    <td>
+                                        {{user.ISMSLE_CreatedDate | date: 'dd-MM-yyyy'}}
+                                    </td>
+                                    <td class="text-center">
+
+                                        <span ng-if="user.ISMSLERaw_status=='Pending'" style="color:#0d4073">
+                                            {{user.ISMSLERaw_status}}
+                                        </span>
+                                        <span ng-if="user.ISMSLERaw_status=='Approved'" style="color:green !important">
+                                            {{user.ISMSLERaw_status}}
+                                        </span>
+                                        <span ng-if="user.ISMSLERaw_status=='Reject'" style="color:red !important">
+                                            {{user.ISMSLERaw_status}}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{user.ISMSLE_VerifedRemark }}
+
+                                    </td>
+                                    <td class="text-center">
+
+                                        <span ng-if="user.ISMSLERaw_statusTel=='Pending'" style="color:#0d4073">
+                                            {{user.ISMSLERaw_statusTel}}
+                                        </span>
+                                        <span ng-if="user.ISMSLERaw_statusTel=='Approved'" style="color:green !important">
+                                            {{user.ISMSLERaw_statusTel}}
+                                        </span>
+                                        <span ng-if="user.ISMSLERaw_statusTel=='Reject'" style="color:red !important">
+                                            {{user.ISMSLERaw_statusTel}}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{user.ISMSLERaw_ApprovedRemarkTel }}
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="box box-primary" ng-show="hide">
+        <div class="box-header with-border">
+            <h3 class="box-title">Duplicate Data</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-12 well">
+                <div id="exceldata">
+                    <div class="col-sm-12">
+                        <table class="table table-responsive table-bordered text-left">
+                            <thead>
+                                <tr>
+                                    <th>SL.No</th>
+                                    <th>Lead Name</th>
+                                    <th>ContactNo</th>
+                                    <th>Email</th>
+                                    <th>LeadCode</th>
+                                    <th>Address1</th>
+                                    <th>Lead_Created_By</th>
+                                    <th>Source</th>
+                                    <th>Category</th>
+                                    <th>Contact_Person</th>
+                                    <th>Designation</th>
+                                    <th>Health</th>
+                                    <th>State</th>
+                                    <th>Remarks</th>
+                                    <th>Duplicate Data reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in DuplicateDataArray">
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{user.leadName}}</td>
+                                    <td class="text-left">{{user.contactNo}}</td>
+                                    <td class="text-left">{{user.email}}</td>
+                                    <td class="text-left">{{user.leadCode}}</td>
+                                    <td class="text-left">{{user.address1}}</td>
+                                    <td class="text-left">{{user.lead_Created_By}}</td>
+                                    <td class="text-left">{{user.source}}</td>
+                                    <td class="text-left">{{user.category}}</td>
+                                    <td class="text-left">{{user.contact_Person}}</td>
+                                    <td class="text-left">{{user.designation}}</td>
+                                    <td class="text-left">{{user.health}}</td>
+                                    <td class="text-left">{{user.state}}</td>
+                                    <td class="text-left">{{user.remarks}}</td>
+                                    <td class="text-left">{{user.country}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="hide">
+        <div class="box-header with-border">
+            <h3 class="box-title">Invalid Data</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-12 well">
+                <div id="InvalidDataExcelData">
+                    <div class="col-sm-12">
+                        <table class="table table-responsive table-bordered text-left">
+                            <thead>
+                                <tr>
+                                    <th>SL.No</th>
+                                    <th>Lead Name</th>
+                                    <th>ContactNo</th>
+                                    <th>Email</th>
+                                    <th>LeadCode</th>
+                                    <th>Address1</th>
+                                    <th>Lead_Created_By</th>
+                                    <th>Source</th>
+                                    <th>Category</th>
+                                    <th>Contact_Person</th>
+                                    <th>Designation</th>
+                                    <th>Health</th>
+                                    <th>State</th>
+                                    <th>Remarks</th>
+                                    <th>Duplicate Data reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in InvalidData">
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{user.leadName}}</td>
+                                    <td class="text-left">{{user.contactNo}}</td>
+                                    <td class="text-left">{{user.email}}</td>
+                                    <td class="text-left">{{user.leadCode}}</td>
+                                    <td class="text-left">{{user.address1}}</td>
+                                    <td class="text-left">{{user.lead_Created_By}}</td>
+                                    <td class="text-left">{{user.source}}</td>
+                                    <td class="text-left">{{user.category}}</td>
+                                    <td class="text-left">{{user.contact_Person}}</td>
+                                    <td class="text-left">{{user.designation}}</td>
+                                    <td class="text-left">{{user.health}}</td>
+                                    <td class="text-left">{{user.state}}</td>
+                                    <td class="text-left">{{user.remarks}}</td>
+                                    <td class="text-left">{{user.country}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

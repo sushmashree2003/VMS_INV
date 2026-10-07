@@ -1,0 +1,643 @@
+﻿<link href="./css/Portals/PortalsStyles.css" rel="stylesheet" />
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<style>
+
+    /* Container for the vertical text */
+    .vertical-text {
+        display: inline-block; /* Make text an inline-block element */
+        white-space: nowrap; /* Prevent wrapping */
+        letter-spacing: 3px; /* Adds space between each letter */
+    }
+
+        /* Apply block display to each letter */
+        .vertical-text span {
+            display: block; /* Display each letter on a new line */
+        }
+    /* Ensure the chart container fills the available space and is centered */
+    .chart-container {
+        display: flex;
+        justify-content: center; /* Horizontally center */
+        align-items: center; /* Vertically center */
+        height: 100%; /* Fill the available height of the box-body */
+        width: 100%; /* Fill the available width */
+        overflow: hidden; /* Prevent overflow */
+    }
+
+    #columnchart {
+        max-width: 100%; /* Ensure the chart doesn't exceed container width */
+        height: 550px; /* Fixed height for the chart */
+        width: 100%; /* Ensure the chart fills the width of its container */
+    }
+</style>
+
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Company Financial Year Budget Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="well text-center">
+                        <div ng-init="obj.rdopunch='department'">
+                            <label class="radio-inline">
+                                <input type="radio" value="department" name="enhc" ng-model="obj.rdopunch" ng-change="otherdaydatechange()">
+                                <span class="lbl padding-8"><b>Department  </b></span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="client" name="enhc" ng-model="obj.rdopunch" ng-change="otherdaydatechange()">
+                                <span class="lbl padding-8"><b>  Revenue </b></span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Capital" name="enhc" ng-model="obj.rdopunch" ng-change="otherdaydatechange()">
+                                <span class="lbl padding-8"><b>Capital  </b></span>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="obj.MI_Id" ng-change="oncmpchangeDept2()" ; name="Companyr" required>
+                                    <option value="">Select Company</option>
+                                    <option ng-repeat="option in allcompany" value="{{option.mI_Id}}">
+                                        {{option.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.Companyr)" ng-messages="myForm.Companyr.$error">
+                                    <div ng-message="required">Enter Company</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Department:<strong style="color:red;">*</strong></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search here.....">
+                                <label>
+                                    <input type="checkbox" ng-model="allSelectedDept" ng-click="toggleAllDepartments(allSelectedDept)">
+                                    <span class="lbl padding-8">All</span>
+                                </label>
+                                <label ng-repeat="dept in deptList | filter:searchValueDept">
+                                    <input type="checkbox" ng-model="dept.selected" ng-click="updateSelectedDepartments()">
+                                    <span class="lbl padding-8">{{dept.hrmD_DepartmentName}}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <center>
+                            <div class="error-messages" ng-if="!isDepartmentSelected && myForm.$submitted">
+                                <div style="color: red;">Please select at least one department</div>
+                            </div>
+                        </center>
+                    </div>
+
+
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Financial Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="obj.IMFY_Id" name="grpsF" required>
+                                    <option value="">Select Financial Year --</option>
+                                    <option ng-repeat="option in FinancialYear" value="{{option.imfY_Id}}">
+                                        {{option.imfY_FinancialYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.grpsF)" ng-messages="myForm.grpsF.$error">
+                                    <div ng-message="required">Enter Financial Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Monthly:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="obj.ivrM_Month_Id" name="grpsF">
+                                    <option value="">Select Month --</option>
+                                    <option ng-repeat="option in Month_List" value="{{option.ivrM_Month_Id}}">
+                                        {{option.ivrM_Month_Name}}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+                <div class="col-sm-12 text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="getApprovalReportdata()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="printData()" ng-if="reportBudgetlist.length > 0">
+                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel('#printpi')" ng-if="reportBudgetlist.length > 0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export To Excel
+                    </md-button>
+                </div>
+                <div>
+                    <canvas id="budgetChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+        <!--</div>-->
+    </form>
+
+
+
+
+    <div class="box box-primary" ng-if="reportBudgetlist.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Company Financial Year Budget Approving Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+
+
+                        <!-- Added table-responsive here -->
+                        <!--<table class="table table-bordered table-condensed" border="1">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name of the cost Head</th>
+                <th class="hdTH">
+                    <label>
+                        <input type="checkbox" ng-model="allSelectedItems" ng-click="toggleAllItems(allSelectedItems)">
+                        <span class="lbl padding-8">All</span>
+                    </label>
+                </th>
+                <th>April</th>
+                <th>May</th>
+                <th>June</th>
+                <th>July</th>
+                <th>August</th>
+                <th>September</th>
+                <th>October</th>
+                <th>November</th>
+                <th>December</th>
+                <th>January</th>
+                <th>February</th>
+                <th>March</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="dd in reportBudgetlist | filter: customSearch">
+            <tr></tr>
+            <tr>
+                <td rowspan="0" class="text-center">
+                    <h4 class="vertical-text" style="width: 30px;">
+                        <span ng-repeat="char in dd.transformedHRMD_DepartmentName track by $index">{{char}}</span>
+                    </h4>
+                </td>
+            </tr>
+            <tr ng-repeat="user in dd.templist">
+
+                <td>{{user.VMBDGHDAMTN_Name}}</td>
+                <td class="text-center hdTD">
+                    <label>
+                        <input type="checkbox" ng-model="user.selected" ng-change="updateSelectedItems(user)">
+                        <span class="lbl padding-8"></span>
+                    </label>
+                </td>
+                <td><input type="text" ng-model="user.April" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.May" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.June" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.July" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.August" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.September" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.October" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.November" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.December" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.January" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.February" ng-disabled="!user.editable" /></td>
+                <td><input type="number" ng-model="user.March" ng-disabled="!user.editable" /></td>
+                <td>{{user.TotalAmount}}</td>
+            </tr>
+            <tr ng-repeat="user in dd.deptotal" style="background-color:lightblue !important">
+
+                <td><b>Total</b></td>
+                <td></td>
+                <td><strong ng-if="user.April > 0">{{user.April}}</strong></td>
+                <td><strong ng-if="user.May > 0">{{user.May}}</strong></td>
+                <td><strong ng-if="user.June > 0">{{user.June}}</strong></td>
+                <td><strong ng-if="user.July > 0">{{user.July}}</strong></td>
+                <td><strong ng-if="user.August > 0">{{user.August}}</strong></td>
+                <td><strong ng-if="user.September > 0">{{user.September}}</strong></td>
+                <td><strong ng-if="user.October > 0">{{user.October}}</strong></td>
+                <td><strong ng-if="user.November > 0">{{user.November}}</strong></td>
+                <td><strong ng-if="user.December > 0">{{user.December}}</strong></td>
+                <td><strong ng-if="user.January > 0">{{user.January}}</strong></td>
+                <td><strong ng-if="user.February > 0">{{user.February}}</strong></td>
+                <td><strong ng-if="user.March > 0">{{user.March}}</strong></td>
+                <td><strong>{{user.TotalAmount}}</strong></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr ng-repeat="user in Budgettotal" style="background-color:antiquewhite !important">
+                <td colspan="2"><b>Grand Total</b></td>
+                <td></td>
+                <td><strong ng-if="user.April > 0">{{user.April}}</strong></td>
+                <td><strong ng-if="user.May > 0">{{user.May}}</strong></td>
+                <td><strong ng-if="user.June > 0">{{user.June}}</strong></td>
+                <td><strong ng-if="user.July > 0">{{user.July}}</strong></td>
+                <td><strong ng-if="user.August > 0">{{user.August}}</strong></td>
+                <td><strong ng-if="user.September > 0">{{user.September}}</strong></td>
+                <td><strong ng-if="user.October > 0">{{user.October}}</strong></td>
+                <td><strong ng-if="user.November > 0">{{user.November}}</strong></td>
+                <td><strong ng-if="user.December > 0">{{user.December}}</strong></td>
+                <td><strong ng-if="user.January > 0">{{user.January}}</strong></td>
+                <td><strong ng-if="user.February > 0">{{user.February}}</strong></td>
+                <td><strong ng-if="user.March > 0">{{user.March}}</strong></td>
+                <td><strong>{{user.TotalAmount}}</strong></td>
+            </tr>
+        </tfoot>
+    </table>-->
+
+
+
+
+                        <table class="table table-bordered table-condensed" border="1">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Name of the Cost Head</th>
+                                    <th class="hdTH">
+                                        <label>
+                                            <!--<input type="checkbox" ng-model="allSelectedItems" ng-click="toggleAllItems(allSelectedItems)">-->
+                                            <input type="checkbox" ng-model="selectAll" ng-change="toggleAllItems(selectAll)">
+
+                                            <span class="lbl padding-8">All</span>
+                                        </label>
+                                    </th>
+                                    <th>Total Amount</th>
+                                    <th>April</th>
+                                    <th>May</th>
+                                    <th>June</th>
+                                    <th>July</th>
+                                    <th>August</th>
+                                    <th>September</th>
+                                    <th>October</th>
+                                    <th>November</th>
+                                    <th>December</th>
+                                    <th>January</th>
+                                    <th>February</th>
+                                    <th>March</th>
+                                    <!--<th>Total Amount</th>-->
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="dd in reportBudgetlist | filter: customSearch">
+                                <tr>
+                                    <td rowspan="0" class="text-center">
+                                        <h4 class="vertical-text" style="width: 30px;">
+                                            <span ng-repeat="char in dd.transformedHRMD_DepartmentName track by $index">{{char}}</span>
+                                        </h4>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="user in dd.templist">
+                                    <td>{{user.VMBDGHDAMTN_Name}}</td>
+                                    <td class="text-center hdTD">
+                                        <label>
+                                            <input type="checkbox" ng-model="user.selected" ng-change="updateSelectedItems(user)">
+
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+
+                                    <td>
+                                        <input type="number" ng-model="user.TotalAmount"
+                                               ng-disabled="!user.selected"
+                                               ng-change="onTotalAmountChanged(user)" />
+                                    </td>
+
+                                    <td><input type="number" ng-model="user.April" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.May" ng-change="updateTotal(user,'May')" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.June" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.July" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.August" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.September" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.October" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.November" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.December" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.January" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.February" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                    <td><input type="number" ng-model="user.March" ng-change="updateTotal(user)" ng-disabled="!user.editable" /></td>
+                                 
+                                      <!--<td>{{user.TotalAmount}}</td>-->
+                                </tr>
+                                <tr ng-repeat="user in dd.deptotal" style="background-color:lightblue !important">
+                                    <td><b>Total</b></td>
+                                    <td></td>
+                                    <td><strong>{{user.TotalAmount}}</strong></td>
+                                    <td><strong>{{user.April}}</strong></td>
+                                    <td><strong>{{user.May}}</strong></td>
+                                    <td><strong>{{user.June}}</strong></td>
+                                    <td><strong>{{user.July}}</strong></td>
+                                    <td><strong>{{user.August}}</strong></td>
+                                    <td><strong>{{user.September}}</strong></td>
+                                    <td><strong>{{user.October}}</strong></td>
+                                    <td><strong>{{user.November}}</strong></td>
+                                    <td><strong>{{user.December}}</strong></td>
+                                    <td><strong>{{user.January}}</strong></td>
+                                    <td><strong>{{user.February}}</strong></td>
+                                    <td><strong>{{user.March}}</strong></td>
+
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr ng-repeat="user in Budgettotal" style="background-color:antiquewhite !important">
+                                    <td colspan="2"><b>Grand Total</b></td>
+                                    <td></td>
+                                    <td><strong>{{user.TotalAmount}}</strong></td>
+                                    <td><strong>{{user.April}}</strong></td>
+                                    <td><strong>{{user.May}}</strong></td>
+                                    <td><strong>{{user.June}}</strong></td>
+                                    <td><strong>{{user.July}}</strong></td>
+                                    <td><strong>{{user.August}}</strong></td>
+                                    <td><strong>{{user.September}}</strong></td>
+                                    <td><strong>{{user.October}}</strong></td>
+                                    <td><strong>{{user.November}}</strong></td>
+                                    <td><strong>{{user.December}}</strong></td>
+                                    <td><strong>{{user.January}}</strong></td>
+                                    <td><strong>{{user.February}}</strong></td>
+                                    <td><strong>{{user.March}}</strong></td>
+
+                                </tr>
+                            </tfoot>
+                        </table>
+
+
+
+
+
+                    </div>
+                    <div class="text-center">
+                        <input type="hidden" ng-model="obj.VMBDGHDAMTNM_Id" value="{{VMBDGHDAMTNM_Id}}" />
+
+                        <!--<md-button class="md-raised md-primary" ng-click="Approve()" ng-disabled="!isUpdateEnabled" style="width: 200px;">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Approved
+    </md-button>-->
+                        <md-button class="md-raised md-primary"
+                                   ng-click="Approve('Approved')"
+                                  
+                                   style="width: 200px;">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Approved
+                        </md-button>
+
+                        <md-button class="md-raised md-warn"  ng-click="Approve('Rejected')" style="width: 200px;">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Rejected
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!--<div class="col-sm-6" ng-show="reportBudgetlist.length>0">-->
+    <!--<div class="col-sm-6" ng-show="reportBudgetlist.length>0">
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h3 class="box-title">Budget {{IVRM_Month_Name}}</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div id="columnchart" style="height: 550px; width: 100%;"></div>
+            </div>
+        </div>
+    </div>-->
+    <!--//workinhg
+    <div class="box box-primary"  ng-show="reportBudgetlist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Outward Record</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+
+        </div>
+        <div class="box-body ">
+            <div id="columnchart" style="height: 550px; width: 100%;"></div>
+
+        </div>
+
+        </div>-->
+    <!--<div class="box box-primary" ng-show="reportBudgetlist.length > 0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Financial Year Budget Graph</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body ">
+                <div class="columnchart k-content wide col-sm-12">
+
+                    <div class="chart-container">
+                        <div id="columnchart" style="height: 500px"></div>
+                    </div>
+                </div>
+            </div>
+    </div>-->
+    <!--<div class="box box-primary" ng-show="reportBudgetlist.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Financial Year Budget Graph</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="columnchart k-content wide col-sm-12">
+                <div class="chart-container">
+                    <div id="columnchart" style="height: 300px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <!--<div class="col-sm-12" ng-show="reportBudgetlist.length > 0">
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h3 class="box-title">Budget {{IVRM_Month_Name}}</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+
+                    <div class="col-sm-12">
+                        <div id="columnchart"></div>
+
+                    </div>
+
+            </div>
+
+
+
+
+        </div>
+    </div>-->
+
+
+</section>
+
+
+<!--print-->
+<div class="box-body">
+    <div class="col-sm-12" id="printpi" ng-hide="true">
+
+        <table class="table  table-bordered table-condensed" border="1">
+
+            <thead>
+                <tr>
+                    <th></th>
+
+                    <th>Name of the cost  Head</th>
+
+                    <th>April</th>
+                    <th>May</th>
+                    <th>June</th>
+                    <th>July</th>
+                    <th>August</th>
+                    <th>September</th>
+                    <th>October</th>
+                    <th>November</th>
+                    <th>December</th>
+                    <th>January</th>
+                    <th>February</th>
+                    <th>March</th>
+                    <th>Total Amount</th>
+                </tr>
+            </thead>
+            <tbody ng-repeat="dd in reportBudgetlist">
+                <tr>
+                    <td class="text-center">
+
+                        <h4 class="vertical-text">
+                            <span ng-repeat="char in dd.transformedHRMD_DepartmentName track by $index">{{char}}</span>
+                        </h4>
+                    </td>
+                </tr>
+
+                <tr ng-repeat="user in dd.templist">
+
+                    <td colspan="2" style="text-align:center;"> {{user.VMBDGHDAMTN_Name}} </td>
+
+                    <td><span ng-if="user.April > 0">  {{user.April}} </span> </td>
+                    <td><span ng-if="user.May > 0">   {{user.May}} </span> </td>
+                    <td><span ng-if="user.June > 0">  {{user.June}} </span> </td>
+                    <td><span ng-if="user.July > 0">  {{user.July}} </span> </td>
+                    <td><span ng-if="user.August > 0"> {{user.August}} </span> </td>
+                    <td><span ng-if="user.September > 0"> {{user.September}} </span></td>
+                    <td><span ng-if="user.October > 0"> {{user.October}} </span> </td>
+                    <td><span ng-if="user.November > 0"> {{user.November}} </span> </td>
+                    <td><span ng-if="user.December > 0"> {{user.December}} </span> </td>
+                    <td> <span ng-if="user.January > 0">  {{user.January}} </span> </td>
+                    <td><span ng-if="user.February > 0"> {{user.February}} </span> </td>
+                    <td><span ng-if="user.March > 0">  {{user.March}} </span> </td>
+                    <td>{{user.TotalAmount}}</td>
+                </tr>
+                <tr ng-repeat="user in dd.deptotal" style="background-color:lightblue !important">
+                    <td colspan="2">
+                        <b>Total </b>
+                    </td>
+
+                    <td><strong ng-if="user.April > 0">  {{user.April}} </strong> </td>
+                    <td><strong ng-if="user.May > 0">   {{user.May}} </strong> </td>
+                    <td><strong ng-if="user.June > 0">  {{user.June}} </strong> </td>
+                    <td><strong ng-if="user.July > 0">  {{user.July}} </strong> </td>
+                    <td><strong ng-if="user.August > 0"> {{user.August}} </strong> </td>
+                    <td><strong ng-if="user.September > 0"> {{user.September}} </strong></td>
+                    <td><strong ng-if="user.October > 0"> {{user.October}} </strong> </td>
+                    <td><strong ng-if="user.November > 0"> {{user.November}} </strong> </td>
+                    <td><strong ng-if="user.December > 0"> {{user.December}} </strong> </td>
+                    <td>
+                        <strong ng-if="user.January > 0">  {{user.January}} </strong>
+                    </td>
+                    <td>
+                        <strong ng-if="user.February > 0"> {{user.February}} </strong>
+                    </td>
+                    <td><strong ng-if="user.March > 0">  {{user.March}} </strong> </td>
+                    <td>
+                        <strong>
+                            {{user.TotalAmount}}
+                        </strong>
+
+
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr ng-repeat="user in Budgettotal" style="background-color:antiquewhite !important">
+                    <td colspan="2">
+                        <b>Grand Total</b>
+                    </td>
+
+                    <td><strong ng-if="user.April > 0">  {{user.April}} </strong> </td>
+                    <td><strong ng-if="user.May > 0">   {{user.May}} </strong> </td>
+                    <td><strong ng-if="user.June > 0">  {{user.June}} </strong> </td>
+                    <td><strong ng-if="user.July > 0">  {{user.July}} </strong> </td>
+                    <td><strong ng-if="user.August > 0"> {{user.August}} </strong> </td>
+                    <td><strong ng-if="user.September > 0"> {{user.September}} </strong></td>
+                    <td><strong ng-if="user.October > 0"> {{user.October}} </strong> </td>
+                    <td><strong ng-if="user.November > 0"> {{user.November}} </strong> </td>
+                    <td><strong ng-if="user.December > 0"> {{user.December}} </strong> </td>
+                    <td>
+                        <strong ng-if="user.January > 0">  {{user.January}} </strong>
+                    </td>
+                    <td>
+                        <strong ng-if="user.February > 0"> {{user.February}} </strong>
+                    </td>
+                    <td><strong ng-if="user.March > 0">  {{user.March}} </strong> </td>
+                    <td>
+                        <strong>
+                            {{user.TotalAmount}}
+                        </strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+

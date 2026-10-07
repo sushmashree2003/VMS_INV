@@ -1,0 +1,276 @@
+﻿<style>
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+
+    .well {
+        position: relative;
+        border-radius: 3px;
+        background: #ffffff !important;
+        border-top: 3px solid #d2d6de !important;
+        padding: 5px !important;
+        margin-bottom: 5px !important;
+        width: 66%;
+        -webkit-box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+        box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+</style>
+
+<section class="content" ng-init="LoadHWHealthCheckUpdata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">WELCOME AND CLOSING LETTER</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closeimg13()" style="border-radius: 5px; font-size: 16px;">
+                        Close
+                    </button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Academic Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="year" ng-model="ASMAY_ID" required>
+                                        <option value="">--Select Year--</option>
+                                        <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id==ISMCLTPRMP_AcademicYear}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(dataform1.year)" ng-messages="dataform1.year.$error">
+                                        <div ng-message="required">Select Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Client : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="id2" name="ISMMCLTname" ng-model="objques.ISMMCLT_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Client "
+                                               ng-change="OnChangeQuestion(objques.RATMQE_Id)"
+                                               ng-disabled="editable==true" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Client">
+                                            {{$select.selected.ismmclT_ClientName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="catgry in getclientlist | filter: $select.search"
+                                                           value="{{catgry.ismmclT_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.ISMMCLTname)" ng-messages="myForm1.ISMMCLTname.$error">
+                                        <div ng-message="required">Select Client Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3"> Template: <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="templatess" ng-model="ISMPCL_TemplateName" ng-change="loadtemplate()" required>
+                                        <!--ng-change="loadtemplate()"-->
+                                        <option value="">--Select--</option>
+                                        <option value="WelcomeLetter ">Welcome Letter </option>
+                                        <option value="ClosingLetter">Closing Letter</option>
+                                        <option value="ClosingLetterDelite">Closing Letter Delite</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.templatess)" ng-messages="myForm.templatess.$error">
+                                        <div ng-message="required">Please Select Template</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr />
+                <div class="row text-center">
+                    <input type="hidden" ng-model="ismcltprP_Id " value="{{ismcltprP_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="welclosesavedata()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="welcomeclose.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">WELCOME AND CLOSING LETTER DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="overflow:auto">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Academic Year</th>
+                                    <th>Client Name</th>
+                                    <th>Templeate Name </th>
+                                    <th>View</th>
+                                   
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="user2 in welcomeclose">
+
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-center">{{user2.ASMAY_Year}}</td>
+                                    <td class="text-left">{{user2.ISMMCLT_ClientName}}</td>
+                                    <td class="text-left">{{user2.ISMPCL_TemplateName}}</td>
+                                    <td class="text-center">
+                                        <span ng-click="Viewtemplateone2(user2)">
+                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+                        </dir-pagination-controls>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</section>
+
+<div id="template12345" class="modal fade" role="dialog" data-backdrop="static"style="overflow:auto;"data-keyboard="false" >
+    <div class="modal-dialog modal-lg" style="max-width: 85%; border-radius: 1px; overflow: hidden;">
+        <div class="modal-content" style="border-radius: 10px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);">
+            <!-- Modal Header -->
+            <div class="modal-header" style="background-color: white; color: white; border-bottom: 2px solid #3E7CB1;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+               
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h4 class="modal-title" style="font-weight: bold; font-size: 20px;">MOU Approval</h4>
+                        <div class="col-sm-4">
+                            <md-button type="button" class="md-raised md-primary" data-ng-click="printToCart()">
+                                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                                PRINT
+                            </md-button>
+                            <md-button type="button" class="md-raised md-accent" ng-click="SendDataview()">
+                                SEND MAIL
+                            </md-button>
+                            <div class="col-sm-0 pull-right">
+                                <md-button type="button" class="btn btn-primary" data-dismiss="modal" style="border-radius: 5px; font-size: 16px;">
+                                    Close
+                                </md-button>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Body -->
+        
+            <div class="modal-body" style="padding: 40px; background-color: #f9f9f9; color: #333;" data-backdrop="static">
+
+                <div id="MoutempEmail">
+                    <div class="row">
+                        <div id="bindtemplate12345">
+                            <!-- Your content goes here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer" style="border-top: none; padding: 20px; background-color: #f1f1f1;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closeimg13()" style="border-radius: 5px; font-size: 16px;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="closeimg13()" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+

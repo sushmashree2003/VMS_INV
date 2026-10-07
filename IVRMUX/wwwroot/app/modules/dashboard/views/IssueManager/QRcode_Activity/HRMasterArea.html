@@ -1,0 +1,710 @@
+﻿
+<section class="content twocoloumn">
+    <div ng-init="loaddata()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">QR Code Generation</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div ng-cloak>
+                    <md-content>
+                        <md-tabs md-dynamic-height md-border-bottom>
+                            <!-------------------- Master Area -------------------->
+                            <md-tab label="Master Area">
+                                <md-content class="md-padding">
+                                    <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm1" novalidate>
+                                        <div class="box box-primary">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">Master Area</h3>
+                                                <div class="box-tools pull-right">
+                                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Building Name :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" ng-model="hrmB_Id" name="Building" ng-change="floordetailschange(hrmB_Id)" required>
+                                                                    <option value="">Select Building </option>
+                                                                    <option ng-repeat="option in get_building" value="{{option.hrmB_Id}}" ng-selected="{{option.hrmB_Id == hrmB_Id}}">
+                                                                        {{option.hrmB_BuildingName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.Building)" ng-messages="myForm1.Building.$error">
+                                                                    <div ng-message="required">Please Select Building</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Floor Name  :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" ng-model="hrmF_Id" name="Floor" required>
+                                                                    <option value="">Select Floor </option>
+                                                                    <option ng-repeat="option in get_floor" value="{{option.hrmF_Id}}" ng-selected="{{option.hrmF_Id == hrmF_Id}}">
+                                                                        {{option.hrmF_FloorName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.Floor)" ng-messages="myForm1.Floor.$error">
+                                                                    <div ng-message="required">Please Select Floor</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Area Name :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <input type="text" name="Area" class="form-control" maxlength="100" placeholder="Enter Area Name" data-ng-model="hrmaR_AreaName" required />
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.Area)" ng-messages="myForm1.Area.$error">
+                                                                    <div ng-message="required">Enter Area Name</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Area Code :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <input type="text" name="Code" class="form-control" maxlength="100" placeholder="Enter Area Code" data-ng-model="hrmaR_AreaCode" ng-change="QRcode()" required />
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.Code)" ng-messages="myForm1.Code.$error">
+                                                                    <div ng-message="required">Enter Area Code</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row" ng-hide="true">
+                                                            <div class="col-sm-12" style="text-align:center">
+                                                                <div class="col-md-12">
+                                                                    <textarea id="sig-dataUrl" class="form-control" rows="5"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+
+                                                            <!--<div class="col-sm-7" style="margin-top:9px;">
+                                                                <input type="text" id="website" ng-model="obj.QRCode" class="form-control" ng-disabled="true" />
+                                                            </div>-->
+                                                            <!--<div class="col-sm-5">
+                                                                <md-button type="button" class="md-raised  md-accent md-button md-ink-ripple" ng-click="generateQRCode()">
+                                                                    <i class="fa fa-bar" aria-hidden="true"></i> Click To Genrate
+                                                                </md-button>
+                                                            </div>-->
+
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12" style="text-align:center">
+                                                                <div id="qrcode-container">
+                                                                    <div id="qrcode" class="qrcode"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <hr />
+                                                <div class="text-center">
+                                                    <input type="hidden" ng-model="hrmaR_Id" />
+                                                    <md-button type="submit" class="md-raised md-primary" ng-click="savedataAREA()" ng-disabled="form.$invalid">
+                                                        <i class="fa fa-save" aria-hidden="true"></i> Save
+                                                    </md-button>
+                                                    <md-button type="button" class="md-raised md-warn" ng-click="cancelU()" ng-disabled="form.$invalid">
+                                                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                                    </md-button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <!-- Master Area-->
+                                    <div class="box box-primary" ng-show="get_Area.length>0">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Master Area Details</h3>
+                                            <div class="box-tools pull-right">
+                                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                            </div>
+                                        </div>
+
+                                        <div class="box-body">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            <b> Total Grid Records :</b>
+                                                            <label class="badge">
+                                                                {{presentCountgridU}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group" ng-if="searchValueU!=''">
+                                                        <label class="control-label">
+                                                            <b>Total Records Searched : </b>
+                                                            <label class="badge">
+                                                                {{filterValue1.length}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4 pull-right">
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-search"></i>
+                                                            </span>
+                                                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="overflow-x:auto">
+                                                <table class="table table-hover table-responsive table-bordered text-center">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>SL NO</th>
+                                                            <th><a href="" ng-click="sort('hrmB_BuildingName')">Building Name </a></th>
+                                                            <th><a href="" ng-click="sort('hrmF_FloorName')">Floor Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaR_AreaName')">Area Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaR_AreaCode')">Area Code  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaR_QRCode')">QR Code  </a></th>
+
+                                                            <th>Action</th>
+                                                            <th>Edit</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr dir-paginate="userU in filterValue1 = (get_Area | filter : searchValueU)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPageU" current-page="currentPageU" ng-class-odd="'odd'" pagination-id="xyzz">
+
+                                                            <td>{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                                                            <td>{{userU.hrmB_BuildingName}}</td>
+                                                            <td>{{userU.hrmF_FloorName}}</td>
+                                                            <td>{{userU.hrmaR_AreaName}}</td>
+                                                            <td>{{userU.hrmaR_AreaCode}}</td>
+                                                            <!--<td hidden="hidden">{{userU.hrmaR_QRCode}}</td>
+                                                            <td hidden="hidden">{{userU.hrmaR_Id}}</td>-->
+                                                            <td>
+                                                                <a href="javascript:void(0)" class="text-primary" ng-click="viewQR(userU);">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                </a>
+                                                            </td>
+                                                            <td class="text-center">
+
+                                                                <span ng-if="userU.hrmaR_ActiveFlag === false">
+                                                                    <a href="" ng-click="deactive(userU)"
+                                                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                                        <i> Activate </i>
+                                                                    </a>
+                                                                </span>
+                                                                <span ng-if="userU.hrmaR_ActiveFlag === true">
+                                                                    <a href="" ng-click="deactive(userU)"
+                                                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                                        <i> Deactivate</i>
+                                                                    </a>
+                                                                </span>
+
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="text-aqua" href="" ng-click="edit(userU)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <dir-pagination-controls max-size="5"
+                                                                         direction-links="true"
+                                                                         boundary-links="true" pagination-id="xyzz">
+                                                </dir-pagination-controls>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </md-content>
+                            </md-tab>
+
+                            <!-------------------- Master Area Activity -------------------->
+                            <md-tab label="Master Area Activity">
+                                <md-content class="md-padding">
+                                    <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm2" novalidate>
+                                        <div class="box box-primary">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">Master Area Activity</h3>
+                                                <div class="box-tools pull-right">
+                                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Building Name :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" ng-model="hrmmB_Id" name="Building" ng-change="floordetailschange(hrmmB_Id)" ng-disabled="hrmaracT_Idupdate > 0" required>
+                                                                    <option value="">Select Building </option>
+                                                                    <option ng-repeat="option in get_buildingmap" value="{{option.hrmB_Id}}" ng-selected="{{option.hrmB_Id == hrmmB_Id}}">
+                                                                        {{option.hrmB_BuildingName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted2(myForm2.Building)" ng-messages="myForm2.Building.$error">
+                                                                    <div ng-message="required">Please Select Building</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Floor Name  :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" ng-model="hrmmF_Id" name="Floor" ng-change="areadetailschange(hrmmF_Id)" ng-disabled="hrmaracT_Idupdate > 0" required>
+                                                                    <option value="">Select Floor </option>
+                                                                    <option ng-repeat="option in get_flooramap" value="{{option.hrmF_Id}}" ng-selected="{{option.hrmF_Id == hrmmF_Id}}">
+                                                                        {{option.hrmF_FloorName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted2(myForm2.Floor)" ng-messages="myForm2.Floor.$error">
+                                                                    <div ng-message="required">Please Select Floor</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Area Name   :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" ng-model="hrmaR_Id" name="area1" ng-disabled="hrmaracT_Idupdate > 0" required>
+                                                                    <option value="">Select Area Name  </option>
+                                                                    <option ng-repeat="option in get_getAreaName" value="{{option.hrmaR_Id}}" ng-selected="{{option.hrmaR_Id ==hrmaR_Id}}">
+                                                                        {{option.hrmaR_AreaName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted2(myForm2.area1)" ng-messages="myForm2.area1.$error">
+                                                                    <div ng-message="required">Please Select Area Name </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4"> Activity Name :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <input type="text" name="Activity" class="form-control" maxlength="100" placeholder="Enter Activity Name" data-ng-model="hrmaracT_ActivityName" required />
+                                                                <div class="error-messages" ng-if="interacted2(myForm2.Activity)" ng-messages="myForm2.Activity.$error">
+                                                                    <div ng-message="required">Enter Activity Name</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4"> Activity Desc :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <textarea type="text" name="Desc" class="form-control" maxlength="100" placeholder="Enter Activity Desc" data-ng-model="hrmaracT_ActivityDesc" rows="3" required />
+                                                                <div class="error-messages" ng-if="interacted2(myForm2.Desc)" ng-messages="myForm2.Desc.$error">
+                                                                    <div ng-message="required">Enter Activity Desc</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr />
+                                                <div class="text-center">
+
+                                                    <input type="text" class="hidden" ng-model="hrmaracT_Idupdate" />
+                                                    <md-button type="submit" class="md-raised md-primary" ng-click="savedataAREAActivity()" ng-disabled="form.$invalid">
+                                                        <i class="fa fa-save" aria-hidden="true"></i> Save
+                                                    </md-button>
+                                                    <md-button type="button" class="md-raised md-warn" ng-click="cancelI()" ng-disabled="form.$invalid">
+                                                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                                    </md-button>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <!-- GRID Item Group -->
+                                    <div class="box box-primary" ng-show="get_AreaActivity.length>0">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Master Area Activity Details</h3>
+                                            <div class="box-tools pull-right">
+                                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            <b> Total Grid Records :</b>
+                                                            <label class="badge">
+                                                                {{presentCountgridI}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group" ng-if="searchValueI!=''">
+                                                        <label class="control-label">
+                                                            <b>Total Records Searched : </b>
+                                                            <label class="badge">
+                                                                {{filterValue2.length}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4 pull-right">
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-search"></i>
+                                                            </span>
+                                                            <input class="form-control" ng-model="searchValueI" type="text" placeholder="search here...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="overflow-x:auto">
+                                                <table class="table table-hover table-responsive table-bordered text-center">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>SL NO</th>
+                                                            <th><a href="" ng-click="sort('hrmB_BuildingName')">Building Name </a></th>
+                                                            <th><a href="" ng-click="sort('hrmF_FloorName')">Floor Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaR_AreaName')">Area Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaracT_ActivityName')">Activity Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaracT_ActivityDesc')">Activity Desc  </a></th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr dir-paginate="userAN in filterValue2 = (get_AreaActivity | filter : searchValueI)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPageI" current-page="currentPageI" ng-class-odd="'odd'" pagination-id="xyzzz">
+
+                                                            <td>{{itemsPerPageI *(currentPageI-1)+$index+1}}</td>
+                                                            <td>{{userAN.hrmB_BuildingName}}</td>
+                                                            <td>{{userAN.hrmF_FloorName}}</td>
+                                                            <td>{{userAN.hrmaR_AreaName}}</td>
+                                                            <td>{{userAN.hrmaracT_ActivityName}}</td>
+                                                            <td>{{userAN.hrmaracT_ActivityDesc}}</td>
+                                                            <td hidden="hidden">{{userAN.hrmaracT_Id}}</td>
+
+                                                            <td class="text-center">
+                                                                <a class="text-aqua" href="" ng-click="editAN(userAN)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                                </a>
+                                                                &nbsp;
+
+                                                                <span ng-if="userAN.hrmaracT_ActiveFlag === false">
+                                                                    <a href="" ng-click="deactiveA(userAN)"
+                                                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                                        <i> Activate </i>
+                                                                    </a>
+                                                                </span>
+                                                                <span ng-if="userAN.hrmaracT_ActiveFlag === true">
+                                                                    <a href="" ng-click="deactiveA(userAN)"
+                                                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                                        <i> Deactivate</i>
+                                                                    </a>
+                                                                </span>
+
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <dir-pagination-controls max-size="10"
+                                                                         direction-links="true"
+                                                                         boundary-links="true" pagination-id="xyzzz">
+                                                </dir-pagination-controls>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </md-content>
+                            </md-tab>
+
+                            <!-------------------- Master Area Activity Time -------------------->
+                            <md-tab label="Master Area Activity Time">
+                                <md-content class="md-padding">
+                                    <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm3" novalidate>
+                                        <div class="box box-primary">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">Master Area Activity Time</h3>
+                                                <div class="box-tools pull-right">
+                                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Building Name :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" ng-model="hrmmmB_Id" name="Building3" ng-change="floordetailschange(hrmmmB_Id)" ng-disabled="hrmaractT_Idupdate > 0" required>
+                                                                    <option value="">Select Building </option>
+                                                                    <option ng-repeat="option in get_buildingmap" value="{{option.hrmB_Id}}" ng-selected="{{option.hrmB_Id == hrmmmB_Id}}">
+                                                                        {{option.hrmB_BuildingName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted3(myForm3.Building3)" ng-messages="myForm3.Building3.$error">
+                                                                    <div ng-message="required">Please Select Building</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Floor Name  :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" ng-model="hrmmmF_Id" name="Floor3" ng-change="areadetailschangetab(hrmmmF_Id)" ng-disabled="hrmaractT_Idupdate > 0" required>
+                                                                    <option value="">Select Floor </option>
+                                                                    <option ng-repeat="option in get_flooramap" value="{{option.hrmF_Id}}" ng-selected="{{option.hrmF_Id == hrmmmF_Id}}">
+                                                                        {{option.hrmF_FloorName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted3(myForm3.Floor3)" ng-messages="myForm3.Floor3.$error">
+                                                                    <div ng-message="required">Please Select Floor</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Area Name   :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" ng-model="hrmmaR_Id" ng-change="Activitydetailschange(hrmmaR_Id)" name="area3" ng-disabled="hrmaractT_Idupdate > 0" required>
+                                                                    <option value="">Select Area Name  </option>
+                                                                    <option ng-repeat="option in get_getAreaName" value="{{option.hrmaR_Id}}" ng-selected="{{option.hrmaR_Id ==hrmmaR_Id}}">
+                                                                        {{option.hrmaR_AreaName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted3(myForm3.area3)" ng-messages="myForm3.area3.$error">
+                                                                    <div ng-message="required">Please Select Area Name </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Activity Name   :<span style="color:red;">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" ng-model="hrmaracT_Id" name="Activity3" ng-disabled="hrmaractT_Idupdate > 0" required>
+                                                                    <option value="">Select Activity Name  </option>
+                                                                    <option ng-repeat="option in get_getActivity" value="{{option.hrmaracT_Id}}" ng-selected="{{option.hrmaracT_Id ==hrmaracT_Id}}">
+                                                                        {{option.hrmaracT_ActivityName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted3(myForm3.Activity3)" ng-messages="myForm3.Activity3.$error">
+                                                                    <div ng-message="required">Please Select Activity Name </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+
+                                                        <div class="form-group">
+
+                                                            <label class="control-label col-sm-4" style="padding-top:7%;">Start Time : <strong style="color:red;">*</strong></label>
+                                                            <div class="col-sm-4">
+                                                                <div uib-timepicker="" name="sch_time1" ng-model="hrmaractT_Time" show-meridian="ismeridian" required></div>
+                                                                <div class="error-messages" ng-if="interacted3(myForm.sch_time1)" ng-messages="myForm3.sch_time1.$error">
+                                                                    <div ng-message="required">Select Shift Start Time</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Activity Duration :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <div>
+                                                                    <label style="color: black;">
+                                                                    <strong>Note:</strong>    Activity Duration Consider as Minutes
+                                                                    </label>
+                                                                </div>
+                                                                <input type="text" name="Duration3" class="form-control" maxlength="100" placeholder="Enter Activity Duration" data-ng-model="hrmaractT_ActivityDuration" required />
+                                                                <div class="error-messages" ng-if="interacted3(myForm3.Duration3)" ng-messages="myForm3.Duration3.$error">
+                                                                    <div ng-message="required">Enter Activity Desc</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                <hr />
+                                                <div class="text-center">
+                                                    <input type="text" class="hidden" ng-model="hrmaractT_Idupdate" />
+                                                    <md-button type="submit" class="md-raised md-primary" ng-click="savedataAREAActivityTime()" ng-disabled="form.$invalid">
+                                                        <i class="fa fa-save" aria-hidden="true"></i> Save
+                                                    </md-button>
+                                                    <md-button type="button" class="md-raised md-warn" ng-click="cancelT()" ng-disabled="form.$invalid">
+                                                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                                    </md-button>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                    <!-- GRID Item Group -->
+                                    <div class="box box-primary" ng-show="get_AreaActivityTime.length>0">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Master Area Activity Time Details</h3>
+                                            <div class="box-tools pull-right">
+                                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            <b> Total Grid Records :</b>
+                                                            <label class="badge">
+                                                                {{presentCountgridT}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group" ng-if="searchValueT!=''">
+                                                        <label class="control-label">
+                                                            <b>Total Records Searched : </b>
+                                                            <label class="badge">
+                                                                {{filterValue3.length}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4 pull-right">
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-search"></i>
+                                                            </span>
+                                                            <input class="form-control" ng-model="searchValueT" type="text" placeholder="search here...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="overflow-x:auto">
+                                                <table class="table table-hover table-responsive table-bordered text-center">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>SL NO</th>
+                                                            <th><a href="" ng-click="sort('hrmB_BuildingName')">Building Name </a></th>
+                                                            <th><a href="" ng-click="sort('hrmF_FloorName')">Floor Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaR_AreaName')">Area Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaracT_ActivityName')">Activity Name  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaractT_Time')">Time  </a></th>
+                                                            <th><a href="" ng-click="sort('hrmaractT_ActivityDuration')">Time Duration  </a></th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr dir-paginate="userT in filterValue3 = (get_AreaActivityTime | filter : searchValueT)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPageI" current-page="currentPageI" ng-class-odd="'odd'" pagination-id="xyzzz">
+
+                                                            <td>{{itemsPerPageI *(currentPageI-1)+$index+1}}</td>
+                                                            <td>{{userT.hrmB_BuildingName}}</td>
+                                                            <td>{{userT.hrmF_FloorName}}</td>
+                                                            <td>{{userT.hrmaR_AreaName}}</td>
+                                                            <td>{{userT.hrmaracT_ActivityName}}</td>
+                                                            <td> {{userT.hrmaractT_Time | date  : 'shortTime' }}</td>
+                                                            <td>{{userT.hrmaractT_ActivityDuration}} Min</td>
+                                                            <td class="text-center">
+                                                                <a class="text-aqua" href="" ng-click="editT(userT)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                                </a>
+                                                                &nbsp;
+
+                                                                <span ng-if="userT.hrmaractT_ActiveFlag === false">
+                                                                    <a href="" ng-click="deactiveT(userT)"
+                                                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                                        <i> Activate </i>
+                                                                    </a>
+                                                                </span>
+                                                                <span ng-if="userT.hrmaractT_ActiveFlag === true">
+                                                                    <a href="" ng-click="deactiveT(userT)"
+                                                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                                        <i> Deactivate</i>
+                                                                    </a>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <dir-pagination-controls max-size="10"
+                                                                         direction-links="true"
+                                                                         boundary-links="true" pagination-id="xyzzz">
+                                                </dir-pagination-controls>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </md-content>
+                            </md-tab>
+
+                        </md-tabs>
+                    </md-content>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- QR code  -->
+<div id="QRCodeview" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <div class="pull-right">
+                    <button class="export-pdf k-button md-raised  md-accent md-button md-ink-ripple md-button" ng-click="printData()">Print</button>
+                    <md-button type="button" class="btn btn-default" style="background-color:cornflowerblue" data-dismiss="modal">Close</md-button>
+                </div>
+
+            </div>
+            <div class="box-body" id="printDeviation">
+                <div class="row">
+                    <div class=" col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="text-center" style="width:250px ; height:250px">
+                                    <img src="{{hrmaR_QRCode}}"
+                                         class="img-thumbnail img-responsive ">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-8" style="text-align: center;width:320px">
+                           
+                            <h3 style="margin-bottom:20px;"> &nbsp;&nbsp; {{hrmB_BuildingNameaa}}&nbsp;&nbsp;/{{hrmF_FloorNameaa}}&nbsp;&nbsp; / &nbsp;&nbsp;{{hrmaR_AreaNameaa}} &nbsp;&nbsp;/ &nbsp;&nbsp;{{hrmaR_AreaCodeaa}}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+</div>
+
+<script>
+    function generateQRCode() {
+        let website = document.getElementById("website").value;
+        if (website) {
+            let qrcodeContainer = document.getElementById("qrcode");
+            qrcodeContainer.innerHTML = "";
+            new QRCode(qrcodeContainer, website);
+            document.getElementById("qrcode-container").style.display = "block";
+        } else {
+            alert("Please enter a valid URL");
+        }
+    }
+</script>

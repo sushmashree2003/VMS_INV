@@ -1,0 +1,266 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<style>
+    .tdd {
+        background: #fff !important;
+        color: #131212 !important;
+    }
+</style>
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Feedback </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-3 padding-left-2px">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 8px;width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+                            <label>
+                                <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                <span class="lbl padding-8">
+                                    <b> All Department</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-sm-4 padding-left-none">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                            <label>
+                                <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdesg(designationselectedAll)">
+                                <span class="lbl padding-8">
+                                    <b> All Designation</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                <input name="desg" ng-model="user.selected" type="checkbox" ng-disabled="roleflag==true" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="col-sm-5 padding-left-none">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                            <label>
+                                <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                <span class="lbl padding-8">
+                                    <b>  All Employees</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br /><br />
+            <div class="text-center">
+                <div class="row">
+                    <div class="col-sm-4" style="margin-left: 13.333333%;">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="hrgfE_FeedbackDate" ng-disabled="plannerflg" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Date</div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="box-body" ng-if="totalgrid.length>0">
+                <table class="table table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SLNO
+                            </th>
+
+                            <th>
+                                Employee Name
+                            </th>
+
+
+                            <th>FeedBack</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in totalgrid track by $index" ng-form="dataForm">
+                            <td>{{$index+1}}</td>                            
+                            <td>{{user.userEmpName}}</td>
+                            <td hidden="hidden">{{user.hrmE_ID}}</td>
+                           
+
+                            <td>
+                                <!--<input type="text" name="remarks" ng-model="user.hrgfE_FeedBack" maxlength="100" />-->
+                                <textarea name="remarks" ng-model="user.hrgfE_FeedBack"  rows="4" cols="50" maxlength="100" />
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <hr />
+
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="hrgfE_Id" value="{{hrgfE_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="savedata()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+
+            </div>
+
+
+
+            <hr />
+
+
+        </div>
+    </form>
+  
+
+    <div class="box box-primary" ng-show="feedbackgrid.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee FeedBack</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <!--<label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>-->
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('userEmpName')">Employee Name</a></th>
+                        <th><a href="" ng-click="sortBy('hrgfE_FeedBack')">FeedBack</a> </th>
+
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (feedbackgrid | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.userEmpName}}</td>
+                        <td>{{user.FeedBack}}</td>
+                        <td hidden="hidden">{{user.hrgfE_Id}}</td>
+
+                        <td>
+                            <a href="javascript:void(0)" ng-click="Deletedata(user)" data-toggle="tooltip" title="Delete"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+</section>

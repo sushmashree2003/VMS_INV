@@ -1,0 +1,324 @@
+﻿<style>
+    .multiselect {
+        width: 24.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 25.7%;
+        margin-bottom: 1%;
+        margin-top: -3%;
+        padding: 2%;
+    }
+</style>
+
+
+<section class="content">
+    <div data-ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Booking Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row" ng-show="userflag=='ADMIN' || userflag=='admin'">
+                        <!--<div class="col-sm-3"></div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Company Name :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8" style="padding-left:0px;">
+                                    <select class="form-control" name="miname" ng-model="MI_Id" ng-change="getroom(MI_Id)">
+                                        <option ng-repeat="mi in milist" value="{{mi.mI_Id}}" ng-selected="{{mi.mI_Id==MI_Id}}">{{mi.mI_Name}}</option>
+                                        <option value="">--Select Compamy--</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.miname)" ng-messages="myForm.miname.$error">
+                                        <div ng-message="required">Select Compamy Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3"></div>-->
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> Duration Type : <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="bok" ng-model="bookingtype" name="Dtype" required ng-change="get_listdata();">
+                                        <option value="">--Select Field--</option>
+                                        <option value="Both">Both</option>
+                                        <option value="Hr">Hr</option>
+                                        <option value="Day">Day</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Dtype)" ng-messages="myForm.Dtype.$error">
+                                        <div ng-message="required">Select the Duration Type</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> BookingStatus  <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="bok" ng-model="bookingstatus" name="BS" required ng-change="get_listdata();">
+                                        <option value="">--Select Field--</option>
+                                        <option value="ALL">ALL</option>
+                                        <option value="INPROGRESS">INPROGRESS</option>
+                                        <option value="CONFIRM">CONFIRM</option>
+                                        <option value="CANCELLED">CANCELLED </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.BS)" ng-messages="myForm.BS.$error">
+                                        <div ng-message="required">Select the Booking Status</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8" style="padding-left:0px;">
+                                    <md-datepicker name="startdate" ng-model="testfromdate" md-placeholder="Select date..." required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Please Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8" style="padding-left:0px;">
+                                    <md-datepicker name="enddate" ng-model="testtodate" md-placeholder="Select date..." md-min-date="testfromdate" onkeydown="return false" ng-disabled="!testfromdate" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.enddate)" ng-messages="myForm.enddate.$error">
+                                        <div ng-message="required">Please Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-4">Company Name : <span style="color:red;">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" data-ng-model="searchcomapny" type="text" placeholder="Search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" data-ng-model="MI_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkCCCC()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="compny in Master_Institution | filter:searchcomapny" value="{{room.mI_Id}}">
+                                        <input type="checkbox" data-ng-model="compny.selected" ng-click="togchkbxCCCC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequiredtwo()" name="Company" />
+                                        <span class="lbl padding-8">{{compny.mI_Name}}</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.Company)" ng-messages="myForm.Company.$error">
+                                    <div ng-message="required">Please Select Any One Company</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-4">Room Name : <span style="color:red;">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" data-ng-model="usercheckC" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="room in roomname_list | filter:searchchkbx1" value="{{room.hrmR_Id}}">
+                                        <input type="checkbox" data-ng-model="room.selected" ng-click="togchkbxC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired()" name="Room" />
+                                        <span class="lbl padding-8">{{room.hrmR_RoomName}}</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.Room)" ng-messages="myForm.Room.$error">
+                                    <div ng-message="required">Please Select Any One Room Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <div class="">
+                            <div class="text-center">
+                                <md-button type="button" class="md-raised md-primary" ng-click="get_report()" id="save-btn">
+                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-click="printData()" ng-show="printflag">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="excel-btn" ng-click="ExportToExcel('#printtable')" ng-show="bookinglist_Report.length > 0">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Export to Excel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="box box-primary" ng-show="reportlist">
+            <div class="box-header with-border">
+                <h3 class="box-title">Booking Reports</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{bookinglist_Report.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-bordered table-hover table-responsive text-center">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th>
+                                    <a href="" ng-click="sort('MI_Name')">
+                                        Company Name
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('OSSPBOOK_DurationType')">
+                                        Duration Type
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('OSSPBOOK_StartDate')">
+                                        Start Date
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('OSSPBOOK_EndDate')">
+                                        End Date
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('OSSPBOOK_StartTime')">StartTime</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('OSSPBOOK_EndTime')">
+                                        End Time
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HRMR_RoomName')">
+                                        Room Name
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('OSSPBOOK_NoOfPeople')">
+                                        NoOfPeople
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('OSSPBOOK_BillingName')">
+                                        Billing Name
+                                    </a>
+                                </th>
+                                <th ng-if="bookingstatus=='ALL'">
+                                    <a href="" ng-click="sort('OSSPBOOK_Status')">
+                                        Booking Status
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue=(bookinglist_Report | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td style="text-align:center">{{user.MI_Name}}</td>
+                                <td style="text-align:center">{{user.OSSPBOOK_DurationType}}</td>
+                                <td style="text-align:center">{{user.OSSPBOOK_StartDate |date:'dd-MM-yyyy'}}</td>
+                                <td style="text-align:center">{{user.OSSPBOOK_EndDate |date:'dd-MM-yyyy'}}</td>
+                                <td style="text-align:center">{{user.OSSPBOOK_StartTime}}</td>
+                                <td style="text-align:center">{{user.OSSPBOOK_EndTime}}</td>
+                                <td style="text-align:center">{{user.HRMR_RoomName}}</td>
+                                <td style="text-align:center">{{user.OSSPBOOK_NoOfPeople}}</td>
+                                <td style="text-align:center">{{user.OSSPBOOK_BillingName}}</td>
+                                <td style="text-align:center" ng-if="bookingstatus=='ALL'">{{user.OSSPBOOK_Status}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary" id="printtable" ng-hide="true">        
+        <table>
+            <tr>
+                <th colspan="8" style="font-size:16px"><b>Booking Reports</b></th>
+            </tr>
+        </table>
+        <br /><br />
+        <div class="box-body">            
+            <table class="table table-bordered table-hover table-responsive text-center">
+                <thead>
+                    <tr>
+                        <td ng-if="bookingstatus!='ALL'" colspan="8" style="text-align:center">Booking Status : {{bookingstatus}}</td>
+                    </tr>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Company Name</th>
+                        <th>Duration Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Room Name</th>
+                        <th>NoOfPeople</th>
+                        <th>Billing Name</th>
+                        <th ng-if="bookingstatus=='ALL'">Booking Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in bookinglist_Report">
+                        <td>{{$index+1}}</td>
+                        <td style="text-align:center">{{user.MI_Name}}</td>
+                        <td style="text-align:center">{{user.OSSPBOOK_DurationType}}</td>
+                        <td style="text-align:center">{{user.OSSPBOOK_StartDate |date:'dd-MM-yyyy'}}</td>
+                        <td style="text-align:center">{{user.OSSPBOOK_EndDate |date:'dd-MM-yyyy'}}</td>
+                        <td style="text-align:center">{{user.OSSPBOOK_StartTime}}</td>
+                        <td style="text-align:center">{{user.OSSPBOOK_EndTime}}</td>
+                        <td style="text-align:center">{{user.HRMR_RoomName}}</td>
+                        <td style="text-align:center">{{user.OSSPBOOK_NoOfPeople}}</td>
+                        <td style="text-align:center">{{user.OSSPBOOK_BillingName}}</td>
+                        <td style="text-align:center" ng-if="bookingstatus=='ALL'">{{user.OSSPBOOK_Status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

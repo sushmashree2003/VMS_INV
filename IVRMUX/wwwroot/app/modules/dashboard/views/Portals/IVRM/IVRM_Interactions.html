@@ -1,0 +1,539 @@
+<link href="../css/print/PortalInteraction/interaction.css" rel="stylesheet" />
+<section class="content" data-ng-init="loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Interactions</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Inbox" ng-click="oninbox()">
+                </md-tab>
+                <!--<md-tab label="Compose" ng-click="oncompose()">
+                </md-tab>-->
+                <md-tab label="Group" ng-click="typechangeG()">
+                </md-tab>
+                <md-tab label="Individual" ng-click="typechangeI()">
+                </md-tab>
+            </md-tabs>
+        </md-content>
+
+        <div class="box-body">
+            <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+                <div ng-show="composehead">
+                    <!--================== Compose Message========== -->
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title col-sm-9">New Message</h3>                             
+                                <h2 class="box-title">{{isminT_DateTime | date:'MM/dd/yyyy  h:mma'}}</h2>
+                            </div>
+
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Subject:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="subject" class="form-control active" placeholder="Interaction Subject" data-ng-model="isminT_Subject" required>
+                                        <div class="error-messages" ng-if="interacted(myForm.subject)" ng-messages="myForm.subject.$error">
+                                            <div ng-message="required">Enter Subject</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3"></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" name="message" rows="5" id="comment" ng-model="isminT_Interaction" placeholder="Message" required></textarea>
+                                        <div class="error-messages" ng-if="interacted(myForm.message)" ng-messages="myForm.message.$error">
+                                            <div ng-message="required">Enter Message</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div>
+                                            <div class="text-left">
+                                                <label class="radio-inline col-sm-8" ng-show="roleflg=='Staff'">
+                                                    <input type="radio" value="Student" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">Student</span>
+                                                </label>
+
+                                                <label class="radio-inline col-sm-8" ng-show="roleflg=='Staff'">
+                                                    <input type="radio" value="Teachers" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">Teachers</span>
+                                                </label>
+
+                                                <label class="radio-inline col-sm-8" ng-show="stflag && roleflg=='Student'">
+                                                    <input type="radio" value="SubjectTeacher" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">Subject Teacher</span>
+                                                </label>
+
+                                                <label class="radio-inline col-sm-8" ng-show="ctflag && roleflg=='Student' && ISMINT_GroupOrIndFlg=='Individual'">
+                                                    <input type="radio" value="ClassTeacher" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">Class Teacher </span>
+                                                </label>
+
+                                                <label class="radio-inline col-sm-8" ng-show="hodflag && ISMINT_GroupOrIndFlg=='Individual'">
+                                                    <input type="radio" value="HOD" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">HOD</span>
+                                                </label>
+
+                                                <label class="radio-inline col-sm-8" ng-show="principalflag && ISMINT_GroupOrIndFlg=='Individual'">
+                                                    <input type="radio" value="Principal" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">Principal</span>
+                                                </label>
+                                                <label class="radio-inline col-sm-8" ng-show="asflag && ISMINT_GroupOrIndFlg=='Individual'">
+                                                    <input type="radio" value="AS" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">Academic Supervisor</span>
+                                                </label>
+                                                <label class="radio-inline col-sm-8" ng-show="ecflag && ISMINT_GroupOrIndFlg=='Individual'">
+                                                    <input type="radio" value="EC" name="user" ng-model="userflag" ng-change="getdetail()">
+                                                    <span class="lbl padding-8">Exam Coordinator</span>
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='Student' && getdetails.length>0">
+                                    <label for="sel2" class="control-label col-sm-3 col-sm-offset-1">Student : <span style="color:Red">*</span></label>
+                                    <div class="col-sm-6">
+                                        <div ng-show="groupindvalue">
+                                            <div class="multiselect col-sm-8" style="height: 200px;">
+                                                <select class="form-control" ng-model="asmcL_Id" name="clssec" ng-change="getsection(asmcL_Id);">
+                                                    <option value="">Select Class </option>
+                                                    <option ng-repeat="cls in getdetails" value="{{cls.ASMCL_Id}}">{{cls.ASMCL_ClassName}}</option>
+                                                </select>
+                                                <select class="form-control" ng-model="asmS_Id" ng-show="sectionList.length>0" name="sec" ng-change="getstudent();">
+                                                    <option value="">Select Section </option>
+                                                    <option ng-repeat="sec in sectionList" value="{{sec.asmS_Id}}">{{sec.asmC_SectionName}}</option>
+                                                </select>
+                                                <span ng-show="getdetails.length>0">
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Student here...">
+                                                </span>
+                                                <label>
+                                                    <input name="classes" value="1" ng-model="usercheckSTU" type="checkbox" ng-click="all_checkSTU(usercheckSTU)">
+                                                    <span class="lbl padding-8">
+                                                        All
+                                                    </span>
+                                                </label>
+                                                <label ng-model="amsT_Id" ng-repeat="user in get_student | filter : searchValue">
+                                                    <input name="student" ng-model="user.stuck" type="checkbox" ng-click="togchkbxSTU();" ng-required="isOptionsRequiredSTU()">
+                                                    <span class="lbl padding-8">
+                                                        {{user.studentName}} : {{user.amsT_AdmNo}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="error-messages col-sm-8" ng-if="interacted(myForm.student)" ng-messages="myForm.student.$error">
+                                                <div ng-message="required">Please Select Atleast One Checkbox</div>
+                                            </div>
+                                        </div>
+                                        <div ng-show="!groupindvalue">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Class :<span style="color:Red">*</span></label>
+                                                <div class="col-sm-8">
+                                                    <select class="form-control" ng-model="asmcL_Id" name="clssec" ng-change="getsection(asmcL_Id);">
+                                                        <option value="">Select Class </option>
+                                                        <option ng-repeat="cls in getdetails" value="{{cls.ASMCL_Id}}">{{cls.ASMCL_ClassName}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-show="sectionList.length>0">
+                                                <label class="control-label col-sm-4">Section :<span style="color:Red">*</span></label>
+                                                <div class="col-sm-8">
+                                                    <select class="form-control" ng-model="asmS_Id" name="sec" ng-change="getstudent();">
+                                                        <option value="">Select Section </option>
+                                                        <option ng-repeat="sec in sectionList" value="{{sec.asmS_Id}}">{{sec.asmC_SectionName}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div ng-show="get_student.length>0">
+                                                    <label class="control-label col-sm-4">Student :<span style="color:Red">*</span></label>
+                                                    <div class="col-sm-8">
+                                                        <ui-select id="sel1" name="student" ng-model="obj.amsT_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Student" ng-required="(optionflag==!groupindvalue) && (userflag=='Student')">
+                                                            <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.studentName}}</ui-select-match>
+                                                            <ui-select-choices repeat="option in get_student | filter: $select.search " value="{{option.amsT_Id}}" ng-selected="{{option.Selected == true}}">
+                                                                <div ng-bind-html="option.studentName +':'+ option.amsT_AdmNo| highlight: $select.search"></div>
+                                                            </ui-select-choices>
+                                                        </ui-select>
+                                                        <div class="error-messages" ng-if="interacted(myForm.student)" ng-messages="myForm.student.$error">
+                                                            <div ng-message="required">Please Select Student </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='Teachers' && getdetails.length>0">
+                                    <div class="col-sm-6">
+                                        <div ng-show="groupindvalue">
+                                            <div class="multiselect col-sm-8">
+                                                <span ng-show="getdetails.length>0">
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Employee here...">
+                                                </span>
+                                                <label>
+                                                    <input name="classes" value="1" ng-model="usercheckT" type="checkbox" ng-click="all_checkT(usercheckT)">
+                                                    <span class="lbl padding-8">
+                                                        All
+                                                    </span>
+                                                </label>
+                                                <label ng-model="hrmE_Id" ng-repeat="user in getdetails | filter : searchValue">
+                                                    <input name="teacher" ng-model="user.tck" type="checkbox" ng-click="togchkbxT();" ng-required="isOptionsRequiredT()">
+                                                    <span class="lbl padding-8">
+                                                        {{user.EmpName}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="error-messages col-sm-8" ng-if="interacted(myForm.teacher)" ng-messages="myForm.teacher.$error">
+                                                <div ng-message="required">Please Select Atleast One Checkbox</div>
+                                            </div>
+                                        </div>
+                                        <div ng-show="!groupindvalue">
+                                            <div class="form-group">
+
+                                                <label class="control-label col-sm-4">Teacher :<span style="color:Red">*</span></label>
+                                                <div class="col-sm-8">
+                                                    <ui-select id="sel1" name="teacher" ng-model="obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Teacher" ng-required="(optionflag==!groupindvalue) && (userflag=='Teachers')">
+                                                        <ui-select-match ng-trim="false" placeholder="Select or search Teacher in the list...">{{$select.selected.EmpName}}</ui-select-match>
+                                                        <ui-select-choices repeat="option in getdetails | filter: $select.search " value="{{option.HRME_Id}}" ng-selected="{{option.Selected == true}}">
+                                                            <div ng-bind-html="option.EmpName +':'+ option.HRME_EmployeeCode| highlight: $select.search"></div>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                    <div class="error-messages" ng-if="interacted(myForm.student)" ng-messages="myForm.student.$error">
+                                                        <div ng-message="required">Please Select Student </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='SubjectTeacher' && roleflg=='Student' && getdetails.length>0">
+                                    <!--<label for="sel2" class="control-label col-sm-3 col-sm-offset-1">Subject Teacher : <span style="color:Red">*</span></label>-->
+                                    <div class="col-sm-6">
+                                        <div ng-show="groupindvalue">
+                                            <div class="multiselect col-sm-8">
+                                                <span ng-show="getdetails.length>0">
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Employee here...">
+                                                </span>
+                                                <label>
+                                                    <input name="classes" value="1" ng-model="usercheckST" type="checkbox" ng-click="all_checkST(usercheckST)">
+                                                    <span class="lbl padding-8">
+                                                        All
+                                                    </span>
+                                                </label>
+                                                <label ng-model="hrmE_Id" ng-repeat="user in getdetails | filter : searchValue">
+                                                    <input name="subjt" ng-model="user.stck" type="checkbox" ng-click="togchkbxST();" ng-required="isOptionsRequiredST()">
+                                                    <span class="lbl padding-8">
+                                                        {{user.ISMS_SubjectName}} : {{user.EmpName}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div ng-show="!groupindvalue">
+                                            <div class="multiselect col-sm-8">
+                                                <span ng-show="getdetails.length>0">
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Employee here...">
+                                                </span>
+                                                <label ng-model="hrmE_Id" ng-repeat="user in getdetails | filter : searchValue">
+                                                    <input name="subjtr" ng-model="user.stck" type="radio" ng-click="togchkbxST();" ng-required="isOptionsRequiredST()">
+                                                    <span class="lbl padding-8">
+                                                        {{user.ISMS_SubjectName}} : {{user.EmpName}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="error-messages col-sm-8" ng-if="interacted(myForm.subjtr)" ng-messages="myForm.subjtr.$error">
+                                            <div ng-message="required">Please Select Atleast One Checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='ClassTeacher' && roleflg=='Student' && getdetails.length>0">                                  
+                                    <div class="col-sm-4 padding-top-20">
+                                        <input type="text" class="form-control active" name="employee" value="hrmE_Id" ng-model="empName" ng-disabled="true" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='HOD'  && getdetails.length>0">                                   
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control active" name="hod" value="hrmE_Id" ng-model="empName" ng-disabled="true" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='Principal' && getdetails.length>0">                                
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control active" name="principal" value="hrmE_Id" ng-model="empName" ng-disabled="true" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='AS' && getdetails.length>0">
+                                   
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control active" name="as" value="hrmE_Id" ng-model="empName" ng-disabled="true" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="userflag=='EC' && getdetails.length>0">                                   
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control active" name="ec" value="hrmE_Id" ng-model="empName" ng-disabled="true" />
+                                    </div>
+                                </div>
+
+                                <div class="text-center" ng-show="userflag && getdetails.length>0">
+                                    <input type="hidden" ng-model="isminT_Id" value="{{isminT_Id}}" />
+                                    <md-button type="button" ng-click="savedata()" class="md-raised md-primary">
+                                        <i class="fa fa-paper-plane " aria-hidden="true"></i> Send
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--================== InBOX========== -->
+                <div class="col-sm-12">
+                    <div class="box box-primary" ng-show="inboxtab">
+                        <div class="box-header with-border">
+                            <h3 class="box-title col-sm-9">
+                                Message Inbox
+                                <span class="fa-stack fa-1x">
+                                    <i class="fa fa-comment fa-stack-2x"></i>
+                                    <strong class="fa-stack-1x fa-stack-text fa-inverse" title="You have {{inboxtotal}} message in your inbox"><b>{{inboxtotal}}</b></strong>
+                                </span>
+                            </h3>                            
+                               <i class="fa fa-refresh " aria-hidden="true" ng-click="refresh()" title="Refresh">&nbsp;</i>                                                    
+                            <h2 class="box-title">{{isminT_DateTime | date:'MM/dd/yyyy  h:mma'}}</h2>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="panel-group accordion">
+                                        <div class="panel panel-default" ng-repeat="msg in message_list">
+                                            <div class="panel-heading">
+                                                <div class="row">
+                                                    <div class="col-sm-1 text-left">
+                                                        <span ng-if="msg.ISMINT_GroupOrIndFlg=='Group'">
+                                                            <i class="fa fa-users ml-1" style="color:#2757a6;"></i>
+                                                        </span>
+                                                        <span ng-if="msg.ISMINT_GroupOrIndFlg=='Individual'">
+                                                            <i class="fa fa-user ml-1" style="color:green;"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-sm-6 text-left">
+                                                        <span class="panel-title" style="font-weight: 700;">
+                                                            <a data-toggle="collapse" data-parent=".accordion" href=".{{msg.ISTINT_Id}}">
+                                                                {{msg.ISMINT_Subject}}
+                                                            </a>
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="col-sm-2 text-right">
+                                                        <span ng-if="roleflg=='Staff'">
+                                                            <span ng-if="msg.ISMINT_ComposedByFlg=='Staff'">
+                                                                <span style="font-weight:600;" ng-if="msg.ISMINT_GroupOrIndFlg=='Individual'">
+                                                                    &nbsp;&nbsp;
+                                                                    <span style="font-weight:700;">TO:</span>{{msg.Receiver}}
+                                                                </span>
+                                                            </span>
+                                                            <span ng-if="msg.ISMINT_ComposedByFlg=='Student'">
+                                                                <span style="font-weight:600;" ng-if="msg.ISMINT_GroupOrIndFlg=='Individual'">
+                                                                    &nbsp;&nbsp;
+                                                                    <span style="font-weight:700;">From :</span>{{msg.Sender}}
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                        <span ng-if="roleflg=='Student'">
+                                                            <span ng-if="msg.ISMINT_ComposedByFlg=='Student'">
+                                                                <span style="font-weight:600;" ng-if="msg.ISMINT_GroupOrIndFlg=='Individual'">
+                                                                    &nbsp;&nbsp;
+                                                                    <span style="font-weight:700;">TO:</span>{{msg.Receiver}}
+                                                                </span>
+                                                            </span>
+                                                            <span ng-if="msg.ISMINT_ComposedByFlg=='Staff'">
+                                                                <span style="font-weight:600;" ng-if="msg.ISMINT_GroupOrIndFlg=='Individual'">
+                                                                    &nbsp;&nbsp;
+                                                                    <span style="font-weight:700;">From :</span>{{msg.Sender}}
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-sm-2 text-right" style="font-weight:700;">
+                                                        {{msg.ISMINT_DateTime | date:'MM/dd/yyyy  h:mma'}}
+                                                    </div>
+                                                    <div class="col-sm-1 text-right">
+                                                        <span ng-if="roleflg=='Staff'">
+                                                            <span ng-if="msg.ISMINT_ComposedByFlg=='Staff'">
+                                                                <i class="fa fa-paper-plane ml-1" style="color:dodgerblue;">
+                                                                </i>
+                                                            </span>
+                                                            <span ng-if="msg.ISMINT_ComposedByFlg=='Student'">
+                                                                <i class="fa fa-envelope ml-1" style="color:#2757a6;"></i>
+                                                            </span>
+                                                        </span>
+                                                        <span ng-if="roleflg=='Student'">
+                                                            <span ng-if="msg.ISMINT_ComposedByFlg=='Student'">
+                                                                <i class="fa fa-paper-plane ml-1" style="color:dodgerblue;"></i>
+                                                            </span>
+                                                            <span ng-if="msg.ISMINT_GroupOrIndFlg=='Staff'">
+                                                                <i class="fa fa-envelope ml-1" style="color:#2757a6;"></i>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="panel-collapse collapse {{msg.ISTINT_Id}}">
+                                                <div class="panel-body">
+                                                    <div class="col-sm-10 text-left">
+                                                        {{msg.ISMINT_Interaction}}
+                                                    </div>
+
+                                                    <div class="col-sm-2 text-right">
+                                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View" data-ng-model="reply" data-target="#viewrplyModal" data-ng-click="reply(msg)">
+                                                            <i class="fa fa-bars fa-1x" aria-hidden="true">View & Reply</i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-10">
+                                        <uib-accordion close-others="oneAtATime">
+                                            <div uib-accordion-group class="panel-default" heading="{{msg.ISMINT_Subject}}" ng-repeat="msg in getinboxmsg">
+                                                <span ng-if="msg.ISMINT_GroupOrIndFlg=='Group'">
+                                                    <i class="fa fa-inbox ml-1"></i>
+                                                </span>
+                                                <span ng-if="msg.ISMINT_GroupOrIndFlg=='Individual'">
+                                                    <i class="fa fa-send ml-1"></i>
+                                                </span>
+                                                {{msg.ISMINT_Interaction}}
+                                            </div>
+                                        </uib-accordion>
+                                    </div>-->
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!--================== View Reply Model============== -->
+    <div class="modal fade" id="viewrplyModal" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times text-white" aria-hidden="true"></i>
+                    </button>
+                    <h4 class="modal-title text-white" style="text-align:center">{{subject}}</h4>
+                    <!--<button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>-->
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <h5 class="modal-title" style="text-align:center">{{subjdetails}}</h5>
+                        <div class="col-sm-12">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th width="50%"><a href="" ng-click="sort('ISTINT_Interaction')">Interaction</a></th>
+                                        <th><a href="" ng-click="sort('IINTSS_Date')">Reply By </a></th>
+                                        <!--<th><a href="" ng-click="sort('IINTSS_Date')">To </a></th>-->
+                                        <th><a href="" ng-click="sort('IINTSS_Date')">Date </a></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="rply in viewmessage | orderBy:-ISTINT_Interaction |filter:search">
+                                        <td style="width:50px;">{{$index+1}}</td>
+                                        <td style="overflow-wrap:break-word">{{ rply.ISTINT_Interaction}}</td>
+                                        <td style="overflow-wrap:break-word">{{ rply.Sender}}</td>
+
+                                        <!--<td style="overflow-wrap:break-word">{{ rply.Receiver}}</td>-->
+                                        <!--<td style="width:50px;" ng-if="rply.IINTSS_ByFlg=='Student'"> <i class="fa fa-graduation-cap  fa-1x" aria-hidden="true"></i></td>
+                                        <td style="width:50px;" ng-if="rply.IINTSS_ByFlg=='Staff'"> <i class="fa fa-user fa-1x" aria-hidden="true"></i></td>-->
+                                        <td style="overflow-wrap:break-word; width:105px;">{{rply.ISTINT_DateTime | date:'medium'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+                <div class="modal-footer">
+                    <md-button type="button" class="md-raised md-primary" data-placement="bottom" data-toggle="modal" title="Reply" data-ng-model="reply" data-target="#rplyModal" ng-click="replymsg();">
+                        <i class="fa fa-reply" aria-hidden="true"> &nbsp;    Reply</i>
+                    </md-button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!--================== Reply Model=================== -->
+    <div class="modal fade" id="rplyModal" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times text-white" aria-hidden="true"></i>
+                    </button>
+                    <h4 class="modal-title text-white" style="text-align:center; font-weight:800;">{{subject}}</h4>
+                </div>
+                <form class="form-horizontal ng-pristine ng-valid" name="myFormR" data-ng-submit="saveddata()" role="form" novalidate>
+                    <div class="col-sm-12">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <span ng-repeat="view in viewmessage">
+                                    <span ng-if="view.ISMINT_GroupOrIndFlg=='Group'">
+                                        <i class="fa fa-envelope ml-1"> {{view.Receiver}}</i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <textarea class="form-control" placeholder="Reply here" name="reply" rows="7" id="comment" ng-model="istinT_Interaction" required></textarea>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myFormR.reply)" ng-messages="myFormR.reply.$error">
+                                <div ng-message="required">Enter Reply</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="text-center">
+                    <input type="hidden" ng-model="istinT_Id" value="{{istinT_Id}}" />
+                    <md-button type="submit" ng-click="savereply(viewmessage)" class="md-raised md-primary">
+                        <i class="fa fa-reply " aria-hidden="true">&nbsp; Send</i>
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+

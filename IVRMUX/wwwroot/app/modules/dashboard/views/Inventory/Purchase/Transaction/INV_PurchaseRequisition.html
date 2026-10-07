@@ -1,0 +1,889 @@
+﻿
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Purchase Requisition</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Requisition Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="invmpR_PRDate" name="ddsale" md-placeholder="Select Date"></md-datepicker>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-7">
+                                <select class="form-control" ng-model="MI_Id" id="dpt"
+                                        required ng-change="OnChangeinst(MI_Id)">
+                                    <option value="">--Select Company Name--</option>
+                                    <option ng-repeat="us in  get_mi_list" value="{{us.mI_Id}}"
+                                            ng-selected="us.mI_Id == MI_Id">
+                                        {{us.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm1.deptinst)" ng-messages="myForm1.deptinst.$error">
+                                    <div ng-message="required">Select Department/Organization </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <div class="text-center">
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 50px;">SL.NO.</th>
+                                                <th style="width: 275px;"><a href="" ng-click="sort('invmI_ItemName')">Item</a></th>
+                                                <th><a href="" ng-click="sort('invmuoM_Id')">UOM</a></th>
+
+                                                <th><a href="" ng-click="sort('invtpR_PRQty')">Quantity</a></th>
+                                                <th><a href="" ng-click="sort('invtpR_PRUnitRate')">Approximate Rate</a></th>
+                                                <th><a href="" ng-click="sort('invtpR_ApproxAmount')">Approximate Amount</a></th>
+                                                <th><a href="" ng-click="sort('invtpR_Remarks')">Remarks</a></th>
+                                                <th><a href="" ng-click="sort('Action')">Action</a></th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr ng-repeat="objpr in transrows" ng-form="dataform1">
+                                                <td>{{$index+1}}</td>
+                                                <td>
+                                                    <div ng-show="!edits">
+                                                        <ui-select id="sel1" name="itemnm" ng-model="$parent.objpr.invmI_Id" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onitemchange($parent.objpr.invmI_Id,objpr)" title="Select Item" required>
+                                                            <ui-select-match ng-trim="false" placeholder="Select or search Item in the list...">{{$select.selected.invmI_ItemName}} : {{$select.selected.invmI_ItemCode}}</ui-select-match>
+                                                            <ui-select-choices repeat="option in get_item | filter: $select.search " value="{{option.invmI_Id}}" ng-disabled="{{option.disattr == true}}" ng-selected="{{option.Selected == true}}">
+                                                                <div ng-bind-html="option.invmI_ItemName +':'+ option.invmI_ItemCode | highlight: $select.search"></div>
+                                                            </ui-select-choices>
+                                                        </ui-select>
+                                                        <div class="error-messages" ng-if="interacted(dataform1.itemnm)" ng-messages="dataform1.itemnm.$error">
+                                                            <div ng-message="required">Select Item </div>
+                                                        </div>
+                                                    </div>
+                                                    <div ng-show="edits">
+
+                                                        <span>
+                                                            <label class="control-label col-sm-10">{{objpr.invmI_ItemName}}</label>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="uom" class="form-control active" ng-disabled="true" value="objpr.invmuoM_Id" ng-model="objpr.invmuoM_UOMName" placeholder="UOM" ng-paste="$event.preventDefault()" />
+                                                </td>
+
+                                                <td>
+                                                    <input type="text" name="qty" class="form-control active" ng-model="objpr.invtpR_PRQty" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Enter Quantity" ng-paste="$event.preventDefault()" required />
+                                                    <div class="error-messages" ng-if="interacted(dataform1.qty)" ng-messages="dataform1.qty.$error">
+                                                        <div ng-message="required">Enter Quantity</div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="rate" class="form-control active" ng-model="objpr.invtpR_PRUnitRate" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" ng-blur="countitemAmt(objpr,transrows)" ng-paste="$event.preventDefault()" placeholder="Enter Rate" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="rate" class="form-control active" ng-model="objpr.invtpR_ApproxAmount" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Amount" ng-paste="$event.preventDefault()" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="remarks" class="form-control active" ng-model="objpr.invtpR_Remarks" placeholder="Remarks" ng-paste="$event.preventDefault()" />
+                                                </td>
+                                                <td>
+                                                    <span class="" ng-hide="prrows.length > 4">
+                                                        <span ng-show="!addro && !edits">
+                                                            <a href="" ng-show="$last" ng-click="addprrows()">
+                                                                <i class="fa fa-plus"></i>
+                                                            </a>
+                                                        </span>
+                                                        <span ng-show="addro || edits">
+                                                            <a href="">
+                                                                <i class="fa fa-ban"></i>
+                                                            </a>
+                                                        </span>
+                                                        <span ng-show="!edits">
+                                                            <span class="" id="remove" ng-hide="transrows.length ==1">
+                                                                <a href="" ng-click="removeprrows($index,objg)" ng-disabled="edits">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </a>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </td>
+                                                <td hidden="hidden">{{user.invtpR_Id}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="margin-top-10">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-3">Remarks :</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control" rows="3" id="remarks" ng-model="invmpR_Remarks" placeholder="Enter Remarks" ng-paste="$event.preventDefault()"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Total Approximate Amount :</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control active" name="tamt" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Total Approximate Amount" ng-model="invmpR_ApproxTotAmount" step="0.01" ng-paste="$event.preventDefault()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No.</th>
+                                    <th width="350">Client Name</th>
+                                    <th>Remark's</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="materal1 in clientnames_rem">
+                                    <td class="text-center">
+                                        {{$index+1}}
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <div class="">
+                                                <ui-select id="sel1" name="client" ng-model="$parent.materal1.Client_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Client" required>
+                                                    <ui-select-match ng-trim="false" placeholder="Select or Search Client in the list...">{{$select.selected.ismmclT_ClientName}} </ui-select-match>
+                                                    <ui-select-choices repeat="option in getClient | filter: $select.search " value="{{option.ismmclT_Id}}" ng-selected="{{option.Selected == true}}">
+                                                        <div ng-bind-html="option.ismmclT_ClientName | highlight: $select.search"></div>
+                                                    </ui-select-choices>
+                                                </ui-select>
+                                                <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                                    <div ng-message="required">Please Select Client</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <div class="">
+                                                <textarea maxlength="250" name="client_remarks" ng-model="materal1.INVMPRCLT_Remarks" class="form-control" resize: none; rows="3" placeholder="Remark" />
+                                                <div class="error-messages" ng-if="interacted(myForm.client_remarks)" ng-messages="myForm.client_remarks.$error">
+                                                    <div ng-message="required">Enter Remark</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            <a href="" ng-show="$last" ng-click="addgrnrowsclient()">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="" id="remove" ng-hide="clientnames_rem.length ==1">
+                                            <a href="" ng-click="removeclient($index,objg1)">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr />
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="invmpR_Id" value="{{invmpR_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+   
+    <div class="box box-primary" ng-show="get_purchaserequisition.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Purchase Requisition</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{get_purchaserequisition.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" style="overflow:auto !important">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('sno')">SL.No.</a></th>
+                            <th><a href="" ng-click="sortBy('invmpR_PRNo')">PR Number</a></th>
+                            <th><a href="" ng-click="sortBy('invmpR_PRDate')">Date</a> </th>
+                            <th><a href="" ng-click="sortBy('invmpR_ApproxTotAmount')">Total Approx Amount </a> </th>
+                            <th>Action</th>
+                            <th>
+                                Indent  Remark
+                            </th>
+
+                            <th>
+                                Indent Approval
+                            </th>
+                            <th>
+                                Order Approval
+                            </th>
+                            <th>
+                                Order Approval Remark
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_purchaserequisition | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="idd22">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.invmpR_PRNo}}</td>
+                            <td>{{user.invmpR_PRDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.invmpR_ApproxTotAmount}}</td>
+
+                            <td class="text-center">
+                                <span ng-if="hrmE_Id_temp>0">
+                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Purchase Requisition"
+                                       data-ng-model="ViewOption" data-target="#myModal" data-ng-click="onformclick(user)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.invmpR_PICreatedFlg === false && user.invmpR_RejectFlg === false && hrmE_Id_temp>0">
+                                    <a class="text-aqua" href="" ng-click="edit(user,transrows)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                &nbsp;
+                                <span ng-if="user.invmpR_ActiveFlg === false && hrmE_Id_temp>0">
+                                    <a href="" ng-click="deactiveM(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.invmpR_ActiveFlg === true && hrmE_Id_temp>0">
+                                    <a href="" ng-click="deactiveM(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    <a href="javascript:void(0)" class="text-primary" title="Purchase Requisition"
+                                       data-ng-click="IndentRemark(user)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    <a href="javascript:void(0)" class="text-primary" title="Purchase Requisition"
+                                       data-ng-click="ApprovalRemark(user)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    <a href="javascript:void(0)" class="text-primary" title="Order Remark"
+                                       data-ng-click="OrderRemark(user)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    <a href="javascript:void(0)" class="text-primary" title="Order Remark"
+                                       data-ng-click="OrderAp_Remark(user)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="idd22">
+                </dir-pagination-controls>
+            </div>
+           
+
+        </div>
+
+
+
+
+    </div>
+</section>
+
+<div id="Order_Remark" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Order Remark
+                </h4>
+            </div>
+            <div class="modal-body">
+                <md-button ng-if="get_ApprovalDetail.length>0" type="button" class="md-raised" data-ng-click="printremark()">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <div class="box-body margin-top-10" id="printApPP">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <div class="col-sm-12" style="text-align:center;margin-top:-35px">
+                                <img src="{{logo}}" style="border:none;height:120px;width:600px;text-align:center" />
+                            </div>
+                            <div class="col-sm-12">
+                                <table class="table table-responsive" style="border:none !important" width="100%">
+                                    <tr>
+                                        <td style="float:left"> Requisition Number.:&nbsp; {{prnum}}</td>
+                                        <td>  &nbsp; </td>
+                                        <td style="float:right"> Date:&nbsp; {{INVMPO_PODate|date:'dd/MM/yyyy'}}</td>
+                                    </tr>
+                                </table>
+                                <table class="table table-responsive" style="border:none !important" width="100%">
+                                    <tr>
+                                        <td style="float:left">Total Rate.:&nbsp; {{INVMPO_TotRate}}</td>
+                                        <td>  &nbsp; </td>
+                                        <td style="float:right"> Total Tax:&nbsp; {{INVMPO_TotTax}}</td>
+                                    </tr>
+                                </table>
+                                <table class="table table-responsive" style="border:none !important" width="100%">
+                                    <tr>
+                                        <td style="float:left">Total Amount.:&nbsp; {{INVMPO_TotAmount}}</td>
+                                        <td>  &nbsp; </td>
+                                        <td style="float:right"> Remark:&nbsp; {{INVMPO_Remarks}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="9"> Purchase Order No - {{reqname}} </th>
+                                        </tr>
+                                        <tr class="text-center">
+
+                                            <th>Sl No.</th>
+                                            <th>Item Name</th>
+                                            <th>Order Quantity</th>
+                                            <th>Rate Per Unit</th>
+                                            <th>Tax Amount</th>
+                                            <th>Order Amount</th>
+                                            <th>Approve Quantity</th>
+                                            <th>Final Process</th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in get_ApprovalDetail">
+
+                                            <td>
+                                                {{$index+1}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMI_ItemName}}
+                                            </td>
+                                            <td>
+                                                {{user.INVTPO_POQty}}
+                                            </td>
+                                            <td>
+                                                {{user.INVTPO_RatePerUnit}}
+                                            </td>
+                                            <td>
+                                                {{user.INVTPO_TaxAmount}}
+                                            </td>
+                                            <td>
+                                                {{user.INVTPO_Amount}}
+                                            </td>
+                                            <td>
+                                                {{user.INVTPO_ApproveQty}}
+                                            </td>
+                                            <td>
+                                                <span ng-if="user.INVMPO_FinalProcessFlag==true">
+                                                    <i class="fa fa-times  text-red"></i>
+                                                </span>
+                                                <span ng-if="user.INVMPO_FinalProcessFlag==false">
+                                                    <i class="fa fa-check  text-green"></i>
+
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {{user.INVTPO_Remarks}}
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="myApproval" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Approval Remark
+                </h4>
+            </div>
+            <div class="modal-body">
+                <md-button ng-if="get_ApprovalDetail.length>0" type="button" class="md-raised" data-ng-click="printApproval()">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <div class="box-body margin-top-10" id="printAp">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="6"> PR Number - {{prnum}} / {{reqname}} </th>
+                                        </tr>
+                                        <tr class="text-center">
+
+                                            <th>Approval Date</th>
+                                            <th>Total Amount</th>
+                                            <th>Approved By</th>
+                                            <th>
+                                                Remark
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in get_ApprovalDetail">
+
+                                            <td>
+                                                {{user.INVMPIAPP_PIDate |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPIAPP_ApproxTotAmount}}
+                                            </td>
+                                            <td>
+                                                {{user.ApprovedBy}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPIAPP_Remarks}}
+                                            </td>
+                                            <td>
+                                                <span ng-if="user.INVMPIAPP_RejectFlg==true">
+                                                    <i class="fa fa-times  text-red"></i>
+                                                </span>
+                                                <span ng-if="user.INVMPIAPP_RejectFlg==false">
+                                                    <i class="fa fa-check  text-green"></i>
+
+                                                </span>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="OrderAp_Remark" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Order Approval Remark
+                </h4>
+            </div>
+            <div class="modal-body">
+                <md-button ng-if="get_ApprovalDetail.length>0" type="button" class="md-raised" data-ng-click="printremark()">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <div class="box-body margin-top-10" id="printApPPPP">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <div class="col-sm-12" style="text-align:center;margin-top:-35px">
+                                <img src="{{logo}}" style="border:none;height:120px;width:600px;text-align:center" />
+                            </div>
+                            <div class="col-sm-12">
+                                <table class="table table-responsive" style="border:none !important" width="100%">
+                                    <tr>
+                                        <td style="float:left"> Requisition Number.:&nbsp; {{prnum}}</td>
+                                        <td>  &nbsp; </td>
+                                        <td style="float:right"> Date:&nbsp; {{INVMPO_PODate|date:'dd/MM/yyyy'}}</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="9"> Purchase Order No - {{reqname}} </th>
+                                        </tr>
+                                        <tr class="text-center">
+
+                                            <th>Sl No.</th>
+                                            <th>Approved By</th>
+                                            <th>Approval Order No</th>
+                                            <th>Total Rate</th>
+                                            <th>Total Tax</th>
+                                            <th>Total Amount</th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in get_ApprovalDetail">
+
+                                            <td>
+                                                {{$index+1}}
+                                            </td>
+                                            <td>
+                                                {{user.ApprovedBy}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_PONo}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_TotRate}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_TotTax}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_TotAmount}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_Remarks}}
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="OrderAp_Remark" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Order Approval Remark
+                </h4>
+            </div>
+            <div class="modal-body">
+                <md-button ng-if="get_ApprovalDetail.length>0" type="button" class="md-raised" data-ng-click="printremark()">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <div class="box-body margin-top-10" id="printApPPPP">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <div class="col-sm-12" style="text-align:center;margin-top:-35px">
+                                <img src="{{logo}}" style="border:none;height:120px;width:600px;text-align:center" />
+                            </div>
+                            <div class="col-sm-12">
+                                <table class="table table-responsive" style="border:none !important" width="100%">
+                                    <tr>
+                                        <td style="float:left"> Requisition Number.:&nbsp; {{prnum}}</td>
+                                        <td>  &nbsp; </td>
+                                        <td style="float:right"> Date:&nbsp; {{INVMPO_PODate|date:'dd/MM/yyyy'}}</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="9"> Purchase Order No - {{reqname}} </th>
+                                        </tr>
+                                        <tr class="text-center">
+
+                                            <th>Sl No.</th>
+                                            <th>Approved By</th>
+                                            <th>Approval Order No</th>
+                                            <th>Total Rate</th>
+                                            <th>Total Tax</th>
+                                            <th>Total Amount</th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in get_ApprovalDetail">
+
+                                            <td>
+                                                {{$index+1}}
+                                            </td>
+                                            <td>
+                                                {{user.ApprovedBy}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_PONo}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_TotRate}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_TotTax}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_TotAmount}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPOAPP_Remarks}}
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="myModalfile" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Indent Remark
+                </h4>
+            </div>
+            <div class="modal-body">
+                <md-button ng-if="get_Details.length>0" type="button" class="md-raised" data-ng-click="printApproval()">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <div class="box-body margin-top-10" id="PIND">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="8"> PR Number - {{prnum}} / {{reqname}} </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                Item Name
+                                            </th>
+                                            <th>
+                                                Indent  Quntity
+                                            </th>
+                                            <th>
+                                                Approve Quntity
+                                            </th>
+                                            <th>
+                                                Indent Date
+                                            </th>
+                                            <th>
+                                                Approve
+                                            </th>
+                                            <th>
+                                                Indent Remark
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in get_IndentDetail">
+                                            <td>
+                                                {{user.INVMI_ItemName}}
+                                            </td>
+                                            <td>
+                                                {{user.INVTPI_PIQty}}
+                                            </td>
+                                            <td>
+                                                {{user.INVTPI_ApproveQty}}
+                                            </td>
+                                            <td>
+                                                {{user.INVMPI_PIDate |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                <span ng-if="user.INVTPI_RejectFlg==true">
+                                                    <i class="fa fa-times  text-red"></i>
+                                                </span>
+                                                <span ng-if="user.INVTPI_RejectFlg==false">
+                                                    <i class="fa fa-check  text-green"></i>
+
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {{user.INVTPI_Remarks}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ==================================View Details Model========================================== -->
+<div id="myModal" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                </div>
+                <div class="box-body">
+                    <div class="text-center">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('invmI_ItemName')">Item Name</a></th>
+                                    <th><a href="" ng-click="sortBy('invmuoM_UOMName')">UOM</a> </th>
+                                    <th><a href="" ng-click="sortBy('invmpR_PRDate')">Date</a> </th>
+                                    <th><a href="" ng-click="sortBy('invtpR_PRQty')">Quantity</a> </th>
+                                    <th><a href="" ng-click="sortBy('invtpR_ApprovedQty')">Approved Quantity</a> </th>
+                                    <th><a href="" ng-click="sortBy('invtpR_PRUnitRate')">Approx Rate</a></th>
+                                    <th><a href="" ng-click="sortBy('invtpR_ApproxAmount')">Approx Amount </a> </th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in filterValue2 = (get_prDetail | filter : searchValue2)  |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'" pagination-id="id22">
+                                    <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                    <td>{{user.invmI_ItemName}}</td>
+                                    <td>{{user.invmuoM_UOMName}}</td>
+                                    <td>{{user.invmpR_PRDate | date:'dd-MM-yyyy'}}</td>
+                                    <td>{{user.invtpR_PRQty}}</td>
+                                    <td>{{user.invtpR_ApprovedQty}}</td>
+                                    <td>{{user.invtpR_PRUnitRate}}</td>
+                                    <td>{{user.invtpR_ApproxAmount}}</td>
+                                    <td class="text-center">
+                                        <!--<a class="text-aqua" href="" ng-click="edit(user,transrows)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                        </a>-->
+                                        &nbsp;
+                                        <span ng-if="user.invtpR_ActiveFlg == false">
+                                            <a href="" ng-click="deactive(user)"
+                                               class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate" data-dismiss="modal">
+                                                <i> Activate </i>
+                                            </a>
+                                        </span>
+                                        <span ng-if="user.invtpR_ActiveFlg == true">
+                                            <a href="" ng-click="deactive(user)"
+                                               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate" data-dismiss="modal">
+                                                <i> Deactivate</i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true" pagination-id="id22">
+                        </dir-pagination-controls>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

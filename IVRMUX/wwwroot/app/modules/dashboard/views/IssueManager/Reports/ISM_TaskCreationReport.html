@@ -1,0 +1,427 @@
+﻿<style>
+    .multiselect {
+        width: 19.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 1.6%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content">
+    <div data-ng-init="onpageload()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Enhancements Time table </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-3 padding-left-2px">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 8px;width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueDeptd" type="text" placeholder="Search Department here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                        <label>
+                                            <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Department</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                            <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 padding-left-none">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueDesgd" type="text" placeholder="Search Designation here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                        <label>
+                                            <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdesg(designationselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Designation</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                            <input name="desg" ng-model="user.selected" type="checkbox" ng-disabled="roleflag==true" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 padding-left-none">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                        <label>
+                                            <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                            <span class="lbl padding-8">
+                                                <b>  All Employees</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                            <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Task No :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="qtno" ng-model="$parent.obj.ISMTCR_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Task No" required>
+                                            <ui-select-match ng-trim="false" placeholder="Select or SearchNo in the list...">
+                                                {{$select.selected.ISMTCR_TaskNo}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="option in tasklist | filter: $select.search " value="{{option.ISMTCR_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.ISMTCR_TaskNo | highlight: $select.search"></div>
+                                            </ui-select-choices>
+
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(myForm.qtno)" ng-messages="myForm.qtno.$error">
+                                            <div ng-message="required">Please Select Task No</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br />
+                <!--------Inserting Items-------->
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="getReport()">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button ng-if="get_Report.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel()">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>
+                    <md-button ng-if="get_Report.length>0" type="button" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--ng-if="rdopunch=='TADAAdavance'"-->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Enhancements Time table </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body" ng-show="get_Report.length > 0">
+            <div class="row" id="printsection">
+                <div class="col-sm-12" ng-repeat="dd in get_Status">
+                    <div class="col-sm-3">
+                        <div class=" ">
+                            <div>
+                                <img src="{{dd.HRME_Photo}}" alt="" style="width: 100px;height: 100px;object-fit: cover;margin-top:10px !important">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-9">
+                        <table class="table table-bordered table-condensed" border="1">
+                            <thead>
+                                <tr>
+                                    <th colspan="5">
+                                        TIME TABLE LIST ({{dd.ISMTCR_TaskNo}})
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        Created By
+                                    </th>
+
+                                    <th>
+                                        {{dd.createdby}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Issue/Task Title
+                                    </th>
+
+                                    <th>
+                                        {{dd.ISMTCR_Title}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Description
+                                    </th>
+
+                                    <th>
+                                        {{dd.ISMTCR_Desc}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Priority
+                                    </th>
+
+                                    <th>
+                                        {{dd.HRMP_Name}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        {{dd.ISMTCR_Status}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Client
+                                    </th>
+
+                                    <th>
+                                        {{dd.ISMMCLT_ClientName}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Module
+                                    </th>
+
+                                    <th>
+                                        {{dd.IVRMM_ModuleName}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        created Date
+                                    </th>
+
+                                    <th>
+                                        {{dd.ISMTCR_CreationDate}}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Total Hours
+                                    </th>
+
+                                    <th>
+                                        {{dd.ISMTCR_Days}} --/ Days
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Total Days
+                                    </th>
+
+                                    <th>
+                                        {{dd.ISMTCR_Hours}} --/ Hours
+                                    </th>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <table class="table table-condensed table-bordered text-center" border="1">
+                        <thead>
+                            <tr>
+                                <th class="text-center" colspan="10">
+                                    DEPARTMENTS  TIME TABLE LIST
+                                </th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <th>Sl No</th>
+
+                            <th style="width:20%!important">
+                                Department
+                            </th>
+                            <th style="width :18%!important">
+                                Employee Name
+                            </th>
+                            <th>
+                                Percenatge
+                            </th>
+                            <th>
+                                Days
+                            </th>
+                            <th>
+                                Hours
+                            </th>
+                            <th>
+                                Start
+                            </th>
+                            <th>
+                                End Date
+                            </th>
+                            <th style="width:7%!important">
+                                Level
+                            </th>
+                            <th>
+                                Remark
+                            </th>
+
+                        </tr>
+
+                        <tbody>
+                            <tr ng-repeat="user in  get_Report">
+
+
+                                <td>{{$index+1}}</td>
+                                <td style="text-align:left">
+                                    {{user.HRMD_DepartmentName}}
+                                </td>
+                                <td style="text-align:left">
+                                    {{user.HRME_EmployeeFirstName}}
+                                </td>
+                                <td style="text-align:center">
+                                    {{user.TTEDDP_Percentage}}
+                                </td>
+                                <td style="text-align:center">
+                                    {{user.TTEDDP_Days}}
+                                </td>
+                                <td style="text-align:center">
+                                    {{user.TTEDDP_Hours}}
+                                </td>
+                                <td class="text-left">{{user.TTEDDP_FromDate |date:'dd/MM/yyyy'}}</td>
+                                <td class="text-left">{{user.TTEDDP_ToDate |date:'dd/MM/yyyy'}}</td>
+                                <td>
+                                    {{user.TTEDDP_level}}
+                                </td>
+                                <td style="text-align:left">
+                                    {{user.TTEDDP_Remarks}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="box-body">
+
+                    <div class="col-sm-12" ng-repeat="task in get_taskdetails" ng-if="get_taskdetails.length>0">
+                        <div class="col-sm-5">
+                            <h5>
+                                <strong>  {{$index+1}}) &nbsp;  {{task.createdby}} </strong>
+                            </h5>
+                            <hr />
+                            <ul>
+                                <li>
+                                    <strong>    Created Date :   {{task.crdate | date:"dd-MM-yyyy '-' h:mma"}} </strong>
+                                </li>
+                            </ul>
+                            <!--<ul>
+                                <li>
+                                    <strong>   Assigned By :   {{task.assignedby}}  </strong>
+
+                                </li>
+                            </ul>-->
+                            <ul>
+                                <li>
+                                    <strong>   Status  :   {{task.ISMTCR_Status}}  </strong>
+
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-7">
+                            <br />
+                            <div class="form-group">
+
+                                <div class="box-content col-sm-12 margin-top-10" style="max-height: 250px;  overflow:auto;padding:0px !important">
+                                    <div class="col-sm-12" ng-repeat="response in get_taskresponse" ng-if="response.ISMTCR_Id==task.ISMTCR_Id" style="border-bottom: 0.5px solid #dcd6d6;padding-bottom: 10px;">
+                                        <label class="control-label  text-body" style="font-size:14px;">
+                                            {{get_taskresponse.length-$index}}) Response By : {{response.responseby}} - {{response.ISMTCRRES_ResponseDate | date:"dd-MM-yyyy '-' h:mma"}} <span ng-if="response.pagename!=null && response.pagename!=''"> <span style="color:red">(</span> {{response.pagename}} <span style="color:red">)</span></span>
+                                        </label>
+                                        
+                                        <span ng-if="response.ISMTCRRES_Status!=null && response.ISMTCRRES_Status!=''">
+                                            <br /> <label class="control-label text-left" style="margin-left: 3%">
+                                                <span class="control-label text-body" style="font-size:14px;">Status</span> : <b>{{response.ISMTCRRES_Status}}</b>
+                                            </label>
+                                        </span> <br />
+
+                                        <label  class="control-label text-left" style="margin-left: 3%;"><span class="control-label text-body" style="font-size:14px;">Response</span> :<span style="font-weight: 600;font-family: 'Kendo UI';">{{response.ISMTCRRES_Response}}</span></label>
+
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr />
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</section>
+
+<!--======PRINT EXCEL REPORT======-->

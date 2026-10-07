@@ -1,0 +1,1302 @@
+﻿<style>
+    .table-wrap {
+        height: 180px;
+        overflow-y: auto;
+    }
+
+    input[type="file"] {
+        display: none !important;
+    }
+
+    .student-photoadm :before {
+        content: 'Upload Document';
+        font-size: 13px;
+    }
+
+    .margin-top-5 {
+        margin-top: 5% !important
+    }
+</style>
+
+<section class="content">
+    <div data-ng-init="loadData()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Online Leave Application</h3>
+                    <div class="box-tools pull-right">
+                        <!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal2">
+                            <i class="fa fa-cart-plus" aria-hidden="true"></i> &nbsp; REQUEST ON DUTY / COMP OFF
+                        </button>-->
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="row">
+                    <div class="col-sm-12 col-sm-offset-10">
+                        <span>
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="LeaveApplyPolicy();"> <b>View Leave Apply Policy </b></a>
+                        </span>
+                    </div>
+                </div>
+
+
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee Name :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label">
+                                        {{hrmE_EmployeeFirstName}}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">DOJ :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label">{{hrmE_DOJ | date:'dd-MM-yyyy'}}</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Designation :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label">{{hrmdeS_DesignationName}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Email :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label">{{hrmE_EmailId}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Phone :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label">{{hrmE_MobileNo}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                <div class="box-body" ng-if="leaverestrictflag==true">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <span class="center" style="color:red;font-weight:600">Leave Portal is Blocked By Managment  From <b>{{Rfromdate |date:'dd/MM/yyyy'}} To {{Rtodate |date:'dd/MM/yyyy'}}</b></span><br /><br />
+                            <span style="color:black;font-weight:600">Reason</span>
+                            <textarea class="form-control" ng-disabled="true" name="reason1" rows="5" style="resize:none" data-ng-model="RRemark"></textarea>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-primary" ng-if="leaverestrictflag==false">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Employee Leave Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto;width:100%;">
+                            <table class="table table-responsive table-bordered text-left" style="height:100px;">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">
+                                        </th>
+                                        <th>Sl.No</th>
+                                        <th><a href="" ng-click="sortTableData('hrmL_LeaveName')">Leave Name</a></th>
+                                        <th><a href="" ng-click="sortTableData('hrelS_TotalLeaves')">Total Leaves</a></th>
+                                        <th><a href="" ng-click="sortTableData('hrelS_TotalLeaves')">Applied Leaves</a></th>
+                                        <th><a href="" ng-click="sortTableData('hrelS_CBLeaves')">Balance Leaves</a></th>
+                                        <th><a href="" ng-click="sortTableData('hrelaP_FromDate')">From Date</a></th>
+                                        <th><a href="" ng-click="sortTableData('hrelaP_ToDate')">To Date</a></th>
+                                        <th><a href="" ng-click="sortTableData('hrelaP_TotalDays')">Total Days</a></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="leave in leave_nameview |orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage"
+                                        pagination-id="page0">
+                                        <td class="text-left">
+                                            <label style="margin-left:5px;">
+                                                <input type="checkbox" ng-model="leave.selected" ng-true-value="true" ng-false-value="false" ng-click="GetLeave(leave)" />
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td class="text-left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-left">
+                                            {{leave.hrmL_LeaveName}}
+
+                                            <br />
+                                            <div class="form-group" ng-if="leave.hrmL_LeaveCode=='EL'" ng-show="leave.selected" ng-true-value="true" ng-false-value="false">
+                                                <div class="col-sm-8">
+                                                    <select class="form-control" data-ng-model="obj.catagoryofleave" name="ELname" rows="5" ng-required="leave.selected">
+                                                        <option value="SERIOUS ACCIDENT">SERIOUS ACCIDENT</option>
+                                                        <option value="BE BEREAVEMENT OR FUNERAL">BE BEREAVEMENT OR FUNERAL</option>
+                                                        <option value="MEDICAL EMERGENCY">MEDICAL EMERGENCY</option>
+                                                    </select>
+                                                    <div class="error-messages" ng-if="interacted(myForm.ELname)" ng-messages="myForm.ELname.$error">
+                                                        <div ng-message="required">Select EL Reasone</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-left">{{leave.hrelS_TotalLeaves}}</td>
+                                        <td class="text-left">{{leave.appliedCount}}</td>
+                                        <td class="text-left">{{leave.hrelS_CBLeaves}}</td>
+                                        <td class="text-center">
+                                            <div class="grid-action-cell" ng-if="leave.selected==true"><md-datepicker name="frmdate{{$index}}" onkeypress="return false" ng-show="leave.hrelS_CBLeaves > 0" ng-model="leave.hrelaP_FromDate" md-min-date="leave.fromminDate" md-max-date="leave.frommaxDate" ng-change="fromdate(leave.hrelaP_FromDate,leave)" md-placeholder="Enter date" ng-required="leave.selected" md-date-filter="dateFilter"></md-datepicker></div>
+                                            <div class="error-messages" ng-if="interacted(myForm['frmdate'+$index])" ng-messages="myForm['frmdate'+$index].$error">
+                                                <div ng-message="required">Please Select From Date</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+
+                                            <div class="grid-action-cell" ng-if="leave.selected==true">
+                                                <md-datepicker name="tdate{{$index}}" onkeypress="return false" ng-if="leave.hrelS_CBLeaves > 0" ng-model="leave.hrelaP_ToDate" md-min-date="leave.hrelaP_FromDate" md-max-date="leave.tomaxDate" ng-change="todate(leave.hrelaP_ToDate,leave);GetLeave(leave);leaveCondition(leave)" md-placeholder="Enter date" ng-required="leave.selected"
+                                                               ng-disabled="leave.hrelaP_FromDate==null || leave.hrelaP_FromDate=='' || leave.lopadjest==true" md-date-filter="dateFilter"></md-datepicker>
+                                            </div>
+
+                                            <div class="error-messages" ng-if="interacted(myForm['tdate'+$index])" ng-messages="myForm['tdate'+$index].$error">
+                                                <div ng-message="required" style="padding-left: 30px;">Please Select to Date</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="grid-action-cell">
+                                                <input ng-disabled=true type="text" style="width:40%" ng-model="leave.hrelaP_TotalDays" />
+                                                <input type="checkbox" ng-model="leave.cklop" value="lopdatahd" ng-disabled="leave.disable" ng-change="Hlfday(leave)">
+                                                <span class="lbl padding-6" />Half day
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <dir-pagination-controls max-size="5" pagination-id="page0"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                    <br />
+                    <div class="row margin-top-5">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Reason for Leave  : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="reason" rows="5" style="resize:none" data-ng-model="obj.HRELAP_LeaveReason" required></textarea>
+                                    <div class="error-messages" ng-if="interacted(myForm.reason)" ng-messages="myForm.reason.$error">
+                                        <div ng-message="required" style="padding-left: 30px;">Enter Reason for Leave</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="eanableproxyflag==true">
+                                <label class="control-label col-sm-4">Proxy:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="staff1" ng-model="$parent.obj.HRME_Id" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                               title="Select emp" required ng-click="proxyempdetials()">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search employee in the list...">
+                                            {{$select.selected.HRME_EmployeeFirstName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in Staff_List | filter: $select.search " value="{{option.HRME_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="(option.HRME_EmployeeFirstName) | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.staff1)" ng-messages="myForm.staff1.$error">
+                                        <div ng-message="required">Select Proxy Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box box-primary" ng-if="eanableproxyflag==true && proxytaskList.length>0">
+                                <div class="col-sm-12">
+                                    <div style="overflow:auto;width:100%;">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sl.No.</th>
+                                                    <th>Employee Name</th>
+                                                    <th>Proxy Emp. Name</th>
+                                                    <th>Assigned Date</th>
+                                                    <th>Task Priority</th>
+                                                    <th>Task Title</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!--<tr ng-repeat="proxy in proxytaskList">-->
+                                                <tr dir-paginate="proxy in proxytaskList |orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage"
+                                                    pagination-id="page1">
+                                                    <td>{{$index + 1}}</td>
+                                                    <td class="text-left">{{proxy.TransferredBy}}</td>
+                                                    <td class="text-left">{{proxy.TransferredTo}}</td>
+                                                    <td class="text-center">{{proxy.Assigned_Date | date:'dd/MM/yyyy'}}</td>
+                                                    <td class="text-center">{{proxy.Task_Priority}}</td>
+                                                    <td class="text-left">{{proxy.Task_Title	}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                             direction-links="true"
+                                                             boundary-links="true">
+                                    </dir-pagination-controls>
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date Reporting Back  : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="hrelaP_ReportingDate" md-placeholder="Reporting Date" name="reportingdate"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.reportingdate)" ng-messages="myForm.reportingdate.$error">
+                                        <div ng-message="required" style="padding-left: 30px;">Select Date of Reporting Back</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">Contact Number While on Leave  : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-6">
+                                    <input class="form-control" name="contactno" data-ng-model="contact" allow-pattern="\d" maxlength="10" ng-minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.contactno)" ng-messages="myForm.contactno.$error">
+                                        <div ng-message="required" style="padding-left: 30px;">Enter Contact Number</div>
+                                        <div ng-message="pattern" style="padding-left: 30px;">Enter valid Mobile NO</div>
+                                        <div ng-message="minlength" style="padding-left: 30px;">Enter Minimum 10 characters</div>
+                                        <div ng-message="maxlength" style="padding-left: 30px;">Field cannot take more than 10 characters</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group text-left">
+                                <label class="student-photoadm custom-file-input" style="width:60%;margin:auto;text-align:center">
+                                    <input id="documentid" type="file" name="doc1" accept="image/*" data-ng-model="hrelT_SupportingDocument" onchange="angular.element(this).scope().selectFileforUploadzdBOSBOE(this)" ng-required="leave.selected">
+                                </label>
+                                <div class="error-messages" ng-if="interacted(myForm.doc1)" ng-messages="myForm.doc1.$error">
+                                    <div ng-message="required">Please upload the file</div>
+                                </div>
+                                <span ng-if="hrelT_SupportingDocument !=null && hrelT_SupportingDocument !=''">
+                                    <a ng-if="extention=='jpg' || extention=='JPG' || extention=='jpeg' || extention=='JPEG'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsBOSBOE()"> view</a>
+                                    <a ng-if="extention=='pdf'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#showpdf" data-ng-click="showmodaldetailsBOSBOE()"> view</a>
+                                </span>
+                            </div>
+
+                            <div class="form-group text-left" style="margin-top:10% !important">
+                                <p class="text-red"><b>Note : File Size Not More Then 2MB</b></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="ApplayLeave()">
+                            <i class="fa fa-tags" aria-hidden="true"></i> Apply Leave Now
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="ApplayLeaveReconsideration()">
+                            <i class="fa fa-tags" aria-hidden="true"></i> Reconsideration Leave Appy
+                        </md-button><!--data-ng-click-->
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Employee Leave Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-3 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12 text-wrap" style="overflow-x:auto">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width:10%"><a href="" ng-click="order('sno')">SL.NO.</a></th>
+                                    <th style="width:20%"><a href="" ng-click="sort('hrmL_LeaveName')">LEAVE NAME</a></th>
+                                    <th style="width:30%"><a href="" ng-click="sort('hrelaP_LeaveReason')">LEAVE REASON</a></th>
+                                    <th style="width:15%"><a href="" ng-click="sort('hrelaP_FromDate')">From Date</a></th>
+                                    <th style="width:15%"><a href="" ng-click="sort('hrelaP_ToDate')">To Date</a></th>
+                                    <th style="width:10%"><a href="" ng-click="sort('hreltD_TotDays')">NO. OF DAYS</a></th>
+                                    <th style="width:10%"><a href="" ng-click="sort('hrelaP_ApplicationStatus')">STATUS</a></th>
+                                    <th style="width:10%"><a href="" ng-click="sort('hrelaP_ApplicationStatus')">VIEW</a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in leave_name |itemsPerPage:itemsPerPage2 | filter : searchValue" current-page="currentPage2" pagination-id="page1">
+                                    <!--<tr dir-paginate="user in leave_name |orderBy:sortKey:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" pagination-id="page1">-->
+                                    <td class="text-center">{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                                    <td class="text-left" ng-if="user.hrelapD_InTime.length>0 && user.hrelapD_OutTime.length>0 && user.hrmL_LeaveCode=='COMPOFF'">
+                                        Comp Off Request
+                                    </td>
+                                    <td class="text-left" ng-if="user.hrelapD_InTime.length>0 && user.hrelapD_OutTime.length>0 && user.hrmL_LeaveCode=='OD'">
+                                        On Duty Request
+                                    </td>
+                                    <td class="text-left" ng-if="user.hrelapD_InTime.length==null && user.hrelapD_OutTime.length==null">
+                                        {{user.hrmL_LeaveName}}<br />
+                                        <span ng-if="user.hrmL_LeaveCode=='COMPOFF' && user.HRELAP_CompOffAdjestFlg==true" style="color:mediumseagreen;font-weight:700">
+                                            (Leave For Lop Adjust)
+                                        </span>
+                                    </td>
+                                    <td class="text-left" style="word-wrap:break-word">
+                                        <table ng-if="user.hrelapD_InTime.length>0 && user.hrelapD_OutTime.length>0">
+                                            <tr><td><b>Worked Time:-{{user.hrelapD_InTime}}&nbsp;To&nbsp;{{user.hrelapD_OutTime}}</b></td></tr>
+                                        </table>
+                                        <p ng-bind-html="trustAsHtml(user.hrelaP_LeaveReason)"></p>
+                                        <!--{{user.hrelaP_LeaveReason}}-->
+                                    </td>
+                                    <td class="text-center">{{user.hrelaP_FromDate | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">{{user.hrelaP_ToDate | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">{{user.hreltD_TotDays}}</td>
+                                    <td class="text-left" style="word-wrap:break-word">{{user.hrelaP_ApplicationStatus}}</td>
+                                    <td class="hidden">{{user.hrmL_LeaveCode}}</td>
+                                    <td class="text-center">
+                                        <div class="grid-action-cell" ng-if="user.hrelaP_ApplicationStatus !='Applied' ">
+                                            <a href="javascript:void(0)" ng-model="user.Comments" data-toggle="modal" title="View Comments" data-target="#myModalgetclasslist" ng-click="viewcomment(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                        </div>
+                                        <div class="grid-action-cell" ng-if="user.Proxy.length>0 && user.hrmL_LeaveCode=='PL'">
+
+                                            <a href="javascript:void(0)" data-toggle="modal" title="Proxy Assigned Details"
+                                               data-target="#proxydetails" ng-click="proxydetials(user)">
+                                                <span style="color:green;font-weight:600">Proxy</span>
+                                            </a>
+
+
+                                        </div>
+                                        <!--<div class="grid-action-cell" ng-if="user.hrelaP_ApplicationStatus !='Applied' && user.hrmL_LeaveCode !='COMPOFF'|| user.hrmL_LeaveCode !='OD' ">
+                                            <a  href="javascript:void(0)" ng-model="user.Comments" data-toggle="modal" title="View Comments" data-target="#CompofforOndutyView" ng-click="viewcomment(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                        </div>-->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="myModal2" role="dialog" data-backdrop="false" data-keyboard="false">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myFormextra" novalidate>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <i class="fa fa-times" aria-hidden="true" style="color:#fff !important;"></i>
+                        </button>
+                        <h4 class="modal-title text-center" style="color:#fff !important;">REQUEST - ON DUTY / COMP OFF</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <div class="well">
+                                    <label class="control-label" ng-init="leavetype='OD'">
+                                        <input type="radio" name="vf21" value="OD" ng-model="leavetype">
+                                        <span class="lbl padding-8">ON DUTY</span>
+                                    </label>
+                                    <label class="control-label">
+                                        <input type="radio" name="vf211" value="COMPOFF" ng-model="leavetype">
+                                        <span class="lbl padding-8">COMP OFF</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5">Worked On :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-6 input-group text-right" style="">
+                                        <md-datepicker ng-model="fromDate" onkeydown="return false" name="applydate" id="date2" md-placeholder="Worked Date" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted2(myFormextra.applydate)" ng-messages="myFormextra.applydate.$error">
+                                            <div ng-message="required">Please Select Worked Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5" style="padding-top:7%;">Work Start Time : <strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-7">
+                                        <div uib-timepicker name="sch_time1" ng-model="hrelapD_InTime" ng-change="validateTomintime(hrelapD_InTime)" hour-step="hstep" minute-step="mstep" ng-disabled="timedis" show-meridian="ismeridian" required></div>
+                                        <div class="error-messages" ng-if="interacted2(myFormextra.sch_time1)" ng-messages="myFormextra.sch_time1.$error">
+                                            <div ng-message="required">Select Work Start Time</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5" style="padding-top:7%;">Work End Time : <strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-7">
+                                        <div uib-timepicker name="sch_time2" ng-model="hrelapD_OutTime" min="min" ng-change="validatemax(hrelapD_OutTime)" hour-step="hstep" minute-step="mstep" ng-disabled="timedis" show-meridian="ismeridian" required></div>
+                                        <div class="error-messages" ng-if="interacted2(myFormextra.sch_time2)" ng-messages="myFormextra.sch_time2.$error">
+                                            <div ng-message="required">Select Work End Time</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Reason : <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" rows="5" id="reasons" data-ng-model="HRELAP_LeaveReason1" name="details" required style="resize: none"></textarea>
+                                        <div class="error-messages " ng-if="interacted2(myFormextra.details)" ng-messages="myFormextra.details.$error">
+                                            <div ng-message="required">Enter Reason</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Attach File :</label>
+                                    <div class="col-sm-8">
+                                        <label class="student-photoadm custom-file-input" style="width:60%;margin:auto;text-align:center">
+                                            <input id="documentid2" type="file" name="doc" accept="image/*" data-ng-model="hrelT_SupportingDocument" onchange="angular.element(this).scope().selectFileforUploadzdBOSBOE(this)">
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted2(myFormextra.doc)" ng-messages="myFormextra.doc.$error">
+                                            <div ng-message="required">Please upload the file</div>
+                                        </div>
+                                        <span ng-if="hrelT_SupportingDocument !=null && hrelT_SupportingDocument !=''">
+                                            <a ng-if="extention=='jpg' || extention=='JPG' || extention=='jpeg'|| extention=='png' ||  extention=='JPEG'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsBOSBOE()"> view</a>
+                                            <a ng-if="extention=='pdf'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#showpdf" data-ng-click="showmodaldetailsBOSBOE()"> view</a>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-top:10% !important">
+                                    <p class="text-red"><b>Note : File Size Not More Then 2MB</b></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3 text-center">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" ng-click="reqodcompoff();">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--Other Leave Status View-->
+    <div id="myModalgetclasslist" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom">Leave Status</h4></center>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6 text-left">
+                                <b> Applied Start Date  :  {{Applied_Fromdate |date:dd/MM/yyyy}}</b>
+                            </div>
+                            <div class="col-sm-6 text-left">
+                                <b>  Applied End Date   : {{Applied_Todate|date:dd/MM/yyyy}}</b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row margin-top-10">
+                        <div class="col-sm-12">
+                            <div style="overflow:auto">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No.</th>
+                                            <th>Approved By</th>
+                                            <th>Approved Date</th>
+                                            <th>Approved Days</th>
+                                            <th>Approved From Date</th>
+                                            <th>Approved To Date</th>
+                                            <th>Status</th>
+                                            <th>Comment</th>
+                                            <th>Document</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="cmnt in commentlist">
+                                            <td>{{$index + 1}}</td>
+                                            <td class="text-left">{{cmnt.IVRMSTAUL_UserName	}}</td>
+                                            <td class="text-center">{{cmnt.createdDate | date:'dd/MM/yyyy'}}</td>
+                                            <td class="text-center">{{cmnt.HRELAPA_TotalDays}}</td>
+                                            <td class="text-center">{{cmnt.HRELAPA_FromDate	 | date:'dd/MM/yyyy'}}</td>
+                                            <td class="text-center">{{cmnt.HRELAPA_ToDate	 | date:'dd/MM/yyyy'}}</td>
+                                            <td class="text-left">{{cmnt.HRELAPA_LeaveStatus	}}</td>
+                                            <td class="text-left"> {{cmnt.HRELAPA_Remarks}}</td>
+                                            <td class="text-center">
+                                                <a href="javascript:void(0)" ng-if="Supporting_Document != null" ng-model="cmnt.HRELAP_SupportingDocument" ng-click="viewdocument(cmnt);" title="View Document"> <i class="fa fa-eye text-blue"></i></a><a href="javascript:void(0)" ng-if="Supporting_Document == null" ng-model="cmnt.HRELAP_SupportingDocument" ng- title="No Document"> <i class="fa fa-eye-slash text-red"></i></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!--CompOff/Onduty Leave Status View-->
+    <div id="CompofforOndutyView" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom">Leave Status</h4></center>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6 text-left">
+                                <b> Applied Start Date    {{Applied_Fromdate |date:dd/MM/yyyy}}</b>
+                            </div>
+                            <div class="col-sm-6 text-left">
+                                <b>  Applied End Date    {{Applied_Todate|date:dd/MM/yyyy}}</b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row margin-top-10">
+                        <div class="col-sm-12">
+                            <div style="overflow:auto">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No.</th>
+                                            <th>Approved By</th>
+                                            <th>Approved Date</th>
+                                            <th>Status</th>
+                                            <th>Comment</th>
+                                            <th>Document</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="cmnt in commentlist">
+                                            <td>{{$index + 1}}</td>
+                                            <td class="text-left">{{cmnt.hrmE_EmployeeFirstName}}</td>
+                                            <td class="text-center">{{cmnt.createdDate | date:'dd/MM/yyyy'}}</td>
+                                            <td class="text-left">{{cmnt.hrelapA_LeaveStatus}}</td>
+                                            <td class="text-left">{{cmnt.hrelapA_Remarks}}</td>
+                                            <td class="text-center">
+                                                <a href="javascript:void(0)" ng-if="Supporting_Document != null" ng-model="cmnt.HRELAP_SupportingDocument" ng-click="viewdocument(cmnt);" title="View Document"> <i class="fa fa-eye text-blue"></i></a><a href="javascript:void(0)" ng-if="Supporting_Document == null" ng-model="cmnt.HRELAP_SupportingDocument" ng- title="No Document"> <i class="fa fa-eye-slash text-red"></i></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <!--<div id="pdfId"></div>-->
+                <embed id="idpdf" ng-src="{{content}}" onload="refreshDialer();" style="width: 100%;" height="1000" />
+                <div class="modal-body" oncontextmenu="return false"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                            <!--ng-init="zoomWidth = 100;imgStyle = {width:'100px'}" ng-style="imgStyle"
+                            ng-mouse-wheel-up="zoomWidth = zoomWidth + 20; imgStyle.width = zoomWidth +'px'; "
+                            ng-mouse-wheel-down="zoomWidth = zoomWidth - 20;imgStyle.width = zoomWidth  +'px'; " />-->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-center">
+                        <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                        <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                    </div>
+                    <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="popup1" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Other Leave Apply Policy</h4>
+            </div>
+            <div class="modal-body" id="printDeviation">
+                <div class="box-body margin-top-10">
+                    <div class="col-sm-12">
+                        <div class="printmodal clearfix">
+                            <div class="col-sm-12 text-center" style="margin-top:25px!important;padding-bottom:25px!important">
+                                <h4>Other Leave Constraints  For Full Time Employee / Regular Employee</h4>
+                            </div>
+                            <hr />
+                            <div class="row" style="padding:20px;">
+                                <div class="row margin-bottom-10">
+                                    <table class="table table-hover table-responsive table-bordered table-width text-left">
+                                        <thead>
+                                            <tr>
+                                                <!--<th>SL:NO</th>-->
+                                                <th> Leave   Constraints</th>
+                                                <th> Criteria Of the Constraints  </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <!--<td>1</td>
+                                                <td>
+                                                    PL Encashment
+                                                </td>-->
+                                                <td></td>
+                                                <td>
+                                                    <p style="text-align:left">
+                                                        1. Sick leave and casual leave should not be applied together.<br />
+                                                        2. Emergancy and casual leave should not be applied together.<br />
+                                                        All leave can be Apply with Comp-off like:<br />
+                                                        1.  CL With Comp-off<br />
+                                                        2. EL With Comp-off<br />
+                                                        3. Sick With Comp-off<br />
+                                                        4. EL and Sick leave.<br />
+                                                        5. Casual leave  and PL Should not be applied same time or Continuous day.<br />
+                                                    </p>
+                                                </td>
+                                                <!--<tr>
+                                                    <td>2</td>
+                                                    <td>
+                                                        Reporting Date Not Present Constraints
+                                                    </td>
+                                                    <td>
+                                                        <p style="text-align:left">
+                                                            If Any Employee Will not come As per Reporting Date ,<br />
+                                                            In this condition 1 CL and PL  Leave will be Cancel For that perticular Month.<br />
+                                                        </p>
+                                                    </td>
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td>
+                                                        More than 2 CL Leave Constriants
+                                                    </td>
+                                                    <td>
+                                                        <p style="text-align:left">
+                                                            "We can't apply casual leave more than 2 Days.<br />
+                                                        </p>
+                                                    </td>
+                                                <tr>
+                                                    <td>4</td>
+                                                    <td>
+                                                        Prefix and Suffix Constraints
+                                                    </td>
+                                                    <td>
+                                                        <p style="text-align:left">
+                                                            If Any Employee take 2 day Continuous Leave Before/After of <br />
+                                                            Public Holiday then it will consider as prefix/suffix.(LOP)
+                                                        </p>
+                                                    </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Leave Apply Policy</h4>
+            </div>
+            <div class="modal-body" id="printDeviation">
+                <div class="box-body margin-top-10">
+                    <div class="col-sm-12">
+                        <div class="printmodal clearfix">
+                            <div class="col-sm-12 text-center" style="margin-top:25px!important;padding-bottom:25px!important">
+                                <h4> Leave Apply Policy For Full Time Employee / Regular Employee</h4>
+                            </div>
+                            <hr />
+                            <div class="row" style="padding:20px;">
+                                <div class="row margin-bottom-10">
+                                    <table class="table table-hover table-responsive table-bordered table-width text-center" id="modaltblr">
+                                        <tr>
+                                            <th colspan="6">
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#popup1" data-backdrop="static" ng-click="LeaveApplyPolicy11();"> <b> Other Important Leave Constraints </b></a>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="6">
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#popup2" data-backdrop="static" ng-click="LeaveApplyPolicy11();"> <b>  Leave Apply Policy For  Probationary Employee </b></a>
+                                            </th>
+                                        </tr>
+                                        <thead>
+                                            <tr>
+                                                <th>SL:NO</th>
+                                                <th>Leave Name</th>
+                                                <th>Leave Category </th>
+                                                <th>No. Of Leaves Credited </th>
+                                                <th>Leave Credit Criteria </th>
+                                                <th>Leave Apply  Constraints  </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in leaveview">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{user.hrmL_LeaveName}}</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">
+                                                    -
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">
+                                                    -
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">
+                                                    -
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">
+                                                    Medical emergency involving a family member<br />
+                                                    Unforeseen family crises such as serious accident<br />
+                                                    Bereavement or Funeral<br />
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">
+                                                    -
+                                                    <!--Personal Reason (attending a marriage, family function etc.)<br />-->
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">
+                                                    -
+                                                    <!--Critical Health-related issues<br />
+                                                    Personal Reason (attending a marriage, family function etc.)<br />
+                                                    Family Emergancy<br />-->
+                                                </td>
+                                                <!--<td>{{user.hrelS_CreditedLeaves}}</td>-->
+
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">3</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">2</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">2</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">working 20 Days = 1 CL</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">15</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">Autometically Credited</td>
+
+
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">Leave is  eligible to Credit  to All  Employee Once  Leave Year is Started.</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">Leave is eligible to Credit  to All  Employee Once  Leave Year is Started.</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">Leave is eligible to Credit  to All  Employee Once  Leave Year is Started.</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">
+                                                    Priviledge Leave is eligible to credit Employees whom all completed their 1 year period from their Joining Date.<br />
+                                                    It will be counted from Date of Joining.
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">
+                                                    1 CL Leave has to be credited, after working 20 days in a month.<br />
+                                                    It Should be credit once Attendance  Report will Generate.<br />
+                                                    It will be counted from Date of Joining.<br />
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">
+                                                    Leave will be credited For  Employee whom all work Extra hours in a Day .<br />
+                                                    Extra 3 Hours = 0.5 Day  , 5 Hours = 1 day (Leave credit)<br />
+                                                    If any Unauthorization Leave taken by Employee If they have Com-off leave Count So It will be Autometically Adjusted.<br />
+                                                </td>
+
+
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">
+                                                    <p style="text-align:left">
+                                                        1. We can Apply Sick leave next day  after taking leave.<br />
+                                                        2. We can Apply 2 Sick leave at one time.<br />
+                                                        3.  We can't apply 3 sick leave at one Time.<br />
+                                                        4.  Attachment is needed for Leave Apply.<br />
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">
+                                                    <p style="text-align:left">
+                                                        1. We can Apply Emergency leave after taking  Leave.<br />
+                                                        2. We can Apply 1 Emergency leave at 1 time.<br />
+                                                        3. We can not apply 2 emergency leave at one time.<br />
+                                                        4. We can only  apply Leave by selecting leave category with Attachment is mandatory here.<br />
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">
+                                                    <p style="text-align:left">
+                                                        1. We can Apply only 2 optional leave in a year.<br />
+                                                        2. We can Apply 1 optional leave at one time as per Optional Holiday.<br />
+                                                        3. We can apply optional leave only before days of optional leave.<br />
+                                                        4. We can not apply Optional leave after taking.<br />
+                                                        5. We can not select any day to apply  as a Optional Leave otherwise Pop-up will be display Like  "Selected Date is not Optional Holiday"<br />
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">
+                                                    <p style="text-align:left">
+                                                        1. We can Apply Casual leave before 3 days.<br />
+                                                        2. We can not apply Casual leave on same day or After taking leave.<br />
+                                                        3. We can apply maximum  2  Casual leave  in 1 month. (Constraints)<br />
+                                                        4.  Employee can not Apply Casual Leave If they have following criteria :<br />
+                                                        <span style="color:red">Daily Report not Sent , Deviation on Task , Weekly planner not created </span>
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">
+                                                    <p style="text-align:left">
+                                                        1. We can Apply Priviledge leave Before 10 days.<br />
+                                                        2.  We can not apply Priviledge leave more than 5 days in year.<br />
+                                                        3. Employee can apply minimum  3 PL  and  maximum 5 PL in a Year.<br />
+                                                        4. We can not apply Priviledge Leave after taking Leave , for some  emergancy  reason Employee can take Permission from Management.<br />
+                                                        5. Without selecting Leave category with proper Attachment Leave will be not Approved.<br />
+                                                        6. For Applying Priviledge Leave Adding Proxy and Attachment Option Need to select
+                                                        in order to  Assign Task to their  respective Proxy.<br />
+                                                        7.  Employee can not  Apply Priviledge Leave If they have following criteria :<br />
+                                                        <span style="color:red">
+                                                            DR Blocked , Daily Report not Sent , Deviation on Task , Weekly planner not created
+                                                            Having Nagetive Ratting  , Irregular Employee in Office (Attendance)
+                                                        </span>
+                                                        8. For Applying Privilege Leave Adding Proxy and Adding Attachment Option should be mandatory Task also we can select for that proxy , So that Employee  can give their Task/Work to their Proxy  While Applying Privilege Leave.
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">
+                                                    <p style="text-align:left">
+                                                        <span style="color:royalblue"><b> Updated Constraints</b></span><br />
+                                                        1. If any Employee work after 6.15 and their 3 extra hour they work , So once they send Daily report it should be go to department head for approval.<br />
+                                                        2. After Department head approval it will be go to Final level approval MD SIr , once get final level approval Comp-off has to credited .<br />
+                                                        3. If Department head [1st level]only reject comp-off request. Comp-off creation is cancel it will not go for 2nd level Approval.<br />
+
+                                                        <span style="color:royalblue"><b> Approval Constraints   </b></span><br />
+                                                        1. If any Employee Work any public holiday's or Sundays , they will get 1.5 Days comp-of.<br />
+                                                        <span style="color:red"> Note: For getting  1.5 comp-of for working on public holiday.  Employee should do  punch  and sending Daily report is mandatory .</span><br />
+                                                        2.   If any employee has  LOP due to reasons such as Daily Report Not Sent  , Late In, or Conference Call Not Attended,   if they having Comp Off balance, the LOP automatically adjusted with the available Comp Off.<span style="color:red">(In Week Days) </span><br />
+                                                        3. In cases If employee has taken any  Unauthorized Leave or an Early Out, those  LOP should not be auto-adjusted; instead, it should be apply and go for approval.<br />
+
+                                                    </p>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="proxydetails" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width:80%;" overflow:auto;">
+        <div class="modal-content" style="overflow:auto;">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h4 class="modal-title text-white">
+                    PROXY DETAILS
+                </h4>
+            </div>
+
+            <div class="box-body">
+
+                <!--<div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Employee Name : {{HRME_EmployeeFirstName}}</b></label>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Leave Reason : {{HRELAP_LeaveReason}}</b></label>
+                        </div>
+                        <div class="form-group">
+
+                            <label class="control-label col-sm-4 "><b>Applied Leave:</b> {{HRML_LeaveName}} , (<b>No Of Days:</b>{{HRELAP_TotalDays}})</label>
+
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b></b></label>
+
+                        </div>
+                    </div>
+                </div>-->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Proxy Name</th>
+                            <th>Designation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{$index + 1}}</td>
+                            <td class="text-left">{{ProxyName}}</td>
+                            <td class="text-center">{{HRMDES_DesignationName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-if="proxytaskListview.length>0">
+                <div class="col-sm-12">
+                    <div style="overflow:auto;width:100%;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No.</th>
+                                    <th>Task_No</th>
+                                    <th>Task Title</th>
+                                    <th>Assigned Date</th>
+                                    <th>Task Priority</th>
+                                    <th>Task Status </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--<tr ng-repeat="proxy in proxytaskList">-->
+                                <tr ng-repeat="proxy12 in proxytaskListview">
+                                    <td>{{$index + 1}}</td>
+                                    <td class="text-left">{{proxy12.Task_No}}</td>
+                                    <td class="text-left">{{proxy12.Task_Title}}</td>
+                                    <td class="text-center">{{proxy12.Assigned_Date | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">{{proxy12.Task_Priority}}</td>
+                                    <td class="text-left">{{proxy12.ISMTCR_Status}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="popup2" class="modal fade modal-medium" role="dialog" data-backdrop="static" style="overflow:auto;">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">VMS Leave Apply Policy For  Probationary Employee</h4>
+            </div>
+            <div class="modal-body" id="printDeviation">
+                <div class="box-body margin-top-10">
+                    <div class="col-sm-12">
+                        <div class="printmodal clearfix">
+                            <div class="col-sm-12 text-center" style="margin-top:25px!important;padding-bottom:25px!important">
+                                <h4>Leave Apply Policy For Probationary Employee </h4>
+                            </div>
+                            <hr />
+                            <div class="row" style="padding:20px;overflow:auto;">
+                                <div class="row margin-bottom-10">
+                                    <table class="table table-hover table-responsive table-bordered table-width text-left" id="modaltblr">
+                                        <thead>
+                                            <tr>
+                                                <th>SL:NO</th>
+                                                <th>Leave Name</th>
+                                                <th>Leave Category </th>
+                                                <th>No. Of Leaves Credited </th>
+                                                <th>Leave Credit Criteria </th>
+                                                <th>Leave Apply  Constraints  </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tbody>
+                                            <tr ng-repeat="user in leaveview">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{user.hrmL_LeaveName}}</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">
+                                                    -
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">
+                                                    -
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">
+                                                    -
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">
+                                                    Medical emergency involving a family member<br />
+                                                    Unforeseen family crises such as serious accident<br />
+                                                    Bereavement or Funeral<br />
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">
+                                                    -
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">
+                                                    -
+                                                </td>
+
+
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">3</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">2</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">2</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">working 20 Days = 1 CL</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">15</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">Autometically Credited</td>
+
+
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">Leave is  eligible to Credit  to All  Employee Once  Leave Year is Started.</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">Leave is eligible to Credit  to All  Employee Once  Leave Year is Started.</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">Leave is eligible to Credit  to All  Employee Once  Leave Year is Started.</td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">
+                                                    Priviledge Leave is eligible to credit Employees whom all completed their 1 year period from their Joining Date.<br />
+                                                    It will be counted from Date of Joining.
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">
+                                                    1 CL Leave has to be credited, after working 20 days in a month.<br />
+                                                    It Should be credit once Attendance  Report will Generate.<br />
+                                                    It will be counted from Date of Joining.<br />
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">
+                                                    Leave will be credited For  Employee whom all work Extra hours in a Day .<br />
+                                                    Extra 3 Hours = 0.5 Day  , 5 Hours = 1 day (Leave credit)<br />
+                                                    If any Unauthorization Leave taken by Employee If they have Com-off leave Count So It will be Autometically Adjusted.<br />
+                                                </td>
+
+
+                                                <td ng-if="user.hrmL_LeaveCode=='SL'">
+                                                    <p style="text-align:left">
+                                                        1. Probation period employee can take 2 Sick leave within probation period.but presciption is mandate for approval . <br />
+                                                        Few Apply criteria is given below.<br />
+                                                        2. We can Apply Sick leave next day  after taking leave<br />
+                                                        3. We can Apply 2 Sick leave at one time<br />
+                                                        4.  We can't apply 3 sick leave at one Time.<br />
+                                                        5.  Attachment is needed for Leave Apply<br />
+
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='EL'">
+                                                    <p style="text-align:left">
+                                                        1. Probation period  employee  can Apply 1  Emergency leave within probation with proper reason and attachment .<br />  Few Apply criteria is given below.<br />
+                                                        2. We can Apply 1 Emergency leave at 1 time.<br />
+                                                        3. We can not apply 2 emergency leave at one time<br />
+                                                        4. We can only  apply Leave by selecting leave category with Attachment is mandatory here .<br />
+
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='OL'">
+                                                    <p style="text-align:left">
+                                                        1. Probation period employee can Apply only 1 optional leave within probation period.<br /> Few Apply criteria is given below.<br />
+                                                        2. We can Apply 1 optional leave at one time as per Optional Holiday.<br />
+                                                        3. We can apply optional leave only before days of optional leave.<br />
+                                                        4. We can not apply Optional leave after taking.<br />
+                                                        5. We can not select any day to apply  as a Optional Leave otherwise Pop-up will be display Like  "Selected Date is not Optional Holiday"<br />
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='CL'">
+                                                    <p style="text-align:left">
+                                                        1. Probation period employee can apply 4 CL Within Probationary .<br />
+                                                        2. Probationary employee can apply 1 CL In 1 month If they Have casual balance<br />
+                                                        3. We can Apply Casual leave before 3 days.<br />
+                                                        4. We can not apply Casual leave on same day or After taking leave.<br />
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='PL'">
+                                                    <p style="text-align:left">
+                                                        Priviledge Leave is not Applicable for Probasionary Employee or who not completed their 1 year.<br />
+                                                        1. We can Apply Priviledge leave Before 10 days.<br />
+                                                        2.  We can not apply Priviledge leave more than 5 days in year.<br />
+                                                        3. Employee can apply minimum  4 PL  and  maximum 5 PL in a Year.<br />
+                                                        4. We can not apply Priviledge Leave after taking Leave , for some  emergancy  reason Emp. can take Permission from Management.<br />
+                                                        5. Without selecting Leave category with proper Attachment Leave will be not Approved.<br />
+                                                        6. For Applying Priviledge Leave Adding Proxy and Attachment Option Need to select  in order to  Assign Task to their  respective Proxy.<br />
+                                                        7.  Employee can not  Apply Priviledge Leave If they have following criteria :<br />
+                                                        <span style="color:red">
+                                                            DR Blocked , Daily Report not Sent , Deviation on Task ,
+                                                            Having Nagetive Ratting  , Irregular Employee in Office (Attendance)
+                                                        </span>
+                                                    </p>
+                                                </td>
+                                                <td ng-if="user.hrmL_LeaveCode=='COMPOFF'">
+                                                    <p style="text-align:left">
+                                                        <span style="color:blue"><b> Updated Constraints</b></span><br />
+                                                        1. If any Employee work after 6.15 and their 3 extra hour they work , So once they send Daily report it should be go to department head for approval.<br />
+                                                        2. After Department head approval it will be go to Final level approval MD SIr , once get final level approval Comp-off has to credited .<br />
+                                                        3. If Department head [1st level]only reject comp-off request. Comp-off creation is cancel it will not go for 2nd level Approval.<br />
+
+                                                        <span style="color:blue"><b>   Approval Constraints  </b></span><br />
+                                                        1. If any Employee Work any public holiday's or Sundays , they will get 1.5 Days comp-of.<br />
+                                                        Note: For getting  1.5 comp-of for working on public holiday.  Employee should do  punch  and sending Daily report is mandatory .<br />
+                                                        2.   If any employee has  LOP due to reasons such as Daily Report Not Sent  , Late In, or Conference Call Not Attended,   if they having Comp Off balance, the LOP automatically adjusted with the available Comp Off.<span style="color:red"> (In Week Days)</span><br />
+                                                        3. In cases If employee has taken any  Unauthorized Leave or an Early Out, those  LOP should not be auto-adjusted; instead, it should be apply and go for approval.<br />
+                                                    </p>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="popup11134" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times text-white"
+                       aria-hidden="true" ng-click="closemodal()"></i>
+                </button>
+                <h4 class="modal-title text-white">
+                    Re-Consideration Leave Apply
+                </h4>
+            </div>
+            <div class="modal-body">
+                <from class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" method="post" novalidate>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="row" ng-show="rejectedleaves.length>0">
+                                <div class="col-sm-12">
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a href="">SL.NO</a>
+                                                </th>
+                                                <th class="hdTH">
+                                                    <label>
+                                                        <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </th>
+                                                <th style="width:20%"><a href="" ng-click="sort('hrmL_LeaveName')">LEAVE NAME</a></th>
+                                                <th style="width:30%"><a href="" ng-click="sort('hrelaP_LeaveReason')">LEAVE REASON</a></th>
+                                                <th style="width:15%"><a href="" ng-click="sort('hrelaP_FromDate')">From Date</a></th>
+                                                <th style="width:15%"><a href="" ng-click="sort('hrelaP_ToDate')">To Date</a></th>
+                                                <th style="width:10%"><a href="" ng-click="sort('hreltD_TotDays')">NO. OF DAYS</a></th>
+                                                <th style="width:10%"><a href="" ng-click="sort('hrelaP_ApplicationStatus')">STATUS</a></th>
+                                                <th style="width:10%"><a href="" ng-click="sort('RcRemark')">REMARK</a></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="rcuser in rejectedleaves">
+                                                <td class="handle">{{$index+1}}</td>
+                                                <td class="text-center  hdTD">
+                                                    <label>
+                                                        <input type="checkbox" ng-model="rcuser.selected" value="{{rcuser.HRELAP_Id}}" ng-change="optionToggled1(rcuser)">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <!--<td hidden>{{ rcuser.HRELAP_Id}}</td>
+                                                <td>{{rcuser.HRML_LeaveName}}</td>
+                                                <td>{{rcuser.HRELAP_LeaveReason}}</td>
+                                                <td>{{rcuser.HRERLAP_FromDate | date:'dd/MM/yyyy'}}</td>
+                                                <td>{{rcuser.HRERLAP_ToDate | date:'dd/MM/yyyy'}}</td>
+                                                <td>{{rcuser.HRELAP_TotalDays}}</td>
+                                                <td class="text-left" style="word-wrap:break-word">{{rcuser.hrelaP_ApplicationStatus }}</td>-->
+                                                <td hidden>{{ rcuser.HRELAP_Id}}</td>
+                                                <td>{{rcuser.hrmL_LeaveName}}</td>
+                                                <td>{{rcuser.hrelaP_LeaveReason}}</td>
+                                                <td>{{rcuser.hrelaP_FromDate | date:'dd/MM/yyyy'}}</td>
+                                                <td>{{rcuser.hrelaP_ToDate | date:'dd/MM/yyyy'}}</td>
+                                                <td>{{rcuser.hreltD_TotDays}}</td>
+                                                <td class="text-left" style="word-wrap:break-word">{{rcuser.hrelaP_ApplicationStatus }}</td>
+                                                <td>
+                                                    <textarea type="text" name="Remark" class="form-control active"
+                                                              ng-model="rcuser.RcRemark" placeholder="Remark" required></textarea>
+                                                    <div class="error-messages" ng-if="interacted1(myForm1.Remark)" ng-messages="myForm1.Remark.$error">
+                                                        <div ng-message="required">This field is required.</div>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="text-center" ng-show="rejectedleaves.length > 0">
+                            <!--&& countrecon<=2-->
+                            <md-button type="button" class="md-raised md-accent" ng-click="ReconsiderationSave(rcuser)">
+                                save
+                            </md-button>
+                            <!--<md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                            </md-button>-->
+                            <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                        <div class="box-body" ng-show="rejectedleaves.length==0">
+                            <div class="text-center"><b style="color:red">LEAVE ARE NOT AVAILABLE</b></div>
+                        </div>
+                    </div>
+
+                </from>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"
+                        ng-click="closemodal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

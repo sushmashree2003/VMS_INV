@@ -1,0 +1,2100 @@
+﻿<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<link href="/css/MultselectCheckbx.css" rel="stylesheet" />
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<style>
+    .cretaed {
+        background: white;
+        border-radius: 4px;
+        color: black;
+        cursor: initial;
+        display: inline-block;
+        margin: 5px 10px 5px 0;
+        padding: 3px 7px;
+        border: 1px solid #5e6264;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Inter-Departmental Issue's Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12 text-bold well">
+                    <div class="form-group col-sm-6">
+                        <label class="control-label col-sm-4" style="font-weight:bold">From Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="start_Date" ng-disabled="plannerflg" ng-change="Clearondate()" name="startdate" id="date1" md-placeholder="Created date" md-max-date="end_Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select From Date</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label class="control-label col-sm-4" style="font-weight:bold">To Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="end_Date" name="endate" ng-change="Clearondate()" ng-disabled="plannerflg" md-min-date="start_Date" md-placeholder="Created Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select To Date</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row center">
+                    <div class="col-sm-10 text-center well">
+                        <div class="form-group text-bold col-sm-12">
+                            <div ng-init="reporttype='C'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="C" name="all" ng-model="reporttype">
+                                    <span class="lbl padding-8" style="font-weight:bold"> Consolidated Count</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="I" name="ten" ng-model="reporttype">
+                                    <span class="lbl padding-8" style="font-weight:bold"> InterDepartment Issues </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="E" name="ten" ng-model="reporttype">
+                                    <span class="lbl padding-8" style="font-weight:bold"> Employeewise Issues </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="O" name="ten" ng-model="reporttype">
+                                    <span class="lbl padding-8" style="font-weight:bold"> OverAll Individual </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="A" name="ten" ng-model="reporttype">
+                                    <span class="lbl padding-8" style="font-weight:bold"> OverAll All Dep.T </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div ng-show="reporttype=='E' || reporttype=='O'" class="col-sm-8 col-sm-offset-3">
+                            <div class="form-group col-sm-8">
+                                <label class="control-label col-sm-4"><b>Department</b>:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="stdnamere" ng-model="$parent.Dept" theme="bootstrap" title=" Select Department" ng-required="reporttype=='E'" ng-change="clearonchange()">
+                                        <ui-select-match ng-trim="false" style="outline: 0;font-weight: 700 !important;" placeholder="Select/Search Department">{{$select.selected.hrmD_DepartmentName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in get_department | filter: $select.search" value="{{name.hrmD_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.hrmD_DepartmentName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stdnamere)" ng-messages="myForm.stdnamere.$error">
+                                        <div ng-message="required"> Select Department</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getinterdepartmentreport()">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Get Report
+                </md-button>
+                <md-button ng-if="reporttype=='A'" type="submit" class="md-raised md-primary" id="save-btn" ng-click="SendEmail()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                   Send Email
+                </md-button>
+                <md-button ng-if="consolidatedissues.length>0 || interdeprtissuefilter.length>0 || departmentempissues.length>0 || overallempissues.length>0 || alldepartmentoverallpercentage.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button ng-show="consolidatedissues.length>0 || interdeprtissuefilter.length>0 || departmentempissues.length>0 || overallempissues.length>0 || alldepartmentoverallpercentage.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printDeviation')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="consolidatedissues.length>0 && reporttype=='C'" id="printDeviation">
+        <div class="box-header with-border">
+            <h3 class="box-title">Inter-Departmental-Consolidated Issue's Count-{{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}}</h3>
+        </div>
+        <div id="scrollid">
+            <div class="box-body">
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th><b>SL.No.</b></th>
+                            <th>Department Name</th>
+                            <th>Open</th>
+                            <th>InterMediate</th>
+                            <th>Pending</th>
+                            <th>Close</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in consolidatedissues | orderBy:'-PendingCount'">
+                        <tr>
+                            <td class="text-center" style="text-align:center">{{$index+1}}</td>
+                            <td class="text-left">{{user.CreatedOnDepartment}}</td>
+                            <td style="text-align:center" ng-click="departmenttasklist(user.AssgToDeptId,'Open',user.CreatedOnDepartment)">
+                                <b>{{user.OpenCount}}</b>
+                            </td>
+                            <td style="text-align:center" ng-click="departmenttasklist(user.AssgToDeptId,'InterMediate',user.CreatedOnDepartment)">
+                                <b>{{user.Intermediate}}</b>
+                            </td>
+                            <td style="text-align:center" ng-click="departmenttasklist(user.AssgToDeptId,'Pending',user.CreatedOnDepartment)">
+                                <b>{{user.PendingCount}}</b>
+                            </td>
+                            <td style="text-align:center" ng-click="departmenttasklist(user.AssgToDeptId,'Close',user.CreatedOnDepartment)">
+                                <b>{{user.CloseCount}}</b>
+                            </td>
+                            <td style="text-align:center" ng-click="departmenttasklist(user.AssgToDeptId,'Total',user.CreatedOnDepartment)">
+                                <b>{{user.PendingCount+user.CloseCount}}</b>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-if="interdeprtissuefilter.length>0 && reporttype=='I'" id="printDeviation">
+        <div class="box-header with-border text-center">
+            <h3 class="box-title">Inter-Departmental Issue's Report - {{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}}</h3>
+        </div>
+        <div id="scrollid">
+            <div class="box-body" ng-repeat="user in interdeprtissuefilter track by $index">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <h4><span style="font-size:16px">{{$index+1}}) {{user.name}} department on other department</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table" style="border:0.5px solid black">
+                    <thead>
+                        <tr>
+                            <th style="border:0.5px solid black" width="40%">Department Name</th>
+                            <th style="border:0.5px solid black">Open</th>
+                            <th style="border:0.5px solid black">InterMediate</th>
+                            <th style="border:0.5px solid black">Pending</th>
+                            <th style="border:0.5px solid black">Close</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="issues in interDepartmentissues" ng-if="issues.CreatedDeptId==user.id">
+                        <tr>
+                            <td class="text-left" style="text-align:left;border:0.5px solid black;font-weight:bold">{{issues.CreatedOnDepartment}}</td>
+                            <td class="text-center" style="text-align:center;border:0.5px solid black;font-weight:bold" ng-click="interdepartmenttasklist(user.id,'Open',user.name,issues.AssgToDeptId,issues.CreatedOnDepartment)">{{issues.OpenCount}}</td>
+                            <td class="text-center" style="text-align:center;border:0.5px solid black;font-weight:bold" ng-click="interdepartmenttasklist(user.id,'InterMediate',user.name,issues.AssgToDeptId,issues.CreatedOnDepartment)">{{issues.Intermediate}}</td>
+                            <td class="text-center" style="text-align:center;border:0.5px solid black;font-weight:bold" ng-click="interdepartmenttasklist(user.id,'Pending',user.name,issues.AssgToDeptId,issues.CreatedOnDepartment)">{{issues.PendingCount}}</td>
+                            <td class="text-center" style="text-align:center;border:0.5px solid black;font-weight:bold" ng-click="interdepartmenttasklist(user.id,'Close',user.name,issues.AssgToDeptId,issues.CreatedOnDepartment)">{{issues.CloseCount}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-if="departmentempissues.length>0 && reporttype=='E'" id="printDeviation">
+        <div class="box-header with-border text-center">
+            <h3 class="box-title">Inter-Departmental Employee-Wise Issue's Report</h3>
+        </div>
+        <div id="scrollid">
+            <div class="box-body" style="overflow:auto">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <div class="form-group">
+                            <h4><span style="font-size:16px">{{departmentname}} department - {{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}}</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">SL.No.</th>
+                            <th rowspan="2" colspan="4">Employee Name</th>
+                            <th rowspan="2" colspan="4" ng-if="$parent.Dept.hrmD_Id==0">Department</th>
+                            <th rowspan="2" ng-click="totemppening(1)">Pending <br /><b>{{totinterdeppending}}</b> </th>
+                            <th rowspan="2" ng-click="totemppclose(1)">Close <br /><b>{{totinterdepclose}}</b></th>
+                            <th rowspan="2" ng-click="totemptotal(1)">Total <br /><b>{{totinterdeptot}}</b></th>
+                            <th ng-repeat="status in statusfilteredlist">
+                                <span ng-click="onclickstatus(status.status)">{{status.status}} ({{status.count}})</span>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th ng-repeat="status in statusfilteredlist">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th ng-repeat="priority in priorityfilteredlist">{{priority}}</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="issues in statuswiseemployees | orderBy:'-pendingcount'">
+                        <tr>
+                            <td style="text-align:center">{{$index+1}}</td>
+                            <td style="text-align:left" colspan="4">{{issues.name}}</td>
+                            <td style="text-align:left" colspan="4" ng-if="$parent.Dept.hrmD_Id==0">{{issues.department}}</td>
+                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emppening(issues.empid,issues.departid,1)">{{issues.pendingcount}}</b></td>
+                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emppclose(issues.empid,issues.departid,1)">{{issues.closecount}}</b></td>
+                            <td style="text-align:center"><b style="font-size: 16px !important;" ng-click="emptotal(issues.empid,issues.departid,1)">{{issues.count}}</b></td>
+                            <td ng-repeat="status in statusfilteredlist">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center" ng-repeat="priority in priorityfilteredlist" width="50px" height="35px">
+                                                <span ng-repeat="sub in issues.subarray" ng-if="sub.priority==priority && sub.status==status.status">
+                                                    <b ng-model="sub.hrme_id" ng-click="oncountclick(sub.hrme_id,sub.priority,sub.status,sub.departid)" style="font-size: 16px !important;cursor: pointer;">{{sub.rcount}}</b>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-if="ovrallissuecountempwise.length>0 && reporttype=='O'" id="printDeviation">
+        <div class="box-header with-border text-center">
+            <h3 class="box-title">Department Employee-Wise Overall Issue's Report</h3>
+        </div>
+        <div id="scrollid">
+            <div class="box-body" style="overflow:auto;overflow-x: hidden;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <div class="form-group">
+                            <h4><span style="font-size:16px">{{departmentname}} department - {{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}}</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label style="font-size:medium">
+                            <b>
+                                NOTE: a)<span style="color:red">Red</span> number indicates open tasks count in pending tasks.<br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   b)<span style="color:blue">Blue (C)</span> number indicates completed tasks but not closed by creator in pending tasks.
+                            </b>
+                        </label>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">SL.No.</th>
+                            <th rowspan="2" colspan="4">Employee Name</th>
+                            <th>Inter-Departmental Issues</th>
+                            <th>Department Issues</th>
+                            <th>OverAll Issues</th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="60px">Pending</th>
+                                            <th width="60px">Close</th>
+                                            <th width="60px">Total</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
+                            <th>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="60px">Pending</th>
+                                            <th width="60px">Close</th>
+                                            <th width="60px">Total</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
+                            <th>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="60px">Pending</th>
+                                            <th width="60px">Close</th>
+                                            <th width="60px">Total</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center" colspan="5"><b>Total</b></td>
+                            <td style="text-align:center">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px" height="35px" ng-click="totemppening(1)">
+                                                <b>{{totinterdeppending}}</b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemppclose(1)">
+                                                <b>{{totinterdepclose}}</b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemptotal(1)">
+                                                <b>{{totinterdeptot}}</b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </td>
+                            <td style="text-align:center">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px" height="35px" ng-click="totemppening(2)">
+                                                <b>{{totdeppending}}</b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemppclose(2)">
+                                                <b>{{totdepclose}}</b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemptotal(2)">
+                                                <b>{{totdeptot}}</b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </td>
+                            <td style="text-align:center">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px" height="35px" ng-click="totemppening(3)">
+                                                <b>{{totpending}}</b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemppclose(3)">
+                                                <b>{{totclose}}</b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemptotal(3)">
+                                                <b>{{total}}</b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center" colspan="5"><b>Total %</b></td>
+                            <td style="text-align:center">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px" height="35px" ng-click="totemppening(1)">
+                                                <b><span style="color: yellow;font-weight: 600;font-size: 16px;">{{(totinterdeppending/totinterdeptot)*100 | number:2 }}%</span> </b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemppclose(1)">
+                                                <b><span style="color: #8fef30;font-weight: 600;font-size: 16px;">{{(totinterdepclose/totinterdeptot)*100 | number:2 }}%</span> </b>
+                                            </th>
+                                            <th width="50px" height="35px" style="width: 33%;">
+                                                <b>--</b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </td>
+                            <td style="text-align:center">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px" height="35px" ng-click="totemppening(2)">
+                                                <b><span style="color: yellow;font-weight: 600;font-size: 16px;">{{(totdeppending/totdeptot)*100 | number:2 }}%</span> </b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemppclose(2)">
+                                                <b><span style="color: #8fef30;font-weight: 600;font-size: 16px;">{{(totdepclose/totdeptot)*100 | number:2 }}%</span> </b>
+                                            </th>
+                                            <th width="50px" height="35px" style="width: 33%;">
+                                                <b>--</b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </td>
+                            <td style="text-align:center">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px" height="35px" ng-click="totemppening(3)">
+                                                <b><span style="color: yellow;font-weight: 600;font-size: 16px;">{{(totpending/total)*100 | number:2 }}%</span> </b>
+                                            </th>
+                                            <th width="50px" height="35px" ng-click="totemppclose(3)">
+                                                <b><span style="color: #8fef30;font-weight: 600;font-size: 16px;">{{(totclose/total)*100 | number:2 }}%</span> </b>
+                                            </th>
+                                            <th width="50px" height="35px" style="width: 33%;">
+                                                <b>--</b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="issues in ovrallissuecountempwise | orderBy:'-(ipending+dpending)' | filter : {'name' : '!NotAssigned'}">
+                        <tr>
+                            <td style="text-align:center">{{$index+1}}</td>
+                            <td class="text-left" colspan="4">{{issues.name}}</td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppening(issues.hrme_id,issues.departid,1)">
+                                                <b ng-if="issues.ipending>0">
+                                                    <span ng-if="issues.iopen>0">
+                                                        {{issues.ipending}} <span style="color:red;">({{issues.iopen}})</span>
+                                                    </span>
+                                                    <span ng-if="issues.iopen==0" style="color:blue;">{{issues.ipending}} (C)</span>
+                                                </b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppclose(issues.hrme_id,issues.departid,1)">
+                                                <b ng-if="issues.iclose>0">{{issues.iclose}}</b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emptotal(issues.hrme_id,issues.departid,1)">
+                                                <b ng-if="issues.itotal>0">{{issues.itotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppening(issues.hrme_id,issues.departid,2)">
+                                                <b ng-if="issues.dpending>0">
+                                                    <span ng-if="issues.dopen>0">{{issues.dpending}} <span style="color:red;">({{issues.dopen}})</span> </span>
+                                                    <span ng-if="issues.dopen==0" style="color:blue;">{{issues.dpending}} (C)</span>
+                                                </b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppclose(issues.hrme_id,issues.departid,2)">
+                                                <b ng-if="issues.dclose>0">{{issues.dclose}}</b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emptotal(issues.hrme_id,issues.departid,2)">
+                                                <b ng-if="issues.dtotal>0">{{issues.dtotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppening(issues.hrme_id,issues.departid,3)">
+                                                <b ng-if="issues.ipending+issues.dpending>0">
+                                                    <span ng-if="issues.dopen>0 || issues.iopen>0">{{issues.ipending+issues.dpending}} <span style="color:red;">({{issues.dopen+issues.iopen}})</span></span>
+                                                    <span ng-if="issues.dopen==0 && issues.iopen==0" style="color:blue;">{{issues.ipending+issues.dpending}} (C)</span>
+                                                </b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppclose(issues.hrme_id,issues.departid,3)">
+                                                <b ng-if="issues.iclose+issues.dclose>0">{{issues.iclose+issues.dclose}}</b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emptotal(issues.hrme_id,issues.departid,3)">
+                                                <b ng-if="issues.itotal+issues.dtotal>0">{{issues.itotal+issues.dtotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody ng-repeat="issues in ovrallissuecountempwise | orderBy:'-(ipending+dpending)'" ng-if="issues.name=='NotAssigned'">
+                        <tr>
+                            <td class="text-center" style="text-align:center" colspan="5"><b>{{issues.name}}</b></td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppening(issues.hrme_id,issues.departid,1)">
+                                                <b ng-if="issues.ipending>0">
+                                                    <span ng-if="issues.iopen>0">
+                                                        {{issues.ipending}} <span style="color:red;">({{issues.iopen}})</span>
+                                                    </span>
+                                                    <span ng-if="issues.iopen==0" style="color:blue;">{{issues.ipending}} (C)</span>
+                                                </b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppclose(issues.hrme_id,issues.departid,1)">
+                                                <b ng-if="issues.iclose>0">{{issues.iclose}}</b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emptotal(issues.hrme_id,issues.departid,1)">
+                                                <b ng-if="issues.itotal>0">{{issues.itotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppening(issues.hrme_id,issues.departid,2)">
+                                                <b ng-if="issues.dpending>0">
+                                                    <span ng-if="issues.dopen>0">{{issues.dpending}} <span style="color:red;">({{issues.dopen}})</span> </span>
+                                                    <span ng-if="issues.dopen==0" style="color:blue;">{{issues.dpending}} (C)</span>
+                                                </b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppclose(issues.hrme_id,issues.departid,2)">
+                                                <b ng-if="issues.dclose>0">{{issues.dclose}}</b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emptotal(issues.hrme_id,issues.departid,2)">
+                                                <b ng-if="issues.dtotal>0">{{issues.dtotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppening(issues.hrme_id,issues.departid,3)">
+                                                <b ng-if="issues.ipending+issues.dpending>0">
+                                                    <span ng-if="issues.dopen>0 || issues.iopen>0">{{issues.ipending+issues.dpending}} <span style="color:red;">({{issues.dopen+issues.iopen}})</span></span>
+                                                    <span ng-if="issues.dopen==0 && issues.iopen==0" style="color:blue;">{{issues.ipending+issues.dpending}} (C)</span>
+                                                </b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emppclose(issues.hrme_id,issues.departid,3)">
+                                                <b ng-if="issues.iclose+issues.dclose>0">{{issues.iclose+issues.dclose}}</b>
+                                            </td>
+                                            <td style="text-align:center" width="50px" height="35px" ng-click="emptotal(issues.hrme_id,issues.departid,3)">
+                                                <b ng-if="issues.itotal+issues.dtotal>0">{{issues.itotal+issues.dtotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-if="alldepartmentoverallpercentage.length>0 && reporttype=='A'" id="printDeviation">
+        <div class="box-header with-border text-center">
+            <h3 class="box-title">Overall Department Issue's Report</h3>
+        </div>
+        <div id="scrollid">
+            <div class="box-body" style="overflow:auto;overflow-x: hidden;">
+                <div class="row">
+                    <div class="col-sm-12 text-center box-header with-border">
+                        <div class="form-group">
+                            <h4><span style="font-size:16px;">All department - {{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}}</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body box-header with-border" ng-repeat="user in alldepartmentoverallpercentage | orderBy:'-pending'" style="margin-bottom: 10px;">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <h4><span style="font-size:16px;color: black;margin-left: 5px;">{{$index+1}}) {{user.name}} department</span></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered" id="table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2"><i class="fa fa-eye" style="color:white;font-weight: bold;font-size: medium;" title="View Count-Wise" ng-click="filterfromall(user.departid)"> View in Detail</i></th>
+                                <th>Inter-Departmental Issues</th>
+                                <th>Department Issues</th>
+                                <th>OverAll Issues</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <thead>
+                                            <tr>
+                                                <th width="60px">Pending</th>
+                                                <th width="60px">Close</th>
+                                                <th width="60px">Total</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </th>
+                                <th>
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <thead>
+                                            <tr>
+                                                <th width="60px">Pending</th>
+                                                <th width="60px">Close</th>
+                                                <th width="60px">Total</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </th>
+                                <th>
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <thead>
+                                            <tr>
+                                                <th width="60px">Pending</th>
+                                                <th width="60px">Close</th>
+                                                <th width="60px">Total</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </th>
+                            </tr>
+                            <tr style="text-align:center !important;color: black;background: white;">
+                                <td><b>Total</b></td>
+                                <td>
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <tbody>
+                                            <tr style="text-align:center !important;">
+                                                <td width="50px" height="35px" ng-click="totemppening(1,user.departid,user.name)">
+                                                    <b>{{user.ipending}}</b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemppclose(1,user.departid,user.name)">
+                                                    <b>{{user.iclose}}</b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemptotal(1,user.departid,user.name)">
+                                                    <b>{{user.itotal}}</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="text-align:center !important;color: black;">
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <tbody>
+                                            <tr style="text-align:center !important;">
+                                                <td width="50px" height="35px" ng-click="totemppening(2,user.departid,user.name)">
+                                                    <b>{{user.dpending}}</b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemppclose(2,user.departid,user.name)">
+                                                    <b>{{user.dclose}}</b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemptotal(2,user.departid,user.name)">
+                                                    <b>{{user.dtotal}}</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="text-align:center !important;color: black;">
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <tbody>
+                                            <tr style="text-align:center !important;">
+                                                <td width="50px" height="35px" ng-click="totemppening(3,user.departid,user.name)">
+                                                    <b>{{user.pending}}</b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemppclose(3,user.departid,user.name)">
+                                                    <b>{{user.close}}</b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemptotal(3,user.departid,user.name)">
+                                                    <b>{{user.total}}</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr style="text-align:center !important;color: black;background: white;">
+                                <td><b>Total %</b></td>
+                                <td>
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <tbody>
+                                            <tr style="text-align:center !important;">
+                                                <td width="50px" height="35px" ng-click="totemppening(1,user.departid,user.name)">
+                                                    <b>
+                                                        <span ng-if="user.itotal>0" style="color: blue;font-weight: 600;font-size: 16px;">{{(user.ipending/user.itotal)*100 | number:2 }}%</span>
+                                                        <span ng-if="user.itotal==0">--</span>
+                                                    </b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemppclose(1,user.departid,user.name)">
+                                                    <b>
+                                                        <span ng-if="user.itotal>0" style="color: green;font-weight: 600;font-size: 16px;">{{(user.iclose/user.itotal)*100 | number:2 }}%</span>
+                                                        <span ng-if="user.itotal==0">--</span>
+                                                    </b>
+                                                </td>
+                                                <td width="50px" height="35px" style="width: 33%;color:black">
+                                                    <b>--</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="text-align:center !important">
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <tbody>
+                                            <tr style="text-align:center !important;">
+                                                <td width="50px" height="35px" ng-click="totemppening(2,user.departid,user.name)">
+                                                    <b>
+                                                        <span ng-if="user.dtotal>0" style="color: blue;font-weight: 600;font-size: 16px;">{{(user.dpending/user.dtotal)*100 | number:2 }}%</span>
+                                                        <span ng-if="user.dtotal==0">--</span>
+                                                    </b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemppclose(2,user.departid,user.name)">
+                                                    <b>
+                                                        <span ng-if="user.dtotal>0" style="color: green;font-weight: 600;font-size: 16px;">{{(user.dclose/user.dtotal)*100 | number:2 }}%</span>
+                                                        <span ng-if="user.dtotal==0">--</span>
+                                                    </b>
+                                                </td>
+                                                <td width="50px" height="35px" style="width: 33%;color:black">
+                                                    <b>--</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="text-align:center !important">
+                                    <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                        <tbody>
+                                            <tr style="text-align:center !important;">
+                                                <td width="50px" height="35px" ng-click="totemppening(3,user.departid,user.name)">
+                                                    <b>
+                                                        <span ng-if="user.total>0" style="color: blue;font-weight: 600;font-size: 16px;">{{(user.pending/user.total)*100 | number:2 }}%</span>
+                                                        <span ng-if="user.total==0">--</span>
+                                                    </b>
+                                                </td>
+                                                <td width="50px" height="35px" ng-click="totemppclose(3,user.departid,user.name)">
+                                                    <b>
+                                                        <span style="color: green;font-weight: 600;font-size: 16px;">{{(user.close/user.total)*100 | number:2 }}%</span>
+                                                        <span ng-if="user.total==0">--</span>
+                                                    </b>
+                                                </td>
+                                                <td width="50px" height="35px" style="width: 33%;color:black">
+                                                    <b>--</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+<!--==================== Tasklist Model ===========================-->
+<div id="myModalPreview" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 90%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4 class="text-center">
+                            <span ng-if="reporttype=='I'">{{todepartview}} Department >></span>
+                            <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                            <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                            <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-9 text-left">
+                        <h4>
+                            <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span><span class="pull-right" style="color:forestgreen;font-size: large;font-weight: bold;font-family: 'Font Awesome 5 Free';">
+                                Total Count:{{modaltasklist.length}}
+                            </span>
+                        </h4>
+                    </div>
+                    <div class="col-sm-3 pull-right">
+                        <md-button ng-show="modaltasklist.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcelmodal('#table1')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            <i class="fa fa-backward" aria-hidden="true"> Close</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4 pull-left">
+                                <span style="color:forestgreen;font-size: large;font-weight: bold;font-family: 'Glyphicons Halflings';" ng-if="(searchValuecol.ISMTCR_Status!=null && searchValuecol.ISMTCR_Status!='')||(searchValuecol.Priority!=null && searchValuecol.Priority!='') || (searchValuecol.Createdby!=null && searchValuecol.Createdby!='') || (searchValuecol.AssignedBy!=null && searchValuecol.AssignedBy!='') || (searchValuecol.AssignedTo!=null && searchValuecol.AssignedTo!='') || (searchValueall!=null && searchValueall!='')">
+                                    Filtered Rows: {{filterValue.length}}/{{modaltasklist.length}}
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span>
+                                    <i class="fa fa-eye" style="color:#0094ff;font-weight: bold;font-size: medium;" title="View Count-Wise" ng-click="modalcount()"> View All Counts</i>
+                                </span>
+                            </div>
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon" ng-click="clearindfltr(6)" ng-if="searchValueall!='' && searchValueall!=undefined">
+                                            <i class="fas fa-broom"></i>
+                                        </span>
+                                        <span class="input-group-addon" ng-click="clearindfltr(6)" ng-if="searchValueall=='' || searchValueall==undefined">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <span></span>
+                                        <input class="form-control" ng-model="searchValueall" type="text" placeholder="Filter All">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-responsive table-bordered clearfix" style="margin-bottom: 5px !important;" ng-show="modalstatuslist.length>0">
+                            <thead>
+                                <tr style="background: bisque;color: black;font-size: inherit;">
+                                    <th style="width:8%">
+                                        <label>
+                                            <b>Total :</b>
+                                        </label>
+                                    </th>
+                                    <th ng-repeat="sta in modalstatuslist | orderBy:'-status'">
+                                        <span ng-click="onstatusclickmodalnoft(sta.status)">{{sta.status}} ({{(modaltasklist | filter:{ISMTCR_Status:sta.status}: true).length}})</span>
+                                    </th>
+                                </tr>
+                                <tr style="background: bisque;color: black;font-size: inherit;text-align:center !important" ng-if="(searchValuecol.ISMTCR_Status!=null && searchValuecol.ISMTCR_Status!='')||(searchValuecol.Priority!=null && searchValuecol.Priority!='') || (searchValuecol.Createdby!=null && searchValuecol.Createdby!='') || (searchValuecol.AssignedBy!=null && searchValuecol.AssignedBy!='') || (searchValuecol.AssignedTo!=null && searchValuecol.AssignedTo!='') || (searchValueall!=null && searchValueall!='')">
+                                    <th style="text-align:center;width:8%">
+                                        <label>
+                                            <b>Filtered :</b>
+                                        </label>
+                                    </th>
+                                    <th style="text-align:center" ng-repeat="sta in modalstatuslist | orderBy:'-status'">
+                                        <span ng-click="onstatusclickmodal(sta.status)">{{sta.status}} ({{(filterValue | filter:{ISMTCR_Status:sta.status}: true).length}})</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <table class="table table-responsive table-bordered clearfix" style="margin-bottom: 5px !important;">
+                            <thead>
+                                <tr style="background: aliceblue;">
+                                    <th style="width: 8%;">
+                                        <div class="input-group">
+                                            <label style="color: black;font-weight: bold;">
+                                                <input type="checkbox" ng-model="exact" name="adcheckt"><span class="lbl"></span>
+                                                Exact
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" ng-click="clearindfltr(1)" ng-if="searchValuecol.ISMTCR_Status!='' && searchValuecol.ISMTCR_Status!=undefined">
+                                                <i class="fas fa-broom"></i>
+                                            </span><sapn>
+                                            </sapn>
+                                            <input class="form-control" ng-model="searchValuecol.ISMTCR_Status" type="text" placeholder="by Status...">
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" ng-click="clearindfltr(2)" ng-if="searchValuecol.Priority!='' && searchValuecol.Priority!=undefined">
+                                                <i class="fas fa-broom"></i>
+                                            </span><sapn>
+                                            </sapn>
+                                            <input class="form-control" ng-model="searchValuecol.Priority" type="text" placeholder="by Priority...">
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" ng-click="clearindfltr(3)" ng-if="searchValuecol.Createdby!='' && searchValuecol.Createdby!=undefined">
+                                                <i class="fas fa-broom"></i>
+                                            </span><sapn>
+                                            </sapn>
+                                            <input class="form-control" ng-model="searchValuecol.Createdby" type="text" placeholder="by Createdby...">
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" ng-click="clearindfltr(4)" ng-if="searchValuecol.AssignedBy!='' && searchValuecol.AssignedBy!=undefined">
+                                                <i class="fas fa-broom"></i>
+                                            </span><sapn>
+                                            </sapn>
+                                            <input class="form-control" ng-model="searchValuecol.AssignedBy" type="text" placeholder="by Assignedby...">
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <span class="input-group-addon" ng-click="clearindfltr(5)" ng-if="searchValuecol.AssignedTo!='' && searchValuecol.AssignedTo!=undefined">
+                                                <i class="fas fa-broom"></i>
+                                            </span><sapn>
+                                            </sapn>
+                                            <input class="form-control" ng-model="searchValuecol.AssignedTo" type="text" placeholder="by Assignedto...">
+                                        </div>
+                                    </th>
+                                    <th ng-if="(searchValuecol.ISMTCR_Status!=null && searchValuecol.ISMTCR_Status!='')||(searchValuecol.Priority!=null && searchValuecol.Priority!='') || (searchValuecol.Createdby!=null && searchValuecol.Createdby!='') || (searchValuecol.AssignedBy!=null && searchValuecol.AssignedBy!='') || (searchValuecol.AssignedTo!=null && searchValuecol.AssignedTo!='') || (searchValueall!=null && searchValueall!='')">
+                                        <i class="fas fa-broom" style="color:black" ng-click="clearsearch()">Filters</i>
+                                    </th>
+                                    <th width="20%">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td width="70%" style="color: black;">
+                                                        Items Per Page:
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control" ng-model="itemsPerPage" type="text">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px !important;">SL.NO.</th>
+                                    <th width="40%">Task</th>
+                                    <th>Description</th>
+                                    <th width="10%"><a href="" ng-click="sort('credate')">Created</a></th>
+                                </tr>
+                            </thead>
+                            <tbody dir-paginate="issues in filterValue = (modaltasklist | filter : searchValuecol.ISMTCR_Status:exact | filter : searchValuecol.Priority:false| filter : searchValuecol.Createdby:false| filter : searchValuecol.AssignedBy:false| filter : searchValuecol.AssignedTo:false | filter : searchValueall | orderBy:sortKey:reverse) |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <tr>
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">
+                                        <span>
+                                            <label class="text-body col-sm-12 text-left" style="overflow-x: unset !important;overflow-y: unset !important;" data-ng-click="viewresponsemultiple(issues,'',$index)">
+                                                <span>{{issues.Task}}</span>
+                                            </label>
+                                            <label class="control-label col-sm-12 text-left" style="padding-left:0 !important">
+                                                <span class="col-sm-12 text-left">
+                                                    {{issues.taskno}} - {{issues.Priority}} -
+                                                    <span ng-if="issues.ISMTCR_Status=='Open' || issues.ISMTCR_Status=='ReOpen'">
+                                                        <span style="font-weight:500 !important;font-size: larger;color: red;">
+                                                            {{issues.ISMTCR_Status}}
+                                                        </span>
+                                                    </span>
+                                                    <span ng-if="issues.ISMTCR_Status!='Open' && issues.ISMTCR_Status!='ReOpen'">
+                                                        <span style="font-weight:500 !important;font-size: larger;color: blue;">
+                                                            {{issues.ISMTCR_Status}}
+                                                        </span>
+                                                    </span>
+                                                    <span>
+                                                        <br /> <b>Category: {{issues.Category}}</b>
+                                                    </span>
+                                                    <span>
+                                                        <br /> <b>Client: {{issues.client}}</b>
+                                                    </span>
+                                                    <span>
+                                                        <br /> Created By:    <label class="control-label">
+                                                            {{issues.Createdby}}
+                                                        </label>
+                                                    </span>
+                                                    <span ng-if="issues.FromDate!=null && issues.FromDate!=''">
+                                                        <br /> Date:    <label class="control-label">
+                                                            <span style="font-size:medium">{{issues.FromDate | date:'dd/MM/yyyy'}} to {{issues.Todate | date:'dd/MM/yyyy'}}</span>
+                                                        </label>
+                                                    </span>
+                                                    <span ng-if="issues.AssignedBy!=null && issues.AssignedBy!=''">
+                                                        <br /> Assigned By:
+                                                        <span class="text-left" ng-if="issues.AssignedBy!=''">
+                                                            <label class="control-label">{{issues.AssignedBy}}</label>
+                                                        </span>
+                                                    </span>
+                                                    <span style="font-size:medium">
+                                                        <br /> Assigned To:
+                                                        <span class="text-left" ng-if="issues.AssignedTo!='' && issues.AssignedTo!='NotAssigned'">
+                                                            <span>{{issues.AssignedTo}}</span>
+                                                        </span>
+                                                        <span class="text-left" ng-if="issues.AssignedTo=='NotAssigned'"><b style="color:red">{{issues.AssignedTo}}</b></span>
+                                                    </span>
+                                                </span>
+                                            </label>
+                                        </span>
+                                    </td>
+                                    <td style="text-align:left">
+                                        <label class="control-label text-left">
+                                            {{issues.Description}}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="control-label text-center">
+                                            <b>{{issues.credate | date:'dd/MM/yyyy'}}<br /><br />{{issues.credate | date:"h:mma"}}</b>
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                        <table class="table table-hover table-responsive table-bordered" ng-hide="true" id="table1">
+                            <thead>
+                                <tr>
+                                    <td colspan="5" style="text-align:center">
+                                        <h4 class="text-center">
+                                            <span ng-if="reporttype==='I'">Inter-Departmental Issue's</span>
+                                            <span ng-if="reporttype==='C'">Consolidated Report-{{departview}} Department</span>
+                                            <span ng-if="reporttype==='E' || reporttype=='A'">Inter Department Issues-{{departview}}<span ng-if="empname!=''">-Employee Wise</span></span>
+                                            <span ng-if="reporttype=='O'">OverAll Issues - {{overalltype}} </span>
+                                        </h4>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <h4><span style="text-align:left"><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> - ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span></h4>
+                                        <h4>
+                                            <span class="pull-right" style="text-align:right">
+                                                Count:{{modaltasklist.length}}
+                                                <span style="padding-left:50px;text-align:right" ng-if="(searchValuecol.ISMTCR_Status!=null && searchValuecol.ISMTCR_Status!='')||(searchValuecol.Priority!=null && searchValuecol.Priority!='') || (searchValuecol.Createdby!=null && searchValuecol.Createdby!='') || (searchValuecol.AssignedBy!=null && searchValuecol.AssignedBy!='') || (searchValuecol.AssignedTo!=null && searchValuecol.AssignedTo!='')|| (searchValueall!=null && searchValueall!='')">Filtered Count:{{filterValue.length}}</span>
+                                            </span>
+                                        </h4>
+                                    </td>
+                                </tr>
+                                <tr ng-if="(searchValuecol.ISMTCR_Status!=null && searchValuecol.ISMTCR_Status!='')||(searchValuecol.Priority!=null && searchValuecol.Priority!='') || (searchValuecol.Createdby!=null && searchValuecol.Createdby!='') || (searchValuecol.AssignedBy!=null && searchValuecol.AssignedBy!='') || (searchValuecol.AssignedTo!=null && searchValuecol.AssignedTo!='')|| (searchValueall!=null && searchValueall!='')">
+                                    <td colspan="5">
+                                        <b>
+                                            <span>
+                                                <b>Filtered By:</b>
+                                                <span style="padding-left:15px;text-align:right" ng-if="searchValuecol.ISMTCR_Status!=null && searchValuecol.ISMTCR_Status!=''">Status Name:{{searchValuecol.ISMTCR_Status}}</span>
+                                                <span style="padding-left:15px;text-align:right" ng-if="searchValuecol.Priority!=null && searchValuecol.Priority!=''">Priority Name:{{searchValuecol.Priority}}</span>
+                                                <span style="padding-left:15px;text-align:right" ng-if="searchValuecol.Createdby!=null && searchValuecol.Createdby!=''">Created By:{{searchValuecol.Createdby}}</span>
+                                                <span style="padding-left:15px;text-align:right" ng-if="searchValuecol.AssignedBy!=null && searchValuecol.AssignedBy!=''">Assigned By:{{searchValuecol.AssignedBy}}</span>
+                                                <span style="padding-left:15px;text-align:right" ng-if="searchValuecol.AssignedTo!=null && searchValuecol.AssignedTo!=''">Assigned To:{{searchValuecol.AssignedTo}}</span>
+                                                <span style="padding-left:15px;text-align:right" ng-if="searchValuecol.AssignedTo!=null && searchValuecol.AssignedTo!=''">Whole Table:{{searchValuecol.AssignedTo}}</span>
+                                                <span style="padding-left:15px;text-align:right" ng-if="searchValueall!=null && searchValueall!=''">Whole Table:{{searchValueall}}</span>
+                                            </span>
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>SL.NO.</th>
+                                    <th>Task No.</th>
+                                    <th width="40%">Task</th>
+                                    <th>Description</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Category</th>
+                                    <th>Client</th>
+                                    <th>Module</th>
+                                    <th>Tasktype</th>
+                                    <th width="10%">Created date</th>
+                                    <th width="10%">From Date</th>
+                                    <th width="10%">To Date</th>
+                                    <th>Created By</th>
+                                    <th>Assigned By</th>
+                                    <th>AssignedTo</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="issues in filterValue = (modaltasklist | filter : searchValuecol.ISMTCR_Status:exact | filter : searchValuecol.Priority:false| filter : searchValuecol.Createdby:false| filter : searchValuecol.AssignedBy:false| filter : searchValuecol.AssignedTo:false | filter : searchValueall)  | orderBy:sortKey:reverse">
+                                <tr>
+                                    <td style="text-align:center">{{$index+1}}</td>
+                                    <td>
+                                        <label>
+                                            {{issues.taskno}}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            <label>
+                                                <span>{{issues.Task}}</span>
+                                            </label>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{issues.Description}}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{issues.Priority}}
+                                        </label>
+                                    </td>
+                                    <td style="text-align:left">
+                                        <label>
+                                            {{issues.ISMTCR_Status}}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{issues.Category}}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{issues.client}}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{issues.module}}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{issues.tasktype}}
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <label>
+                                            <b>{{issues.credate | date:'dd/MM/yyyy'}}<br /><br />{{issues.crdate | date:"h:mma"}}</b>
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <label>
+                                            <span>{{issues.FromDate | date:'dd/MM/yyyy'}}</span>
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <label>
+                                            <span>{{issues.Todate | date:'dd/MM/yyyy'}}</span>
+                                        </label>
+                                    </td>
+                                    <td class="text-left">
+                                        <label>
+                                            {{issues.Createdby}}
+                                        </label>
+                                    </td>
+                                    <td class="text-left" ng-if="issues.AssignedBy!=''">
+                                        <label>{{issues.AssignedBy}}</label>
+                                    </td>
+                                    <td class="text-left" style="width: 10%;">
+                                        <span ng-show="reporttype=='C' || reporttype=='I'">
+                                            <span ng-if="issues.AssignedTo!='' && issues.AssignedTo!='NotAssigned'">
+                                                <span>{{issues.AssignedTo}}</span>
+                                            </span>
+                                            <span ng-if="issues.AssignedTo=='NotAssigned'"><b style="color:#e03f3f">{{issues.AssignedTo}}</b></span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================MODEL Response=================================== -->
+<div>
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormModelmulti" method="post" novalidate>
+        <div id="myModalResponse" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" style="width: 85%;">
+                <div class="modal-content" style="padding: 0px 10px;">
+                    <div class="modal-header" style="padding:8px">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4">
+                                <div class="col-sm-12">
+                                    <span>
+                                        <h4 class="modal-title text-white col-sm-4">{{currenttaskslengthmulti}}/{{filterValue.length}}</h4>
+                                        <button type="button" class="btn btn-danger" ng-click="backtaskmulti()" ng-if="backtaskshowmulti">
+                                            <i class="fa fa-backward" aria-hidden="true"> Previous Task</i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <h4 class="modal-title text-white" style="text-align:center">	TASK- {{taskno}} </h4>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-primary" style="background-color:#5db796;padding-right:10%" ng-click="nexttaskmulti()" ng-if="filterValue.length>currenttaskslengthmulti"><i class="fa fa-forward" aria-hidden="true">   Next Task</i></button>
+                                <div class="pull-right">
+                                    <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                                        <i class="fas fa-times-circle">Close</i>
+                                    </button>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <button type="button" class="btn btn-primary pull-right" style="background-color: darkgray;" data-toggle="modal" data-dismiss="modal" ng-click="closeresponse()">
+                                        <i class="fa fa-backward"> <b>List</b></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding: 0px 10px;">
+                        <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <h4 class="text-center">
+                                    <span ng-if="reporttype=='I'">{{todepartview}} Department >>></span>
+                                    <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                                    <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                                    <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <h5>
+                                    <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body" style="padding:0px 10px">
+                        <div class="col-sm-12">
+                            <div style="padding-left:0.5%">
+                                <div class="col-sm-9">
+                                    <span class="text-head  text-left" style="font-size:20px;" ng-model="ISMTCR_Id">{{tasktitle}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="padding-right:50%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-6" style="padding-left:3%">
+                                <div class="form-group">
+                                    <label class="control-label  text-body text-left" style="font-size:15px;">
+                                        {{tasktype}} &nbsp;&nbsp;
+                                        <span ng-if="priorityswitch!='' && priorityswitch!=null">
+                                            - <lable style="color:deeppink;">{{prioritypreswitch}}</lable>
+                                            <i class="fa fa-exchange" aria-hidden="true" style="font-size: medium;color: blue;"></i>
+                                            <label>
+                                                <b style="color:red;">- {{tsakpriority}}</b>  - <b>{{Rep_module}}</b>
+                                            </label>
+                                            <br />
+                                            Switch -<i class="fa fa-exchange" aria-hidden="true" style="font-size: medium;color: blue;"> ({{priorityswitch}})</i>
+                                        </span>
+                                        <span ng-if="priorityswitch==null || priorityswitch==''">
+                                            <label>
+                                                <b style="color:red;">- {{tsakpriority}}</b>  - <b>{{Rep_module}}</b>
+                                            </label>
+                                        </span>
+                                    </label><br />
+                                    <label class="control-label  text-body text-left" style="font-size:15px;">Client: {{taskclient}} </label><br />
+                                    <label class="control-label text-body">
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            Status :
+                                        </label>
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            {{taskstatus}}
+                                        </label>
+                                    </label><br />
+                                    <label class="control-label  text-body">
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            Date :
+                                        </label>
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            {{taskdate | date:"dd-MM-yyyy '-' h:mma"}}
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label  text-body">
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            Created By :
+                                        </label>
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            {{created_by}}
+                                        </label>
+                                    </label><br />
+                                    <label class="control-label  text-body" ng-if="rep_assignedby!='' && rep_assignedby!=null">
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            Assigned By :
+                                        </label>
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            {{rep_assignedby}} ({{rep_assignedDate | date:"dd-MM-yyyy '-' h:mma"}})
+                                        </label>
+                                    </label><br />
+                                    <label class="control-label  text-body">
+                                        <label class="control-label text-body" style="font-size:15px;">
+                                            Assigned To :
+                                        </label>
+                                        <label class="control-label text-body" style="font-size:15px;" ng-if="Rep_assignedto!='' && Rep_assignedto!=null">
+                                            <span ng-if="leftflag" style="color:red">{{Rep_assignedto}} (Left)</span>
+                                            <span ng-if="!leftflag">{{Rep_assignedto}}</span>
+                                        </label>
+                                        <label ng-if="Rep_assignedto=='' || Rep_assignedto==null" class="control-label text-body" style="font-size:15px;">
+                                            <span style="color:red">Not-Assigned</span>
+                                        </label>
+                                    </label><br />
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        <span style="color:brown" ng-if="periodicity!=null && periodicity!=''">
+                                            Periodicity: {{periodicity}}
+                                        </span>
+                                        <span style="color:blue" ng-if="plancount==0">
+                                            (Not added to any Planner!!)
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <textarea class="form-control" style="border-radius:10px" name="response1" type="text" placeholder="Task Description .... " ng-disabled="true" ng-model="taskdescription" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" ng-if="taskAttatchment.length>0" style="padding-left:5%">
+                            <hr />
+                            <div class="form-group">
+                                <span>
+                                    <label class="control-label text-body" style="font-size:16px;">
+                                        Attachments : <b>
+                                            <span ng-repeat="objtfr in taskAttatchment track by $index">
+                                                <span ng-if="objtfr.ISMTCRAT_Attatchment!=null && objtfr.ISMTCRAT_Attatchment!=''">
+                                                    {{$index+1}})
+                                                    <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                        <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr,$index,1);"> View  </i> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                    </span>
+                                                    <span ng-if="objtfr.filetype=='pdf'">
+                                                        <a style="color:red;display:inline; font-weight: bolder;" full-frame="" " data-ng-click="downloadpdf(objtfr,$index,1)"> Pdf <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i> </a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                    </span>
+                                                    <span ng-if="objtfr.filetype=='doc' || objtfr.filetype=='docx' || objtfr.filetype=='ppt' || objtfr.filetype=='pptx'">
+                                                        <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,$index,1)" full-frame=""> Docx/ppt <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                    </span>
+                                                    <span ng-if="objtfr.filetype=='xlsx' || objtfr.filetype=='xls' || objtfr.filetype=='xlx'">
+                                                        <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,$index,1)" full-frame=""> Excel <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                    </span>
+                                                    <span ng-if="objtfr.filetype=='wmv' || objtfr.filetype=='mp4'">
+                                                        <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewvideo(objtfr,$index,1)" full-frame=""> Video <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                    </span>
+                                                    <span ng-if="objtfr.filetype=='mp3'">
+                                                        <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewaudio(objtfr,$index,1)" full-frame=""> Audio <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                    </span>
+                                                    <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png' && objtfr.filetype!='pdf' && objtfr.filetype!='doc' && objtfr.filetype!='docx' && objtfr.filetype!='ppt' && objtfr.filetype!='pptx' && objtfr.filetype!='xlsx' && objtfr.filetype!='xls' && objtfr.filetype!='xlx' && objtfr.filetype!='wmv' && objtfr.filetype!='mp4' && objtfr.filetype!='mp3'">
+                                                        <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRAT_Attatchment}}" full-frame=""> Download </a> - <i class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </b>
+                                    </label>
+                                </span>
+                            </div>
+                            <hr />
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group" style="padding-left: 1%;">
+                                <div class="box-content col-sm-12" style="max-height: 280px;overflow:auto;border: 1px solid #5cb7ff;border-radius: 5px;width: 99%;">
+                                    <div class="" ng-repeat="response in get_taskresponse" style="border-bottom: 0.5px solid #dcd6d6;padding-bottom: 5px;">
+                                        <label class="control-label  text-body" style="font-size:14px;">
+                                            {{get_taskresponse.length-$index}}) Response By : {{response.responseby}} - {{response.ISMTCRRES_ResponseDate | date:"dd-MM-yyyy '-' h:mma"}} <span ng-if="response.pagename!=null && response.pagename!=''">
+                                                <span style="color:red">(</span> {{response.pagename}} <span style="color:red">)</span>
+                                            </span><span ng-if="response.ISMTCRRES_Status!=null && response.ISMTCRRES_Status!=''">
+                                                <span class="control-label text-body" style="font-size:14px;color:black">- Status: <b>{{response.ISMTCRRES_Status}}</b></span>
+                                            </span>
+                                        </label>
+                                        <span ng-if="respattachement">
+                                            <br /><label class="control-label text-body" style="font-size:14px;margin-left: 1.5%;">
+                                                Attachments : <b>
+                                                    <span ng-repeat="objtfr in get_responseattachments track by $index">
+                                                        <span ng-if="objtfr.ISMTCRRES_Response==response.ISMTCRRES_Response && objtfr.ISMTCRRES_ResponseAttachment!=null && objtfr.ISMTCRRES_ResponseAttachment!=''">
+                                                            <!--{{objtfr.slno}})-->
+                                                            <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                                <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr,objtfr.slno-1,2);"> View  </i> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype=='pdf'">
+                                                                <a style="color:red;display:inline; font-weight: bolder;" full-frame="" " data-ng-click="downloadpdf(objtfr,objtfr.slno-1,2)"> Pdf <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i> </a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype=='doc' || objtfr.filetype=='docx' || objtfr.filetype=='ppt' || objtfr.filetype=='pptx'">
+                                                                <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,objtfr.slno-1,2)" full-frame=""> Docx/ppt <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype=='xlsx' || objtfr.filetype=='xls' || objtfr.filetype=='xlx'">
+
+                                                                <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,objtfr.slno-1,2)" full-frame=""> Excel <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype=='wmv' || objtfr.filetype=='mp4'">
+                                                                <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewvideo(objtfr,objtfr.slno-1,2)" full-frame=""> Video <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype=='mp3'">
+                                                                <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewaudio(objtfr,objtfr.slno-1,2)" full-frame=""> Audio <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png' && objtfr.filetype!='pdf' && objtfr.filetype!='doc' && objtfr.filetype!='docx' && objtfr.filetype!='ppt' && objtfr.filetype!='pptx' && objtfr.filetype!='xlsx' && objtfr.filetype!='xls' && objtfr.filetype!='xlx' && objtfr.filetype!='wmv' && objtfr.filetype!='mp4' && objtfr.filetype!='mp3'">
+                                                                <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRRES_ResponseAttachment}}" full-frame=""> Download </a> - <i class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </b>
+                                            </label>
+                                        </span>
+                                        <br />
+                                        <label ng-if="response.ISMTCRRES_Response.length<=50" class="control-label text-left" style="margin-left: 1.5%;"><span class="control-label text-body" style="font-size:14px;">Response</span> :<span style="font-weight: 600;font-family: 'Kendo UI';">{{response.ISMTCRRES_Response}}</span></label>
+
+                                        <span ng-if="response.ISMTCRRES_Response.length>50" class="control-label text-body" style="font-size:14px;margin-left: 1.5%">Response  : </span><br />
+                                        <p ng-if="response.ISMTCRRES_Response.length>50" ng-repeat="rmks in response.student_rmrks track by $index" class="row text-left" style="margin-left: 1.5%;font-weight: 600;font-family: 'Kendo UI';">
+                                            {{rmks}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--==================== Image Preview Model ===========================-->
+<div id="myModalPreviewimg" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-primary" style="background-color: darkgray;" data-toggle="modal" data-dismiss="modal" ng-click="closeresponse()">
+                            <i class="fa fa-backward"> <b>List</b></i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" ng-click="closeview()">
+                            <i class="fa fa-backward"> Back to Task</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4 class="text-center">
+                            <span ng-if="reporttype=='I'">{{todepartview}} Department >>></span>
+                            <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                            <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                            <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4>
+                            <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-primary" style="background-color: darkgray;" data-toggle="modal" data-dismiss="modal" ng-click="closeresponse()">
+                            <i class="fa fa-backward"> <b>List</b></i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" ng-click="closeview()">
+                            <i class="fa fa-backward"> Back to Task</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4 class="text-center">
+                            <span ng-if="reporttype=='I'">{{todepartview}} Department >>></span>
+                            <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                            <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                            <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4>
+                            <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div id="pdfIdzz">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="myModaldocx" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-primary" style="background-color: darkgray;" data-toggle="modal" data-dismiss="modal" ng-click="closeresponse()">
+                            <i class="fa fa-backward"> <b>List</b></i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" ng-click="closeview()">
+                            <i class="fa fa-backward"> Back to Task</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4 class="text-center">
+                            <span ng-if="reporttype=='I'">{{todepartview}} Department >>></span>
+                            <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                            <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                            <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4>
+                            <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=====================video play===============-->
+<div id="myvideoPreview" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-primary" style="background-color: darkgray;" data-toggle="modal" data-dismiss="modal" ng-click="closeresponse()">
+                            <i class="fa fa-backward"> <b>List</b></i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" ng-click="closeview()">
+                            <i class="fa fa-backward"> Back to Task</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4 class="text-center">
+                            <span ng-if="reporttype=='I'">{{todepartview}} Department >>></span>
+                            <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                            <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                            <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4>
+                            <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <div ng-repeat="vd in view_videos">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-2 vdoleft1">
+                                    <video width="800" height="400" controls="controls">
+                                        <source ng-src="{{vd.ihw_video | trustUrl}}" type="video/mp4">
+                                        Your browser does not support HTML5 video.
+                                    </video>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=====================audio play===============-->
+<div id="myaudioPreview" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-primary" style="background-color: darkgray;" data-toggle="modal" data-dismiss="modal" ng-click="closeresponse()">
+                            <i class="fa fa-backward"> <b>List</b></i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" ng-click="closeview()">
+                            <i class="fa fa-backward"> Back to Task</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4 class="text-center">
+                            <span ng-if="reporttype=='I'">{{todepartview}} Department >>></span>
+                            <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                            <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                            <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4>
+                            <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <div ng-repeat="vd in view_videos">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-4 vdoleft1">
+                                    <audio width="800" height="100" controls="controls">
+                                        <source ng-src="{{vd.ihw_video | trustUrl}}" type="audio/mp3">
+                                        Your browser does not support HTML5 Audio.
+                                    </audio>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=====================Modalcount===============-->
+<div id="Modalcount" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4 class="text-center">
+                            <span ng-if="reporttype=='I'">{{todepartview}} Department >>></span>
+                            <span ng-if="reporttype=='C' || reporttype=='I'">  {{departview}} Department</span>
+                            <span ng-if="reporttype=='O' || reporttype=='A'">OverAll Issues {{overalltype}} </span>
+                            <span ng-if="reporttype=='E'"> Inter Department Issues - {{departview}} </span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4>
+                            <span><span ng-if="(reporttype==='E' || reporttype==='O') && empname!=''">{{empname}} -</span> {{empstatus}} <span ng-if="emppriority!=''">- {{emppriority}}</span> ({{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}})</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box box-primary" ng-show="modallistcreated.length>0" style="border: none;padding: 0px;margin: 0px;">
+                    <div class="box-header with-border" style="border-bottom: none !important;padding: 0px;">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4" style="margin-top: 0.5%;">
+                                <label class="radio-inline" style="font-size: medium;"><b>Created By:</b>Count-{{modallistcreated.length}}</label>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                            <div class="form-group col-sm-4 pull-right">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span><sapn>
+                                    </sapn>
+                                    <input class="form-control" ng-model="searchcrenames" type="text" placeholder="Filter Names">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body" style="display: block; padding-top: 0px;">
+                        <div class="col-sm-12" style="padding-left: 3%;">
+                            <span ng-repeat="created in modallistcreated | orderBy:['-count'] | filter : searchcrenames">
+                                <label class="control-label font-weight-bold cretaed">
+                                    <span style="font-size:larger;" ng-click="clickucreatedby(created.createdby,'')">{{created.createdby}}: Total- ({{(modaltasklist | filter:{Createdby:created.createdby}).length}})</span>
+                                    <span ng-repeat="sta in modalstatuslist | orderBy:'-status'">
+                                        <span ng-show="{{(modaltasklist | filter:{Createdby:created.createdby,ISMTCR_Status:sta.status}: true).length>0}}">
+                                            <span ng-click="clickucreatedby(created.createdby,sta.status)">
+                                                <span ng-if="sta.status=='Completed'" style="color:forestgreen;font-weight:bold">{{sta.status}}</span><span ng-if="sta.status!='Completed'">{{sta.status}}</span>-({{(modaltasklist | filter:{Createdby:created.createdby,ISMTCR_Status:sta.status}: true).length}})
+                                            </span>
+                                        </span>
+                                    </span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary" ng-show="modallistassigned.length>0" style="border: none;padding: 0px;margin: 0px;">
+                    <div class="box-header with-border" style="border-bottom: none !important;padding: 0px;">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4" style="margin-top: 0.5%;">
+                                <label class="radio-inline" style="font-size: medium;"><b>Assigned To:</b>Count-{{modallistassigned.length}}</label>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                            <div class="form-group col-sm-4 pull-right">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span><sapn>
+                                    </sapn>
+                                    <input class="form-control" ng-model="searchcrenamesa" type="text" placeholder="Filter Names">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body" style="display: block; padding-top: 0px;">
+                        <div class="col-sm-12" style="padding-left: 3%;">
+                            <span ng-repeat="created in modallistassigned | orderBy:['-count'] | filter : searchcrenamesa">
+                                <label class="control-label font-weight-bold cretaed">
+                                    <span style="font-size:larger;" ng-click="clickuassignedto(created.AssignedTo,'')">{{created.AssignedTo}}: Total- ({{(modaltasklist | filter:{AssignedTo:created.AssignedTo}).length}})</span>
+                                    <span ng-repeat="sta in modalstatuslist | orderBy:'-status'">
+                                        <span ng-show="{{(modaltasklist | filter:{AssignedTo:created.AssignedTo,ISMTCR_Status:sta.status}: true).length>0}}">
+                                            <span ng-click="clickuassignedto(created.AssignedTo,sta.status)">
+                                                <span ng-if="sta.status=='Completed'" style="color:forestgreen;font-weight:bold">{{sta.status}}</span><span ng-if="sta.status!='Completed'">{{sta.status}}</span>-({{(modaltasklist | filter:{AssignedTo:created.AssignedTo,ISMTCR_Status:sta.status}: true).length}})
+                                            </span>
+                                        </span>
+                                    </span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary" ng-show="modallistclient.length>0" style="border: none;padding: 0px;margin: 0px;">
+                    <div class="box-header with-border" style="border-bottom: none !important;padding: 0px;">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4" style="margin-top: 0.5%;">
+                                <label class="radio-inline" style="font-size: medium;"><b> Client List:</b>Count-{{modallistclient.length}}</label>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                            <div class="form-group col-sm-4 pull-right">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span><sapn>
+                                    </sapn>
+                                    <input class="form-control" ng-model="searchcrenamesf" type="text" placeholder="Filter Client">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body" style="display: block; padding-top: 0px;">
+                        <div class="col-sm-12" style="padding-left: 3%;">
+                            <span ng-repeat="created in modallistclient | orderBy:['-count'] | filter : searchcrenamesf">
+                                <label class="control-label font-weight-bold cretaed">
+                                    <span style="font-size:larger;" ng-click="clickclient(created.client)">{{created.client}}: Total- ({{(modaltasklist | filter:{client:created.client}).length}})</span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary" ng-show="filtermodule.length>0" style="border: none;padding: 0px;margin: 0px;">
+                    <div class="box-header with-border" style="border-bottom: none !important;padding: 0px;">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4" style="margin-top: 0.5%;">
+                                <label class="radio-inline" style="font-size: medium;"><b>Module List:</b>Count-{{filtermodule.length}}</label>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                            <div class="form-group col-sm-4 pull-right">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span><sapn>
+                                    </sapn>
+                                    <input class="form-control" ng-model="searchcrenamesm" type="text" placeholder="Filter module">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body" style="display: block; padding-top: 0px;">
+                        <div class="col-sm-12" style="padding-left: 3%;">
+                            <span ng-repeat="created in filtermodule | orderBy:['-count'] | filter : searchcrenamesm">
+                                <label class="control-label font-weight-bold cretaed">
+                                    <span style="font-size:larger;" ng-click="clickmodule(created.module)">{{created.module}}: Total- ({{(modaltasklist | filter:{module:created.module}).length}})</span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary" ng-show="filtertype.length>0" style="border: none;padding: 0px;margin: 0px;">
+                    <div class="box-header with-border" style="border-bottom: none !important;padding: 0px;">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4" style="margin-top: 0.5%;">
+                                <label class="radio-inline" style="font-size: medium;"><b>TaskType:</b>Count-{{filtertype.length}}</label>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                            <div class="form-group col-sm-4 pull-right">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span><sapn>
+                                    </sapn>
+                                    <input class="form-control" ng-model="searchcrenamest" type="text" placeholder="Filter tasktype">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body" style="display: block; padding-top: 0px;">
+                        <div class="col-sm-12" style="padding-left: 3%;">
+                            <span ng-repeat="created in filtertype | orderBy:['-count'] | filter : searchcrenamest">
+                                <label class="control-label font-weight-bold cretaed">
+                                    <b>
+                                        <span style="font-size:larger;" ng-click="clickutask(created.tasktype)">{{created.tasktype}}: Total- ({{(modaltasklist | filter:{tasktype:created.tasktype}).length}})</span>
+                                    </b>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Send Email Overall count-->
+
+
+<div class="box box-primary" id="SendEmail" hidden="hidden">
+    <div class="box-header with-border text-center">
+        <h3 class="box-title">Overall Department Issue's </h3>
+    </div>
+    <div id="scrollid">
+        <div class="box-body" style="overflow:auto;overflow-x: hidden;">
+            <div class="row">
+                <div class="col-sm-12 text-center box-header with-border">
+                    <div class="form-group">
+                        <p>This Mail Is Inform you regarding the Deviation Percentage and Count </p>
+                        <h4><span style="font-size:16px;">All department - {{start_Date | date:'dd/MM/yyyy'}} to {{end_Date | date:'dd/MM/yyyy'}}</span></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body box-header with-border" ng-repeat="user in alldepartmentoverallpercentage | orderBy:'-pending'" style="margin-bottom: 10px;">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <h4><span style="font-size:16px;color: black;margin-left: 5px;">{{$index+1}}) {{user.name}} department</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2"><i class="fa fa-eye" style="color:white;font-weight: bold;font-size: medium;" title="View Count-Wise" ng-click="filterfromall(user.departid)"> View in Detail</i></th>
+                            <th>Inter-Departmental Issues</th>
+                            <th>Department Issues</th>
+                            <th>OverAll Issues</th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="60px">Pending</th>
+                                            <th width="60px">Close</th>
+                                            <th width="60px">Total</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
+                            <th>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="60px">Pending</th>
+                                            <th width="60px">Close</th>
+                                            <th width="60px">Total</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
+                            <th>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th width="60px">Pending</th>
+                                            <th width="60px">Close</th>
+                                            <th width="60px">Total</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
+                        </tr>
+                        <tr style="text-align:center !important;color: black;background: white;">
+                            <td><b>Total</b></td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr style="text-align:center !important;">
+                                            <td width="50px" height="35px" ng-click="totemppening(1,user.departid,user.name)">
+                                                <b>{{user.ipending}}</b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemppclose(1,user.departid,user.name)">
+                                                <b>{{user.iclose}}</b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemptotal(1,user.departid,user.name)">
+                                                <b>{{user.itotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="text-align:center !important;color: black;">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr style="text-align:center !important;">
+                                            <td width="50px" height="35px" ng-click="totemppening(2,user.departid,user.name)">
+                                                <b>{{user.dpending}}</b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemppclose(2,user.departid,user.name)">
+                                                <b>{{user.dclose}}</b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemptotal(2,user.departid,user.name)">
+                                                <b>{{user.dtotal}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="text-align:center !important;color: black;">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr style="text-align:center !important;">
+                                            <td width="50px" height="35px" ng-click="totemppening(3,user.departid,user.name)">
+                                                <b>{{user.pending}}</b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemppclose(3,user.departid,user.name)">
+                                                <b>{{user.close}}</b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemptotal(3,user.departid,user.name)">
+                                                <b>{{user.total}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr style="text-align:center !important;color: black;background: white;">
+                            <td><b>Total %</b></td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr style="text-align:center !important;">
+                                            <td width="50px" height="35px" ng-click="totemppening(1,user.departid,user.name)">
+                                                <b>
+                                                    <span ng-if="user.itotal>0" style="color: blue;font-weight: 600;font-size: 16px;">{{(user.ipending/user.itotal)*100 | number:2 }}%</span>
+                                                    <span ng-if="user.itotal==0">--</span>
+                                                </b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemppclose(1,user.departid,user.name)">
+                                                <b>
+                                                    <span ng-if="user.itotal>0" style="color: green;font-weight: 600;font-size: 16px;">{{(user.iclose/user.itotal)*100 | number:2 }}%</span>
+                                                    <span ng-if="user.itotal==0">--</span>
+                                                </b>
+                                            </td>
+                                            <td width="50px" height="35px" style="width: 33%;color:black">
+                                                <b>--</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="text-align:center !important">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr style="text-align:center !important;">
+                                            <td width="50px" height="35px" ng-click="totemppening(2,user.departid,user.name)">
+                                                <b>
+                                                    <span ng-if="user.dtotal>0" style="color: blue;font-weight: 600;font-size: 16px;">{{(user.dpending/user.dtotal)*100 | number:2 }}%</span>
+                                                    <span ng-if="user.dtotal==0">--</span>
+                                                </b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemppclose(2,user.departid,user.name)">
+                                                <b>
+                                                    <span ng-if="user.dtotal>0" style="color: green;font-weight: 600;font-size: 16px;">{{(user.dclose/user.dtotal)*100 | number:2 }}%</span>
+                                                    <span ng-if="user.dtotal==0">--</span>
+                                                </b>
+                                            </td>
+                                            <td width="50px" height="35px" style="width: 33%;color:black">
+                                                <b>--</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="text-align:center !important">
+                                <table class="table table-hover table-responsive table-bordered" style="margin-bottom: 0px !important;">
+                                    <tbody>
+                                        <tr style="text-align:center !important;">
+                                            <td width="50px" height="35px" ng-click="totemppening(3,user.departid,user.name)">
+                                                <b>
+                                                    <span ng-if="user.total>0" style="color: blue;font-weight: 600;font-size: 16px;">{{(user.pending/user.total)*100 | number:2 }}%</span>
+                                                    <span ng-if="user.total==0">--</span>
+                                                </b>
+                                            </td>
+                                            <td width="50px" height="35px" ng-click="totemppclose(3,user.departid,user.name)">
+                                                <b>
+                                                    <span style="color: green;font-weight: 600;font-size: 16px;">{{(user.close/user.total)*100 | number:2 }}%</span>
+                                                    <span ng-if="user.total==0">--</span>
+                                                </b>
+                                            </td>
+                                            <td width="50px" height="35px" style="width: 33%;color:black">
+                                                <b>--</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

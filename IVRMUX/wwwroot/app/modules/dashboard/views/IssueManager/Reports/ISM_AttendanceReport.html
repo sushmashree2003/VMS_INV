@@ -1,0 +1,619 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .backkk {
+        background-color: #8a494924;
+    }
+
+    .md-icon-button + .md-datepicker-input-container {
+        margin-left: -10px;
+        width: 53%;
+    }
+
+    ._md-datepicker-has-triangle-icon {
+        margin-right: -45px;
+    }
+</style>
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <!--<div class="col-sm-6 col-sm-offset-3">
+                    <div class="form-group">
+                        <div class="text-center well">
+                            <div ng-init="reporttype='Generated'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Generated" name="cdreport" ng-model="reporttype" ng-change="onchangeReportType()">
+                                    <span class="lbl padding-8"><b> Generated </b></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="NotGenerated" name="cdreport" ng-model="reporttype" ng-change="onchangeReportType()">
+                                    <span class="lbl padding-8"><b>Not Generated</b></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="row" ng-show="depdes==true">
+                    <div class="col-sm-6" style="padding-left: 2.5%;">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 12px;width: 78%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+                                <label>
+                                    <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-click="all_checkdept(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Department</b>
+                                    </span>
+                                </label>
+                                <hr />
+                                <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                    <input name="dept" ng-model="user.selected" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDC_Name}} Department</b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" style="padding-left: 14px;/* width: 25.0em; */width: 78%;">
+                                <span>
+                                    <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8" style="width: 75% !important;">
+
+                                <label>
+                                    <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        <b style="color:#0f15d8"> All Designation</b>
+                                    </span>
+                                </label>
+                                <hr />
+                                <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                    <input name="desg" ng-model="user.selected" type="checkbox" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 92%;">
+                            <span ng-show="get_userEmplist.length>0">
+                                <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="search Employee here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 91% !important">
+                            <label>
+                                <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                <span class="lbl padding-8">
+                                    <b style="color:#0f15d8"> All Employee</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6" style="padding-top: 2%;">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4 col-sm-offset-2">Start Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <md-datepicker ng-model="start_Date" ng-disabled="plannerflg" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding-top: 10%;">
+                        <label class="control-label col-sm-4 col-sm-offset-2">End Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-6">
+                            <md-datepicker ng-model="end_Date" name="endate" ng-disabled="plannerflg" md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="plannerReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    ATTENDANCE REPORT
+                </md-button>
+                <md-button ng-if="get_plannerreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button type="button" ng-if="get_plannerreport.length>0" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel()">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_plannerreport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">ATTENDANCE REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div id="printDeviation1">
+            <div class="box-body" id="myTable1">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group text-center">
+                            <h4>  ATTENDANCE REPORT</h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue2" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="mainlist.length>0" style="overflow:scroll">
+                    <table class="table table-hover table-responsive table-bordered" id="table" style="border-collapse:collapse;width:1400px">
+                        <thead>
+                            <tr style="border-collapse:collapse">
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Date</b></a> </th>
+                                <th width="275px"><a href="" ng-click="sortBy('')"><b>Employee</b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('')"><b>Task</b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('start')"><b>Task Description </b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('start')"><b>Remarks </b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Category</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Standard Timing As per category and %</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Time Taken by Individuals</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Approved By</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Status</b></a></th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in mainlist | filter : searchValue2" style="border-collapse:collapse">
+                            <tr style="border-collapse:collapse">
+                                <td class="text-center" rowspan="{{user.LIST.length+1}}">{{$index+1}}</td>
+                                <td class="text-left" rowspan="{{user.LIST.length+1}}"><b>{{user.DATE |date:'dd/MM/yyyy'}}</b></td>
+                                <td class="text-left" rowspan="{{user.LIST.length+1}}"><b>{{user.EMPNAME}}</b></td>
+                            </tr>
+                            <tr ng-repeat="planner in user.LIST" style="border-collapse:collapse">
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMTCR_Title}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMTCR_Desc}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMDRPT_Remarks}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMMTCAT_TaskCategoryName}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMTPLTA_EffortInHrs}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMDRPT_TimeTakenInHrs}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ApprovedEmpName}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMDRPT_Status}}
+
+
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div id="printDeviation" ng-show="abcd">
+            <div class="box-body" id="myTable11">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group text-center">
+                            <h4>  ATTENDANCE REPORT</h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                    <!--<div class="col-sm-3 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue2" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>-->
+                </div>
+                <div ng-show="mainlist.length>0">
+                    <table class="table table-hover table-responsive table-bordered" id="table" style="border-collapse:collapse">
+                        <thead>
+                            <tr style="border-collapse:collapse">
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Date</b></a> </th>
+                                <th width="275px"><a href="" ng-click="sortBy('')"><b>Employee</b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('')"><b>Task</b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('start')"><b>Task Description </b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('start')"><b>Remarks </b></a> </th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Category</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Standard Timing As per category and %</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Time Taken by Individuals</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Approved By</b></a></th>
+                                <th style="border-collapse:collapse"><a href="" ng-click="sortBy('end')"><b>Status</b></a></th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in mainlist | filter : searchValue2" style="border-collapse:collapse">
+                            <tr style="border-collapse:collapse">
+                                <td class="text-center" rowspan="{{user.LIST.length+1}}">{{$index+1}}</td>
+                                <td class="text-left" rowspan="{{user.LIST.length+1}}"><b>{{user.DATE |date:'dd/MM/yyyy'}}</b></td>
+                                <td class="text-left" rowspan="{{user.LIST.length+1}}"><b>{{user.EMPNAME}}</b></td>
+                            </tr>
+                            <tr ng-repeat="planner in user.LIST" style="border-collapse:collapse">
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMTCR_Title}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMTCR_Desc}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMDRPT_Remarks}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMMTCAT_TaskCategoryName}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMTPLTA_EffortInHrs}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMDRPT_TimeTakenInHrs}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ApprovedEmpName}}
+
+
+                                </td>
+                                <td class="text-left" style="border-collapse:collapse">
+                                    {{planner.ISMDRPT_Status}}
+
+
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div id="printDeviation" ng-show="abcd">
+            <div class="box-body" id="myTable">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group text-center">
+                            <h4>  ATTENDANCE REPORT</h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                   
+                </div>
+                <div ng-show="mainlist.length>0">
+                    <table class="table table-hover table-responsive table-bordered" id="table" style="border-collapse:collapse">
+                        <thead>
+                            <tr style="background-color:antiquewhite;border:solid">
+                                <th style="border-collapse:collapse"><b>SL.No.</b></th>
+                                <th style="border-collapse:collapse"><b>Date</b> </th>
+                                <th><b>Employee Name</b> </th>
+                                <th style="border-collapse:collapse"><b>Task</b></th>
+                                <th style="border-collapse:collapse"><b>Task Description </b></th> 
+                                <th style="border-collapse:collapse"><b>Remarks </b></th>
+                                <th style="border-collapse:collapse"><b>Category</b></th>
+                                <th style="border-collapse:collapse"><b>Standard Timing As per category and %</b></th>
+                                <th style="border-collapse:collapse"><b>Time Taken by Individuals</b></th>
+                                <th style="border-collapse:collapse"><b>Approved By</b></th> 
+                                <th style="border-collapse:collapse"><b>Status</b></th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in mainlist | filter : searchValue2" style="border-collapse:collapse">
+                            <tr style="border : solid 0.5px black;">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left"><b>{{user.DATE |date:'dd/MM/yyyy'}}</b></td>
+                                <td class="text-left" style="word-wrap:break-word"><b>{{user.EMPNAME}}</b></td>
+
+
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ISMTCR_Title}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ISMTCR_Title}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ISMTCR_Desc}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ISMTCR_Desc}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ISMDRPT_Remarks}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ISMDRPT_Remarks}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ISMMTCAT_TaskCategoryName}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ISMMTCAT_TaskCategoryName}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ISMTPLTA_EffortInHrs}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ISMTPLTA_EffortInHrs}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ISMDRPT_TimeTakenInHrs}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ISMDRPT_TimeTakenInHrs}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ApprovedEmpName}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ApprovedEmpName}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+
+                                <td style="padding:0px" class="text-center">
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr ng-if="user.LIST.length==1" ng-repeat="ff in user.LIST" style="width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+
+                                                    {{ff.ISMDRPT_Status}}
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr ng-if="user.LIST.length>1" ng-repeat="ff in user.LIST" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%;border : solid 0.5px black;">
+                                                <td style="width:100%;height:100%;padding:8px" class="text-center">
+                                                    {{ff.ISMDRPT_Status}}
+
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+                                </td>
+                            </tr>
+                          
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+

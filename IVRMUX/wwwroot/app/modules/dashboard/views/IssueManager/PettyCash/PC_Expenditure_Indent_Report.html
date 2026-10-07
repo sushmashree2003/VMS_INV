@@ -1,0 +1,255 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <di class="box-header with-border">
+                <h3 class="box-title">Expenditure Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </di>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Organization : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="MI_Id" id="id1" name="miname" required ng-change="OnChangeBalanceSheetInstitution()">
+                                    <option value="">-- Select Organization --</option>
+                                    <option ng-repeat="ins in getuserinstitution" value="{{ins.mI_Id}}" ng-selected="ins.mI_Id==MI_Id">
+                                        {{ins.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.miname)" ng-messages="myForm.miname.$error">
+                                    <div ng-message="required">Select Organization</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Indent :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="PCINDENT_Id" id="PCINDENTId" required name="PCINDENT_Idd">
+                                    <option value="">-- Select Indent --</option>
+                                    <option ng-repeat="dd in indentdetails" value="{{dd.pcindenT_Id}}">
+                                        {{dd.pcindenT_IndentNo}} : {{dd.pcindenT_Date | date:'dd/MM/yyyy'}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.PCINDENT_Idd)" ng-messages="myForm.PCINDENT_Idd.$error">
+                                    <div ng-message="required">Select Indent</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="indentapproveddetais.length==0" ng-click="Print()" id="save-btn">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="indentapproveddetais.length==0" ng-click="exportToExceldetails()" id="save-btn">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="indentapproveddetais.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Expenditure Report Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Particular</th>
+                        <th>Expenditure No.</th>
+                        <th>Date</th>
+                        <th>Mode Of Payment</th>
+                        <th>Expenditure Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in indentapproveddetais">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.PCMPART_ParticularName}}</td>
+                        <td class="text-left">{{user.PCEXPTR_ExpenditureNo}}</td>
+                        <td class="text-center">{{user.PCEXPTR_Date | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-left">{{user.PCEXPTR_ModeOfPayment}}</td>
+                        <td class="text-right">{{user.PCEXPTR_Amount |number:2}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-right">Total Expenditure Amount</td>
+                        <td class="text-right">{{totalexpenditure |number:2}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-right">Sanctioned Amount</td>
+                        <td class="text-right">{{sanc_amt |number:2}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-right">{{labelname}} Amount</td>
+                        <td class="text-right">{{balance_amt |number:2}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div ng-show="sdfsdfdsfsd==true" id="printSectionId">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="text-center">
+                Indent Wise Expenditure Report
+            </h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-sm-6">
+                <label class="col-sm-12 text-left"><b>Indent No.: {{indentno}}</b></label>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-12 text-right"><b>Date : {{date |date : 'dd/MM/yyyy'}}</b></label>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Particular</th>
+                        <th>Expenditure No.</th>
+                        <th>Date</th>
+                        <th>Mode Of Payment</th>
+                        <th>Expenditure Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in indentapproveddetais">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.PCMPART_ParticularName}}</td>
+                        <td class="text-left">{{user.PCEXPTR_ExpenditureNo}}</td>
+                        <td class="text-center">{{user.PCEXPTR_Date | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-left">{{user.PCEXPTR_ModeOfPayment}}</td>
+                        <td class="text-right">{{user.PCEXPTR_Amount |number:2}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-right">Total Expenditure Amount</td>
+                        <td class="text-right">{{totalexpenditure |number:2}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-right">Sanctioned Amount</td>
+                        <td class="text-right">{{sanc_amt |number:2}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-right">{{labelname}} Amount</td>
+                        <td class="text-right">{{balance_amt |number:2}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div ng-show="sdfsdfdsfsd==true" id="exceltopd">
+    <table>
+        <tr style="border:0.5px solid black">
+            <td colspan="6" style="text-align:center">
+                {{institutioname}}
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td colspan="6" style="text-align:center">
+                Indent Wise Expenditure Report
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td colspan="3" style="text-align:left">
+                Indent No.: {{indentno}}
+            </td>
+            <td colspan="3" style="text-align:right">
+                Date : {{date |date : 'dd/MM/yyyy'}}
+            </td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+            <tr style="border:0.5px solid black">
+                <th>SL.No.</th>
+                <th>Particular</th>
+                <th>Expenditure No.</th>
+                <th>Date</th>
+                <th>Mode Of Payment</th>
+                <th>Expenditure Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border:0.5px solid black" ng-repeat="user in indentapproveddetais">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left">{{user.PCMPART_ParticularName}}</td>
+                <td class="text-left">{{user.PCEXPTR_ExpenditureNo}}</td>
+                <td class="text-center">{{user.PCEXPTR_Date | date :'dd/MM/yyyy'}}</td>
+                <td class="text-left">{{user.PCEXPTR_ModeOfPayment}}</td>
+                <td class="text-right">{{user.PCEXPTR_Amount |number:2}}</td>
+            </tr>
+            <tr style="border:0.5px solid black">
+                <td colspan="5" class="text-right">Total Expenditure Amount</td>
+                <td class="text-right">{{totalexpenditure |number:2}}</td>
+            </tr>
+            <tr style="border:0.5px solid black">
+                <td colspan="5" class="text-right">Sanctioned Amount</td>
+                <td class="text-right">{{sanc_amt |number:2}}</td>
+            </tr>
+            <tr style="border:0.5px solid black">
+                <td colspan="5" class="text-right">{{labelname}} Amount</td>
+                <td class="text-right">{{balance_amt |number:2}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

@@ -1,0 +1,236 @@
+﻿<style>    
+    .multiselect {
+        width: 21.8em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;       
+        margin-bottom: 1%;
+        
+    }
+</style>
+
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Task Category Employee</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Department:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="studentname" ng-model="$parent.HRMD_Id" ng-disabled="flg" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select book" ng-change="getcategory($parent.HRMD_Id)">
+                                    <!--$parent.LMB_Id-->
+                                    <ui-select-match ng-trim="false" placeholder="Select or search Department...">{{$select.selected.hrmD_DepartmentName}}::{{$select.selected.mI_Name}} </ui-select-match>
+
+                                    <ui-select-choices repeat="option in departmentlist | filter: $select.search " value="{{option.hrmD_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmD_DepartmentName)+'::'+(option.mI_Name) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Category:<span style="color:red">*</span> </label>
+                                <div class="form-group">
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                        <label>
+                                            <input type="checkbox" name="stdd" value="1" ng-model="usercheck" data-ng-click="all_check()" />
+                                            <span class="lbl padding-8">All</span>
+                                        </label>
+                                        <label data-ng-model="ISMMTCAT_Id" ng-repeat="year in categorylist |filter:filterchkbx" value="{{year.ismmtcaT_Id}}">
+                                            <input type="checkbox" name="year1" value="1" data-ng-model="year.select3" ng-click="togchkbx()" ng-required="isOptionsRequired()" />
+                                            <span class="lbl padding-8" ng-if="year.ismmtcaT_CompulsoryFlg==true">{{year.ismmtcaT_TaskCategoryName}} : {{year.ismmtcaT_TaskPercentage}} - Compulsory</span>
+                                            <span class="lbl padding-8" ng-if="year.ismmtcaT_CompulsoryFlg==false">{{year.ismmtcaT_TaskCategoryName}} : {{year.ismmtcaT_TaskPercentage}} </span>
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                            <div ng-message="required" style="color:red">Please Select Category</div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" style="text-align:center">Employee:<span style="color:red">*</span> </label>
+                                <div class="multiselect col-sm-8">
+
+                                    <input class="form-control" ng-model="searchchkbxtype" type="text" placeholder="search here...">
+                                    <label>
+                                        <input type="checkbox" name="type" value="1" ng-model="userchecktype" data-ng-click="all_checktype()" />
+                                        <span class="lbl padding-8">All</span>
+                                    </label>
+                                    <label data-ng-model="HRME_Id" ng-repeat="type in employeelist|filter:filterchkbxtype" value="{{type.hrmE_Id}}">
+                                        <input type="checkbox" name="type1" value="1" data-ng-model="type.select1" ng-click="togchkbxtype()" ng-required="isOptionsRequiredtype()" />
+                                        <span class="lbl padding-8">{{type.hrmE_EmployeeFirstName}}</span>
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted(myForm.type1)" ng-messages="myForm.type1.$error">
+                                        <div ng-message="required" style="color:red">Select Employee</div>
+                                    </div>
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="add()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>ADD
+                    </md-button>
+                </div>
+
+
+                <div class="box-body" ng-show="showgrid">
+                    <table  class="table table-bordered table-responsive" style="width:700px;text-align:center">
+                        <thead>
+                            <tr>
+
+
+                                <th>Employee Name</th>
+                                <th>Category Name</th>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" name="stdd" value="1" ng-model="usercheckadd" data-ng-click="toggleAll(usercheckadd)" />
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in emplcategorylist">
+                            <tr>
+                                <td style="text-align:left">{{user.hrmE_EmployeeFirstName}}</td>
+                                <td style="text-align:left">{{user.ismmtcaT_TaskCategoryName}}</td>
+                                <td class="text-center">
+                                    <label>
+                                        <input type="checkbox" name="year1" value="1" ng-model="user.isSelected22" ng-change="optionToggled(user1)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="ISMMTCATE_Id" value="{{ISMMTCATE_Id}}" />
+                       
+
+
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-disabled="showgridsave" ng-click="save()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="showgridsave" ng-click="exportToExcel('#printareaId1')" ng-show="alldata1.length>0">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                        </md-button>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="alldata1.length>0">
+        <div class="box box-body" id="printareaId1">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{alldata1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th><a href="" ng-click="sort('ismmtcaT_TaskCategoryName')">Task Category Name</a></th>
+                        <th><a href="" ng-click="sort('hrmE_EmployeeFirstName')">Department Name</a></th>
+                        <th><a href="" ng-click="sort('hrmE_EmployeeFirstName')">Company Name</a></th>
+                        <th><a href="" ng-click="sort('hrmE_EmployeeFirstName')">Employee Name</a></th>
+                        <th><a href="" ng-click="sort('ismmtcatE_TaskPercentage')">Task Percentage</a></th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (alldata1 | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td style="text-align:left">{{user.ismmtcaT_TaskCategoryName}}</td>
+                        <td style="text-align:left">{{user.hrmD_DepartmentName}}</td>
+                        <td style="text-align:left">{{user.mI_Name}}</td>
+                        <td style="text-align:left">{{user.hrmE_EmployeeFirstName}}</td>
+                        <td style="text-align:left" ng-if="user.ismmtcatE_CompulsoryFlg==true">{{user.ismmtcatE_TaskPercentage}} - Compulsory</td>
+                        <td style="text-align:left" ng-if="user.ismmtcatE_CompulsoryFlg==false">{{user.ismmtcatE_TaskPercentage}}</td>
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="edittab1(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            <span ng-if="!user.ismmtcatE_ActiveFlag">
+                                <a href="" ng-click="deactivYTab1(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="activate">
+                                    Activate
+                                </a>
+                            </span>
+                            <span ng-if="user.ismmtcatE_ActiveFlag">
+                                <a href="" ng-click="deactivYTab1(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="deactivate">
+                                    De-activate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+

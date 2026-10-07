@@ -1,0 +1,219 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="onloadmonths()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Feedback Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <!--<div class="col-sm-8 col-lg-offset-2">
+                        <div class="well">
+                            <div class="text-center" ng-init="flag='Canteen'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Canteen" name="Canteen" ng-model="flag" class="ng-pristine ng-untouched ng-valid" ng-change="clearayyary()" aria-checked="true" aria-invalid="false">
+                                    <span class="lbl padding-8">Canteen </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="HouseKeeping" name="HouseKeeping" ng-model="flag" class="ng-pristine ng-untouched ng-valid" ng-change="clearayyary()" aria-checked="false" aria-invalid="false">
+                                    <span class="lbl padding-8">House Keeping</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>-->
+                    <div class="col-sm-8 col-lg-offset-2">
+                        <div class="well">
+                            <div class="text-center" ng-init="optionflag='Average'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Average" name="PRno" ng-model="optionflag" class="ng-pristine ng-untouched ng-valid" ng-change="clearayyary()" aria-checked="true" aria-invalid="false">
+                                    <span class="lbl padding-8">Average </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Individual" name="PRno" ng-model="optionflag" class="ng-pristine ng-untouched ng-valid" ng-change="clearayyary()" aria-checked="false" aria-invalid="false">
+                                    <span class="lbl padding-8">Individual</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>Select Type:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="t1_status_{{$index}}" ng-model="type">
+                                    <option value="">--Type--</option>
+                                    <option ng-repeat="option in types" ng-selected="option.value==value"
+                                            value="{{option.value}}">
+                                        {{option.type}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group" style="padding-top: 5%;">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>From Date:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="fromdate" onkeypress="return false" name="fromdate" md-placeholder="Select date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.fromdate)" ng-messages="myForm.fromdate.$error">
+                                <div ng-message="required"><b>Select From Date</b></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group" style="padding-top: 5%;">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>To Date:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="todate" onkeypress="return false" name="todate" md-placeholder="Select date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.todate)" ng-messages="myForm.todate.$error">
+                                <div ng-message="required"><b>Select To Date</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                        <i class="fa fa-search-minus" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()" ng-if="canteenfeedbackreport.length>0">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#modulefeedback')" ng-if="canteenfeedbackreport.length>0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>
+
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+
+    <div class="box box-primary" ng-if="canteenfeedbackreport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Feedback Report </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body" ng-if="optionflag=='Average'">
+            <div id="modulefeedback">
+                <div class="text-center"><h3>{{type}} Average Rating Report</h3></div>
+                <table class="table table-striped table-bordered ">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Feedback Question</th>
+                            <th>Average Rating  out of 4</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="r in canteenfeedbackreport">
+                            <td>{{$index+1}}</td>
+                            <td>{{r.FMQE_FeedbackQuestions}}</td>
+                            <td>{{r.Average}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <div class="box-body" ng-if="optionflag=='Individual'">
+            <div id="modulefeedback">
+                <div class="text-center"><h3>{{type}} FeedBack Individual Remarks Report</h3></div>
+
+                <div style=" overflow-x: scroll;">
+                    <table class="table table-bordered  table-striped">
+                        <thead>
+                            <tr>
+                                <th>Sl.no</th>
+                                <th>Question</th>
+                                <th colspan="{{betweendates.length}}">FeedBack</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in feedbackquestion">
+                                <th>{{$index+1}}</th>
+                                <th>{{x.FMQE_FeedbackQuestions}}</th>
+                                <th ng-repeat="date in betweendates" class="text-center" style="vertical-align:top">
+                                    {{date.date}}
+                                    <table class="table table-bordered table-striped">
+                                        <tr class="text-center">
+                                            <th>Emp Name</th>
+                                            <th>Emp Code</th>
+                                            <th>Rating</th>
+                                            <th>FeedBack</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                        <tr ng-repeat="y in canteenfeedbackreport" ng-if="x.FMQE_Id==y.FMQE_Id && y.FSSTR_FeedbackDate == date.date ">
+                                            <td class="text-left">{{y.employeename}}</td>
+                                            <td>{{y.HRME_EmployeeCode}}</td>
+                                            <td>{{y.FMOP_OptionsValue}}</td>
+                                            <td>{{y.FMOP_FeedbackOptions}}</td>
+                                            <td>{{y.FSTTR_FeedBack}}</td>
+                                        </tr>
+                                    </table>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!--<table class="table table-striped table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Employee Name</th>
+                        <th>Question</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="r in canteenfeedbackreport">
+                        <td>{{$index+1}}</td>
+                        <td>{{r.employeename}}</td>
+                        <td>{{r.HRME_EmployeeCode}}</td>
+                        <td>{{r.VMF_ModuleName}}</td>
+                        <td>{{r.VMF_Rating}}</td>
+                        <td>{{r.VMF_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>-->
+            <!--<table class="table table-striped table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Employee Name</th>
+                        <th>Emp Code</th>
+                        <th>Module Name</th>
+                        <th>Average Rating  out of 5</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="r in canteenfeedbackreport">
+                        <td>{{$index+1}}</td>
+                        <td>{{r.employeename}}</td>
+                        <td>{{r.HRME_EmployeeCode}}</td>
+                        <td>{{r.VMF_ModuleName}}</td>
+                        <td>{{r.VMF_Rating}}</td>
+                        <td>{{r.VMF_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>-->
+        </div>
+    </div>
+
+</section>

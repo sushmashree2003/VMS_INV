@@ -1,0 +1,293 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    COE Trigger <label>
+                    </label>
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+
+                    <div class="col-sm-12">
+                        <div style="text-align:center;" data-ng-init="Coetype='Leads'">
+                            <input value="Leads" ng-model="Coetype" type="radio" name="Coetype">
+                            <span class="lbl padding-8">
+                                Leads
+                            </span>
+                            <input value="Vendor" ng-model="Coetype" type="radio" name="Coetype">
+                            <span class="lbl padding-8">
+                                Vendors
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6" ng-if="Coetype=='Leads'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Lead Name:</label>
+
+                            <div class="multiselect col-sm-8">
+                                <label>
+                                    <input name="all" value="1" ng-model="ismslE_Id" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(ismslE_Id)">
+                                    <span class="lbl padding-8">
+                                        <b> All Lead</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in leadlist">
+                                    <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired() && Coetype=='Leads' ">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.ismslE_LeadName}} </b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6" ng-if="Coetype=='Vendor'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Vendor Name:</label>
+
+                            <div class="multiselect col-sm-8">
+                                <label>
+                                    <input name="all" value="1" ng-model="invmS_Id" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept1(invmS_Id)">
+                                    <span class="lbl padding-8">
+                                        <b> All Vendor</b>
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in vendorlist">
+                                    <input name="dept1" ng-model="user.selected1" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept1(user);" title="Select Employee" ng-required="isOptionsRequired() &&  Coetype=='Vendor' ">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.invmS_SupplierName}} </b>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.dept1)" ng-messages="myForm.dept1.$error">
+                                <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Template:<span style="color:Red">*</span></label>
+                        <div class="col-sm-5">
+                            <select class="form-control" name="grp" ng-model="ISES_Id">
+                                <option value="">--Select--</option>
+                                <option ng-repeat="val in templatelist" value="{{val.iseS_Id}}" ng-selected="val.iseS_Id==ISES_Id">{{val.ismsmsO_SourceName}}</option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.grp)" ng-messages="myForm.grp.$error">
+                                <div ng-message="required"> Select Template</div>
+                            </div>
+                        </div>
+                        <label class="control-label col-sm-4">
+
+                            <b style="color:Red" ng-show="ISES_Id>0">
+                                <a href="javascript:void(0)" class="text-primary" ng-click="viewtemplate();">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                                View Template
+                            </b>
+                        </label>
+                    </div>
+
+
+
+                </div>
+
+
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <span>
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="showreport()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                SendMail
+                            </md-button>
+                        </span>
+                        <md-button type="submit" class="md-raised md-warn" data-ng-click="Clearid();">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="leadcommentsreport.length > 0 ">
+            <div class="box-header with-border">
+                <h3 class="box-title"> COE Trigger</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{leadcommentsreport.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th style="width:30px">SL.NO</th>
+                            <th style="width:140px">Lead Name </th>
+                            <th style="width:300px"> Comments</th>
+                            <th style="width:124px"> Comments Date</th>
+                            <th style="width:124px"> Comments By</th>
+                            <th style="width:124px">View</th>
+                        </tr>
+                    </thead>
+
+                    <tbody ng-repeat="user in taskid5">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.leadcommentsreport.length+1}}">{{$index+1}}</td>
+                            <td style="text-align:left" rowspan="{{user.leadcommentsreport.length+1}}">
+                                {{user.ISMSLE_LeadName}}
+                            </td>
+                        </tr>
+                        <tr ng-repeat="obja in user.leadcommentsreport">
+
+
+                            <td class="text-left">{{obja.ISMSLECOM_Comments}}</td>
+                            <td class="text-left">{{obja.ISMSLECOM_CreatedDate| date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{obja.employeename}}</td>
+                            <td>
+                                <span ng-show="obja.ISMSLE_FilePath!=null && obja.ISMSLE_FilePath!=''">
+                                    <a class="text-primary" data-placement="bottom" data-title="View Details" data-ng-click="previewimg_new(obja.ISMSLE_FilePath)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+
+
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+
+                </table>
+                <dir-pagination-controls max-size="5" pagination-id="paginate1" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                <hr />
+            </div>
+            <div id="printSectionId" ng-show="print_data" style="overflow:scroll">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="vaps">
+                </div>
+                <center> <h4><u> COE Trigger </u></h4></center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th style="width:30px">SL.NO</th>
+                            <th style="width:140px">Lead Name </th>
+                            <th style="width:300px"> Comments</th>
+                            <th style="width:124px"> Comments Date</th>
+                            <th style="width:124px"> Comments By</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in taskid5">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.leadcommentsreport.length+1}}">{{$index+1}}</td>
+                            <td style="text-align:left" rowspan="{{user.leadcommentsreport.length+1}}">
+                                {{user.ISMSLE_LeadName}}
+                            </td>
+                        </tr>
+                        <tr ng-repeat="obja in user.leadcommentsreport">
+                            <td class="text-left">{{obja.ISMSLECOM_Comments}}</td>
+                            <td class="text-left">{{obja.ISMSLECOM_CreatedDate| date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{obja.employeename}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="tableexcell" ng-show="print_data_excell" class="table-bordered text-center" style="overflow:scroll">
+                <center> <h4><u> COE Trigger </u></h4></center>
+                <table class="table table-hover table-responsive table-bordered text-center" id="tableex">
+                    <thead>
+                        <tr>
+                            <th>SL.NO</th>
+                            <th style="width:140px">Lead Name </th>
+                            <th style="width:300px"> Comments</th>
+                            <th style="width:124px"> Comments Date</th>
+                            <th style="width:124px"> Comments By</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in taskid5">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.leadcommentsreport.length+1}}">{{$index+1}}</td>
+                            <td style="text-align:left" rowspan="{{user.leadcommentsreport.length+1}}">
+                                {{user.ISMSLE_LeadName}}
+                            </td>
+                        </tr>
+                        <tr ng-repeat="obja in user.leadcommentsreport">
+                            <td class="text-left">{{obja.ISMSLECOM_Comments}}</td>
+                            <td class="text-left">{{obja.ISMSLECOM_CreatedDate| date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{obja.employeename}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="myModal" class="modal fade" role="dialog" data-backdrop="" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="col-sm-4">
+                            <h4 class="modal-title text-white">Template Details</h4>
+                        </div>
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+
+
+                    </div>
+                    <div class="modal-body">
+                        <div class="box box-primary">
+
+                            <div class="box-body">
+                                <div id="test">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            &nbsp;
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</section>
+
+
+<

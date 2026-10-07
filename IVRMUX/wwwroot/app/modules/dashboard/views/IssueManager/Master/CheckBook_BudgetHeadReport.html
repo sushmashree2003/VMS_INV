@@ -1,0 +1,453 @@
+﻿<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Cheque Book Budget Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="well text-center">
+                            <div ng-init="rdopunch='Consolidated'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Consolidated" name="enhc" ng-model="rdopunch" ng-change="otherdaydatechange()">
+                                    <span class="lbl padding-8"><b> Consolidated </b></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Detailed" name="enhc" ng-model="rdopunch" ng-change="otherdaydatechange()">
+                                    <span class="lbl padding-8"><b>Detailed </b></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Monthwise" name="enhc" ng-model="rdopunch" ng-change="otherdaydatechange()">
+                                    <span class="lbl padding-8"><b> Monthwise</b></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group" ng-if="rdopunch=='Detailed' || rdopunch=='Monthwise' ">
+                                <label class="control-label col-sm-4">Company Name :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="obj.MI_Id" name="grps" required>
+                                        <option value="">Select Company --  </option>
+                                        <option ng-repeat="option in allcompany" value="{{option.mI_Id}}" ng-selected="{{option.mI_Id == obj.MI_IdTwo}}">
+                                            {{option.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.grps)" ng-messages="myForm.grps.$error">
+                                        <div ng-message="required"> Select Company Name </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="rdopunch =='Consolidated'">
+                                <label class="control-label col-sm-3">Company  :<strong style="color:red;">*</strong></label>
+                                <div class="multiselect col-sm-6">
+                                    <input class="form-control" ng-model="searchValuetwo" type="text" placeholder="search Company here..." onkeydown="return false">
+                                    <label>
+                                        <input name="alitem" value="1" ng-model="allmiddff" type="checkbox" ng-click="allmidd(allmiddff)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-model="MI_Id" ng-repeat="mi in allcompany | filter : searchValuetwo">
+                                        <input name="mid" ng-model="mi.miiddd" type="checkbox" ng-click="mi_clicktwo();" ng-required="isRequiredmitwo()">
+                                        <span class="lbl padding-8">
+                                            {{mi.mI_Name}}
+                                        </span>
+                                    </label>
+
+                                </div>
+                            </div>
+                            <!--Month_List-->
+                            <div class="form-group" ng-if="rdopunch=='Monthwise'">
+                                <label class="control-label col-sm-3">Month  :<strong style="color:red;">*</strong></label>
+                                <div class="multiselect col-sm-6">
+                                    <input class="form-control" ng-model="searchValuethree" type="text" placeholder="search Month here..." onkeydown="return false">
+                                    <label>
+                                        <input name="alitem" value="1" ng-model="allmiddffpo" type="checkbox" ng-click="allmiddd(allmiddffpo)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label  ng-repeat="mi in Month_List | filter : searchValuethree">
+                                        <input name="mid" ng-model="mi.miiddfgd" type="checkbox"  ng-required="isRequiredmithree()">
+                                        <span class="lbl padding-8">
+                                            {{mi.ivrM_Month_Name}}
+                                        </span>
+                                    </label>
+
+                                </div>
+                            </div>
+                            <div class="error-messages text-center" ng-if="interacted(myForm.mid) && rdopunch =='Consolidated'" ng-messages="myForm.mid.$error">
+                                <div ng-message="required"> Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Financial Year  :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="obj.IMFY_Id" name="grpsF" ng-change="FianciBudget()" required>
+                                        <option value="">Select Financial Year --  </option>
+                                        <option ng-repeat="option in FinancialYear" value="{{option.imfY_Id}}" ng-selected="{{option.imfY_Id == obj.IMFY_Id}}">
+                                            {{option.imfY_FinancialYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.grpsF)" ng-messages="myForm.grpsF.$error">
+                                        <div ng-message="required"> Select Financial Year </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="rdopunch =='Detailed'">
+                                <label class="control-label col-sm-3"> Budget :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1ww" name="yrnam" ng-model="obj.VMBDGHD_Id" required>
+                                        <option value="">--Select Budget--</option>
+                                        <option ng-repeat="option in CheckBookBudget" value="{{option.VMBDGHD_Id}}"
+                                                ng-selected="{{option.VMBDGHD_Id == obj.VMBDGHD_Id}}">
+                                            {{option.VMBDGHD_BudgetHead}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yrnam)" ng-messages="myForm.yrnam.$error">
+                                        <div ng-message="required">Select Budget</div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group" ng-if="rdopunch =='Consolidated' || rdopunch=='Monthwise'">
+                                <label class="control-label col-sm-3">Budget :<strong style="color:red;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Item here..." ng-paste="$event.preventDefault()" onkeydown="return false">
+                                    <label>
+                                        <input name="alitem" value="1" ng-model="allmi" type="checkbox" ng-click="all_miid(allmi)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-model="MI_Id" ng-repeat="mi in CheckBookBudget | filter : searchValue">
+                                        <input name="mi" ng-model="mi.miid" type="checkbox" ng-click="mi_click();" ng-required="isRequiredmi()">
+                                        <span class="lbl padding-8">
+                                            {{mi.VMBDGHD_BudgetHead}} /{{mi.MI_Name}}
+                                        </span>
+                                    </label>
+
+                                </div>
+
+
+                            </div>
+                            <div class="error-messages text-center" ng-if="interacted(myForm.mi) && rdopunch =='Consolidated'" ng-messages="myForm.mi.$error" >
+                                <div ng-message="required">Please Select Atleast One checkbox</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-sm-12 text-center">
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="CheckbookSource.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="CheckbookSource.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printpi')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+
+
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="rdopunch =='Consolidated' && CheckbookSource.length>0 ">
+        <div class="box-header with-border">
+            <h3 class="box-title">Cheque Book Budget Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{CheckbookSource.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Comapany Name</th>
+                        <th>Fianacial Year</th>
+                        <th>Budget Head</th>
+                        <th>Budget Amount</th>
+
+                        <th>Approved Amount</th>
+                        <th>Balance Amount</th>
+                        <th>Month Wise Amount</th>
+
+                        <th>Reamrk</th>
+                        <th>
+                            View
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1=(CheckbookSource |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                        current-page="currentPage" pagination-id="page1">
+                        <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>
+                            {{user.MI_Name}}
+                        </td>
+                        <td>
+                            {{user.IMFY_FinancialYear}}
+                        </td>
+
+                        <td>
+                            {{user.VMBDGHD_BudgetHead}}
+                        </td>
+                        <td>
+                            {{user.VMBDGHDAMT_Amount}}
+                        </td>
+                        <td>
+                            {{user.VPAYVOU_ApprovedAmount}}
+                        </td>
+                        <td>
+                            {{user.VMBDGHDAMT_Amount - user.VPAYVOU_ApprovedAmount}}
+                        </td>
+                        <td>
+                            {{user.VMBDGHDAMT_MonthwiseAmount}}
+                        </td>
+                        <td>
+                            {{user.VMBDGHDAMT_Remarks}}
+                        </td>
+                        <td>
+                            <a href="javascript:void(0)" ng-click="Uploaddata(user)" data-placement="bottom" data-toggle="tooltip"
+                               title="Upload file">
+                                <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <dir-pagination-controls max-size="10" pagination-id="page1"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+    <div class="box box-primary" ng-if="rdopunch =='Monthwise' && CheckBookBudgetlist.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Cheque Book Budget Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-12" style="overflow:auto !important" id="printpi">
+                        <div class="col-sm-12" style="text-align:center;">
+                            <img src="{{imagename}}" style="border:none;height:120px;width:600px;text-align:center" />
+                        </div>
+
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>SL No</th>
+                                    <th>
+                                       Budget Head
+                                    </th>
+                                    <th>
+                                        Budget Amount
+                                    </th>
+                                    <th ng-repeat="user in temp_MonthList">
+                                        <span>{{user.IVRM_Month_Name}}</span>
+                                    </th>
+                                    <th>
+                                        Budget Balance
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="opt in CheckBookBudgetlist">
+                                    <td>{{$index+1}}</td>
+                                    <td>
+                                        {{opt.VMBDGHD_BudgetHead}}
+                                    </td>
+                                   <td>
+                                       {{opt.VMBDGHDAMT_Amount}}
+                                   </td>
+
+                                    <td ng-repeat="user in temp_MonthList">
+                                        <span>
+                                            {{opt[user.IVRM_Month_Name]}}
+                                        </span>
+                                    </td>
+                                    <td ng-repeat="dd in BudgetReportotal" ng-if="opt.VMBDGHD_Id==dd.VMBDGHD_Id">
+                                        <strong>{{opt.VMBDGHDAMT_Amount - dd.Total}}</strong>
+                                    </td>
+                                   
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<div id="CheckBookBudget" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Check Book    Budget Details
+                </h4>
+                <div class="col-sm-4 pull-right">
+                    <md-button  type="submit" class="md-raised md-primary" id="save-btn" ng-click="printDatatwo()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12" style="overflow:auto !important" id="printpiP">
+                            <div class="col-sm-12" style="text-align:center;">
+                                <img src="{{imagename}}" style="border:none;height:120px;width:600px;text-align:center" />
+                            </div>
+                           
+                            <table class="table table-responsive table-bordered" width="100%">
+                                <tr>
+                                    <td style="width:50%;text-align:left"> BudgetHead : &nbsp;  <strong> {{VMBDGHD_BudgetHead}}  </strong>  </td>
+                                    <td style="width:50%;text-align:left"> <span> Budget Amount:&nbsp; <strong> {{VMBDGHDAMT_Amount}} </strong> </span></td>
+                                </tr>
+
+                                <tr>
+                                    <td style="width:50%;text-align:left">
+                                        <span>
+                                            <b>
+                                                Financial Year  : {{IMFY_FinancialYear}}
+                                            </b>
+                                        </span>
+
+
+                                    </td>
+                                    <td style="width:50%;text-align:left">
+                                        <b>
+                                            Total Approved Amount  : {{TotalApproved}}
+                                        </b>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:50%;text-align:left">
+                                        <span>
+                                            <b>
+
+                                                Monthwise Amount  : {{VMBDGHDAMT_MonthwiseAmount}}
+
+                                            </b>
+                                        </span>
+
+
+                                    </td>
+                                    <td style="width:50%;text-align:left">
+                                        <b>
+                                            Balance Budget  Amount : {{VMBDGHDAMT_Amount - TotalApproved}}
+                                        </b>
+
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>SL.No.</th>
+                                        <th>Voucher No</th>
+                                        <th>Bank Details</th>
+                                        <th>Pay Name</th>
+                                        <th>Cheque No</th>
+                                        <th>Payment Date</th>
+                                    
+                                        <th>Applied Amount</th>
+                                        <th>Approved Amount</th>
+                                        <th>Voucher Createdby</th>
+                                        <th>Narration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in CheckBookBudgetlist">
+                                        <td style="width:1%;">{{$index+1}}</td>
+
+                                        <td style="text-align:left">{{user.VPAYVOU_VoucherNo}}</td>
+                                        <td style="text-align:left">
+                                            {{user.HRMBD_BankName}}<br />A/c No
+                                            {{user.HRMBD_BankAccountNo}}
+                                        </td>
+                                        <td style="text-align:left">
+
+                                            <span ng-if="user.INVMS_SupplierName!=null && user.INVMS_SupplierName!=''">
+                                                {{user.INVMS_SupplierName}}
+                                            </span>
+                                            <span ng-if="user.VPAYVOU_PaymentTo!=null && user.VPAYVOU_PaymentTo!=''">
+                                                {{user.VPAYVOU_PaymentTo}}
+                                            </span>
+                                        </td>
+                                        <td style="text-align:left">{{user.VPAYVOU_ChequeNo}}</td>
+                                        <td style="text-align:left">{{user.VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}</td>
+
+                                        <td style="text-align:left">{{user.VPAYVOU_AppliedAmount}}</td>
+                                        <td style="text-align:left">{{user.VPAYVOU_ApprovedAmount}}</td>
+                                        <td style="text-align:left">{{user.createdby}}</td>
+                                        <td style="text-align:left">{{user.VPAYVOU_Remarks}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

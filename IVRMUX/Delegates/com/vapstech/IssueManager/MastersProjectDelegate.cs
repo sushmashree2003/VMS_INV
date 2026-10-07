@@ -1,0 +1,36 @@
+﻿using CommonLibrary;
+using PreadmissionDTOs.com.vaps.IssueManager;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace IVRMUX.Delegates.com.vapstech.IssueManager
+{
+    public class MastersProjectDelegate
+    {
+        private readonly object resource;
+        private readonly string serviceBaseUrl;
+        private const String JsonContentType = "application/json; charset=utf-8";
+        CommonDelegate<MastersProject_DTO, MastersProject_DTO> COMMM = new CommonDelegate<MastersProject_DTO, MastersProject_DTO>();
+
+        public MastersProject_DTO getdetails(MastersProject_DTO dTO)
+        {
+            return COMMM.POSTIssueManager(dTO, "MastersProjectFacade/getdetails/");
+        }
+        public MastersProject_DTO OnChangeInstitution(MastersProject_DTO dTO)
+        {
+            return COMMM.POSTIssueManager(dTO, "MastersProjectFacade/OnChangeInstitution/");
+        }
+        public MastersProject_DTO saverecord(MastersProject_DTO dTO)
+        {
+            return COMMM.POSTIssueManager(dTO, "MastersProjectFacade/saverecord/");
+        }
+        public MastersProject_DTO deactiveY(MastersProject_DTO dTO)
+        {
+            return COMMM.POSTIssueManager(dTO, "MastersProjectFacade/deactiveY/");
+        }
+
+
+    }
+}

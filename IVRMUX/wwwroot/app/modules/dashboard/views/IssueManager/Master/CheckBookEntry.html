@@ -1,0 +1,1586 @@
+﻿<style>
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PAYMENT VOUCHER ENTRY</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamwwe" ng-model="obj.MI_Id" ng-change="oncmpchange()" ng-disabled="editflag==true" required>
+                                    <option value="">--Select Company--</option>
+                                    <option ng-repeat="option in allcompany" value="{{option.mI_Id}}"
+                                            ng-selected="{{option.mI_Id == obj.MI_Id}}">
+                                        {{option.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamwwe)" ng-messages="myForm.yrnamwwe.$error">
+                                    <div ng-message="required">Select Company</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <h5 ng-show="obj.MI_Id>0 && voucherBalance > 0"><strong> Voucher Running Bank Balance :{{voucherBalance}}</strong></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body" ng-show="obj.MI_Id>0">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="well">
+
+                        <div class="text-center" ng-init="obj.optionflag='Cheque'">
+                            <input type="checkbox" ng-model="obj.modeFlag" />
+                            <span class="lbl padding-8">Mode Of Payment</span>
+                            <label class="radio-inline">
+                                <input type="radio" value="Cheque" name="Group" ng-model="obj.optionflag" ng-change="RDIchaNge()">
+                                <span class="lbl padding-8">CHEQUE  </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="online" name="" ng-model="obj.optionflag" ng-change="RDIchaNge()">
+                                <span class="lbl padding-8">ONLINE </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="col-sm-6 form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Bank Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamddwwe" ng-model="obj.HRMBD_Id" ng-change="bankchange()" required ng-disabled="editflag==true">
+                                    <option value="">--Select Bank--</option>
+                                    <option ng-repeat="option in banklist" value="{{option.hrmbD_Id}}"
+                                            ng-selected="{{option.hrmbD_Id == obj.HRMBD_Id}}">
+                                        {{option.hrmbD_BankName}}--{{option.hrmbD_BankAccountNo}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamddwwe)" ng-messages="myForm.yrnamddwwe.$error">
+                                    <div ng-message="required">Select Bank</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--ng-change="ChequeNumbersArray()"-->
+                        <div class="form-group" ng-show="obj.optionflag=='Cheque'">
+                            <label class="control-label col-sm-4">Cheque No <span style="color:red">*</span> :</label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="iamounqqtchk" ng-model="$parent.obj.VPAYVOU_ChequeNo" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Cheque No"
+                                           ng-required="obj.optionflag=='Cheque'">
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Cheque No">
+                                        {{$select.selected.vpayvoU_ChequeNo}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in CheckbookSource | filter: $select.search" value="{{catgry.vpayvoU_ChequeNo}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.vpayvoU_ChequeNo | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <!--<input class="form-control" name="iamounqqtchk" type="text" ng-model="VPAYVOU_ChequeNo" placeholder="Cheque No" allow-pattern="[0-9.]" autocomplete="off" ng-paste="$event.preventDefault()" ng-required="obj.VPAYVOU_SelfPayFlg==false" />-->
+                                <div class="error-messages" ng-if="interacted(myForm.iamounqqtchk)" ng-messages="myForm.iamounqqtchk.$error">
+                                    <div ng-message="required">Enter Cheque No</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="obj.modeFlag==true">
+                            <label class="control-label col-sm-4">Mode Of Payment :</label>
+                            <div class="col-sm-8">
+                                <!--VPAYVOU_PaymentMode-->
+                                <select class="form-control" id="sel1ww" name="yrnamwweeee" ng-model="obj.VPAYVOU_PaymentMode" ng-disabled="obj.optionflag=='Cheque'" ng-required="obj.modeFlag==true">
+                                    <option value="">--Select Payment Mode--</option>
+                                    <option ng-repeat="option in ModeOfPayment" value="{{option.ivrmmoD_ModeOfPayment}}"
+                                            ng-selected="{{option.ivrmmoD_ModeOfPayment == obj.VPAYVOU_PaymentMode}}">
+                                        {{option.ivrmmoD_ModeOfPayment}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamwweeee)" ng-messages="myForm.yrnamwweeee.$error">
+                                    <div ng-message="required"> Select Payment Mode</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="obj.modeFlag==true">
+                            <!--ng-hide="obj.VPAYVOU_PaymentMode=='cash'"-->
+                            <!---->
+                            <label class="control-label col-sm-4">Payment Reference :</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" ng-model="obj.VPAYVOU_PaymentReference" autocomplete="off" allow-pattern="^[a-zA-Z0-9\s]*$" placeholder="Payment Reference" maxlength="20" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"></label>
+                            <div class="col-sm-8 text-center">
+                                <div class="well">
+                                    <input name="lvemp" ng-model="obj.VPAYVOU_SupplierFlg" type="checkbox" ng-click="Supliearfrom()" ng-disabled="editflag==true" />
+                                    <span class="lbl padding-8">
+                                        Supplier
+                                    </span>
+                                    <input name="lvemp" ng-model="obj.VPAYVOU_ToSupplierFlg" type="checkbox" ng-click="SupliearTO()" ng-disabled="editflag==true" />
+                                    <span class="lbl padding-8">
+                                        Others
+                                    </span>
+                                    <input name="lvemp" ng-model="obj.VPAYVOU_SelfPayFlg" type="checkbox" style="display:none !important" />
+                                    <span class="lbl padding-8" style="display:none !important">
+                                        Self Pay
+                                    </span>
+                                    <span ng-show="leafcancelD.length > 0">
+                                        <a href="javascript:void(0)" ng-click="viewCheckBook()" data-placement="bottom" data-toggle="tooltip"
+                                           title="View file" data-target="#myModalfile">
+                                            <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="obj.VPAYVOU_SupplierFlg==true">
+                            <label class="control-label col-sm-4">
+                                Pay
+                                Name:<span style="color:Red">*</span>
+                            </label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="client" ng-model="$parent.obj.INVMS_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Supplier"
+                                           ng-disabled="editflag==true" ng-required="obj.VPAYVOU_SupplierFlg==true" ng-change="amtchange()">
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Supplier">
+                                        {{$select.selected.invmS_SupplierName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in get_supplier | filter: $select.search" value="{{catgry.invmS_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.invmS_SupplierName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                    <div ng-message="required">Pay Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="obj.VPAYVOU_ToSupplierFlg==true">
+                            <label class="control-label col-sm-4">Pay Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="VPAYVOU_PaymentTo" placeholder=" Others" ng-model="obj.VPAYVOU_PaymentTo" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()" autocomplete="off" ng-required="obj.VPAYVOU_ToSupplierFlg==true" />
+                                <div class="error-messages" ng-if="interacted(myForm.VPAYVOU_PaymentTo)" ng-messages="myForm.VPAYVOU_PaymentTo.$error">
+                                    <div ng-message="required"> Pay Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--obj.VPAYVOU_SelfPayFlg-->
+                        <!--ng-blur="amtchange()"-->
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Total Amount:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="ddamtt" placeholder="Enter Amount" ng-model="obj.VPAYVOU_AppliedAmount" allow-pattern="[0-9]" autocomplete="off" ng-paste="$event.preventDefault()" ng-blur="amtvalidation()" required />
+                                <div class="error-messages" ng-if="interacted(myForm.ddamtt)" ng-messages="myForm.ddamtt.$error">
+                                    <div ng-message="required">Enter Amount</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6 form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Bank Balance:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="blll" placeholder="0" ng-model="obj.VPAYVOU_BankBalalnce" ng-disabled="true" autocomplete="off" />
+                                <div class="error-messages" ng-if="interacted(myForm.blll)" ng-messages="myForm.blll.$error">
+                                    <div ng-message="required">Enter Bank Balance</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"></label>
+                            <div class="col-sm-8 text-center">
+                                <div class="well">
+                                    <input ng-model="obj.TDS" ng-change="amtvalidation()" type="checkbox" />
+                                    <span class="lbl padding-8">
+                                        TDS
+                                    </span>
+                                    <input ng-model="obj.Penaltiy" ng-change="amtvalidation()" type="checkbox" />
+                                    <span class="lbl padding-8">
+                                        Penalty
+                                    </span>
+                                    <input ng-model="obj.ESICAmount" ng-change="amtvalidation()" type="checkbox" />
+                                    <span class="lbl padding-8">
+                                        ESIC
+                                    </span>
+                                    <input ng-model="obj.OtherAmount" ng-change="amtvalidation()" type="checkbox" />
+                                    <span class="lbl padding-8">
+                                        Other
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="obj.TDS==true || obj.Penaltiy==true">
+                            <label class="control-label col-sm-4"></label>
+                            <div class="col-sm-4" ng-if="obj.TDS==true">
+                                <input type="text" class="form-control active" placeholder="TDS" allow-pattern="[0-9.]" ng-blur="amtvalidation()" ng-model="obj.VPAYVOU_TDS " autocomplete="off" ng-paste="$event.preventDefault()" maxlength="10" />
+                            </div>
+                            <div class="col-sm-4" ng-if="obj.Penaltiy==true">
+                                <input type="text" class="form-control active" placeholder="Penaltiy" allow-pattern="[0-9.]" ng-blur="amtvalidation()" ng-model="obj.VPAYVOU_Penaltiy" autocomplete="off" ng-paste="$event.preventDefault()" maxlength="10" />
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="obj.ESICAmount==true || obj.OtherAmount==true">
+                            <label class="control-label col-sm-4"></label>
+                            <div class="col-sm-4" ng-if="obj.ESICAmount==true">
+                                <input type="text" class="form-control active" placeholder="ESIC Amount" allow-pattern="[0-9.]" ng-blur="amtvalidation()" ng-model="obj.VPAYVOU_ESICAmount " autocomplete="off" ng-paste="$event.preventDefault()" maxlength="10" />
+                            </div>
+                            <div class="col-sm-4" ng-if="obj.OtherAmount==true">
+                                <input type="text" class="form-control active" placeholder="Other Amount" allow-pattern="[0-9.]" ng-blur="amtvalidation()" ng-model="obj.VPAYVOU_OtherAmount" maxlength="10" autocomplete="off" ng-paste="$event.preventDefault()" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Narration :<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" rows="2" id="comment" name="ccc" ng-model="obj.VPAYVOU_Remarks" placeholder="Narration" required></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.ccc)" ng-messages="myForm.ccc.$error">
+                                    <div ng-message="required">Enter Narration</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Payment Date<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8" style="padding-left:0px !important;">
+                                <md-datepicker name="payment_date" onkeypress="return false" data-ng-model="obj.VPAYVOU_PaymentDate" md-placeholder="Enter Date" ng-change="PaymentDate()" ng-paste="$event.preventDefault()" md-min-date="plMaxdate" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.payment_date)" ng-messages="myForm.payment_date.$error">
+                                    <div ng-message="required">Select  Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Payble Amount:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" placeholder="Enter Amount" ng-model="obj.Payble_AppliedAmount" ng-disabled="true" allow-pattern="[0-9]" autocomplete="off" ng-paste="$event.preventDefault()" />
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!--ng-if="obj.VPAYVOU_AppliedAmount > 0"-->
+                <div class="col-sm-12" ng-if="obj.VPAYVOU_AppliedAmount > 0">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"> Budget Multipale Head  </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body margin-top-10">
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Budget</th>
+                                        <th>Budget Amount </th>
+                                        <th>Remark</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="materal in Budgetupload">
+                                        <td class="text-center">
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+
+                                                <div class="col-sm-10">
+                                                    <select class="form-control" id="sel1ww" name="yrnam" ng-model="materal.VMBDGHD_Id" ng-change="Validation(materal)">
+                                                        <option value="">--Select Budget--</option>
+                                                        <option ng-repeat="option in CheckBookBudget" value="{{option.VMBDGHD_Id}}"
+                                                                ng-selected="{{option.VMBDGHD_Id == materal.VMBDGHD_Id}}">
+                                                            {{option.VMBDGHD_BudgetHead}}
+                                                        </option>
+                                                    </select>
+
+                                                </div>
+                                                <div class="col-sm-2" ng-show="materal.VMBDGHD_Id > 0">
+                                                    <a href="javascript:void(0)" ng-click="Uploaddata(materal.VMBDGHD_Id)" data-placement="bottom" data-toggle="tooltip"
+                                                       title="Upload file">
+                                                        <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control active" placeholder="Enter Amount" ng-model="materal.VMBDGHD_AmountSpent" allow-pattern="[0-9]" autocomplete="off" ng-paste="$event.preventDefault()" ng-blur="Validation(materal)" />
+
+                                        </td>
+                                        <td>
+                                            <textarea maxlength="250" name="remark" ng-model="materal.VPAYVOUBUD_Remark" class="form-control" resize: none; rows="2" placeholder="Budget Remark " />
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <a href="" ng-show="$last" ng-click="addBudget()">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="Budgetupload.length ==1">
+                                                <a href="" ng-click="removeBudget($index,objg)">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="col-sm-12" ng-show="GRnDetails.length > 0 && obj.VPAYVOU_AppliedAmount > 0">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">GRN Details </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="col-sm-4">
+                                <b>Total Payble Grn Amount :  {{obj.TotalAmmountGrn}} </b>
+                            </div>
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <input class="form-control" ng-model="searchtwo" type="text" placeholder="search here..." />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" style="overflow:auto !important">
+                                <table class="table table-bordered table-condensed table-responsive" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Sl No
+                                            </th>
+                                            <th>
+                                            </th>
+                                            <th>
+                                                GRN Number
+                                            </th>
+                                            <th>
+                                                Purchase Date
+                                            </th>
+                                            <th>
+                                                Invoice No
+                                            </th>
+                                            <th>Grn Total Amount</th>
+                                            <th>Total Paid Amount</th>
+                                            <th>Grn Running Balance Amount</th>
+
+                                            <th>Files</th>
+                                            <th>Paid Amount </th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="grn in filterValue1=(GRnDetails |filter:searchtwo) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage1"
+                                            current-page="currentPage1" pagination-id="page2">
+                                            <td style="width:1%;">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                            <td>
+                                                <input type="checkbox" ng-model="grn.chkitem" />
+                                                <span class="lbl padding-8"></span>
+                                            </td>
+                                            <td>
+
+                                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="item" data-ng-model="itemOption" data-target="#myModalG"
+                                                   ng-click="mainmodelclick(grn)">
+                                                    {{grn.INVMGRN_GRNNo}}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                {{grn.INVMGRN_PurchaseDate  |date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td>
+                                                {{grn.INVMGRN_InvoiceNo}}
+                                            </td>
+                                            <td>
+                                                {{grn.INVMGRN_TotalAmount}}
+                                            </td>
+                                            <td>
+
+                                                {{grn.Voucher_PaidAmount}}
+
+
+                                            </td>
+                                            <td>
+                                                {{grn.INVMGRN_ActualTotalAmount}}
+                                            </td>
+                                            <td>
+
+
+                                                <a href="javascript:void(0)" ng-click="Uploaddatass(grn,grn.chkitem)"
+                                                   data-placement="bottom" data-toggle="tooltip"
+                                                   title="Upload file" data-target="#myModaGrnFile" ng-if="grn.filecount > 0">
+                                                    <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                                </a>
+                                                <span ng-if="grn.filecount==0">
+                                                    ----
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-disabled="grn.chkitem==false" class="form-control active" placeholder="Enter Amount" ng-model="grn.INVMGRN_PaidAmount"
+                                                       allow-pattern="[0-9]" autocomplete="off" ng-paste="$event.preventDefault()" ng-blur="Validationddd(grn)" />
+
+                                            </td>
+                                            <td>
+                                                <textarea class="form-control" rows="6" id="comment" ng-model="grn.VPAYVOU_RemarksGRN" placeholder="Remark" maxlength="100" style="height:40px !important"></textarea>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <dir-pagination-controls max-size="5" pagination-id="page2"
+                                                         direction-links="true"
+                                                         boundary-links="true">
+                                </dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"> Documents Upload </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body margin-top-10">
+                            <p style="color:red;font-size:14px !important">
+                                *  File   Must Be Upload jpeg,Png,pdf, Document
+                                <br />
+                                * File size should be less than 2 MB
+                            </p>
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Upload</th>
+                                        <th>View</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="materal in materaldocuupload">
+                                        <td class="text-center">
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                                <input type="file" name="impfile" id="document" class="btn btn-success" value="Import" ng-model="vbabrsF_FilePath" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().materal)" style="padding-top: 1px;padding-bottom: 2px;" />
+
+                                            </label>
+
+                                        </td>
+                                        <td>
+                                            <span ng-show="materal.vbabrsF_FilePath!=null && materal.vbabrsF_FilePath!=''">
+                                                <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.vbabrsF_FilePath  !=null && materal.vbabrsF_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.vbabrsF_FilePath)">
+                                                    view
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <textarea maxlength="250" name="remark" ng-model="materal.vbabrsF_Filedesc" class="form-control" resize: none; rows="2" placeholder="Description" />
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                <a href="" ng-click="removegrnrows($index,objg)">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="col-sm-12">
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <span class="hidden">{{mi_logo}}</span>
+                        <input type="hidden" ng-model="obj.VPAYVOU_Id" value="{{obj.vpayvoU_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="alldata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">PAYMENT VOCHER ENTRY DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{alldata.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" style="overflow:auto !important">
+                <table class="table table-hover table-responsive table-bordered" style="overflow:auto !important">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>View Voucher</th>
+                            <th><a href="" ng-click="sort('VPAYVOU_VoucherNo')">Voucher No</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_PaymentDate')">Bank Details</a></th>
+                            <th><a href="" ng-click="sort('INVMS_SupplierName')">Pay Name</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_VoucherNo')">Cheque No</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_PaymentDate')">Entry Date</a></th>
+
+                            <th><a href="" ng-click="sort('VPAYVOU_AppliedAmount')">Applied Amount </a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_PaymentDate')">Approved Date</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_ApprovedAmount')">Approved Amount </a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_StatusFlg')">Status</a></th>
+                            <th><a href="" ng-click="sort('VPAYVOU_Remarks')">Narration</a></th>
+                            <th>Action</th>
+                            <th> View Budget </th>
+                            <th>File Upload</th>
+                            <th>Upload Budget</th>
+                            <th>View RTGS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1=(alldata |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                            current-page="currentPage" pagination-id="page1">
+                            <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center">
+                                <span ng-show="user.VPAYVOU_ApprovedAmount > 0">
+                                    <a href="javascript:void(0)" ng-click="reschedule(user)" data-placement="bottom" data-toggle="tooltip"
+                                       title="View Data" data-target="#myModalreadmitview">
+                                        <i class="fa fa-print" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+
+                            </td>
+                            <td style="text-align:left">{{user.VPAYVOU_VoucherNo}}</td>
+                            <td style="text-align:left">
+                                {{user.HRMBD_BankName}}<br />A/c No
+                                {{user.HRMBD_BankAccountNo}}
+                            </td>
+                            <td style="text-align:left">
+
+                                <span ng-if="user.INVMS_SupplierName!=null && user.INVMS_SupplierName!=''">
+                                    {{user.INVMS_SupplierName}}
+                                </span>
+                                <span ng-if="user.VPAYVOU_PaymentTo!=null && user.VPAYVOU_PaymentTo!=''">
+                                    {{user.VPAYVOU_PaymentTo}}
+                                </span>
+                            </td>
+                            <td style="text-align:left">{{user.VPAYVOU_ChequeNo}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}</td>
+                            <!--<td style="text-align:left">
+                                <span ng-hide="user.VMBDGHD_Id > 0">
+                                    ---
+                                </span>
+                                <span ng-show="user.VMBDGHD_Id > 0">
+                                    {{user.VMBDGHD_BudgetHead}}
+                                </span>
+
+
+                            </td>-->
+                            <td style="text-align:left">{{user.VPAYVOU_AppliedAmount}}</td>
+                            <td style="text-align:left"><span ng-show="user.VPAYVOU_StatusFlg=='Approved'">{{user.VPAYVOU_UpdatedDate |date:'dd/MM/yyyy'}}</span></td>
+                            <td style="text-align:left">{{user.VPAYVOU_ApprovedAmount}}</td>
+
+                            <td style="text-align:left">{{user.VPAYVOU_StatusFlg}}</td>
+                            <td style="text-align:left">{{user.VPAYVOU_Remarks}}</td>
+                            <td class="text-center">
+                                <span class="hidden">
+                                    {{user.VPAYVOU_TDS}}
+                                </span>
+                                <span class="hidden">
+                                    {{user.VPAYVOU_Penalty}}
+                                </span>
+                                <span ng-if="user.VPAYVOU_ActiveFlg==true && user.VPAYVOU_StatusFlg=='Pending'">
+                                    <a class="text-aqua" href="" ng-click="Editdata(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                    <a href="" ng-click="clientDecative(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+
+                                </span>
+                                <span ng-if="user.VPAYVOU_ActiveFlg==false  && user.VPAYVOU_StatusFlg=='Pending'">
+                                    <a href="" ng-click="clientDecative(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Activate</i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.VPAYVOU_StatusFlg=='Approved' || user.VPAYVOU_StatusFlg=='Rejected'">
+                                    ----
+                                </span>
+
+                            </td>
+                            <td>
+                                <span ng-if="user.BudgetCount > 0">
+                                    <i class="fa fa-check  text-green"></i>
+                                    <a href="javascript:void(0)" ng-click="ViewB(user)" data-placement="bottom" data-toggle="tooltip"
+                                       title="Upload file">
+                                        <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                    </a>
+
+                                </span>
+                                <span ng-if="user.BudgetCount ==0">
+                                    <i class="fa fa-times  text-red"></i>
+                                </span>
+
+                            </td>
+
+                            <td>
+                                <span>
+                                    <a href="javascript:void(0)" ng-click="fileUploaddata(user)" data-placement="bottom" data-toggle="tooltip"
+                                       title="Upload file">
+                                        <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+
+
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" ng-click="UploaddataBudget(user)" data-placement="bottom" data-toggle="tooltip"
+                                   title="Upload file">
+                                    <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                </a>
+
+                            </td>
+                            <td class="text-center">
+                                <span>
+                                    <a href="javascript:void(0)" ng-click="viewdocument(user);">
+                                        <i class="fa fa-eye text-black"></i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="10" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!--==otpcheck====-->
+<!-- =======================Transcation Tax Model ====================================-->
+<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h3 class="modal-title text-white">
+                    Payment Voucher  DETAILS
+                </h3>
+                <md-button type="button" class="md-raised" data-ng-click="printData()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div class="row">
+                                <div class="col-sm-12" style="text-align:center">
+                                    <h4><strong>Payment Voucher</strong></h4>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" style="text-align:center;margin-top:-35px" ng-if="imagenew!=null && imagenew!=''">
+                                <img src="{{imagenew}}" style="border:none;height:120px;width:600px;text-align:center" />
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive" style="border:none !important" width="100%">
+                                        <tr>
+                                            <td style="float:left">Cheque No.:&nbsp; {{chno}}</td>
+                                            <td>  &nbsp; </td>
+                                            <td style="float:right"> Dated:&nbsp; {{pdate|date:'dd/MM/yyyy'}}</td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:75%">Particulars </td>
+                                            <td style="width:25%;"> Amount</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:75%;text-align:left">
+
+
+                                                <b>Supplier/Vender:</b>
+                                                <p style="padding-left:60px">{{supldetails}}</p>
+                                                <b>Through : </b>
+                                                <p style="padding-left:60px">{{bankname}} A/c No:{{bbacc}}</p>
+
+                                                <b>On Account of : </b>
+                                                <p style="padding-left:60px">{{rmrk}} </p>
+                                                <b>Amount (in words) : </b>
+                                                <p style="padding-left:60px">Indian Rupees {{words}} Only </p>
+
+                                            </td>
+                                            <td style="width:25%;text-align:right;vertical-align:top;padding-top:15px">
+                                                <span>
+                                                    {{amtt | number:2}}
+
+                                                </span>
+                                                <br />
+                                                <span ng-if="tdsamt!=null && tdsamt!=''">
+                                                    TDS  : &nbsp;
+                                                    &nbsp; {{tdsamt}}
+                                                </span>
+                                                <br />
+                                                <span ng-if="penaltyamt!=null && penaltyamt!=''">
+                                                    Penalty :&nbsp;
+                                                    &nbsp;{{penaltyamt}}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="width:75%;text-align:left">
+                                                &nbsp;
+                                                &nbsp; &nbsp;
+                                            </td>
+
+                                            <td style="width:25%;text-align:right">
+                                                <b>{{amtt | number:2}}</b>
+
+
+                                            </td>
+                                        </tr>
+
+
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Receiver's Signature : </h5>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Authorised Signatory</h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Prepared by </h5>
+                                    <strong>{{crby}}</strong>
+                                </div>
+
+                                <div class="col-sm-4" style="text-align:center">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Checked by  </h5>
+                                    <strong>Govindaiah M</strong>
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Verified by </h5>
+                                    <strong>Siddesh Kumar</strong>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="chequecancel" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!--<button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>-->
+                <h4 class="modal-title text-white">
+                    Checque Cancel Details
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <h4 class="text-center">    Cheque No Misssing Remarks</h4>
+                            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormone" novalidate>
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                sl No
+                                            </th>
+                                            <th>
+                                                Cheque No
+                                            </th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="rpt in leafcancelD">
+                                            <td>
+                                                {{$index+1}}
+                                            </td>
+
+                                            <td>
+                                                {{rpt.vpayvoU_ChequeNoleaf}}
+                                            </td>
+                                            <td>
+                                                <textarea class="form-control" rows="2" id="comment" name="ccyc" ng-model="rpt.VPAYVOU_Remarksleaf" placeholder="Remark" ng-paste="$event.preventDefault()" required></textarea>
+                                                <div class="error-messages" ng-if="interactedone(myFormone.ccycT)" ng-messages="myFormone.ccycT.$error">
+                                                    <div ng-message="required">Enter Remark</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+
+                                <div class="text-center">
+                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedataModal()" id="save-btn">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                        Save
+                                    </md-button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="myModalfile" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Check Book Attachment File Details
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row">
+                        <div class="box-content clearfix">
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No.</th>
+                                        <th>File Name</th>
+                                        <th>View</th>
+                                        <th>Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="file in fileupload">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{file.vpayvouF_FileName}}
+                                        </td>
+                                        <td class="text-center">
+                                            <span ng-show="file.vpayvouF_FilePath!=null && vpayvouF_FilePath!=''">
+                                                <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="file.vpayvouF_FilePath  !=null && file.vpayvouF_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(file.vpayvouF_FilePath)">
+                                                    view
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{file.vbabrsF_Filedesc}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--//fileUpload-->
+<div id="fileUpload" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Check Book Attachment File Details
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title"> Documents Upload </h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body margin-top-10">
+                                    <p style="color:red;font-size:14px !important">
+                                        *  File   Must Be Upload jpeg,Png,pdf, Document
+                                        <br />
+                                        * File size should be less than 2 MB
+                                    </p>
+                                    <input type="text" ng-model="obj.VPAYVOU_IdTwo" ng-hide="true" />
+                                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No.</th>
+                                                <th>Upload</th>
+                                                <th>View</th>
+                                                <th>Description</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="materal in materaldocuuploadtwo">
+                                                <td class="text-center">
+                                                    {{$index+1}}
+                                                </td>
+                                                <td>
+                                                    <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                                        <input type="file" name="impfile" id="document" class="btn btn-success" value="Import" ng-model="vbabrsF_FilePath" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().materal)" style="padding-top: 1px;padding-bottom: 2px;" />
+
+                                                    </label>
+
+                                                </td>
+                                                <td>
+                                                    <span ng-show="materal.vbabrsF_FilePath!=null && materal.vbabrsF_FilePath!=''">
+                                                        <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.vbabrsF_FilePath  !=null && materal.vbabrsF_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.vbabrsF_FilePath)">
+                                                            view
+                                                        </a>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <textarea maxlength="250" name="remark" ng-model="materal.vbabrsF_Filedesc" class="form-control" resize: none; rows="2" placeholder="Description" />
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        <a href="" ng-show="$last" ng-click="addgrnrowsmateral()">
+                                                            <i class="fa fa-plus"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span class="" id="remove" ng-hide="materaldocuuploadtwo.length ==1">
+                                                        <a href="" ng-click="removegrnrowsmateral($index,objg)">
+                                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br />   <br />
+                                    <div class="col-sm-12 text-center">
+                                        <md-button type="submit" class="md-raised md-primary" ng-click="savedataFile()" id="save-btn">
+                                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                            Save
+                                        </md-button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="UploadBudget" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Check Book Upload Budget
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">    Check Book Upload Budget </h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No.</th>
+                                                <th>Budget</th>
+                                                <th>Budget Amount </th>
+                                                <th>Remark</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="materal in Budgetuploadone">
+                                                <td class="text-center">
+                                                    {{$index+1}}
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control" id="sel1ww" name="yrnam" ng-model="materal.VMBDGHD_Id" ng-change="ValidationFire(materal)">
+                                                                <option value="">--Select Budget--</option>
+                                                                <option ng-repeat="option in CheckBookBudgetwo" value="{{option.VMBDGHD_Id}}"
+                                                                        ng-selected="{{option.VMBDGHD_Id == materal.VMBDGHD_Id}}">
+                                                                    {{option.VMBDGHD_BudgetHead}}
+                                                                </option>
+                                                            </select>
+
+                                                        </div>
+                                                        <div class="col-sm-2" ng-show="materal.VMBDGHD_Id > 0">
+                                                            <a href="javascript:void(0)" ng-click="Uploaddata(materal.VMBDGHD_Id)" data-placement="bottom" data-toggle="tooltip"
+                                                               title="Upload file">
+                                                                <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control active" placeholder="Enter Amount" ng-model="materal.VMBDGHD_AmountSpent" allow-pattern="[0-9]" autocomplete="off" ng-paste="$event.preventDefault()" ng-blur="ValidationFire(materal)" />
+
+                                                </td>
+                                                <td>
+                                                    <textarea maxlength="250" name="remark" ng-model="materal.VPAYVOUBUD_Remark" class="form-control" resize: none; rows="2" placeholder="Budget Remark " />
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        <a href="" ng-show="$last" ng-click="addBudgetone()">
+                                                            <i class="fa fa-plus"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span class="" id="remove" ng-hide="Budgetuploadone.length ==1">
+                                                        <a href="" ng-click="removeBudgetwo($index,objg)">
+                                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="box-body margin-top-10">
+                                    <div class="col-sm-12 col-sm-offset-2">
+                                        <div class="col-sm-6">
+                                            <!--<div class="form-group">
+                                                <label class="control-label col-sm-4"> Budget :<strong style="color:red;">*</strong></label>
+                                                <div class="col-sm-8">
+                                                    <select class="form-control" id="sel1ww" name="yrnam" ng-model="obj.VMBDGHD_Idtwo" ng-change="ValidationFire()">
+                                                        <option value="">--Select Budget--</option>
+                                                        <option ng-repeat="option in CheckBookBudgetwo" value="{{option.VMBDGHD_Id}}"
+                                                                ng-selected="{{option.VMBDGHD_Id == obj.VMBDGHD_Idtwo}}">
+                                                            {{option.VMBDGHD_BudgetHead}}
+                                                        </option>
+                                                    </select>
+
+                                                </div>
+
+                                            </div>-->
+                                            <div class="form-group" style="display:none !important">
+                                                <md-datepicker onkeypress="return false" data-ng-model="obj.VPAYVOU_PaymentDatetwo" md-placeholder="Enter Date" ng-paste="$event.preventDefault()"></md-datepicker>
+                                                <input type="text" ng-model="obj.VPAYVOU_AppliedAmounttwo" />
+                                                <input type="text" ng-model="obj.MI_IdTwo" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <br />
+                                    <div class="col-sm-12 text-center">
+                                        <br />
+                                        <input type="hidden" ng-model="obj.VPAYVOU_Idthree" />
+                                        <md-button type="submit" class="md-raised md-primary" ng-click="savedataBudget()" id="save-btn">
+                                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                            Update
+                                        </md-button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="CheckBookBudget" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Check Book    Budget Details
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12" style="overflow:auto !important">
+                            <div class="row" style="padding-left:18% !important">
+                                <img src="{{imagename}}" class="img-responsive img-fluid" />
+                            </div>
+
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>SL.No.</th>
+                                        <th>Voucher No</th>
+                                        <th>Bank Details</th>
+                                        <th>Pay Name</th>
+                                        <th>Cheque No</th>
+                                        <th>Payment Date</th>
+                                        <th>Budget Head</th>
+                                        <th>Budget Applied Amount</th>
+                                        <!--<th>Approved Amount</th>-->
+                                        <th>Narration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in CheckBookBudgetlist">
+                                        <td style="width:1%;">{{$index+1}}</td>
+
+                                        <td style="text-align:left">{{user.VPAYVOU_VoucherNo}}</td>
+                                        <td style="text-align:left">
+                                            {{user.HRMBD_BankName}}<br />A/c No
+                                            {{user.HRMBD_BankAccountNo}}
+                                        </td>
+                                        <td style="text-align:left">
+
+                                            <span ng-if="user.INVMS_SupplierName!=null && user.INVMS_SupplierName!=''">
+                                                {{user.INVMS_SupplierName}}
+                                            </span>
+                                            <span ng-if="user.VPAYVOU_PaymentTo!=null && user.VPAYVOU_PaymentTo!=''">
+                                                {{user.VPAYVOU_PaymentTo}}
+                                            </span>
+                                        </td>
+                                        <td style="text-align:left">{{user.VPAYVOU_ChequeNo}}</td>
+                                        <td style="text-align:left">{{user.VPAYVOU_PaymentDate |date:'dd/MM/yyyy'}}</td>
+                                        <td style="text-align:left">{{user.VMBDGHD_BudgetHead}}</td>
+                                        <td style="text-align:left">{{user.VMBDGHDAMT_Amount}}</td>
+
+                                        <td style="text-align:left">{{user.VPAYVOU_Remarks}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printToCart('Baldwin');" style="float:right;margin-right:52px;">Print</button>
+                <h4 class="modal-title text-white text-center">
+                    <u>RTGS/NEFT Request Form</u>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div style="overflow:scroll !important">
+                    <div id="report">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>-->
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printToCart('Baldwin');" style="float:right;margin-right:52px;">Print</button>
+                <h4 class="modal-title text-white text-center">
+                    <u>RTGS/NEFT Request Form</u>
+                </h4>
+            </div>
+            <div class="modal-body" style="max-height: 600px; overflow-y: auto; padding-right: 15px;">
+                <div id="report" style="min-height: 100px; padding: 10px;">
+                    <!-- Content goes here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="viewPrinting" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title text-white"> VMS CHEQUEBOOK PRINITING RTGS FORMATS </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+
+                                        <th colspan="5">
+                                            {{companyName}}
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            SL NO
+                                        </th>
+                                        <th>
+                                            Tempalte Print
+                                        </th>
+                                        <th>
+                                            File Name
+                                        </th>
+                                        <th>
+                                            View Format
+                                        </th>
+                                        <th>
+                                            Remark
+                                        </th>
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in Priniting">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <a href="javascript:void(0)" data-backdrop="static" ng-click="viewdocumentTwo(user);">
+                                                    <i class="fa fa-eye text-black"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{user.vcpseT_ChequeImageFileName}}
+                                        </td>
+                                        <td>
+                                            {{user.vcpseT_ChequeImageFilePath}}
+                                        </td>
+                                        <td>
+                                            {{user.vcpseT_Remarks}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="myModalG" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg" style="width: 92%;">
+
+        <div class="modal-content">
+            <div class="modal-body">
+                <!--<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>-->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">{{grnnumber}}</h4>
+                </div>
+                <div class="box-body">
+                    <div class="text-center">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th><a href="" ng-click="sort('invmI_ItemName')">Item</a></th>
+                                    <th><a href="" ng-click="sort('invmuoM_UOMName')">UOM </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_BatchNo')">Batch no. </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_Qty')">Quantity </a></th>
+                                    <!--<th><a href="" ng-click="sort('invtgrN_ExpDate')">Expiry Date </a></th>-->
+                                    <th><a href="" ng-click="sort('invtgrN_PurchaseRate')">Purchase Rate </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_MRP')">MRP </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_SalesPrice')">Sale Price </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_DiscountAmt')">Discount </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_TaxAmt')">Tax Amount </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_Amount')">Amount </a></th>
+                                    <th><a href="" ng-click="sort('invtgrN_Naration')">Narration </a></th>
+                                    <!--<th>Action</th>-->
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="useri in get_GRNItemDetails">
+                                    <td>{{$index+1}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invmI_ItemName}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invmuoM_UOMName}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_BatchNo}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_Qty}}</td>
+
+                                    <!--<td style="overflow-wrap:break-word">{{ useri.invtgrN_ExpDate | date:'MM/dd/yyyy'}}</td>-->
+                                    se
+
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_PurchaseRate | number : 2}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_MRP | number : 2}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_SalesPrice | number : 2}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_DiscountAmt | number : 2}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_TaxAmt | number : 2}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_Amount | number : 2}}</td>
+                                    <td style="overflow-wrap:break-word">{{ useri.invtgrN_Naration}}</td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!------GrnFileDetails-->
+<div id="myModaGrnFile" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg" style="width:65%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+
+                </div>
+                <div class="box-body">
+                    <div class="text-center">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Sl No
+                                    </th>
+                                    <th>
+                                        File Name
+                                    </th>
+                                    <th>
+                                        Remark
+                                    </th>
+                                    <th>
+                                        View
+                                    </th>
+                                    <th>
+                                        (Moove To Check)  <a> <i class="fa fa-download" aria-hidden="true" ng-click="Moovefile()"></i></a>
+                                        <input type="hidden" ng-model="obj.chkitem" />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="grn in  grnfile">
+                                    <td>
+                                        {{$index+1}}
+                                    </td>
+                                    <td>
+                                        {{grn.INVMGRNF_FileName}}
+                                    </td>
+                                    <td>
+                                        {{grn.INVMGRNF_Filedesc}}
+                                    </td>
+                                    <td>
+                                        <a ng-click="previewimg_new(grn.INVMGRNF_FilePath)">
+                                            <span style="color:red !important">View</span>
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <a href="{{grn.INVMGRNF_FilePath}}">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+<!--=====imgpriviwew=========-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 style="color:white !important"> Check Book Entry </h4>
+
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

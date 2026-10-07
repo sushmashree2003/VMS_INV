@@ -1,0 +1,348 @@
+﻿
+<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .md-icon-button + .md-datepicker-input-container {
+        margin-left: -10px;
+        width: 53%;
+    }
+
+    ._md-datepicker-has-triangle-icon {
+        margin-right: -45px;
+    }
+
+    .padding-rigth-10px {
+        padding-right: 10px !important;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .tbhead {
+        width: 35%;
+        font-size: 16px;
+        color: #3a5999 !important;
+    }
+
+    .tbcontent {
+        width: 15%;
+        font-size: 17px;
+    }
+
+    .lablehalfday {
+        color: blue;
+        font-size: large;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .custom-file-input {
+        display: inline-block;
+        position: relative;
+        color: #533e00;
+        width: 100px !important;
+    }
+
+    .blinkcssatag {
+        color: red !important;
+        font-weight: bolder !important;
+    }
+
+    .blinkCss {
+        animation: blinker 0.9s linear infinite;
+        color: red !important;
+        font-size: 30px;
+        font-weight: bolder;
+        font-family: sans-serif;
+        text-decoration: underline;
+    }
+
+    .blinkCssnew {
+        animation: blinker 0.9s linear infinite;
+        color: blue !important;
+        font-size: 30px;
+        font-weight: bolder;
+        font-family: sans-serif;
+        text-decoration: underline;
+    }
+
+    .imgpfgdownload {
+        width: 30px;
+        height: 30px;
+    }
+
+    .modal {
+        overflow: auto !important;
+    }
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+</style>
+
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Extra Task List </h3>
+
+            </div>
+            <div class="box-body">
+                <div id="interdepartmenttaslist">
+
+
+                    <div class="col-sm-12">
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-2 col-sm-offset-2">Select Employee  :<span style="color:Red">*</span></label>
+                            <div class="col-sm-4">
+                                <ui-select id="sel1" name="empl" ng-model="$parent.obj.HRME_Id" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onEmpchange(obj)" title="Employee" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select or search Employee in the list...">{{$select.selected.employeeName}} : {{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in get_Emplist | filter: $select.search " value="{{option.HRME_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.employeeName +' : '+  option.HRMD_DepartmentName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="error-messages col-sm-6 col-sm-offset-4" ng-if="interacted(myForm.empl)" ng-messages="myForm.empl.$error">
+                                <div ng-message="required"> Select Employee </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-show="save" ng-click="Report()" id="save-btn">
+                            <i class="fa fa-search-minus" aria-hidden="true"></i>
+                            Get Extra Task List
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-show="save" ng-click="clear()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+
+
+
+
+                </div>
+
+
+
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="box box-primary" ng-if="temparraynew.length>0">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Swapping Task List </h3>
+
+                            </div>
+                            <div class="box-body">
+                                <div id="interdepartmenttaslist">
+
+                                    <div class="box-body" ng-if="temparraynew.length>0">
+
+                                        <table class="table table-responsive table-bordered clearfix col-sm-6">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sl.No</th>
+                                                    <!--<th></th>-->
+                                                    <th><a href="" ng-click="sort('invmI_Id')">Issue Details</a>
+                                               
+
+                                                    <th>Created By / Assigned By</th>
+                                                    <th>Created Date</th>
+                                                    <th>Effort</th>
+                                                    <th><a href="" ng-click="sort('invmI_Id')">Category</a></th>
+                                                    <!--<th><a href="" ng-click="sort('invtsL_SalesPrice')">Assigned By</a></th>-->
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr ng-repeat="objplnr in temparraynew  | filter : searchDRD">
+                                                    <td class="text-center">
+                                                        {{$index+1}}
+                                                        <!--</td>-->
+                                                        <!--<td class="text-center">-->
+                                                        <br />
+                                                        <label>
+                                                            <input type="checkbox" name="adcheckt" value="{{objplnr.addck}}" ng-model="objplnr.checkedTask"
+                                                                   ng-change="onTaskCheck(objplnr)"><span class="lbl padding-8"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td>
+                                                        <span class="text-head col-sm-12 text-left" style="font-size:15px;" ng-model="objplnr.ISMTCR_Id">
+
+                                                            {{objplnr.ISMTCR_Title}}<br />
+                                                            <span style="font-size:12px;">{{objplnr.ISMTCR_TaskNo}} </span>
+
+                                                        </span>
+
+
+                                                        <label>Issue Or Enhancement : </label>
+                                                        <span style="font-size:12px;">
+                                                            {{objplnr.ISMTCR_BugOREnhancementFlg}}
+                                                            <span ng-if="(objplnr.HRMP_Name=='High')|| (objplnr.HRMP_Name=='HIGH')"><label style="color:red;"><b>-{{objplnr.HRMP_Name}}</b></label></span>
+                                                            <span ng-if="(objplnr.HRMP_Name=='Normal')||(objplnr.HRMP_Name=='NORMAL')"><label style="color:orange;"><b>-{{objplnr.HRMP_Name}}</b></label></span>
+                                                            <span ng-if="(objplnr.HRMP_Name=='Low')||(objplnr.HRMP_Name=='LOW')"><label style="color:green;"><b>-{{objplnr.HRMP_Name}}</b></label></span>
+                                                            &nbsp;&nbsp;
+                                                        </span>
+                                                        <br />
+                                                        <span ng-if="objplnr.ISMMCLT_ClientName!=null">
+
+                                                            <label>Client: </label>{{objplnr.ISMMCLT_ClientName}}
+                                                        </span>
+
+
+
+
+                                                    </td>
+                                                    <td>
+                                                        {{objplnr.createdby}}
+                                                        <br />/
+                                                        {{objplnr.assignedby}}
+                                                    </td>
+                                                    <td>
+                                                        {{objplnr.ISMTCR_CreationDate | date:'dd-MM-yyyy'}}
+                                                    </td>
+
+                                                    <td>
+                                                        {{objplnr.ISMTPLTA_EffortInHrs}} Hr
+                                                    </td>
+                                                    <td class="text-left">
+                                                        {{objplnr.taskcategoryname}}
+                                                    </td>
+                                                    <!--<td class="text-left">
+                                                    {{objplnr.assignedby}}
+                                                </td>-->
+                                                    {{objplnr.ISMTCR_Id}}
+                                                    <td hidden="hidden">{{objplnr.BugOREnhancement}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="text-center">
+                                            <md-button type="button" class="md-raised md-primary" ng-click="Swaplist()" id="save-btn">
+                                                <i class="fa fa-search-minus" aria-hidden="true"></i>
+                                                Get Swapping Task List
+                                            </md-button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+
+                        <div class="box box-primary" ng-if="swappinglst.length>0">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Planned Task List </h3>
+
+                            </div>
+                            <div class="box-body">
+                                <div id="interdepartmenttaslist">
+
+                                    <div class="box-body">
+
+                                        <table class="table table-responsive table-bordered clearfix">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sl.No</th>
+                                                    <!--<th></th>-->
+                                                    <th><a href="" ng-click="sort('invmI_Id')">Issue Details</a></th>
+
+                                                    <th><a href="" ng-click="sort('invmI_Id')">Category</a></th>
+                                                    <th>Effort</th>
+                                                    <th><a href="" ng-click="sort('invtsL_SalesPrice')">Assigned By</a></th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr ng-repeat="objplnr in swappinglst  | filter : searchDRD">
+                                                    <td class="text-center">
+                                                        {{$index+1}}
+                                                        <!--</td>
+                                                    <td class="text-center">-->
+                                                        <label>
+                                                            <input type="checkbox" name="adcheckt" value="{{objplnr.addck}}" ng-model="objplnr.chetask"
+                                                                   ng-change="onTaskCheck1(objplnr)"><span class="lbl padding-8"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td>
+                                                        <span class="text-head col-sm-12 text-left" style="font-size:15px;" ng-model="objplnr.ISMTCR_Id">
+                                                            Issue Details :<br />
+                                                            {{objplnr.ISMTCR_Title}}<br />
+                                                            <span style="font-size:12px;">{{objplnr.ISMTCR_TaskNo}} </span>
+                                                            <span style="font-size:12px;">
+                                                             <!--Bug/Enhancement -{{objplnr.ISMTCR_BugOREnhancementFlg}}-->
+                                                                <span ng-if="(objplnr.HRMP_Name=='High')|| (objplnr.HRMP_Name=='HIGH')"><label style="color:red;"><b>-{{objplnr.HRMP_Name}}</b></label></span>
+                                                                <span ng-if="(objplnr.HRMP_Name=='Normal')||(objplnr.HRMP_Name=='NORMAL')"><label style="color:orange;"><b>-{{objplnr.HRMP_Name}}</b></label></span>
+                                                                <span ng-if="(objplnr.HRMP_Name=='Low')||(objplnr.HRMP_Name=='LOW')"><label style="color:green;"><b>-{{objplnr.HRMP_Name}}</b></label></span>
+                                                                &nbsp;&nbsp;
+                                                            </span>
+                                                        </span>
+                                                        <span ng-if="objplnr.ISMMCLT_ClientName!=null">
+                                                            <label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Client: {{objplnr.ISMMCLT_ClientName}} </label>
+                                                        </span>
+                                                        <label class="control-label col-sm-12 text-body text-left" style="font-size:12px;">Created By: {{objplnr.Createdby}} </label>
+                                                        <label class="control-label col-sm-10 text-body text-left" style="font-size:12px;">Date: {{objplnr.ISMTCR_CreationDate | date:'dd-MM-yyyy'}} </label>
+                                                    </td>
+                                                    <td class="text-left">
+                                                        <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">{{objplnr.taskcategoryname}} </label>
+                                                    </td>
+
+                                                    <td class="text-left">
+                                                        {{objplnr.ISMTPLTA_EffortInHrs}} Hr
+                                                    </td>
+                                                    <td class="text-left">
+                                                        <span class="control-label  text-body text-left" style="font-size:14px;">{{objplnr.assignedby}} </span>
+                                                    </td>
+
+                                                    <td class="text-left" hidden="hidden">{{objplnr.ISMTCR_Id}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-if="swappinglst.length>0" ng-click="Swaptask()" ng-show="save" id="save-btn">
+                        <i class="fa fa-search-minus" aria-hidden="true"></i>
+                        Swap Tasks
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-if="swappinglst.length>0" id="save-btn" ng-click="Cancel()">
+
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

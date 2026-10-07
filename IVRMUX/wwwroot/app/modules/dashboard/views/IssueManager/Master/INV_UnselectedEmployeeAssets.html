@@ -1,0 +1,95 @@
+<section class="content" ng-init="loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Unselected Assets</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" ng-model="searchValue" placeholder="Search..." />
+                </div>
+                <div class="col-sm-8 text-right">
+                    <button type="button" class="btn btn-primary" ng-click="exportToExcel('#table_unselected')" ng-disabled="!unselectedassets || unselectedassets.length == 0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export
+                    </button>
+                    <button type="button" class="btn btn-info" ng-click="printData()" ng-disabled="!unselectedassets || unselectedassets.length == 0">
+                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                    </button>
+                </div>
+            </div>
+            <br />
+            <div id="printSection" style="width:100%; overflow:auto; max-height:750px;">
+                <table class="table table-hover table-responsive table-bordered" id="table_unselected">
+                    <thead style="background-color: #0066c0; color: #ffffff;">
+                        <tr>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="5%">Sl.No</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="15%">Employee Name</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="15%">Item-Name</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="12%">Asset-Id</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="10%">Serial No</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="10%">Amount</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="13%">Company Name</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="8%">CheckOut-Qty</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="12%">Location RoomName</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="10%">Status</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold;" width="5%">View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="planner in unselectedassets | filter : searchValue">
+                            <td class="text-center" style="vertical-align: middle; width:5%">{{$index+1}}</td>
+                            <td style="vertical-align: middle; width:15%">{{planner.EmployeeName}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:15%">{{planner.INVMI_ItemName}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:12%">{{planner.INVAAT_AssetId}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:10%">{{planner.INVAAT_SerialNo}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:10%">{{planner.INVTGRN_PurchaseRate}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:13%">{{planner.MI_Name}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:8%">{{planner.INVATCO_CheckOutQty}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:12%">{{planner.INVMLO_LocationRoomName}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:10%">{{planner.INVATCO_CheckOutRemarks}}</td>
+                            <td class="text-center" style="vertical-align: middle; width:5%">
+                                <span ng-if="planner.INVAAT_FilePath != null && planner.INVAAT_FilePath != ''">
+                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" title="View Image" ng-click="previewimg_new(planner.INVAAT_FilePath)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr ng-if="!unselectedassets || unselectedassets.length == 0">
+                            <td colspan="11" class="text-center" style="padding: 20px;">
+                                No unselected assets found.
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold;">
+                            <td colspan="5" class="text-center" style="vertical-align: middle;">Total Amount</td>
+                            <td colspan="6" class="text-center" style="vertical-align: middle; font-weight: bold; color: #000;">{{TotalgrossAmount() | number : 0}}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imagemodal" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Asset Image Preview</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <img ng-src="{{imagepreview}}" class="img-responsive center-block" style="max-height: 450px;" alt="Asset Preview" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

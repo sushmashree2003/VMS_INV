@@ -1,0 +1,434 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+
+    .textareaclass {
+        resize: none !important;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PARTICULARS REQUISITION</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Department Name :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="deptname" ng-model="$parent.HRMD_Id" ng-change="onchangedept()" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,user.status);" title="Select Department" required ng-disabled="editflag==true">
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Department">
+                                            {{$select.selected.hrmD_DepartmentName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="catgry in getdept | filter: $select.search" value="{{catgry.hrmD_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.hrmD_DepartmentName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.deptname)" ng-messages="myForm.deptname.$error">
+                                        <div ng-message="required">Select The Department Name </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8 input-group">
+                                    <md-datepicker ng-model="PCREQTN_Date" id="sel2" name="appl_date1" onkeypress="return false"
+                                                   md-placeholder="Enter Date" md-max-date="maxdate" required>
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.appl_date1)" ng-messages="myForm.appl_date1.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee Name :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel3" name="empnamed" ng-model="$parent.HRME_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,user.status);" title="Select Employee" required ng-disabled="editflag==true">
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">{{$select.selected.empname}}</ui-select-match>
+                                        <ui-select-choices repeat="catgry in getemp | filter: $select.search" value="{{catgry.hrmE_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.empname | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.empnamed)" ng-messages="myForm.empnamed.$error">
+                                        <div ng-message="required">Select The Employee Name </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Purpose :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="stsnam" id="sel4" type="text" ng-model="PCREQTN_Purpose"
+                                           placeholder="Enter Purpose" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.stsnam)" ng-messages="myForm.stsnam.$error">
+                                        <div ng-message="required">Enter The Purpose</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th><a href="">SLNO</a></th>
+                                        <th width="250"><a href="">Particulars</a></th>
+                                        <th><a href="">Amount</a></th>
+                                        <th><a href="">Remark</a></th>
+                                        <th><a href="">Action</a> </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in totalgrid">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">
+                                            <ui-select id="parti{{$index}}" name="particular{{$index}}" ng-model="user.PCMPART_Id" theme="bootstrap"
+                                                       ng-keyup="searchfilter($select,user.status);"
+                                                       ng-disabled="user.editfalguser==true"
+                                                       ng-change="onchangeparticuar(user.PCMPART_Id,$index)" title="Select Particulars" style="width:250px;" required>
+                                                <ui-select-match ng-trim="false" placeholder="Select Or Search Particular">
+                                                    {{$select.selected.pcmparT_ParticularName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="dd in getparticulars | filter: $select.search" value="{{dd.pcmparT_Id}}"
+                                                                   ng-selected="{{dd.Selected == true}}" style="width:250px;">
+                                                    <div ng-bind-html="dd.pcmparT_ParticularName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(myForm['particular'+$index])"
+                                                 ng-messages="myForm['particular'+$index].$error">
+                                                <div ng-message="required">Select Particular</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="text" class="form-control" id="amt{{$index}}" name="amount{{$index}}" allow-pattern="[0-9.]"
+                                                   ng-pattern="/^[0-9]+(\.[0-5]{1,2})?$/" ng-model="user.amount" required ng-blur="onchangeamount(user)" />
+                                            <div class="error-messages" ng-if="interacted(myForm['amount'+$index])"
+                                                 ng-messages="myForm['amount'+$index].$error">
+                                                <div ng-message="required">Enter Amount</div>
+                                                <div ng-message="pattern">Enter valid Format[For Example 10.5.10,20.5,......]</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-left">
+                                            <textarea class="form-control textareaclass" ng-model="user.remarks" id="rmks{{$index}}" rows="5" name="remarks{{$index}}"></textarea>
+                                            <div class="error-messages" ng-if="interacted(myForm['remarks'+$index])"
+                                                 ng-messages="myForm['remarks'+$index].$error">
+                                                <div ng-message="required">Enter Remarks</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="" ng-hide="totalgrid.length > 49">
+                                                <a href="" ng-show="$last" ng-click="addNewsiblingguard()">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="totalgrid.length ==1">
+                                                <a href="" ng-click="removeNewsiblingguard($index)">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                            <input type="hidden" ng-model="user.pcreqtndeT_Id" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Total Amount:</label>
+                                <div class="col-sm-8 input-group">
+                                    <input type="text" ng-model="PCREQTN_TotAmounttemp" disabled />
+                                    <input type="hidden" ng-model="PCREQTN_TotAmount" disabled />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="PCREQTN_Id" value="{{PCREQTN_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saverecord()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="getloaddata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">PARTICULARS REQUISITION DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:5%">SL.No.</th>
+                        <th style="width:20%"><a href="" ng-click="sort('pcreqtN_RequisitionNo')">Requisition No.</a></th>
+                        <th style="width:10%"><a href="" ng-click="sort('pcmparT_ParticularName')">Department</a></th>
+                        <th style="width:15%"><a href="" ng-click="sort('pcmparT_ParticularDesc')">Requested By</a></th>
+                        <th style="width:10%"><a href="" ng-click="sort('pcmparT_ParticularDesc')">Date</a></th>
+                        <th style="width:30%"><a href="" ng-click="sort('pcmparT_ParticularDesc')">Purpose</a></th>
+                        <th style="width:10%">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue=(getloaddata | filter : filterValue1) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{user.pcreqtN_RequisitionNo}}</td>
+                        <td class="text-left">{{user.departmentname}}</td>
+                        <td class="text-left">{{user.employeename}}</td>
+                        <td class="text-center">{{user.pcreqtN_Date | date:'dd/MM/yyyy'}}</td>
+                        <td class="text-left">{{user.pcreqtN_Purpose}}</td>
+                        <td style="text-align:left">
+                            <span>
+                                <a href="" title="View Detais">
+                                    <i class="fa fa-eye" style="color:black;" data-target="#mymodalviewdetailsfirsttab" data-toggle="modal"
+                                       title="View Detais" ng-click="Viewdata(user);"></i>
+                                </a>
+                                |
+                            </span>
+                            <span ng-if="user.approvedflag==false">
+                                <a href="javascript:void(0)" ng-click="EditData(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                |
+                                <span ng-if="user.pcreqtN_ActiveFlg === true">
+                                    <a href="" ng-click="deactiveY(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.pcreqtN_ActiveFlg === false">
+                                    <a href="" ng-click="deactiveY(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                    </a>
+                                </span>
+                            </span>
+                            <span ng-if="user.approvedindentcashflag==true">
+                                <a href="" title="Approved">
+                                    <i class="fa fa-check text-green" title="Approved"></i>
+                                </a>
+                            </span>
+                            <span ng-if="user.approvedindentcashflag!=true && user.approvedflag!=false">
+                                <a href="" title="Approved">
+                                    <i class="fa fa-check text-yellow" title="Approved"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div id="mymodalviewdetailsfirsttab" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Requisition Details : {{PCREQTN_RequisitionNotemp}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.No</th>
+                                    <th>Particular</th>
+                                    <th>Amount</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="userclient in getviewdata">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{userclient.pcmparT_ParticularName}}</td>
+                                    <td class="text-center">{{userclient.pcreqtndeT_Amount}}</td>
+                                    <td class="text-left">{{userclient.pcreqtndeT_Remarks}}</td>
+                                    <td class="text-center">
+                                        <span>
+                                            <a href="" title="View Detais">
+                                                <i class="fa fa-eye" style="color:black;" data-target="#mymodalviewdetailssecondtab" data-toggle="modal"
+                                                   title="View Detais" ng-click="ApprovalRemark(userclient);"></i>
+                                            </a>
+                                            |
+                                        </span>
+                                        <label ng-if="viewapprovedflag==false">
+                                            <span ng-if="userclient.pcreqtndeT_ActiveFlg === true">
+                                                <a href="" ng-click="deactiveparticulars(userclient)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="userclient.pcreqtndeT_ActiveFlg === false">
+                                                <a href="" ng-click="deactiveparticulars(userclient)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                                </a>
+                                                |
+                                            </span>
+                                        </label>
+
+                                        <label font-weight:bold">{{status}}</label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="mymodalviewdetailssecondtab" ng-show="modalview.length>0" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <!--<h4 class="modal-title text-white">Requisition Details : {{PCREQTN_RequisitionNotemp}}</h4>-->
+                <h4 class="modal-title text-white">Approved Details </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="5">First Level</th>
+                                    <th colspan="5">Second Level</th>
+                                </tr>
+                                <tr>
+
+                                    <th>SL.No</th>
+                                    <th>Approved By</th>
+                                    <th>Approved Date</th>
+                                    <th>Approved Amount</th>
+                                    <th>Remark</th>
+                                    <th>ApprovedBy</th>
+                                    <th>Approved Date</th>
+                                    <th>Approved Amount</th>
+                                    <th>Approved Remark</th>
+                                </tr>
+                            </thead>
+
+
+
+                            <tbody ng-repeat="userclient in modalview ">
+                                <tr>
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{userclient.First_Approvalperson}}</td>
+                                    <td class="text-center">{{userclient.first_approval_date | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-left">{{userclient.First_ApprovalAmount}}</td>
+                                    <td class="text-left">{{userclient.FirstApproval_remark}}</td>
+
+                                    <td class="text-center">
+                                        <span ng-if="userclient.Second_Approvalperson!=0 || userclient.Second_Approvalperson!=null ">
+                                            {{userclient.Second_Approvalperson}}
+                                        </span>
+                                        <span ng-if="userclient.Second_Approvalperson==0 || userclient.Second_Approvalperson==null">
+                                            -
+                                        </span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span ng-if="userclient.second_approval_date!=0 || userclient.second_approval_date!=null ">
+                                            {{userclient.second_approval_date | date:'dd/MM/yyyy'}}
+                                        </span>
+                                        <span ng-if="userclient.second_approval_date==0 || userclient.second_approval_date==null">
+                                            -
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-if="userclient.Second_ApprovalAmount!=0 || userclient.Second_ApprovalAmount!=null ">
+                                            {{userclient.Second_ApprovalAmount}}
+                                        </span>
+                                        <span ng-if="userclient.Second_ApprovalAmount==0 || userclient.Second_ApprovalAmount==null">
+                                            -
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-if="userclient.SecondApproval_remark!=0 || userclient.SecondApproval_remark!=null ">
+                                            {{userclient.SecondApproval_remark}}
+                                        </span>
+                                        <span ng-if="userclient.SecondApproval_remark==0 || userclient.SecondApproval_remark==null">
+                                            -
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

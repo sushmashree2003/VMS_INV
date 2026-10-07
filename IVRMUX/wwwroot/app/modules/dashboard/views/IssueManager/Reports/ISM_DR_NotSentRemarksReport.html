@@ -1,0 +1,324 @@
+﻿<style>
+    .red {
+        background-color: red;
+    }
+
+    .darkred {
+        background-color: darkRed;
+    }
+
+    .green {
+        background-color: green;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Daily Report/HR Planner Remarks </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-3 padding-left-2px">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 8px;width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueDeptd" type="text" placeholder="Search Department here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                    <label>
+                                        <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true"
+                                               ng-click="all_checkdept(departmentselectedAll)">
+                                        <span class="lbl padding-8">
+                                            <b> All Department</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                        <input name="dept" ng-model="user.selected" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee"
+                                               ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueDesgd" type="text" placeholder="Search Designation here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                    <label>
+                                        <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                        <span class="lbl padding-8">
+                                            <b> All Designation</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                        <input name="desg" ng-model="user.selected" type="checkbox" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 padding-left-none">
+                            <div class="form-group">
+                                <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                                    <span>
+                                        <input class="form-control" ng-model="obj.searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                        <span class="lbl padding-8">
+                                            <b>  All Employees</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                        <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee"
+                                               ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Report Type : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="Template" name="templatenme" required>
+                                        <option value="">--Select Report Type--</option>
+                                        <option value="All">All</option>
+                                        <option value="HRPlannerRemarks">HR Planner Remarks</option>
+                                        <option value="DRNotSentRemarks">DR Not Sent Remarks</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.templatenme)" ng-messages="myForm.templatenme.$error">
+                                        <div ng-message="required">Select Report Type</div>                                     
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="start_Date" onkeypress="return false" name="startdate" md-placeholder="Enter Date" ng-change="onchangestartdate()" required>
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Select Start Date</div>
+                                        <div ng-message="valid">The entered value is not Valid!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="end_Date" name="endate" ng-disabled="!start_Date" md-min-date="start_Date" md-max-date="getMaxDate" md-placeholder="Enter Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                    <div ng-message="required">Select End Date</div>
+                                    <div ng-message="valid">The entered value is not Valid!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button ng-if="getdrnotsetreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel()">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+
+                <md-button ng-if="getdrnotsetreport.length>0" type="button" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="getdrnotsetreport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">DR/HR Planner Remarks</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12 off-sm-6">                    
+                    <h4 class="text-center">From {{start_Date | date:'dd/MM/yyyy'}} To {{end_Date | date:'dd/MM/yyyy'}}</h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-hover table-responsive table-bordered" id="table">
+                        <thead>
+                            <tr>
+                                <th>Employee Details </th>
+                                <th>DR Not Sent Date</th>
+                                <th>Remarks Date</th>
+                                <th>Remarks</th>
+                                <th>Template Name</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in getdrnotsetreport">
+                            <tr>
+                                <td class="text-left">
+                                    Name :  {{user.EMPLOYEENAME}}<br />
+                                    Code : {{user.EMPLOYEECODE}}
+                                </td>
+                                <td class="text-left">
+                                    {{user.DRNotSentDate}}
+                                </td>
+                                <td class="text-left">
+                                    {{user.CreatedDate | date :'dd/MM/yyyy hh:mm a'}}
+                                </td>
+                                <td class="text-left">
+                                    {{user.ISMDRNSDR_Remarks}}
+                                </td>
+                                <td class="text-left">
+                                    {{user.ISMDRNSDR_TemplateName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="consolidatedetailed">
+            <div id="detailedreport">
+                <table>                    
+                    <tr style="border :0.5px solid black">
+                        <td colspan="5" style="text-align:center">From {{start_Date | date:'dd/MM/yyyy'}} To {{end_Date | date:'dd/MM/yyyy'}}</td>
+                    </tr>
+                </table>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr style="border :0.5px solid black">
+                                    <th>Employee Details </th>
+                                    <th>DR Not Sent Date</th>
+                                    <th>Remarks Date</th>
+                                    <th>Remarks</th>
+                                    <th>Template Name</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in getdrnotsetreport">
+                                <tr style="border :0.5px solid black">
+                                    <td class="text-left">
+                                        Name :  {{user.EMPLOYEENAME}}<br />
+                                        Code : {{user.EMPLOYEECODE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.DRNotSentDate}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.CreatedDate | date :'dd/MM/yyyy hh:mm a'}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.ISMDRNSDR_Remarks}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.ISMDRNSDR_TemplateName}}
+                                    </td>
+                                </tr>                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="detailedreportprint">
+                <table>                    
+                    <tr>
+                        <td colspan="5" style="text-align:center">From {{start_Date | date:'dd/MM/yyyy'}} To {{end_Date | date:'dd/MM/yyyy'}}</td>
+                    </tr>
+                </table>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered" id="table">
+                            <thead>
+                                <tr>
+                                    <th>Employee Details </th>
+                                    <th>DR Not Sent Date</th>
+                                    <th>Remarks Date</th>
+                                    <th>Remarks</th>
+                                    <th>Template Name</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in getdrnotsetreport">
+                                <tr>
+                                    <td class="text-left">
+                                        Name :  {{user.EMPLOYEENAME}}<br />
+                                        Code : {{user.EMPLOYEECODE}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.DRNotSentDate}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.CreatedDate | date :'dd/MM/yyyy hh:mm a'}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.ISMDRNSDR_Remarks}}
+                                    </td>
+                                    <td class="text-left">
+                                        {{user.ISMDRNSDR_TemplateName}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

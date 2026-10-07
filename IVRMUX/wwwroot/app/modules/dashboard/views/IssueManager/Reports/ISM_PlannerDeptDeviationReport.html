@@ -1,0 +1,789 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<style>
+    .tdd {
+        background: #fff !important;
+        color: #131212 !important;
+    }
+</style>
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Deviation Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-3 padding-left-2px">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 8px;width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+                            <label>
+                                <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                <span class="lbl padding-8">
+                                    <b> All Department</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 padding-left-none">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                            <label>
+                                <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdesg(designationselectedAll)">
+                                <span class="lbl padding-8">
+                                    <b> All Designation</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                <input name="desg" ng-model="user.selected" type="checkbox" ng-disabled="roleflag==true" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5 padding-left-none">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                            <label>
+                                <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                <span class="lbl padding-8">
+                                    <b>  All Employees</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4" style="margin-left: 13.333333%;">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="start_Date" ng-disabled="plannerflg" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="end_Date" name="endate" ng-disabled="plannerflg" md-min-date="start_Date" ng-change="onenddatechange(end_Date)" md-placeholder="Enter Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="row padding-top-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="DepD" value="DepD" ng-model="DepD" ng-disabled="get_userEmplist.length<2" ng-click="Depatdeviation()">
+                            <span class="lbl padding-8"><b>Departmentwise Deviation</b></span>
+                        </label>
+                        <br />
+                        <label class="checkbox-inline" style="padding-top: 30px !important;">
+                            <input type="checkbox" name="EmpD" value="EmpD" ng-model="EmpD" ng-disabled="get_userEmplist.length<2" ng-click="Empdeviation()">
+                            <span class="lbl padding-8"><b>Employeewise Deviation</b></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="row padding-top-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="Email" value="Email" ng-disabled="get_userEmplist.length<2" ng-model="Email" ng-click="send()">
+                            <span class="lbl padding-8"><b>Send Email</b></span>
+                        </label>
+                        <br />
+                        <label class="checkbox-inline" style="padding-top: 30px !important;">
+                            <input type="checkbox" name="Notif" value="Notif" ng-disabled="get_userEmplist.length<2" ng-model="Notif" ng-click="send()">
+                            <span class="lbl padding-8"><b>Send Notification</b></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="row center">
+                <div class="col-sm-12 text-center">
+                    <div class="form-group">
+                        <div ng-init="noofdays='0'">
+                            <label class="radio-inline">
+                                <input type="radio" value="0" name="all" ng-change="clearreport()" ng-model="noofdays">
+                                <span class="lbl padding-8"> All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="20" name="ten" ng-change="clearreport()" ng-model="noofdays">
+                                <span class="lbl padding-8">  <b>></b> 20% Deviation </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="30" name="ten" ng-change="clearreport()" ng-model="noofdays">
+                                <span class="lbl padding-8">  <b>></b> 30% Deviation </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="40" name="twenty" ng-change="clearreport()" ng-model="noofdays">
+                                <span class="lbl padding-8">  <b>></b> 40% Deviation</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input  type="radio" value="60" name="ten" ng-change="clearreport()" ng-model="noofdays">
+                                <span class="lbl padding-8">  <b>></b> 60% Deviation </span>
+                            </label>
+                            <!--<label class="radio-inline" ng-repeat="user in deviationpercentage">
+                                <input type="radio" value="user.ISM_MD_Id" name="ten" ng-model="noofdays">
+                                <span class="lbl padding-8"> > {{user.ISM_Deviated_Per}} % Deviation </span>
+                            </label>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="deviationReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Deviation Report
+                </md-button>
+                <md-button ng-if="get_deviationreport.length>0 || DeptdeviationRemarksReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+                <md-button ng-show="get_deviationreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#ExcellDeviation')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button ng-if="get_userEmplist.length>1 || DeptdeviationRemarksReport.length>1" type="button" ng-click="empemailmemo('Memo')" class="md-raised md-primary" id="save-btn">
+                    <i class="fa fa-exclamation" aria-hidden="true"></i>
+                    Send Memo
+                </md-button>
+                <!--<md-button ng-if="get_userEmplist.length>1 || DeptdeviationRemarksReport.length>1" type="button" ng-click="empemailmemo('Notice')" class="md-raised md-warn" id="save-btn">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    Send Notice
+                </md-button>-->
+                <md-button ng-if="get_userEmplist.length>1 || DeptdeviationRemarksReport.length>1" ng-disabled="Email!=true && Notif!=true" type="button" data-toggle="modal" data-target="#myModal" class="md-raised md-primary" id="save-btn">
+                    <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                    Send Email/Notification
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="employeeid.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">DEVIATION REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div ng-if="DepD!=true">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-5">
+                        <div class="form-group">
+                            <h4><span style="padding-left:5%"> DEVIATION REPORT</span> </h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                    <!--<div class="col-sm-12">
+                        <div class="form-group">
+                            <span class="text-left col-sm-6" style="font-size:16px;"> Taken By :<b> {{empname}}</b></span>
+                            <span class="text-right col-sm-6" style="font-size:16px;"> Department : <b>{{empdepartment}}</b></span>
+                        </div>
+                    </div>-->
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th class="hdTH" ng-if="get_userEmplist.length>1">
+                                <label>
+                                    <input name="checkallemp" type="checkbox" ng-model="checkallemp" ng-click="togglecheckboxAll(checkallemp)">
+                                    <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                                </label>
+                            </th>
+                            <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Planner</b></a> </th>
+                            <!--<th width="10%"><a href="" ng-click="sortBy('start')"><b>Start Date </b></a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('end')"><b>End Date</b></a></th>-->
+                            <th width="10%"><a href=""><b>Total Effort (Hr)</b>   </a> </th>
+                            <th width="10%"><a href=""><b>Completed Effort (Hr)</b>   </a> </th>
+                            <!--<th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b>Completed</b>   </a> </th>-->
+                            <th width="8%"><a href=""><b>Deviation </b></a> </th>
+                            <th><a href=""><b>Complete By </b></a> </th>
+                            <th width="10%"><a href=""><b>View </b></a> </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in employeeid">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}" ng-if="get_userEmplist.length>1">
+                                <input type="checkbox" ng-model="user.checked" ng-change="optionToggled(user,user.plannerdetails.length+1)">
+                                <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                            </td>
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">
+                                <b>
+                                    <!--{{user.employeename}}-->
+                                    <a class="text-body text-left"  data-ng-click="viewresponsetask(user)">{{user.employeename}}</a>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="planner in user.plannerdetails">
+                            <td class="text-left">
+                                <b>{{planner.ISMTPL_PlannerName}}</b><br /> ({{planner.ISMTPL_StartDate | date:'dd-MM-yyyy'}} To {{planner.ISMTPL_EndDate | date:'dd-MM-yyyy'}})
+                                <!--<a class="text-body col-sm-8 text-left" data-toggle="modal" data-target="#myModalResponse" data-ng-click="viewresponse(objs)">{{planner.ISMTPL_PlannerName}}</a>-->
+                            </td>
+                            <!--<td class="text-center">{{planner.ISMTPL_StartDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center">{{planner.ISMTPL_EndDate | date:'dd-MM-yyyy'}}</td>-->
+                            <td class="text-left">{{planner.Total_Effort}}</td>
+                            <td class="text-left">{{planner.Completed_Effort}}</td>
+                            <!--<td class="text-left">{{planner.Completed_Percentage | number :2}}%</td>-->
+                            <td class="text-left"><span style="color:red;">{{planner.Deviation_Percentage | number :2}}%</span></td>
+                            <td class="text-left tdd" ng-if="$index==0" rowspan="{{user.plannerdetails.length+1}}">
+                                <md-datepicker ng-model="user.comp_Date" name="Comp_Date" ng-disabled="user.checked!=true" id="date1f" md-placeholder="Select date" ng-required="user.checked!=true"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.Comp_Date)" ng-messages="myForm.Comp_Date.$error">
+                                    <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Date</div>
+                                </div>
+                            </td>
+                            <td ng-if="$index==0" class="tdd" rowspan="{{user.plannerdetails.length+1}}">
+                                <span ng-show="user.checked==true && user.comp_Date!=null">
+                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View Memo/Notice" data-ng-model="receiptdetails"  data-ng-click="viewempemailmemo('Memo',user.HRME_Id)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true"> View Memo </i>
+                                    </a><br />
+                                    <!--<a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View Memo/Notice" data-ng-model="receiptdetails"  data-ng-click="viewempemailmemo('Notice',user.HRME_Id)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true"> View Notice </i>
+                                    </a>-->
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="printDeviation" ng-hide="true">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group text-center">
+                            <h4><span> DEVIATION REPORT</span> </h4>
+                            <h4><span> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th width="5%"><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th width="30%"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                            <th width="25%"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Planner</b></a> </th>
+                            <th width="20%"><a href="" ng-click="sortBy('start')"><b>Start Date </b></a> </th>
+                            <th width="20%"><a href="" ng-click="sortBy('end')"><b>End Date</b></a></th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Total Effort (Hr)</b>   </a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Completed Effort (Hr)</b>   </a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Completed %</b>   </a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Deviation %</b></a> </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in employeeid">
+                        <tr style="page-break-after:always;">
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.employeename}}</b></td>
+                        </tr>
+                        <tr ng-repeat="planner in user.plannerdetails" style="page-break-after:always;">
+                            <td class="text-left">{{planner.ISMTPL_PlannerName}}</td>
+                            <td class="text-center">{{planner.ISMTPL_StartDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center">{{planner.ISMTPL_EndDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{planner.Total_Effort}}</td>
+                            <td class="text-left">{{planner.Completed_Effort}}</td>
+                            <td class="text-left">{{planner.Completed_Percentage | number :2}}%</td>
+                            <td class="text-left"><span style="color:red;">{{planner.Deviation_Percentage | number :2}}%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="ExcellDeviation" ng-hide="true">
+            <div class="box-body">
+                <!--<div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group text-center">
+                            <h4><span> DEVIATION REPORT</span> </h4>
+                            <h4><span> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</span></h4>
+                        </div>
+                    </div>
+                </div>-->
+                <table class="table table-hover table-responsive table-bordered" id="table" style="border:1px solid black">
+                    <thead style="font-weight: bold;">
+                        <tr>
+                            <td style="text-align:center;font-size:20px;font-weight:800;word-wrap:break-word;" colspan="9"><b style="color:blue">DEVIATION REPORT</b></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;font-size:18px;font-weight:800;word-wrap:break-word;" colspan="9"><b style="color:blue">{{start_Date | date:'dd/MM/yyyy'}} TO {{end_Date | date:'dd/MM/yyyy'}}</b></td>
+                        </tr>
+                        <tr style="border:1px solid black;color:crimson">
+                            <th width="5%"><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th width="30%"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Employee</b></a> </th>
+                            <th width="25%"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Planner</b></a> </th>
+                            <th width="20%"><a href="" ng-click="sortBy('start')"><b>Start Date </b></a> </th>
+                            <th width="20%"><a href="" ng-click="sortBy('end')"><b>End Date</b></a></th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Total Effort (Hr)</b>   </a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Completed Effort (Hr)</b>   </a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Completed %</b>   </a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('avaiableStock')"><b>Deviation %</b></a> </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in employeeid" style="border:0.5px solid black">
+                        <tr style="page-break-after:always;border:0.5px solid black">
+                            <td class="text-center" style="vertical-align:middle;text-align:center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.employeename}}</b></td>
+                        </tr>
+                        <tr ng-repeat="planner in user.plannerdetails" style="page-break-after:always;border:0.5px solid black">
+                            <td class="text-left">{{planner.ISMTPL_PlannerName}}</td>
+                            <td class="text-center">{{planner.ISMTPL_StartDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center">{{planner.ISMTPL_EndDate | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{planner.Total_Effort}}</td>
+                            <td class="text-left">{{planner.Completed_Effort}}</td>
+                            <td class="text-left">{{planner.Completed_Percentage | number :2}}%</td>
+                            <td class="text-left"><span style="color:red;">{{planner.Deviation_Percentage | number :2}}%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div class="row text-center">
+                                <div class="col-sm-6 col-sm-offset-2">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-3">Message:<span style="color:darkred">*</span></label>
+                                        <div class="col-sm-8">
+                                            <textarea name="Record" ng-model="messgaeboxdata" class="form-control" style="width: 300px;height: 100px;resize: none;" />
+                                            <div class="error-messages" ng-if="interacted(myForm.Record)" ng-messages="myForm.Record.$error">
+                                                <div ng-message="required">Enter Message</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row text-center" style="padding-left: 10%;">
+                                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="empemailmemo()">
+                                    <i class="fa fa-paper-plane" aria-hidden="true"></i> Send
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================MODEL Response=================================== -->
+    <div>
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" method="post" novalidate>
+            <!--<div id="myModalAddtoPlanner" class="modal fade" role="dialog" style="z-index:9999;" ng-if="taskplanner.length>0">-->
+            <div id="myModalResponse" class="modal fade" role="dialog" style="z-index:9999;" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" style="width: 95%;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h4 class="modal-title text-white col-sm-10">PENDING TASK LIST - {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</> </h4>
+                                </div>
+                                <div class="col-sm-3 col-sm-offset-2">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-search"></i>
+                                            </span><sapn>
+                                            </sapn>
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 pull-right">
+                                    <button type="button" class="btn btn-default" ng-click="closeimg()">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table class="table table-responsive table-bordered clearfix">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th><a href="" ng-click="sort('ISMTCR_TaskNo')">Task No</a></th>
+                                        <th><a href="" ng-click="sort('ISMTCR_Title')">Task</a></th>
+                                        <th><a href="" ng-click="sort('ISMTCR_BugOREnhancementFlg')">Type</a></th>
+                                        <th><a href="" ng-click="sort('ISMTCR_Status')">Status</a></th>
+                                        <th><a href="" ng-click="sort('StartDate')">Start Date</a></th>
+                                        <th><a href="" ng-click="sort('EndDate')">End Date</a></th>
+                                        <th><a href="" ng-click="sort('AssignedBy')">AssignedBy</a></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="objplnr in get_taskdetails  | filter : searchValue  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'">
+                                        <td class="text-center">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                        <td class="text-left">
+                                            {{objplnr.ISMTCR_TaskNo}}
+                                        </td>
+                                        <td class="text-left">
+                                            {{objplnr.ISMTCR_Title}}
+                                        </td>
+                                        <td class="text-left">
+                                            {{objplnr.ISMTCR_BugOREnhancementFlg}}
+                                        </td>
+                                        <td class="text-left">
+                                            {{objplnr.ISMTCR_Status}}
+                                        </td>
+                                        <td class="text-left">
+                                            {{objplnr.StartDate}}
+                                        </td>
+                                        <td class="text-left">
+                                            {{objplnr.EndDate}}
+                                        </td>
+                                        <td class="text-left">
+                                            {{objplnr.AssignedBy}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box box-primary">
+        <div ng-if="DepD==true && DeptdeviationRemarksReport.length>0">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group text-center">
+                            <h4><span>DEPARTMENTS DEVIATION REPORT</span> </h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th width="5%" class="hdTH" ng-if="roleflag==false">
+                                <label>
+                                    <input name="checkallemp" type="checkbox" ng-model="checkalldept" ng-click="togglecheckboxAllDept(checkalldept)">
+                                    <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                                </label>
+                            </th>
+                            <th width="5%"><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th width="30%"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>DEPARTMENT</b></a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('start')"><b>START DATE </b></a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('end')"><b>END DATE</b></a></th>
+                            <th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b>COMPLETED</b>   </a> </th>
+                            <th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b>DEVIATION</b></a> </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in DeptdeviationRemarksReport">
+                        <tr>
+                            <td class="text-center" ng-if="roleflag==false">
+                                <input type="checkbox" ng-model="user.checked" ng-change="optionToggleddept(user)">
+                                <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                            </td>
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-left text-uppercase">{{user.HRMDC_Name}} DEPARTMENT</td>
+                            <td class="text-center">{{start_Date | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center">{{end_Date | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{user.completePercent}}%</td>
+                            <td class="text-left">{{user.DevPercent}}%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div ng-if="DepD==true && DeptdeviationRemarksReport.length>0" ng-show="false" id="printDeviationDept">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group text-center">
+                            <h4><span>DEPARTMENTS DEVIATION REPORT</span> </h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th width="10%"><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <th width="30%"><a href="" ng-click="sortBy('INVMI_ItemName')"><b>DEPARTMENT</b></a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('start')"><b>START DATE </b></a> </th>
+                            <th width="10%"><a href="" ng-click="sortBy('end')"><b>END DATE</b></a></th>
+                            <th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b>COMPLETED</b>   </a> </th>
+                            <th width="8%"><a href="" ng-click="sortBy('avaiableStock')"><b>DEVIATION</b></a> </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in DeptdeviationRemarksReport">
+                        <tr>
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-left text-uppercase">{{user.HRMDC_Name}} DEPARTMENT</td>
+                            <td class="text-center">{{start_Date | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center">{{end_Date | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-left">{{user.completePercent}}%</td>
+                            <td class="text-left">{{user.DevPercent}}%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="myModalswal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="">
+                        <center>
+                            <p><h4 style="color:red;">Department Head List Under This Department</h4></p>
+                        </center>
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center">SEND TO</th>
+                                    <th style="text-align:center">SL.NO.</th>
+                                    <th style="text-align:center">EMPLOYEE NAME</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="sibling in departmntheadselect">
+                                    <td class="text-center">
+                                        <input type="checkbox" ng-model="sibling.checked">
+                                        <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                                    </td>
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td style="text-align:left">
+                                        {{sibling.employeename}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--//modal-->
+    <div id="myModalmemo" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog" style="width:80%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeviewmodal()">Close</button>
+                </div>
+                <div class="modal-body">
+                    <div id="test">
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>    
+    <!--//modal-->
+    <!--<div class="box box-primary">
+
+        <h3>Nested Tables <small class="text-muted">with tree view-like connecting lines</small></h3>
+        <link href="../../../../../../css/tree.css" rel="stylesheet" />
+        <link href="../../../../../../css/tree.css" rel="stylesheet" />
+        <br>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>SL.No.</th>
+                    <th>DEPARTMENT</th>
+                    <th>START DATE</th>
+                    <th>END DATE</th>
+                    <th>COMPLETED PERCENTAGE</th>
+                    <th>DEVIATION PERCENTAGE</th>
+                </tr>
+            </thead>
+            <tbody ng-repeat="user in DeptdeviationRemarksReport">
+                <tr id="tr-detail" class="tr-detail hidden">
+                    <td></td>
+                    <td colspan="4">
+                        <div class="detail-content">
+                            <ul>
+                                <li>
+                                    <div class="detail"></div>
+
+                                    <div class="detail detail-main">
+                                        <fieldset>
+                                            <legend><span class="label label-primary">Nested Data</span></legend>
+                                            <div>
+                                                <table class="table table-condensed">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tr>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="detail"></div>
+                                    <div class="detail detail-main">
+                                        <fieldset>
+                                            <legend><span class="label label-primary">Nested Data</span></legend>
+                                            <div>
+                                                <table class="table table-condensed">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tr>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="detail"></div>
+
+                                    <div class="detail detail-main">
+                                        <fieldset>
+                                            <legend><span class="label label-primary">Nested Data</span></legend>
+                                            <div>
+                                                <table class="table table-condensed">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                            <th>Header</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tr>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                        <td>123</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="fa fa-chevron-right fa-fw"></span> </td>
+                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                    <td class="text-left text-uppercase">{{user.HRMD_DepartmentCode}} DEPARTMENT</td>
+                    <td class="text-center">{{start_Date | date:'dd-MM-yyyy'}}</td>
+                    <td class="text-center">{{end_Date | date:'dd-MM-yyyy'}}</td>
+                    <td class="text-left">{{user.completePercent}}%</td>
+                    <td class="text-left">{{user.DevPercent}}%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>-->
+</section>

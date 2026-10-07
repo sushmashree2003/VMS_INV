@@ -1,0 +1,311 @@
+﻿<style>
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+
+    .well {
+        position: relative;
+        border-radius: 3px;
+        background: #ffffff !important;
+        border-top: 3px solid #d2d6de !important;
+        padding: 5px !important;
+        margin-bottom: 5px !important;
+        width: 66%;
+        -webkit-box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+        box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+</style>
+<section class="content" ng-init="LoadHWHealthCheckUpdata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Health CheckUp</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Institution :<strong class="text-red">*</strong> </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="MI_Id" name="miname" required
+                                        ng-change="OnChangeHwHealthCheckUpInst()" ng-disabled="editable==true">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="dd in getuserinstitution" value="{{dd.mI_Id}}" ng-selected="{{dd.mI_Id==MI_Id}}">
+                                        {{dd.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.miname)" ng-messages="myForm1.miname.$error">
+                                    <div ng-message="required">Select Institution</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Client : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="id2" name="ISMMCLTname" ng-model="objques.ISMMCLT_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Client "
+                                               ng-change="OnChangeQuestion(objques.RATMQE_Id)"
+                                               ng-disabled="editable==true" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Client">
+                                            {{$select.selected.ismmclT_ClientName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="catgry in getclientlist | filter: $select.search"
+                                                           value="{{catgry.ismmclT_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.ISMMCLTname)" ng-messages="myForm1.ISMMCLTname.$error">
+                                        <div ng-message="required">Select Client Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Visited Date : <strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="sch_date" ng-model="VisitedDate" onkeydown="return false" md-max-date="visitedmaxdate"
+                                                   required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.sch_date)" ng-messages="myForm1.sch_date.$error">
+                                        <div ng-message="required">Select Visited Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Remarks :<strong class="text-red">*</strong> </label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" ng-model="Remarks" name="reson" rows="5" style="resize:none" required></textarea>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.reson)" ng-messages="myForm1.reson.$error">
+                                        <div ng-message="required">Enter Remarks</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Visited Person : <strong class="text-red">*</strong> </label>
+                                <div class="col-sm-8">
+                                    <ui-select id="id2" name="ques" ng-model="objques.HRME_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Employee " ng-disabled="editable==true" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">
+                                            {{$select.selected.hrmE_EmployeeFirstName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="catgry in getemployeedetails | filter: $select.search"
+                                                           value="{{catgry.hrmE_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.ques)"
+                                         ng-messages="myForm1.ques.$error">
+                                        <div ng-message="required">Select Vistied Person</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div style="overflow:auto">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No</th>
+                                                <th>Download Template</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center">1</td>
+                                                <td class="text-left">Service Report(Pdf)</td>
+                                                <td class="text-center">
+                                                    <span ng-click="ViewFile('https://dcampusstrg.blob.core.windows.net/hardwarehealthchekup/servicereport.pdf',
+                                                      'Service Report', 'Pdf')">
+                                                        <i class="fa fa-eye text-black" title="View Template"></i>
+                                                    </span>
+                                                    <span ng-click="DownloadFile('https://dcampusstrg.blob.core.windows.net/hardwarehealthchekup/servicereport.pdf',
+                                                      'Service Report', 'Pdf')">
+                                                        <i class="fa fa-download text-blue" title="Download Template"></i>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">2</td>
+                                                <td class="text-left">Health CheckUp Format(Excel)</td>
+                                                <td class="text-center">
+                                                    <span ng-click="ViewFile('https://dcampusstrg.blob.core.windows.net/hardwarehealthchekup/HardWareHealthCheckUp.xls', 'Health CheckUp Report', 'Excel')">
+                                                        <i class="fa fa-eye text-black" title="View Template"></i>
+                                                    </span>
+                                                    <span ng-click="DownloadFile('https://dcampusstrg.blob.core.windows.net/hardwarehealthchekup/HardWareHealthCheckUp.xls', 'Health CheckUp Report', 'Excel')">
+                                                        <i class="fa fa-download text-blue" title="Download Template"></i>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10%">Sl.No</th>
+                                        <th style="width:30%">Upload</th>
+                                        <th style="width:40%">File Name</th>
+                                        <th style="width:10%">View/Download</th>
+                                        <th style="width:10%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="userviewreponse in temptaskreponsefiles">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-center lessonplanner">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <input class="custom-file-input file-blue text-center" id="{{teacher.filepath}}"
+                                                                   data-ng-model="userviewreponse.filepath" type="file"
+                                                                   accept="image/*, application/pdf,application/msword,
+                                                               application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                                               application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                               application/vnd.ms-excel" name="filetypeteacher{{$index}}" onchange="angular.element(this).scope().uploadtecherdocuments(this,angular.element(this).scope().userviewreponse)">
+                                                            <div class="error-messages" ng-if="interacted6(myForm6['filetypeteacher'+$index])"
+                                                                 ng-messages="myForm6['filetypeteacher'+$index].$error">
+                                                                <div ng-message="required">Upload File</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-left">
+                                            <div class="col-sm-6">
+                                                <span ng-if="userviewreponse.filepath !=null && userviewreponse.filepath !=''">
+                                                    <label>{{userviewreponse.filename}}</label>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span ng-if="userviewreponse.filepath !=null && userviewreponse.filepath !=''">
+                                                <a ng-if="userviewreponse.filetype=='jpg' || userviewreponse.filetype=='png'
+                                                                   || userviewreponse.filetype=='svg'|| userviewreponse.filetype=='jpeg'
+                                                                   || userviewreponse.filetype=='gif'"
+                                                   style="color:red;display:inline; font-weight: bolder;"
+                                                   data-ng-click="showmothersign(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+                                                <a ng-if="userviewreponse.filetype=='pdf'" style="color:blue;display:inline;"
+                                                   ng-click="onviewpdf(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+
+                                                <a ng-if="userviewreponse.filetype=='doc' || userviewreponse.filetype=='docx'"
+                                                   style="color:blue;display:inline;"
+                                                   ng-click="ViewDocExcelfles(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+
+                                                <a ng-if="userviewreponse.filetype=='xls' || userviewreponse.filetype=='xlsx'"
+                                                   style="color:blue;display:inline;"
+                                                   ng-click="ViewDocExcelfles(userviewreponse.filepath,userviewreponse.filename)">
+                                                    <i class="fa fa-eye text-black" title="View File"></i>
+                                                </a>
+                                            </span>
+
+                                            <span ng-if="userviewreponse.filepath !=null && userviewreponse.filepath !=''">
+                                                |
+                                                <a class="downloadIcon" title="Dowload Template"
+                                                   ng-click="downloaddirectimage(userviewreponse.filepath,userviewreponse.filename,userviewreponse.filetype)">
+                                                    <i class="fa fa-download" title="Download Template"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="" ng-hide="temptaskreponsefiles.length > 10">
+                                                <a href="" ng-show="$last" ng-click="addNewviewresponse()">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="temptaskreponsefiles.length ==1">
+                                                <a href="" ng-click="removeNewviewresponse($index)">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="row text-center">
+                    <input type="hidden" ng-model="ismcltprP_Id " value="{{ismcltprP_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="SaveHWHealthChekUp()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+  
+</section>
+
+
+

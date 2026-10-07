@@ -1,0 +1,160 @@
+﻿
+<section class="content" ng-init="loadInitialData()">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Entry</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6">
+                                <md-datepicker ng-model="HRDTA_Date" onkeypress="return false" name="aemonaddoe" md-placeholder="Enter Date" md-min-date="minDatemf" ng-change="loadInitialData()" md-max-date="maxDatemf" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.aemonaddoe)" ng-messages="myForm.aemonaddoe.$error || myForm.aemonaddoe.$dirty">
+                                    <div ng-message="required">Select Attendance Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <label class="control-label col-sm-4">Start Time:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <div allow-pattern="(\s|[0-9])" ng-paste="$event.preventDefault()">
+                                    <div uib-timepicker name="sch_time24" ng-model="HRDTA_StartTime" id="9" min="min" show-meridian="true" required></div>
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_time24)" ng-messages="myForm.sch_time24.$error">
+                                        <div ng-message="required">Select Start Time</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label md-raised  col-sm-4">Training Topic:<span style="color:Red">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="sel2" name="flr" ng-model="HRTCRINTTR_Id" ng-change="get_detail()" required>
+                                    <option value="">--Select Topic--</option>
+                                    <option ng-repeat="flr in trainingsub" value="{{flr.hrtcrinttR_Id}}" ng-selected="{{flr.hrtcrinttR_Id == HRTCRINTTR_Id}}">
+                                        {{flr.hrtcrinttR_TrainingDesc}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.flr)" ng-messages="myForm.flr.$error">
+                                    <div ng-message="required">Select Training Topic</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <label class="control-label col-sm-4">End Time:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6" allow-pattern="(\s|[0-9])" ng-paste="$event.preventDefault()">
+                                <div uib-timepicker name="sch_time_to24" ng-model="HRDTA_EndTime" id="10" min="min" show-meridian="true" required></div>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_time_to24)" ng-messages="myForm.sch_time_to24.$error">
+                                    <div ng-message="required">Select End Time</div>
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="col-sm-6" ng-show="trainingsubdetails.length>0">
+                        <table class="table table-responsive table-bordered text-left">
+                            <thead>
+                                <tr>
+                                    <th>SL. No</th>
+                                    <th>Training Topic</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="employee in trainingsubdetails">
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-center">{{employee.hrtcrinttR_TrainingDesc}}</td>
+                                    <td class="text-center">{{employee.hrtcrinttR_StartDate |date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">{{employee.hrtcrinttR_EndDate |date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">{{employee.hrtcrinttR_StartTime}}</td>
+                                    <td class="text-center">{{employee.hrtcrinttR_EndTime}}</td>      
+                                </tr>
+                            </tbody>
+                        </table>                    
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="trainingsubdetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <label class="col-sm-6" style="font:bold ; color:blue; font-size:20px;"> Select Absent Employees</label>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group pull-right">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SL. NO.</th>
+                                <th>Emp Code</th>
+                                <th>Emoployee Name</th>
+                                <th>Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue = (trainingEmpList | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                <!--<tr dir-paginate="user in trainingEmpList|filter:filterValue|itemsPerPage:itemsPerPage |orderBy:sortKey:sortReverse" current-page="currentPage" ng-class-odd="'odd'">-->
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left">{{user.hrme_employeecode}}</td>
+                                <td class="text-left">{{user.EmployeeName}}</td>
+                                <td class="text-center">
+                                    <input type="checkbox" id="check-{{user.Hrme_id}}" ng-model="user.selected" name="aemoncb"><!--ng-disabled="AttendenceCheckDis"-->
+                                    <span class="lbl padding-8"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="error-messages" ng-if="interacted(myForm.aemoncb)" style="margin-left:885px;margin-top:-16px;" ng-messages="myForm.aemoncb.$error || myForm.aemoncb.$dirty">
+                        <div ng-message="required">Select Atleast One Check Box</div>
+                    </div>
+                    <div class="error-messages" ng-if="interacted(myForm.aemoninp)" ng-messages="myForm.aemoninp.$error || myForm.aemoninp.$dirty">
+                        <div ng-message="required">Enter Days of selected checkbox</div>
+                    </div>
+                </div>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" on-page-change="pageChanged(newPageNumber)">
+                </dir-pagination-controls>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="SaveEmpAttendance(user);">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-warn" ng-click="clearData();">
+                        <i class="fa fa-times" aria-hidden="true"></i>Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+

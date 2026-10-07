@@ -1,0 +1,155 @@
+﻿<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Extra Training Approval</h3>
+                <div class="box-body" ng-hide="training_details_list.length==0">
+                    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                        <div style="overflow:auto;">
+                            <div class="col-sm-12 row">
+                                <table class="table table-responsive table-bordered" style="height:100px;">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label>
+                                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </th>
+                                            <th>Employee Code</th>
+                                            <th>Employee Name</th>
+                                            <th>Description</th>
+                                            <th>From Date</th>
+                                            <th>To Date</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="leave in training_details_list |orderBy:sortKey:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" pagination-id="pagination2" ng-class-odd="'odd'">
+                                            <td class="text-center">
+                                                <label style="margin-left:5px;">
+                                                    <input type="checkbox" ng-model="leave.selected" ng-true-value="true" ng-false-value="false"
+                                                           ng-change="GetLeave(leave)" ng-required="isOptionsRequired()" name="adcheckt">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </td>
+                                            <td class="text-center">
+                                                {{leave.HRME_EmployeeCode}}
+                                            </td>
+                                            <td class="text-center">
+                                                {{leave.EmployeeName}}
+                                            </td>
+                                            <td class="text-center">
+                                                {{leave.HRETR_Description}}
+                                            </td>
+                                            <td class="text-center">
+                                                {{leave.HRETR_FromDate | date:'dd-MM-yyyy'}}
+                                            </td>
+                                            <td>
+                                                {{leave.HRETR_ToDate | date:'dd-MM-yyyy'}}
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <textarea class="form-control" rows="3" style="resize:none" ng-model="leave.HRETR_Remarks" name="t1reason_{{$index}}"
+                                                                  ng-required="leave.selected"></textarea>
+                                                        <div class="error-messages" ng-if="interacted(myForm['t1reason_'+$index])"
+                                                             ng-messages="myForm['t1reason_'+$index].$error">
+                                                            <div ng-message="required">Enter Remark</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <dir-pagination-controls max-size="5" pagination-id="pagination2"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="text-center form-group">
+                                    <md-button type="submit" class="md-raised md-primary" ng-click="get_status('Approved')">
+                                        <i class="fa fa-check" aria-hidden="true"></i> Approve
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-in" style="background: darkgray;" ng-click="cancel()">
+                                        <i class="fa fa-refresh" aria-hidden="true"></i> Cancel
+                                    </md-button>
+                                    <md-button type="submit" class="md-raised md-warn" ng-click="get_status('Rejected')">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Reject
+                                    </md-button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div ng-show="training_details_list.length==0" class="text-center">
+                <p class="box-title" style="color:red">NO pending for approval!!</p>
+            </div>
+        </div>
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Extra Training Approval Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-6 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 table-wrap">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Sl.No</th>
+                                <th rowspan="2">Employee Code</th>
+                                <th rowspan="2">Employee Name</th>
+                                <th rowspan="2">Description</th>
+                                <th rowspan="2">From Date</th>
+                                <th rowspan="2">To Date</th>
+                                <th rowspan="2">Status</th>
+                                <th rowspan="2">Remark</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            <tr dir-paginate="employee in filterValue = (training_details_Grid| filter : searchValue) |orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page1" ng-class-odd="'odd'">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-center">{{employee.HRME_EmployeeCode}}</td>
+                                <td class="text-center">{{employee.EmployeeName}}</td>
+                                <td class="text-center">{{employee.HRETR_Description}}</td>
+                                <td class="text-center">{{employee.HRETR_FromDate|date:'dd-MM-yyyy'}}</td>
+                                <td class="text-center">{{employee.HRETR_ToDate|date:'dd-MM-yyyy'}}</td>
+                                <td class="text-center">{{employee.HRETR_Status}}</td>
+                                <td class="text-center">{{employee.HRETR_Remarks}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="10" pagination-id="page1"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,475 @@
+
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<style>
+    .ssss {
+        margin-left: 957px;
+    }
+
+    .multiselect {
+        width: 21.5em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 1.9%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .q {
+        margin-left: 12px;
+    }
+
+    .asaa {
+        margin-left: -3px;
+        width: 301px;
+    }
+
+    .ee {
+        margin-left: 157px;
+    }
+
+    .ddd {
+        margin-left: -148px;
+    }
+
+    .awe {
+        margin-left: 77px;
+        padding-left: 8px;
+        padding-right: 0px;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Feedback </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4"><b>Employees</b><label style="color:red">*</label></label>
+                            <div class="col-sm-8">
+                                <label class="control-label" style="padding-left: 9px;width: 100%;">
+                                    <span>
+                                        <input class="form-control asaa" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkalluu" type="checkbox" ng-click="all_checkuu(checkalluu)">
+                                        <span class="lbl padding-8">
+                                            <b style="color:#0f15d8"> All Employee</b>
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                        <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbxuu();" title="Select Employee" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b>  {{user.userEmpName}}</b>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required" class="col-sm-10">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div style="text-align:center;" ng-init="feedbackflg=false">
+                        <input ng-value="false" ng-model="feedbackflg" ng-change="feedbackflgclr()" type="radio" name="aaa">
+                        <span class="lbl padding-8">
+                            <b>Today</b>
+                        </span>
+                        <input ng-value="true" ng-model="feedbackflg" ng-change="feedbackflgclr()" type="radio" name="aaa">
+                        <span class="lbl padding-8">
+                            <b>Between Days</b>
+                        </span>
+                    </div>-->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="text-align:right">Start Date:<label style="color:red">*</label></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="stdate" ng-model="start_Date" md-placeholder="Enter Date" md-max-date="maxdate" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.stdate)" ng-messages="myForm.stdate.$error">
+                                <div ng-message="required" class="col-sm-10 ee">Select Start Date</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="text-align:right">End Date:<label style="color:red">*</label></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="eddate" ng-model="end_Date" md-min-date="start_Date" md-max-date="maxdate" md-placeholder="Enter Date">
+                                </md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.eddate)" ng-messages="myForm.eddate.$error">
+                                <div ng-message="required" class="col-sm-10 ee">Select End Date</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="approvalReport()" id="save-btn">
+                                <i class="fa fa-search-minus" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button ng-if="get_emp_dailyreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                            <md-button ng-show="get_emp_dailyreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#excelid')">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export To Excel
+                            </md-button>
+                            <md-button type="button" ng-if="get_emp_dailyreport.length>0" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                                <i class="fa fa-times" aria-hidden="true"></i> Clear
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_emp_dailyreport.length>0">
+        <div>
+            <div class="box-body">
+                <div ng-repeat="user in plannerid">
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <h4>Employee : {{user.plannedby}}</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table  table-responsive table-bordered" id="table">
+                                <thead>
+                                    <tr>
+                                        <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                        <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Report Date</b></a> </th>
+                                        <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Task Details</b></a> </th>
+                                        <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Effort</b></a> </th>
+                                        <th><a href="" ng-click="sortBy('INVMI_ItemName')"><b>Remark</b></a> </th>
+                                        <th><b>Feedback</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="plnr in user.plannerdetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">{{plnr.ISMDRPT_Date|date:'dd/MM/yyyy'}}</td>
+                                        <td class="text-left" style="width: 250px;">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <label class="control-label text-body text-left">Task No.: {{plnr.ISMTCR_TaskNo}}</label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <label title="View Task Details" class="control-label text-body text-left " ng-model="plnr.ISMTCR_Id"
+                                                           data-toggle="modal" data-target="#myModalResponse" data-ng-click="viewresponse(plnr)">
+                                                        Task Title : {{plnr.ISMTCR_Title}}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <label class="control-label text-body text-left"> Status : {{plnr.ISMDRPT_Status}}</label>
+                                                </div>
+                                            </div>
+
+                                        </td>
+                                        <td class="text-left" style="width: 150px;">
+                                            Actual Effort: {{plnr.actualeffortinhrs}}<br />
+                                            Time Taken: {{plnr.timetakeninhrs}}
+                                        </td>
+                                        <td style="width: 250px;" class="text-left">{{plnr.ISMDRPT_Remarks}}</td>
+                                        <td>
+                                            <textarea ng-model="plnr.feedbact" class="textareaclass form-control" rows="5"
+                                                      ng-disabled="plnr.FLAG==1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center ddd">
+            <md-button type="button" ng-click="Sendfeedback(plnr)" class="md-raised md-primary ssss">
+                <i class="fa fa-paper-plane " aria-hidden="true"></i> Send
+            </md-button>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="hide_n">
+        <div id="printP">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-4">
+                        <div class="form-group">
+                            <h4>  Employee Daily Report</h4>
+                            <h4> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div ng-repeat="user in plannerid">
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <h4>Employee : {{user.plannedby}}</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table  table-responsive table-bordered" id="table">
+                                <thead>
+                                    <tr>
+                                        <th><b>SL.No.</b></th>
+                                        <th><b>Report Date</b></th>
+                                        <th><b>Task Details</b></th>
+                                        <th><b>Effort</b></th>
+                                        <th><b>Remark</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="plnr in user.plannerdetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">{{plnr.ISMDRPT_Date|date:'dd/MM/yyyy'}}</td>
+                                        <td class="text-left" style="width: 250px;">
+                                            Task No.: {{plnr.ISMTCR_TaskNo}}<br />
+                                            Task Title : {{plnr.ISMTCR_Title}}<br />
+                                            Status : {{plnr.ISMDRPT_Status}}
+                                        </td>
+                                        <td class="text-left" style="width: 150px;">
+                                            Actual Effort: {{plnr.actualeffortinhrs}}<br />
+                                            Time Taken: {{plnr.timetakeninhrs}}
+                                        </td>
+                                        <td style="width: 250px;" class="text-left">{{plnr.ISMDRPT_Remarks}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="dffsd==true" id="excelid">
+        <table>
+            <thead>
+                <tr style="border:0.5px solid black">
+                    <td colspan="5" style="text-align:center">Employee Daily Report</td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="5" style="text-align:center"> {{start_Date | date:'dd-MM-yyyy'}} To {{end_Date | date:'dd-MM-yyyy'}}</td>
+                </tr>
+                <tr>
+                    <td colspan="5" style="text-align:center">&nbsp;</td>
+                </tr>
+            </thead>
+        </table>
+        <div ng-repeat="user in plannerid">
+            <table>
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <td colspan="5" style="text-align:center"> Employee : {{user.plannedby}}</td>
+                    </tr>
+                </thead>
+            </table>
+            <table>
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th><b>SL.No.</b></th>
+                        <th><b>Report Date</b></th>
+                        <th><b>Task Details</b></th>
+                        <th><b>Effort</b></th>
+                        <th><b>Remark</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border:0.5px solid black" ng-repeat="plnr in user.plannerdetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{plnr.ISMDRPT_Date|date:'dd/MM/yyyy'}}</td>
+                        <td class="text-left" style="width: 250px;">
+                            Task No.: {{plnr.ISMTCR_TaskNo}}<br />
+                            Task Title : {{plnr.ISMTCR_Title}}<br />
+                            Status : {{plnr.ISMDRPT_Status}}
+                        </td>
+                        <td class="text-left" style="width: 150px;">
+                            Actual Effort: {{plnr.actualeffortinhrs}}<br />
+                            Time Taken: {{plnr.timetakeninhrs}}
+                        </td>
+                        <td style="width: 250px;" class="text-left">{{plnr.ISMDRPT_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- View Task Response Details -->
+<div id="myModalResponse" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title text-white">	Task Details </h4>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6" style="padding-left:4%">
+                            <div class="form-group">
+                                <span class="text-head  text-left" style="font-size:20px;" ng-model="ISMTCR_Id">{{tasktitle}}</span><br />
+                                <label class="control-label  text-body text-left" style="font-size:15px;">{{taskno}} </label><br />
+                                <label class="control-label  text-body text-left" style="font-size:15px;">
+                                    {{tasktype}} &nbsp;&nbsp;
+                                    <span ng-if="(tsakpriority=='High')|| (tsakpriority=='HIGH')"><label style="color:red;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Normal')||(tsakpriority=='NORMAL')"><label style="color:orange;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Low')||(tsakpriority=='LOW')"><label style="color:green;"><b>{{tsakpriority}}</b></label></span>
+                                </label><br />
+                                <label class="control-label  text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Created By :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{createdby}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label  text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Date :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{taskdate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Status :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{taskstatus}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Task Start Date :   {{startdate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label><br />
+                                <label class="control-label text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Task End Date &nbsp; :   {{enddate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-6">
+                                    <label class="control-label  text-body"><b>Description :</b> </label>
+                                </div>
+                                <div class="col-sm-12 margin-top-10">
+                                    <textarea class="form-control" name="response" type="text" placeholder="Task Description .... " ng-disabled="true" ng-model="taskdescription" rows="10"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12" ng-if="taskAttatchment.length>0" style="padding-left:5%">
+                        <hr />
+                        <div class="form-group margin-top-5">
+                            <span>
+                                <label class="control-label text-body" style="font-size:18px;">
+                                    Attachments : <b>
+                                        <span ng-repeat="objtfr in taskAttatchment track by $index">
+                                            <span ng-if="objtfr.ISMTCRAT_Attatchment!=null && objtfr.ISMTCRAT_Attatchment!=''">
+                                                {{$index+1}})
+                                                <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                    <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr.ISMTCRAT_Attatchment);"> View  </i> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                </span>
+                                                <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png'">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRAT_Attatchment}}" full-frame=""> Download </a> - <i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </b>
+                                </label>
+                            </span>
+                        </div>
+                        <hr />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-7 margin-top-10">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">Comments :</label>
+                                <div class="box-content col-sm-12 margin-top-10" style="max-height: 250px;  overflow:auto;">
+                                    <div class="margin-top-10" ng-repeat="response in get_taskresponse">
+                                        <label class="control-label  text-body" style="font-size:14px;">
+                                            {{get_taskresponse.length-$index}}) Response By : {{response.responseby}} - {{response.ISMTCRRES_ResponseDate | date:'dd/MM/yyyy'}}
+                                        </label>
+                                        <span>
+                                            <br /><label class="control-label text-body" style="font-size:14px;margin-left: 3%;">
+                                                Attachments : <b>
+                                                    <span ng-repeat="objtfr in get_responseattachments track by $index" style="font-size:medium">
+                                                        <span ng-if="objtfr.ISMTCRRES_Response==response.ISMTCRRES_Response && objtfr.ISMTCRRES_ResponseAttachment!=null && objtfr.ISMTCRRES_ResponseAttachment!=''">
+                                                            -{{objtfr.slno}}) <i class="fa fa-file-image-o" aria-hidden="true"></i> -
+                                                            <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                                <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr.ISMTCRRES_ResponseAttachment);"> View</i>
+                                                            </span>
+                                                            <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png'">
+                                                                <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRRES_ResponseAttachment}}" full-frame=""> Download</a>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </b>
+                                            </label>
+                                        </span>
+                                        <span ng-if="response.ISMTCRRES_Status!=null && response.ISMTCRRES_Status!=''">
+                                            <br /> <label class="control-label text-left" style="margin-left: 3%">
+                                                <span class="control-label text-body" style="font-size:14px;">Status</span> : <b>{{response.ISMTCRRES_Status}}</b>
+                                            </label>
+                                        </span> <br />
+                                        <label class="control-label text-left" style="margin-left: 3%;"><span class="control-label text-body" style="font-size:14px;">Response</span> : {{response.ISMTCRRES_Response}}</label>
+                                        <span class="margin-top-5"></span><hr />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" data-dismiss="modal">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Close
+                        </md-button>
+                    </div>
+                </div>
+            </div>           
+        </div>        
+    </div>
+</div>

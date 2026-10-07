@@ -1,0 +1,295 @@
+﻿<style>
+    .disable {
+        background-color: #8a494924;
+        cursor: not-allowed;
+    }
+</style>
+<html>
+<body>
+    <section class="content">
+        <div data-ng-init="loaddata()">
+            <form class="form-horizontal" role="form" name="myForm" novalidate>
+                <div class="box box-primary" ng-app="MyModule">
+                    <div class="box-header with-border">
+                        <div class="col-sm-4">
+                            <h3 class="box-title">
+                                Version Control Tasks Approval
+                            </h3>
+                        </div>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Host Name:<span style="color:red;font-weight:600">*</span></label>
+                                        <div class="col-sm-8">
+                                            <ui-select id="sel2" name="client" ng-model="$parent.ivrmcH_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Hosting" required ng-change="getversiondetails()">
+                                                <ui-select-match placeholder="Select or Search Hosting Name">
+                                                    {{$select.selected.ivrmcH_HostName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option in clientHosting | propsFilter: {ivrmcH_HostName: $select.search}"
+                                                                   value="{{option.ivrmcH_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.ivrmcH_HostName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                                <div ng-message="required">Select Hosting Name <i class="fa fa-warning"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Deployment Type:<span style="color:red;font-weight:600">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" ng-model="IVRMVRT_DeployType" name="Deploymnettype" required ng-change="getnextversion()" ng-disabled="typedisable==true">
+                                                <option value="">--Status--</option>
+                                                <option value="P">Patch Deployment</option>
+                                                <option value="F">Full Deploymnet</option>
+
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.Deploymnettype)" ng-messages="myForm.Deploymnettype.$error">
+                                                <div ng-message="required">Deploymnet Type <i class="fa fa-warning"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="form-group">
+                                        <label class="control-label col-sm-4">Last Deployed Date: </label>
+                                        <div class="col-sm-2">
+                                            <md-datepicker name="d_date" ng-model="IVRMVT_lastdeplomentdate" onkeydown="return false" md-max-date="minDatef" title="Select Date" ng-disabled="true"></md-datepicker>
+
+                                        </div>
+                                    </div>-->
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Task List Date: <strong style="color:red;">*</strong></label>
+                                        <div class="col-sm-8">
+                                            <md-datepicker name="d_date" ng-model="IVRMVT_DeployementDate" onkeydown="return false" md-max-date="minDatef" title="Select Date" required></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.d_date)" ng-messages="myForm.d_date.$error">
+                                                <div ng-message="required">Select Date <i class="fa fa-warning"></i></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-6" ng-show="showversionlist==true">
+                                    <style>
+
+                                        .card {
+                                            border: 1px solid #ccc;
+                                            border-radius: 8px;
+                                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                                           
+                                            max-width: 500px;
+                                            overflow: hidden;
+                                            font-family: Arial, sans-serif;
+                                            background-color: #fff;
+                                        }
+
+                                        .card-header {
+                                            background-color: #f8f9fa;
+                                            padding: 15px;
+                                            display: flex;
+                                            align-items: center;
+                                            border-bottom: 1px solid #ddd;
+                                        }
+
+                                        .card-icon {
+                                            font-size: 24px;
+                                            color: #007bff;
+                                            margin-right: 15px;
+                                        }
+
+                                        .card-header h4 {
+                                            margin: 0;
+                                            color: #333;
+                                            font-size: 1.2em;
+                                        }
+
+                                        .card-body {
+                                            padding: 15px;
+                                        }
+
+                                            .card-body h6 {
+                                                margin: 10px 0;
+                                                color: #555;
+                                            }
+
+                                                .card-body h6 i {
+                                                    margin-right: 8px;
+                                                    color: #007bff;
+                                                }
+
+                                            .card-body.text-center {
+                                                text-align: center;
+                                                color: #888;
+                                            }
+
+                                                .card-body.text-center i {
+                                                    margin-right: 8px;
+                                                    color: #dc3545;
+                                                }
+                                    </style>
+                                    <div class="card" >
+                                        <div class="card-header">
+                                            <i class="fa fa-rocket card-icon"></i>
+                                            <h4>Previous Deployment Details</h4>
+                                        </div>
+                                        <div >
+                                            <div class="card-body" >
+                                                <h5 ng-if="noversions==false">
+
+                                                <i class="fa fa-calendar"></i>&nbsp; Date &nbsp; :
+                                                    &nbsp; {{previousdeploydate |  date :'dd/MM/yyyy'}}
+                                                </h5>
+                                                <hr />
+                                                <h5 ng-if="noversions==false">
+                                                    <i class="fa fa-code-fork"></i>&nbsp; Version &nbsp;:
+                                                    &nbsp; {{previousversion}}
+                                                </h5>
+                                                <hr />
+                                                <h5>
+                                                    <i class="fa fa-code-fork"></i>&nbsp; Next Version &nbsp;:
+                                                    &nbsp; {{updatedversion}}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-center" ng-if="noversions==true">
+                                            <h4><i class="fa fa-exclamation-triangle"></i> No Previous Deployment Found for This Client/Hosting</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <div class="text-center">
+                          
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="tasklist(ivrmcH_Id)" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Task list
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="box box-primary" ng-show='gettaskforapproval.length>0'>
+            <div class="box-header with-border">
+                <h3 class="box-title">  Version Control Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" >
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{tasklength}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue1" type="text" placeholder="Search Task..Like Open ,Close....">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="overflow:scroll !important">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <td>Sl.No</td>
+                                <td>
+                                    Select <br />
+                                    <label class="control-label">
+                                        <input type="checkbox" name="dfsd" ng-model="taskcheck" ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false" ng-change="selectall(taskcheck)"><span class="lbl padding-12"></span>
+                                    </label>
+                                </td>
+                                <td>Client Name</td>
+                                <td>Task ID</td>
+                                <td>Task Description</td>
+                                <td>Created By</td>
+                                <td>Assigned To</td>
+                                <td>Man Working Hours</td>
+                                <td>AddedFeature</td>
+                                <td>Remark</td>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="task in filterValue=(gettaskforapproval | filter : searchValue1 ) |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="firstPagination"  class="{{task.css}}">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td>
+                                    <label class="control-label">
+                                        <input type="checkbox" name="dfsd" ng-model="task.taskcheck"  ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-12"></span>
+                                    </label>
+                                </td>
+                                <td>{{task.ISMMCLT_ClientName}}</td>
+                                <td>
+                                    {{task.ISMTCR_TaskNo}} <br />
+                                    <label>({{task.ISMTCR_Status}})</label> <br />
+                                    <span class="text-left" ng-if="task.ISMTCR_BugOREnhancementFlg=='B'"> Bugs & Complaints</span> <br />
+                                    <span class="text-left" ng-if="task.ISMTCR_BugOREnhancementFlg=='E'">Enhancement</span> <br />
+                                    <span class="text-left" ng-if="task.ISMTCR_BugOREnhancementFlg== 'O'">Other</span> <br />
+                                    <span class="text-left" ng-if="task.ISMTCR_BugOREnhancementFlg== 'T'"> Task</span><br />
+                                    <span class="text-left text-danger" ng-if="task.IVRMVRT_DeployType== 'P'"> (Given  Under Last Patch)</span>
+                                </td>
+                                <td>{{task.ISMTCR_Desc}}</td>
+                                <td>{{task.TaskCreation_emp}}</td>
+                                <td>{{task.AssignedTo_emp}}</td>
+                                <td>
+                                    <label class="control-label">
+                                        <input type="number" ng-disabled="task.ISMTCR_BugOREnhancementFlg!='E'" ng-init="task.IVRMVRT_ManHour=0" placeholder="Enter Effort Hrs...." ng-model="task.IVRMVRT_ManHour" />
+                                    </label>
+                                </td>
+                                <td>
+                                    <label class="control-label">
+                                        <input type="checkbox" ng-disabled="task.ISMTCR_BugOREnhancementFlg!='E'" name="dfsd" ng-model="task.IVRMVRT_AddedFeature" ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-12"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <textarea ng-disabled="task.ISMTCR_BugOREnhancementFlg!='E'" ng-init="task.IVRMVRT_Remarks='Approved'" ng-model="task.IVRMVRT_Remarks" placeholder="Enter Remarks......"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             pagination-id="firstPagination"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+            <div class="text-center">
+
+                <md-button type="submit" class="md-raised md-primary"  ng-disabled="form.$invalid" ng-click="approve()" id="save-btn">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Approve For Deployment
+                </md-button>
+                
+            </div>
+        </div>
+    </section>
+
+
+</body>
+</html>

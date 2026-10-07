@@ -1,0 +1,211 @@
+﻿<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Payment Subscription Audit Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Client:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="client" ng-model="$parent.ISMMCLT_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,ts.optradio);" title="Select Client"
+                                               required ng-change="onchangeclient()">
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Client">
+                                            {{$select.selected.ismmclT_ClientName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="catgry in clientlist | filter: $select.search" value="{{catgry.ismmclT_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                        <div ng-message="required">Select Client Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">From Date<strong style="color:red;">*</strong></label>
+                                </div>
+                                <div class="col-sm-8 input-group">
+                                    <md-datepicker name="from_payment_date" onkeypress="return false" data-ng-model="obj.FromDate" placeholder="Enter date" required md-max-date="maxdate" ng-change="onchangefromdate()"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.from_payment_date)" ng-messages="myForm.from_payment_date.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">To Date<strong style="color:red;">*</strong></label>
+                                </div>
+                                <div class="col-sm-8 input-group">
+                                    <md-datepicker name="to_payment_date" onkeypress="return false" data-ng-model="obj.ToDate" placeholder="Enter date" required md-max-date="maxdate" md-min-date="obj.FromDate" ng-change="onchangetodate()" ng-disabled="dated==true"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.to_payment_date)" ng-messages="myForm.to_payment_date.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport(obj)" id="save-btn">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="reprotd==true" ng-click="print(obj)" id="save-btn">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="reprotd==true" ng-click="exportToExcel(obj)" id="save-btn">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="getreportdetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Payment Subscription Audit Report Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">                
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Sl.No</th>
+                                <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Client Name</a></th>
+                                <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Employee Name</a></th>
+                                <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleDesc')">Date Time </a></th>
+                                <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleDesc')">Remarks</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in getreportdetails |filter : searchValueU">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left">{{user.MI_Name}}</td>
+                                <td class="text-left">{{user.EMPNAME}}</td>
+                                <td class="text-left">{{user.LOGINDATE}}</td>
+                                <td class="text-left">{{user.IVRMPSLR_Remarks}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="printSectionId" ng-show="table_flag">
+        <div class="row" ng-if="imagenew!=null && imagenew!=''">
+            <div class="baldwin text-center">
+                <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+            </div>
+        </div>
+        <br />
+        <div class="row margin-to-10">
+            <h3 class="text-center">
+                Payment Subscription Audit Report
+            </h3>
+        </div>
+        <div class="row margin-to-10">
+            <h3 class="text-center">
+                {{datedisplay}}
+            </h3>
+        </div>
+        <div class="row margin-top-10">
+            <table class="table-bordered" id="table">
+                <thead>
+                    <tr>
+                        <th class="text-center">Sl.No</th>
+                        <th class="text-center">Client Name</th>
+                        <th class="text-center">Employee Name</th>
+                        <th class="text-center">Date Time</th>
+                        <th class="text-center">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in getreportdetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.MI_Name}}</td>
+                        <td class="text-left">{{user.EMPNAME}}</td>
+                        <td class="text-left">{{user.LOGINDATE}}</td>
+                        <td class="text-left">{{user.IVRMPSLR_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="printexcel" ng-show="table_flag">
+        <table>
+            <tr style="border:0.5px solid black">
+                <td colspan="5" style="text-align:center">
+                    <h4>Payment Subscription Audit Report </h4>
+                </td>
+            </tr>
+            <tr style="border:0.5px solid black">
+                <td colspan="5" style="text-align:center">
+                    <h4>{{datedisplay}} </h4>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr style="border:0.5px solid black">
+                    <th style="text-align:center">Sl.No</th>
+                    <th style="text-align:center">Client Name</th>
+                    <th style="text-align:center">Employee Name</th>
+                    <th style="text-align:center">Date Time</th>
+                    <th style="text-align:center">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border:0.5px solid black" ng-repeat="user in getreportdetails">
+                    <td style="text-align:center">{{$index+1}}</td>
+                    <td style="text-align:left">{{user.MI_Name}}</td>
+                    <td style="text-align:left">{{user.EMPNAME}}</td>
+                    <td style="text-align:left">{{user.LOGINDATE}}</td>
+                    <td style="text-align:left">{{user.IVRMPSLR_Remarks}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

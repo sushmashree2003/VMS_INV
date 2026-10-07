@@ -1,0 +1,488 @@
+﻿
+<style>
+    .gridflow {
+        width: 1180px;
+        height: 110px;
+        overflow: auto;
+    }
+
+    table, tr, th, td {
+        border: 1px solid #dddddd;
+        border-collapse: collapse;
+    }
+
+    .tbl-header {
+        width: calc(100% - 17px);
+        width: -webkit-calc(100% - 17px);
+        width: -moz-calc(100% - 17px);
+    }
+</style>
+<section class="content twocoloumn">
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Depreciation Balance</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Company Name :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="mI_Id" name="compnyna"
+                                            ng-change="storechanges();" ng-disabled="INVDEP_Id > 0" required>
+                                        <option value="">Select Institution </option>
+                                        <option ng-repeat="room in Institution" value="{{room.mI_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{room.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.compnyna)" ng-messages="myForm.compnyna.$error">
+                                        <div ng-message="required"> Select Company </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Store :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="invmsT_Id" name="store"
+                                            ng-change="storeChangestwo();" ng-disabled="INVDEP_Id > 0" required>
+                                        <option value="">Select Store </option>
+                                        <option ng-repeat="option in get_Store" value="{{option.invmsT_Id}}" ng-selected="{{option.invmsT_Id == invmsT_Id}}">
+                                            {{option.invmS_StoreName}}/{{option.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.store)" ng-messages="myForm.store.$error">
+                                        <div ng-message="required"> Select Store </div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <!--ng-disabled="INVDEP_Id > 0"-->
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Year :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="imfY_Id" name="year"
+                                            ng-change="onchangeyear()" required>
+                                        <option value="">Select Year </option>
+                                        <option ng-repeat="option in IMFY_YEAR" value="{{option.imfY_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.imfY_FinancialYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                        <div ng-message="required"> Select Year </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group text-center" ng-hide="INVDEP_Id">
+                                <md-button type="button" class="md-raised md-primary" ng-click="Getreport()" ng-disabled="form.$invalid" id="save-btn">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Caluculation
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                            </div>
+                        </div>                        
+                    </div>
+                    
+                </div>
+                <hr />
+            </div>
+        </form>
+
+        <form name="myform2" class="form-horizontal ng-pristine ng-valid" role="form" novalidate>
+            <div class="box box-primary" ng-show="getdata.length > 0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Depreciation Balance</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" ng-model="searchValuess"
+                                           type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12" style="overflow:scroll; max-height:600px;">
+                            <table class="table table-hover table-bordered"
+                                   style="width:1500px !important">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>Chk</th>
+                                        <!--<th class="hidden">Company Name</th>
+                                        <th class="hidden">Store Name</th>-->
+                                        <th>Item Name</th>
+                                        <th>More Than 180 Days</th>
+                                        <th>Below 180 Days</th>
+                                        <th>Deleted Item Amount</th>
+                                        <th>Purchase Rate</th>
+                                        <!--<th class="hidden">Quntity</th>-->
+                                        <th>Depreciation Percentage</th>
+                                        <th>Opening Value</th>
+                                        <th>Opening Value Date</th>
+                                        <th>Closing Value</th>
+                                        <th>Closing Date</th>
+                                        <th>ReValuation Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in getdata | filter:searchValuess">
+                                        <td>{{$index+1}}</td>
+                                        <td>
+                                            <input name="lvemp" ng-model="user.chkitem" type="checkbox"
+                                                   ng-click="ChkKk_Click()"
+                                                   ng-required="isOptionsRequired()" />
+                                            <span class="lbl padding-8"></span>
+                                        </td>
+                                        <td style="text-align:left" class="hidden">{{user.MI_Name}}</td>
+                                        <td style="text-align:left" class="hidden">{{user.INVMS_StoreName}}</td>
+                                        <td style="text-align:left">{{user.INVMI_ItemName}}</td>
+                                        <td>
+                                            <input type="text" class="form-control" autocomplete="off" style="width:116px;"
+                                                   placeholder="MoreThan180"
+                                                   ng-model="user.INVMI_ItemMoreThan180"
+                                                   ng-required="user.chkitem" name="t13_{{$index}}"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" >
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t13_'+$index])"
+                                                 ng-messages="myform2['t13_'+$index].$error" allow-pattern="[0-9.]">
+                                                <div ng-message="required">Enter Amount</div>
+                                                <div ng-message="pattern">
+                                                    Enter valid input format
+                                                    e.g., 15.5, 10.5,10.25  
+                                                </div>
+                                            </div>
+                                            
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" autocomplete="off"   style="width:116px;"
+                                                   placeholder="LessThan180"
+                                                   ng-model="user.INVMI_ItemLessThan180"
+                                                   ng-required="user.chkitem" name="t11_{{$index}}"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" allow-pattern="[0-9.]" >
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t11_'+$index])"
+                                                 ng-messages="myform2['t11_'+$index].$error">
+                                                <div ng-message="required">Enter Amount</div>
+                                                <div ng-message="pattern">
+                                                    Enter valid input format
+                                                    e.g., 15.5, 10.5,10.25
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" autocomplete="off"   style="width:130px;"
+                                                  placeholder="DeletedItemAmount"
+                                                   ng-model="user.INVMI_DeletedItemAmount"
+                                                   ng-required="user.chkitem" name="t14_{{$index}}"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" allow-pattern="[0-9.]" >
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t14_'+$index])"
+                                                 ng-messages="myform2['t14_'+$index].$error">
+                                                <div ng-message="required">Enter Amount</div>
+                                                <div ng-message="pattern">
+                                                    Enter valid input format
+                                                    e.g., 15.5, 10.5,10.25
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align:left">{{user.INVOB_PurchaseRate}}</td>
+                                        <!--<td style="text-align:left" class="hidden">{{user.INVOB_Qty}}</td>-->
+                                        <td style="text-align:left">
+                                            <input type="text" class="form-control" autocomplete="off" ng-disabled="getdata.length > 0 || get_Report.length > 0"  
+                                                   placeholder="Depreciation Value" style="width:130px;"
+                                                   ng-model="user.INVDEP_DepreciationPer" allow-pattern="[0-9.]"
+                                                   ng-required="user.chkitem" name="t9_{{$index}}"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" value="{{user.INVDEP_DepreciationPer}}">
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t9_'+$index])"
+                                                 ng-messages="myform2['t9_'+$index].$error">
+                                                <div ng-message="required">Enter Depreciation Percentage</div>
+                                                <div ng-message="pattern">
+                                                    Enter valid input format
+                                                    e.g., 15.5, 10.5,10.25
+                                                </div>
+                                            </div>
+                                            <!--{{user.INVDEP_DepreciationPer}}-->
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" autocomplete="off" style="width:116px;"
+                                                   placeholder="Opening Value"
+                                                   ng-model="user.INVDEP_OpeningValue"
+                                                   ng-required="user.chkitem" name="t1_{{$index}}"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" allow-pattern="[0-9.]">
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t1_'+$index])"
+                                                 ng-messages="myform2['t1_'+$index].$error">
+                                                <div ng-message="required">Enter Opening Value</div>
+                                                <div ng-message="pattern">
+                                                    Enter valid input format
+                                                    e.g., 15.5, 10.5,10.25
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <md-datepicker ng-model="user.INVDEP_OpeningValueAsOnDate"
+                                                           md-placeholder="Opening Date"
+                                                           ng-required="user.chkitem" name="t2_{{$index}}">
+                                                <div class="error-messages"
+                                                     ng-if="interacted2(myform2['t2_'+$index])"
+                                                     ng-messages="myform2['t2_'+$index].$error">
+                                                    <div ng-message="required">Select Opening Date</div>
+                                                </div>
+                                            </md-datepicker>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" autocomplete="off" style="width:100px;"
+                                                    placeholder="closing Value"
+                                                   ng-model="user.INVDEP_ClosingValue"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/"
+                                                   ng-required="user.chkitem" name="t3_{{$index}}" allow-pattern="[0-9.]" />
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t3_'+$index])"
+                                                 ng-messages="myform2['t3_'+$index].$error">
+                                                <div ng-message="required">Enter closing Value</div>
+                                                <div ng-message="pattern">
+                                                    Enter valid input format
+                                                    e.g., 15.5, 10.5,10.25
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <md-datepicker ng-model="user.INVDEP_ClosingValueAsOnDate"
+                                                           md-placeholder="Closing Date"
+                                                           ng-required="user.chkitem" name="t4_{{$index}}">
+                                            </md-datepicker>
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t4_'+$index])"
+                                                 ng-messages="myform2['t4_'+$index].$error">
+                                                <div ng-message="required">Select closing Date</div>
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" autocomplete="off"  style="width:125px;"
+                                                   placeholder="ReValuation Value" name="t5_{{$index}}"
+                                                   ng-model="user.INVDEP_ReValuationValue"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/"
+                                                   ng-required="user.chkitem" allow-pattern="[0-9.]" />
+                                            <div class="error-messages"
+                                                 ng-if="interacted2(myform2['t5_'+$index])"
+                                                 ng-messages="myform2['t5_'+$index].$error">
+                                                <div ng-message="required">Enter closing Value</div>
+                                                <div ng-message="pattern">
+                                                    Enter valid input format
+                                                    e.g., 15.5, 10.5,10.25
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="hidden">
+                                            {{user.INVMST_Id}}
+                                        </td>
+                                        <td class="hidden">
+                                            {{user.INVMI_Id}}
+                                        </td>
+                                        <td class="hidden">
+                                            {{user.MI_Id}}
+                                        </td>
+                                        <td class="hidden">
+                                            {{user.IMFY_Id}}
+                                        </td>
+                                        
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="error-messages" ng-if="interacted2(myform2.lvemp)" ng-messages="myform2.lvemp.$error">
+                            <div ng-message="required" style="text-align:center;font-family:'Times New Roman';font-size:medium;">
+                                <strong>
+                                    Select Check Box &amp; To Save The Details
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <input type="hidden" ng-model="INVDEP_Id" value="{{invdeP_Id}}" />
+                        <md-button type="button" class="md-raised md-primary" ng-click="savedata()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="box box-primary" ng-show="get_Report.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Depreciation Balance Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        
+                        <tr>
+                            <th>Sl No</th>                            
+                            <th>Company Name</th>
+                            <th>Store Name</th>
+                            <th>Item Name</th>                          
+                            <th>Purchase Rate</th>
+                            <th>Depreciation Percentage</th>
+                            <th>Opening Value</th>
+                            <th>Opening Value Date</th>
+                            <th>Closing Value</th>
+                            <th>Closing Date</th>
+                            <th>ReValuation Value</th>
+                            <th>Action</th>
+                        </tr>
+                        
+
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="userss in filterValue1 = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td style="text-align:left">
+                                {{userss.mI_Name}}
+                            </td>
+                            <td style="text-align:left">
+                                {{userss.invmS_StoreName}}
+                            </td>
+                            <td style="text-align:left">
+                                {{userss.invmI_ItemName}}
+                            </td>
+                            <td>
+                                {{userss.invoB_PurchaseRate}}
+                            </td>
+                            <td>
+                                {{userss.invdeP_DepreciationPer}}
+                            </td>
+                            <td>
+                                {{userss.invdeP_OpeningValue}}
+                            </td>
+                            <td style="text-align:left">
+                                {{userss.invdeP_OpeningValueAsOnDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{userss.invdeP_ClosingValue}}
+                            </td>
+                            <td style="text-align:left">
+                                {{userss.invdeP_ClosingValueAsOnDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{userss.invdeP_ReValuationValue}}
+                            </td>
+                            <td class="hidden">
+                                {{userss.invdeP_Id}}
+                            </td>
+                            <td class="hidden">
+                                {{userss.invmsT_Id}}
+                            </td>
+                            <td class="hidden">
+                                {{userss.invmI_Id}}
+                            </td>
+                            <td class="hidden">
+                                {{userss.mI_Id}}
+                            </td>
+                            <td class="hidden">
+                                {{userss.imfY_Id}}
+                            </td>
+                            <td class="hidden">
+                                {{userss.invmI_ItemMoreThan180}}
+
+                            </td>
+                            <td class="hidden">
+                                {{userss.invmI_ItemLessThan180}}
+                            </td>
+                            <td class="hidden">
+                                {{userss.invmI_DeletedItemAmount}}
+                            </td>
+                            <td class="text-center">
+                                <span ng-if="userss.invdeP_ActiveFlg==true">
+                                    <a class="text-aqua" href="" ng-click="edit(userss)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                    <a href="" ng-click="Deletedata(userss)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                                <span ng-if="userss.invdeP_ActiveFlg == false">
+                                    <a href="" ng-click="Deletedata(userss)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                    <!--GetReport-->
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="xyz">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+    </div>       
+</section>

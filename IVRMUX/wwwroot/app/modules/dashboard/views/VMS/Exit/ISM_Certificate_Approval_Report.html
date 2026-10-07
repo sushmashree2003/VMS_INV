@@ -1,0 +1,510 @@
+﻿<link href="/css/print/Fees/MonthEndReport.css" rel="stylesheet" />
+
+<style>
+    .lateinearly {
+        background-color: #c535359c;
+        color: white;
+    }
+
+    .tscroll {
+        width: 100%;
+        overflow-x: scroll;
+        margin-bottom: 10px;
+        border: solid black 1px;
+    }
+
+    .myBtn:hover {
+        background-color: #555;
+    }
+
+    #scrollToTop, #scrollToBottom {
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    #myBtn {
+        display: none;
+        position: fixed;
+        top: 60px;
+        right: 15px;
+        z-index: 99;
+        outline: none;
+        color: black;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: x-large;
+        font-weight: bold;
+        border: red 1px solid;
+    }
+
+    #myBtntop {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 15px;
+        z-index: 99;
+        border: none;
+        outline: none;
+        color: black;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: x-large;
+        font-weight: bold;
+        border: red 1px solid;
+    }
+
+    #myBtn:hover {
+        background-color: #555;
+    }
+
+    .paddtab1 {
+        padding-right: 1px !important;
+        padding-left: 0px !important;
+    }
+
+    .paddtab2 {
+        padding-right: 1px !important;
+        padding-left: 1px !important;
+    }
+
+    .control-label1 {
+        padding-top: 0px !important;
+    }
+
+    .multiselect {
+        text-align: left
+    }
+</style>
+
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loadData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">ISM CERTIFICATE APPROVAL REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well text-center" ng-init="allind ='datewise'">
+                            <input type="radio" value="datewise" name="allind" ng-model="allind">
+                            <span class="lbl padding-8">Date Wise</span>
+                            <input type="radio" value="monthwise" name="allind" ng-model="allind">
+                            <span class="lbl padding-8">Month Wise</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='monthwise'">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee Name:<span style="color:red">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" data-ng-model="searchchkbx" type="text" placeholder="Search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" data-ng-model="hrmE_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+
+                                    <label ng-repeat="emp in employees | filter:searchchkbx" value="{{emp.hrmE_Id}}">
+                                        <input type="checkbox" data-ng-model="emp.selected" ng-click="togchkbxC1()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired() && allind=='monthwise'" name="employee1" />
+                                        <span class="lbl padding-8">{{emp.hrmE_EmployeeFirstName}}</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.employee1)" ng-messages="myForm.employee1.$error">
+                                    <div ng-message="required">Select Employee Name</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Status :<span style="color:red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control " id="sel2556" name="status" ng-model="status" ng-required="allind=='monthwise'">
+                                        <option value="" label="--Select Status--"> </option>
+                                        <option value="all"> All </option>
+                                        <option value="Approved"> Approved </option>
+                                        <option value="Pending"> Pending </option>
+                                        <option value="Partial Approved"> Partial Approved </option>
+                                        <option value="Rejected"> Rejected </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.status)" ng-messages="myForm.status.$error">
+                                    <div ng-message="required">Select Status</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel255" name="year1" ng-model="ASMAY_Id" ng-required="allind=='monthwise'">
+                                        <option value="">--Select Year--</option>
+                                        <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.hrmlY_LeaveYear == true}}">
+                                            {{option.hrmlY_LeaveYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                        <div ng-message="required">Select Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Month:<span style="color:Red">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" data-ng-model="ivrM_Month_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC4()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+
+                                    <label ng-repeat="month in fillmonth | filter:searchchkbx1" value="{{month.ivrM_Month_Id}}">
+                                        <input type="checkbox" data-ng-model="month.selected" ng-click="togchkbxC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired4() && allind=='monthwise'" name="monthname" />
+                                        <span class="lbl padding-8">{{month.ivrM_Month_Name}}</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-offset-1 error-messages" ng-if="interacted(myForm.monthname)" ng-messages="myForm.monthname.$error">
+                                    <div ng-message="required" class="col-sm-12"> Select  Month </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="allind=='datewise'">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee Name:<span style="color:red">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" data-ng-model="searchchkbx" type="text" placeholder="Search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" data-ng-model="hrmE_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+
+                                    <label ng-repeat="emp in employees | filter:searchchkbx" value="{{emp.hrmE_Id}}">
+                                        <input type="checkbox" data-ng-model="emp.selected" ng-click="togchkbxC1()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired() && allind=='datewise'" name="employee" />
+                                        <span class="lbl padding-8">{{emp.hrmE_EmployeeFirstName}}</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                    <div ng-message="required">Select Employee Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Status :<span style="color:red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control " id="sel2556" name="status" ng-model="status" ng-required="allind=='datewise'">
+                                        <option value="" label="--Select Status--"> </option>
+                                        <option value="all"> All </option>
+                                        <option value="Approved"> Approved </option>
+                                        <option value="Pending"> Pending </option>
+                                        <option value="Partial Approved"> Partial Approved </option>
+                                        <option value="Rejected"> Rejected </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.status)" ng-messages="myForm.status.$error">
+                                    <div ng-message="required">Select Status</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 4px;">*</strong></label>
+                                <div class="col-sm-6 input-group text-right" style="">
+                                    <md-datepicker ng-model="fromdate" onkeydown="return false" name="From_Date" id="date1" md-placeholder="From Date" ng-required="allind=='datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                        <div ng-message="required">Please Select From date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 4px;">*</strong></label>
+                                <div class="col-sm-6 input-group text-right" style="">
+                                    <md-datepicker ng-model="todate" onkeydown="return false" name="To_Date" id="date2" md-placeholder="To Date" ng-required="allind=='datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                        <div ng-message="required">Please Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="ShowReportdata()" id="save-btn">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-click="Clear_Details();" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+                        <md-button type="button" ng-if="certificaterequestid.length>0" class="md-raised md-primary" id="excel-btn" ng-click="exportToExceldetails()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" ng-if="certificaterequestid.length>0" class="md-raised md-primary" id="print-btn" ng-click="Print();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="approvaldetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">ISM CERTIFICATE APPROVAL REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Requisition Details</th>
+                        <th>Remarks</th>
+                        <th>Receiving Mode</th>
+                        <th>Collection b/w Date</th>
+                        <th>Received Date</th>
+                        <th>File Name</th>
+                        <!--<th>Acknowledgement Copy</th>-->
+                        <th>Sanction Level</th>
+                        <th>Approved By</th>
+                        <th>Approved Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody dir-paginate="user in filterValue=(certificaterequestid | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                    <!--<tr dir-paginate="user in filterValue=(requisitionid | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">-->
+                    <!--<td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>-->
+                    <tr>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.templistdata.length+1}}">
+                            Requested By:{{user.EMPLOYEENAME}}<br />
+                            Requested Date:{{user.REQDATE | date :'dd/MM/yyyy'}}
+                        </td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.ISMCERTREQ_Remarks}}</td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.ISMCERTREQ_ReceivingMode}}</td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">
+                            <span ng-if="user.ISMCERTDISDET_ReceivingFromDate != null && user.ISMCERTDISDET_ReceivingToDate != null">
+                                {{user.ISMCERTDISDET_ReceivingFromDate | date :'dd/MM/yyyy'}} to
+                                {{user.ISMCERTDISDET_ReceivingToDate | date :'dd/MM/yyyy'}}
+                            </span>
+                        </td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.ISMCERTREQAPP_ReceiningDate | date :'dd/MM/yyyy'}}</td>
+
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">
+                            {{user.ISMCERTREQ_FileName}} <br />
+                            <span ng-if="user.ISMCERTREQ_FilePath.length>0">
+                                <a href="" data-ng-click="previewimg_new(user.ISMCERTREQ_FilePath)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i class="fa fa-eye  text-blue" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </td>
+                        <!--<td class="text-center" rowspan="{{user.templistdata.length+1}}">                          
+                            <span ng-if="user.ISMCERTREQAPP_ACK.length>0">
+                                <a href="" data-ng-click="previewimg_new(user.ISMCERTREQAPP_ACK)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i class="fa fa-eye  text-blue" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </td>-->
+                    </tr>
+                    <tr ng-repeat="temp in user.templistdata">
+                        <td class="text-center">{{temp.HRPAON_SanctionLevelNo}}</td>
+                        <td class="text-center">
+                            <span ng-if="temp.ISMCERTREQAPP_ACK.length>0">
+                                <b>Acknowledgement Copy :</b> 
+                                <a href="" data-ng-click="previewimg_new(temp.ISMCERTREQAPP_ACK)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i class="fa fa-eye  text-blue" aria-hidden="true"></i>
+                                </a>
+                            </span><br />
+                        {{temp.Approvar_Name}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_ApprovedDate | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_AppRejFlag}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div ng-show="table_flag" id="printSectionId">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="text-center">
+                ISM CERTIFICATE APPROVAL REPORT
+            </h4>
+        </div>
+    </div>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Requisition Details</th>
+                        <th>Remarks</th>
+                        <th>Receiving Mode</th>
+                        <th>Sanction Level</th>
+                        <th>Approved By</th>
+                        <th>Approved Date</th>
+                        <th>Resigining Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in certificaterequestid">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.templistdata.length+1}}">
+                            Requested By:{{user.EMPLOYEENAME}}<br />
+                            Requested Date:{{user.REQDATE | date :'dd/MM/yyyy'}}
+                        </td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.ISMCERTREQ_Remarks}}</td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.ISMCERTREQ_ReceivingMode}}</td>
+                    </tr>
+                    <tr ng-repeat="temp in user.templistdata">
+                        <td class="text-center">{{temp.HRPAON_SanctionLevelNo}}</td>
+                        <td class="text-center">{{temp.Approvar_Name}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_ApprovedDate | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_ReceiningDate | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_AppRejFlag}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div ng-show="sdfsdfdsfsd==true" id="exceltopd">
+    <table class="table table-hover table-responsive table-bordered">
+        <tr style="border:0.5px solid black">
+            <td colspan="9" style="text-align:center">
+                {{institutioname}}
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td colspan="9" style="text-align:center">
+                ISM CERTIFICATE APPROVAL REPORT
+            </td>
+        </tr>
+
+    </table>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Requisition Details</th>
+                        <th>Remarks</th>
+                        <th>Receiving Mode</th>
+                        <th>Sanction Level</th>
+                        <th>Approved By</th>
+                        <th>Approved Date</th>
+                        <th>Resigining Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in certificaterequestid">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.templistdata.length+1}}">
+                            Requested By:{{user.EMPLOYEENAME}}
+                            Requested Date:{{user.REQDATE | date :'dd/MM/yyyy'}}
+                        </td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.ISMCERTREQ_Remarks}}</td>
+                        <td class="text-center" rowspan="{{user.templistdata.length+1}}">{{user.ISMCERTREQ_ReceivingMode}}</td>
+                    </tr>
+                    <tr ng-repeat="temp in user.templistdata">
+                        <td class="text-center">{{temp.HRPAON_SanctionLevelNo}}</td>
+                        <td class="text-center">{{temp.Approvar_Name}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_ApprovedDate | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_ReceiningDate | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{temp.ISMCERTREQAPP_AppRejFlag}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--==================== Image Preview Model ===========================-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{filenames}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+
+
+                <div id="pdfIdzz">
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

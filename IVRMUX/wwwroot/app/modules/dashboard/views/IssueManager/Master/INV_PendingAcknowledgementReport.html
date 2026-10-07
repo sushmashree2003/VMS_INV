@@ -1,0 +1,162 @@
+<section class="content" ng-init="loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Pending Acknowledgement Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" ng-click="loaddata()" title="Refresh"><i class="fa fa-refresh"></i></button>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <!-- Search and Action Bar -->
+            <div class="row" style="margin-bottom: 12px;">
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-model="searchValue" placeholder="Search employee, item, asset id, location..." />
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+                <div class="col-sm-8 text-right">
+                    <button type="button" class="btn btn-success" ng-click="exportToExcel('#table_pending_ack')" ng-disabled="!pendingAssetList || pendingAssetList.length == 0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export to Excel
+                    </button>
+                    <button type="button" class="btn btn-info" ng-click="printData()" ng-disabled="!pendingAssetList || pendingAssetList.length == 0">
+                        <i class="fa fa-print" aria-hidden="true"></i> Print Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Unchecked Asset Items Banner -->
+            <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 10px 15px; margin-bottom: 12px; border-radius: 4px; font-size: 14px; font-weight: 500;">
+                Unchecked asset items
+            </div>
+
+            <!-- Data Table -->
+            <div id="printSection" style="width: 100%; overflow: auto; max-height: 600px;">
+                <table class="table table-hover table-responsive table-bordered" id="table_pending_ack">
+                    <thead style="background-color: #0066c0; color: #ffffff;">
+                        <tr>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 4%;">
+                                <label style="margin-bottom: 0;">
+                                    <input type="checkbox" ng-model="allSelected" ng-click="selectAll(allSelected)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 4%;">SL.No</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 14%;">Employee Name</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 14%;">Item Name</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 11%;">Asset-Id</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 9%;">Serial No</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 8%;">Total Amount</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 12%;">Company Name</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 6%;">CheckOut-Qty</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 9%;">Location RoomName</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 8%;">Assigned Date</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 6%;">Pending Days</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 8%;">Status</th>
+                            <th class="text-center" style="background-color: #0066c0 !important; color: #ffffff !important; font-weight: bold; width: 4%;">View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="planner in pendingAssetList | filter : searchValue">
+                            <td class="text-center" style="vertical-align: middle;">
+                                <label style="margin-bottom: 0;">
+                                    <input type="checkbox" ng-model="planner.selected" ng-change="optionToggled()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td class="text-center" style="vertical-align: middle;">{{$index + 1}}</td>
+                            <td style="vertical-align: middle;">
+                                <strong>{{planner.EmployeeName || 'Unassigned / Open'}}</strong>
+                                <div style="font-size: 11px; color: #666;" ng-if="planner.HRME_EmployeeCode || planner.HRMD_DepartmentName">
+                                    <span ng-if="planner.HRME_EmployeeCode">ID: {{planner.HRME_EmployeeCode}}</span>
+                                    <span ng-if="planner.HRMD_DepartmentName"> | Dept: {{planner.HRMD_DepartmentName}}</span>
+                                </div>
+                            </td>
+                            <td style="vertical-align: middle; font-weight: 500;">{{planner.INVMI_ItemName}}</td>
+                            <td class="text-center" style="vertical-align: middle;">{{planner.INVAAT_AssetId}}</td>
+                            <td class="text-center" style="vertical-align: middle;">{{planner.INVAAT_SerialNo || '-'}}</td>
+                            <td class="text-center" style="vertical-align: middle; font-weight: bold;">{{planner.INVTGRN_PurchaseRate | number : 0}}</td>
+                            <td style="vertical-align: middle;">{{planner.MI_Name}}</td>
+                            <td class="text-center" style="vertical-align: middle;">{{planner.INVATCO_CheckOutQty}}</td>
+                            <td class="text-center" style="vertical-align: middle;">{{planner.INVMLO_LocationRoomName}}</td>
+                            <td class="text-center" style="vertical-align: middle;">{{planner.AssignedDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center" style="vertical-align: middle;">
+                                <span class="badge" ng-class="{'badge-danger': planner.PendingDays > 7, 'badge-warning': planner.PendingDays <= 7 && planner.PendingDays > 3, 'badge-info': planner.PendingDays <= 3}" style="padding: 4px 8px; font-size: 12px; background-color: #f0ad4e; color: #fff;">
+                                    {{planner.PendingDays || 0}} Days
+                                </span>
+                            </td>
+                            <td class="text-center" style="vertical-align: middle;">
+                                <span class="label" ng-class="{'label-danger': planner.AcknowledgementStatus === 'Unselected by Employee', 'label-warning': planner.AcknowledgementStatus !== 'Unselected by Employee'}" style="font-size: 11px; padding: 4px 8px;">
+                                    {{planner.AcknowledgementStatus || 'Pending Acknowledgement'}}
+                                </span>
+                            </td>
+                            <td class="text-center" style="vertical-align: middle;">
+                                <span ng-if="planner.INVAAT_FilePath != null && planner.INVAAT_FilePath != ''">
+                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" title="View Image" ng-click="previewimg_new(planner.INVAAT_FilePath)">
+                                        <i class="fa fa-eye" aria-hidden="true" style="font-size: 15px;"></i>
+                                    </a>
+                                </span>
+                                <span ng-if="!planner.INVAAT_FilePath" class="text-muted">-</span>
+                            </td>
+                        </tr>
+                        <tr ng-if="!pendingAssetList || pendingAssetList.length == 0">
+                            <td colspan="14" class="text-center" style="padding: 25px; color: #666;">
+                                <i class="fa fa-check-circle text-success" style="font-size: 24px; margin-bottom: 5px; display: block;"></i>
+                                No pending acknowledgement assets found. All assigned assets are confirmed.
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold; background-color: #f9f9f9;">
+                            <td colspan="6" class="text-center" style="vertical-align: middle;">Total Amount (Filtered Records)</td>
+                            <td class="text-center" style="vertical-align: middle; font-weight: bold; color: #000;">{{TotalgrossAmount() | number : 0}}</td>
+                            <td colspan="7"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Re-assign / Move To Location Box -->
+            <div class="row" style="margin-top: 20px; padding: 15px; background-color: #f9fbfd; border: 1px solid #d2d6de; border-radius: 4px;">
+                <div class="col-sm-3 text-right" style="padding-top: 7px;">
+                    <label style="font-size: 14px; font-weight: 600; color: #333;">
+                        To Location/Room :<span style="color:red">*</span>
+                    </label>
+                </div>
+                <div class="col-sm-6">
+                    <select class="form-control" ng-model="To_INVMLO_Id" name="toloc">
+                        <option value="">Select or search location in the list...</option>
+                        <option ng-repeat="loc in locationRoomList" value="{{loc.INVMLO_Id}}">
+                            {{loc.INVMLO_LocationRoomName}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <button type="button" class="btn btn-primary" style="padding: 6px 30px; font-weight: 600; background-color: #0066c0; border-color: #0055a5;" ng-click="saveLocationTransfer()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imagemodal" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #0066c0; color: #fff;">
+                    <button type="button" class="close text-white" style="color: #fff; opacity: 1;" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">Asset Image Preview</h4>
+                </div>
+                <div class="modal-body text-center" style="padding: 20px;">
+                    <img ng-src="{{imagepreview}}" class="img-responsive center-block" style="max-height: 450px; border-radius: 4px;" alt="Asset Preview" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

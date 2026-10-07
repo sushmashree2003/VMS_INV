@@ -1,0 +1,243 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+        .lessonplanner .file-blue:before {
+            content: 'Browse';
+            font-size: 13px;
+            text-align: center
+        }
+    </style>
+</head>
+<body>
+    <section class="content">
+        <div data-ng-init="loaddata()">
+            <form class="form-horizontal" role="form" name="myForm" novalidate>
+                <div class="box box-primary" ng-app="MyModule">
+                    <div class="box-header with-border">
+                        <div class="col-sm-4">
+                            <h3 class="box-title">
+                                Master Client Hosting
+                            </h3>
+                        </div>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3">
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Host Name :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="HostingName" placeholder="Host Name..." maxlength="70" ng-model="IVRMCH_HostName" required>
+                                        <div class="error-messages" ng-if="interacted(myForm.HostingName)" ng-messages="myForm.HostingName.$error">
+                                            <div ng-message="required">Please Enter Hosting Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Host URL:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="HostingURL" ng-model="IVRMCH_HostUrl"
+                                               placeholder="Add URL Of The Host...." required
+                                               ng-pattern="urlPattern" />
+
+                                        <div class="error-messages" ng-show="myForm.HostingURL.$error.pattern">
+                                            Invalid URL <br> Please enter a URL in the format: https://hostingurl.com/#.
+                                        </div>    
+                                        <div class="error-messages" ng-if="interacted(myForm.HostingURL)" ng-messages="myForm.HostingURL.$error">
+                                            <div ng-message="required">Please Enter Hosting URL</div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-4">Select Client <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8">
+                                            <input class="form-control" ng-model="search" type="text" placeholder="Search Client Name...">
+                                            <label class="checkbox-inline padding-left-none">
+                                                <input type="checkbox" name="Typeemp" ng-model="clientid" data-ng-click="all_check_Emp()">
+                                                <span class="lbl padding-8">All</span>
+                                            </label>
+                                            <label data-ng-model="ismmclT_Id" ng-repeat="emp in getclientlist| filter:search" value="{{emp.ismmclT_Id}}">
+                                                <input name="client" value="1" ng-model="emp.selected" type="checkbox" ng-required="isOptionsRequired();" ng-click="emptogchkbx();">
+                                                <span class="lbl padding-8">
+                                                    {{emp.ismmclT_ClientName}}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                            <div ng-message="required">Please Select Client Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+                        <div class="text-center">
+                            <input type="hidden" ng-model="IVRMCH_Id" value="{{IVRMCH_Id}}" />
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="box box-primary" ng-show='griddata.length>0'>
+            <div class="box-header with-border">
+                <h3 class="box-title">Planner Details</h3>
+                <md-button type="button" style="margin-left:20px" ng-click="exportToExcel();" target="_blank" class="md-raised md-primary" ng-show="setremind==true && griddata.length > 0">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export to Excel
+                </md-button>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <!-----excel------>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sort('sno')">SL.No.</a>
+                            </th>
+
+                            <th width="15%"><a href="" ng-click="sort('ivrmcH_HostName')">Host Name</a></th>
+                            <th><a href="" ng-click="sort('ivrmcH_HostUrl')"> Host Url</a> </th>
+                            <th>Client Details</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue = (griddata | filter : searchValue)| orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-left">{{user.ivrmcH_HostName}}</td>
+                            <td class="text-left">{{user.ivrmcH_HostUrl}}</td>
+                            <td class="text-center">
+                                <span>
+                                    <a class="text-aqua" href="" ng-click="viewdocument(user)" data-placement="bottom" data-toggle="tooltip" title="View Comments">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span>
+                                    <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                &nbsp;
+                                <span ng-if="user.ivrmcH_ActiveFlag === false">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.ivrmcH_ActiveFlag === true">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+
+            </div>
+        </div>
+    </section>
+
+
+
+    <div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                    <h4 class="modal-title text-white">Host Name:{{HostName}}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body margin-top-10">
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO</th>
+                                    <th>Client NAME</th>
+                                    <!--<th>ACTION</th>-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in getClientDetails">
+                                    <td class="text-center">{{ $index + 1 }}</td>
+                                    <td class="text-left">{{user.ISMMCLT_ClientName}}</td>
+                                    <!--<td class="text-center">
+                                        <span ng-if="!user.IVRMHCM_ActiveFlag">
+                                            <a href="" ng-click="deactiveClientMappingdata(user)"
+                                               class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                            </a>
+                                        </span>
+                                        <span ng-if="user.IVRMHCM_ActiveFlag">
+                                            <a href="" ng-click="deactiveClientMappingdata(user)"
+                                               class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                <i class="fa fa-toggle-on text-green" aria-hidden="true" itle="Activate Record"></i>
+                                            </a>
+                                        </span>
+                                    </td>-->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+﻿<style>
+    .table-wrap {
+        height: 180px;
+        overflow-y: auto;
+    }
+
+    input[type="file"] {
+        display: none !important;
+    }
+
+    .student-photoadm :before {
+        content: 'Upload Document';
+        font-size: 13px;
+    }
+</style>
+
+<section class="content">
+    <div data-ng-init="loadData()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">GPS Location Attendance </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee Name :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" ng-repeat="option in online_leave">
+                                        {{option.hrmE_EmployeeFirstName}}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">DOJ :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" ng-repeat="option in online_leave">{{option.hrmE_DOJ | date:'dd-MM-yyyy'}}</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Designation :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" ng-repeat="option in online_leave">{{option.hrmdeS_DesignationName}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Email :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" ng-repeat="option in online_leave">{{option.hrmE_EmailId}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Phone :</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" ng-repeat="option in online_leave">{{option.hrmE_MobileNo}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">GPS Location Parameters</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Client Name:<span style="color:red;font-weight:600">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel2" name="clientname" ng-model="$parent.ismmclT_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Client" required>
+                                        <ui-select-match placeholder="Select or Search Client Name" >
+                                            {{$select.selected.ismmclT_ClientName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in clientlist | propsFilter: {ismmclT_ClientName: $select.search}"
+                                                           value="{{option.ismmclT_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.clientname)" ng-messages="myForm.clientname.$error">
+                                        <div ng-message="required">Select Client Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="box-tools col-sm-1">
+                                    <button type="button" class="btn btn-box-tool" data-placement="bottom" data-toggle="tooltip" title="Location" style="color:red"><i class="fa fa-map-marker fa-2x"></i></button>
+                                </div>
+                                <label class="control-label col-sm-11 text-bold" style="color:blue;">{{vmsatgpsL_Address}}</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Sales Lead:</label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel2" name="sales" ng-model="$parent.ismslE_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Sales Lead">
+                                        <ui-select-match placeholder="Select or Search Sales Lead">
+                                            {{$select.selected.ismslE_LeadName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in saleslist | propsFilter: {ismslE_LeadName: $select.search}"
+                                                           value="{{option.ismslE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.ismslE_LeadName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.sales)" ng-messages="myForm.sales.$error">
+                                        <div ng-message="required">Select Sales Lead</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Remark :<span style="color:red;font-weight:600">*</span></label>
+                                <div class="col-sm-8">
+                                    <!--<text class="form-control" placeholder="Enter Remark" name="n" id="usr" type="text" ng-paste="$event.preventDefault()" data-ng-model="vmsatgpsL_Remarks">-->
+                                    <textarea class="form-control textareaclass" placeholder="Enter Remark" name="remark" rows="3" ng-model="vmsatgpsL_Remarks" id="usr" required></textarea>
+                                    <div class="error-messages" ng-if="interacted(myForm.remark)" ng-messages="myForm.remark.$error">
+                                        <div ng-message="required">Enter the Remark</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <label>
+                            <input name="all" ng-true-value="true" ng-false-value="false" ng-model="punchflag" type="checkbox">
+                            <span class="lbl padding-8">
+                            </span>
+                            <b>Punch Flag</b>
+                        </label><br />
+
+                        <input type="hidden" ng-model="" />
+                        <md-button type="button" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="save()">
+                            <i class="fa fa-tags" aria-hidden="true"></i> SAVE
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i> CANCEL
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-primary" ng-if="empdetails.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Employee GPS Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="col-sm-6 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No.</th>
+                                    <th>Client Name</th>
+                                    <th>Sales Lead Name</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Address</th>
+                                    <th>Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in empdetails | itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="page2">
+                                    <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                    <td>{{user.ISMMCLT_ClientName}}</td>
+                                    <td>{{user.ISMSLE_LeadName}}</td>
+                                    <td>{{user.VMSATGPSL_DateTime|date:'dd-MM-yyyy'}}</td>
+                                    <td>{{user.VMSATGPSL_Time }}</td>
+                                    <td>{{user.VMSATGPSL_Address}}</td>
+                                    <td>{{user.VMSATGPSL_Remarks}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5" pagination-id="page2"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>

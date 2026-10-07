@@ -1,0 +1,809 @@
+﻿<style>
+
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Cheque Book Print</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamwwe" ng-model="MI_Id" ng-change="oncmpchange()" required ng-disabled="editflag==true">
+                                    <option value="">--Select Company--</option>
+                                    <option ng-repeat="option in allcompany" value="{{option.mI_Id}}"
+                                            ng-selected="{{option.mI_Id == MI_Id}}">
+                                        {{option.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamwwe)" ng-messages="myForm.yrnamwwe.$error">
+                                    <div ng-message="required">Select Company</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <hr />
+            </div>
+            <div class="box box-primary" ng-show="editflag==true">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Cheque Book  DETAILS</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-sm-12">
+
+                        <div class="col-sm-6 form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-4"><b> Company Name</b></label>
+                                <div class="col-sm-8">
+                                    <strong> &nbsp;{{ cname |uppercase}} </strong>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <span class="hidden">{{paynametwo |uppercase}}</span>
+                                <label class="col-sm-4">
+                                    <b> Pay Name</b>
+                                </label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" rows="2" id="cltrName" name="ccc" ng-model="clientname" placeholder="Pay Name" required></textarea>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.cltrName)" ng-messages="myForm.cltrName.$error">
+                                        <div ng-message="required">Pay Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b>Cheque Type</b></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1ww" name="yrnamwwewwwww" ng-model="banknameselection" required>
+                                        <option value="">--Select --</option>
+                                        <option value="HDFC">HDFC</option>
+                                        <option value="BOB">Bank of Baroda</option>
+                                        <option value="BOI"> Bank of India</option>
+
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yrnamwwewwwww)" ng-messages="myForm.yrnamwwewwwww.$error">
+                                        <div ng-message="required">Select Bank</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4">
+
+                                </label>
+                                <div class="col-sm-8">
+                                    <input type="checkbox" ng-model="Selfpay" ng-click="PayFlag()">
+                                    <span class="lbl padding-8">Self Pay</span>
+                                    <input type="checkbox" ng-model="Accountpay" ng-click="PayFlag1()">
+                                    <span class="lbl padding-8">Account Pay</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4">
+                                    <!--<b> Self/Acc pay </b>-->
+                                </label>
+                                <div class="col-sm-8">
+                                    <input type="text" ng-model="AccPayName" ng-paste="$event.preventDefault()" class="form-control" placeholder="Self /Acc pay" maxlength="15" allow-pattern="(\s|[a-zA-Z])" name="namepay" ng-disabled="true" required />
+                                    <div class="error-messages" ng-if="interacted(myForm.namepay)" ng-messages="myForm.namepay.$error">
+                                        <div ng-message="required">Pay Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <b>
+                                        Cheque Date
+                                    </b>
+                                    <strong style="color:red;">*</strong>
+                                </label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="payment_date" onkeypress="return false" data-ng-model="VPAYVOU_ChequePrintedDate" md-placeholder="Enter date" md-min-date="plMaxdate" ng-paste="$event.preventDefault()" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.payment_date)" ng-messages="myForm.payment_date.$error">
+                                        <div ng-message="required">Select  Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <b>
+                                        Cheque Amount:
+                                    </b>
+                                </label>
+                                <div class="col-sm-8">
+                                    <b>{{sactamt}}</b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-4"><b> Voucher Number</b></label>
+                                <div class="col-sm-8">
+                                    <strong>
+                                        &nbsp;{{vno}}
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b> Cheque Number</b></label>
+                                <div class="col-sm-8">
+                                    <strong>
+                                        &nbsp;{{ChequeNo}} <a class="text-aqua" href="" ng-click="UploadCheque(user)" data-placement="bottom" data-toggle="tooltip" title="Cheque Number">
+                                            <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                        </a>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b>Applied Amount</b></label>
+                                <div class="col-sm-8">
+                                    <strong>&nbsp;{{aplamount}} </strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b>Approved Amount</b></label>
+                                <div class="col-sm-8">
+                                    <strong>&nbsp;{{sactamt}} </strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b>  Date</b></label>
+                                <div class="col-sm-8">
+                                    <strong>  &nbsp;{{inddate|date:'dd-MM-yyyy'}}</strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b>Bank Name</b></label>
+                                <div class="col-sm-8">
+                                    <strong>&nbsp;{{bbname|uppercase}}</strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b>A/C NO</b></label>
+                                <div class="col-sm-8">
+                                    <strong>&nbsp;{{acno}}</strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4"><b> Narration</b></label>
+                                <div class="col-sm-8">
+                                    <strong> &nbsp;&nbsp;{{ remarks }}</strong>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+
+                <div class="text-center">
+                    <br />
+                    <input type="hidden" ng-model="VPAYVOU_Id" value="{{VPAYVOU_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="forgortpwdprint()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        PRINT CHEQUE
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-primary" ng-click="savedata()" ng-disabled="forgetEmail_id.length > 0" id="save-btn" ng-show="resetpassword==true">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        PRINT CHEQUE
+                    </md-button>-->
+
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        CANCEL
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">CHECKBOOK ENTRY   DETAILS FOR PRINT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="checkbooklist.length>0">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{checkbooklist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th>View Voucher</th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_VoucherNo')">Voucher No</a></th>
+                        <th><a href="" ng-click="sortBy('MI_Name')">Company Name</a></th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_ChequeNo')">Cheque Number</a></th>
+
+                        <th><a href="" ng-click="sortBy('CityName')">Bank Details</a></th>
+                        <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier / Other</a></th>
+
+                        <th><a href="" ng-click="sortBy('VPAYVOU_PaymentDate')">Applied Date</a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_BankBalalnce')">Bank Balance </a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_AppliedAmount')">Applied Amount </a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_ApprovedAmount')">Sanctioned Amount </a> </th>
+                        <th><a href="" ng-click="sortBy('VPAYVOU_Remarks')">Narration </a> </th>
+                        <th>Print</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (checkbooklist | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" ng-class-odd="'odd'" pagination-id="xyz">
+                        <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="reschedule(user);"> <i class="fa fa-print" aria-hidden="true"></i></a>
+                        </td>
+                        <td>{{user.VPAYVOU_VoucherNo}}</td>
+                        <td>{{user.MI_Name}}</td>
+                        <td>{{user.VPAYVOU_ChequeNo}}</td>
+                        <td>
+                            {{user.HRMBD_BankName}}<br />A/c No
+                            {{user.HRMBD_BankAccountNo}}
+                        </td>
+                        <td>
+                            <span ng-if="user.INVMS_SupplierName !=null && user.INVMS_SupplierName !=''">
+                                {{user.INVMS_SupplierName}}
+                            </span>
+                            <span ng-if="user.VPAYVOU_PaymentTo !=null && user.VPAYVOU_PaymentTo !=''">
+                                {{user.VPAYVOU_PaymentTo}}
+                            </span>
+
+                        </td>
+                        <td>{{user.VPAYVOU_PaymentDate | date:'dd-MM-yyyy'}}</td>
+                        <td>{{user.VPAYVOU_BankBalalnce}}</td>
+                        <td>{{user.VPAYVOU_AppliedAmount}}</td>
+                        <td>{{user.VPAYVOU_ApprovedAmount}}</td>
+                        <td>{{user.VPAYVOU_Remarks}}</td>
+                        <td class="hidden">{{user.MI_Logo}}</td>
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Approve/Reject">
+                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="xyz">
+            </dir-pagination-controls>
+        </div>
+        <div class="box-body" ng-show="checkbooklist.length==0">
+            <div class="text-center"><b style="color:red">CHECKBOOK ENTRY  IS NOT AVAILABLE FOR PRINT </b></div>
+        </div>
+    </div>
+
+</section>
+<!-- =======================Transcation Tax Model ====================================-->
+<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Payment Voucher  DETAILS
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printDataV()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div class="row">
+                                <div class="col-md-8" ng-if="imagenew!=null && imagenew!=''">
+                                    <img src="{{imagenew}}" class="img-responsive" alt="vaps" />
+                                </div>
+
+                                <br />
+                                <br />
+                                <div class="col-sm-12" style="text-align:center">
+                                    <h3> <b>Payment Voucher</b> </h3>
+                                </div>
+
+
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive" style="border:none !important" width="100%">
+                                        <tr>
+                                            <td style="float:left"> No.:&nbsp; {{pvno}}</td>
+                                            <td>  &nbsp; </td>
+                                            <td style="float:right"> Dated:&nbsp; {{pdate|date:'dd/MM/yyyy'}}</td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:75%">Particulars </td>
+                                            <td style="width:25%;"> Amount</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:75%;text-align:left">
+                                                <b>Account :</b>
+                                                <p style="padding-left:60px">{{supldetails}}</p>
+                                                <b>Through : </b>
+                                                <p style="padding-left:60px">{{bankname}} A/c No:{{bbacc}}</p>
+
+                                                <b>On Account of : </b>
+                                                <p style="padding-left:60px">{{rmrk}} </p>
+                                                <b>Amount (in words) : </b>
+                                                <p style="padding-left:60px">Indian Rupees {{words}} Only </p>
+
+                                            </td>
+                                            <td style="width:25%;text-align:right;vertical-align:top;padding-top:15px">{{amtt | number:2}}</td>
+                                        </tr>
+
+                                        <tr>
+
+
+                                            <td style="width:75%;text-align:left">
+                                                &nbsp;
+                                                &nbsp; &nbsp;
+                                            </td>
+
+                                            <td style="width:25%;text-align:right"><b>{{amtt | number:2}}</b></td>
+                                        </tr>
+
+
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Receiver's Signature : </h5>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Authorised Signatory</h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Prepared by </h5>
+                                </div>
+
+                                <div class="col-sm-4" style="text-align:center">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Checked by  </h5>
+                                    <strong>Govindaiah M</strong>
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Verified by </h5>
+                                    <strong>Siddesh Kumar</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="popup1112" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">
+                    Cheque Details
+                </h4>
+                <!--<md-button type="button" class="md-raised" data-ng-click="printData()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>-->
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf1">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+
+                            <div class="row">
+                                <div class="col-sm-12" style="float:right">
+
+
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:75%">Particulars </td>
+                                            <td style="width:25%;"> Amount</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:75%;text-align:left">
+                                                <b>Account :</b>
+                                                <p style="padding-left:60px">{{supldetails}}</p>
+                                                <b>Through : </b>
+                                                <p style="padding-left:60px">{{bankname}} A/c No:{{bbacc}}</p>
+
+                                                <b>On Account of : </b>
+                                                <p style="padding-left:60px">{{rmrk}} </p>
+                                                <b>Amount (in words) : </b>
+                                                <p style="padding-left:60px">Indian Rupees {{words}} Rupees Only </p>
+
+                                            </td>
+                                            <td style="width:25%;text-align:right;vertical-align:top;padding-top:15px">{{amtt | number:2}}</td>
+                                        </tr>
+
+                                        <tr>
+
+
+                                            <td style="width:75%;text-align:left">
+                                                &nbsp;
+                                                &nbsp; &nbsp;
+                                            </td>
+
+                                            <td style="width:25%;text-align:right"><b>{{amtt | number:2}}</b></td>
+                                        </tr>
+
+
+                                    </table>
+
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--=====printvisiuable=============-->
+<!--/////printvisiable===============-->
+<div id="myModalotp" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white" style="text-align:center;">
+                    Cheque Design
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printData()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div id="printmodalnew" ng-if="banknameselection=='HDFC' && AccPayName=='ACCOUNT PAY'">
+                    <h4 style="margin-left:570px;padding-top:18px;">{{b1}} &nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp; {{b4}} &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp; {{b8}} </h4>
+                    <h5 style="margin-left:310px;"> {{AccPayName | uppercase}}</h5>
+                    <h5 style="margin-left:80px;padding-top:11px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:16px;">{{wordsss | uppercase}} RUPEES ONLY</h5>
+                    <h5 style="margin-left:612px;padding-top:12px;font-size:15px;"> **{{roundoffttltwo}}</h5>
+                </div>
+                <div id="printmodalnew" ng-if="banknameselection=='HDFC' && AccPayName=='SELF PAY'">
+                    <h4 style="margin-left:570px;padding-top:18px;">{{b1}} &nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp; {{b4}} &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp; {{b8}} </h4>
+                    <h5 style="margin-left:75px;padding-top:36px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:16px;">{{wordsss | uppercase}} RUPEES ONLY</h5>
+                    <h5 style="margin-left:612px;padding-top:12px;font-size:15px;"> **{{roundoffttltwo}}</h5>
+                </div>
+
+                <div id="BOB" ng-if="banknameselection=='BOB'  && AccPayName=='ACCOUNT PAY'">
+                    <h4 style="margin-left:562px;padding-top:18px;">{{b1}}&nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp;{{b4}}  &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp;  {{b8}} </h4>
+                    <h5 style="margin-left:50px;"> {{AccPayName | uppercase}}</h5>
+                    <h5 style="margin-left:80px;padding-top:13px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:18px;">{{wordsss | uppercase}} RUPEES ONLY</h5>
+                    <h5 style="margin-left:600px;padding-top:13px;font-size:15px;"> **{{roundoffttltwo}} </h5>
+                </div>
+                <div id="BOB" ng-if="banknameselection=='BOB' && AccPayName=='SELF PAY'">
+                    <h4 style="margin-left:562px;padding-top:18px;">{{b1}}&nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp;{{b4}}  &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp;  {{b8}} </h4>
+                    <h5 style="margin-left:50px;"> <!--{{AccPayName | uppercase}}--></h5>
+                    <h5 style="margin-left:75px;padding-top:43px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:18px;">{{wordsss | uppercase}} RUPEES ONLY</h5>
+                    <h5 style="margin-left:600px;padding-top:13px;font-size:15px;"> **{{roundoffttltwo}} </h5>
+                </div>
+                <div id="BOI" ng-if="banknameselection=='BOI' && AccPayName=='ACCOUNT PAY'">
+                    <h4 style="margin-left:562px;padding-top:18px;">{{b1}}&nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp;{{b4}}  &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp;  {{b8}} </h4>
+                    <h5 style="margin-left:320px;"> {{AccPayName | uppercase}}</h5>
+                    <h5 style="margin-left:80px;padding-top:11px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:16px;">{{wordsss | uppercase}} Rupees Only </h5>
+                    <h5 style="margin-left:580px;padding-top:13px;font-size:15px;"> **{{roundoffttltwo}} </h5>
+                </div>
+                <div id="BOI" ng-if="banknameselection=='BOI' && AccPayName=='SELF PAY'">
+                    <h4 style="margin-left:562px;padding-top:18px;">{{b1}}&nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp;{{b4}}  &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp;  {{b8}} </h4>
+                    <h5 style="margin-left:75px;padding-top:41px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:16px;">{{wordsss | uppercase}} RUPEES ONLY </h5>
+                    <h5 style="margin-left:580px;padding-top:13px;font-size:15px;"> **{{roundoffttltwo}} </h5>
+                </div>
+            </div>
+            <!--<div class="modal-body">
+
+                <div id="printmodalnew" ng-if="banknameselection=='HDFC'">
+                    <h4 style="margin-left:570px;padding-top:18px;">{{b1}} &nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp; {{b4}} &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp; {{b8}} </h4>
+                    <h5 style="margin-left:310px;"> {{AccPayName | uppercase}}</h5>
+                    <h5 style="margin-left:80px;padding-top:11px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:16px;">{{wordsss | uppercase}} Rupees Only</h5>
+                    <h5 style="margin-left:612px;padding-top:12px;font-size:15px;"> **{{roundoffttltwo}}</h5>
+                </div>
+                <div id="BOB" ng-if="banknameselection=='BOB'">
+                    <h4 style="margin-left:562px;padding-top:18px;">{{b1}}&nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp;{{b4}}  &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp;  {{b8}} </h4>
+                    <h5 style="margin-left:50px;"> {{AccPayName | uppercase}}</h5>
+                    <h5 style="margin-left:80px;padding-top:13px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:18px;">{{wordsss | uppercase}} Rupees Only</h5>
+                    <h5 style="margin-left:600px;padding-top:13px;font-size:15px;"> **{{roundoffttltwo}} </h5>
+                </div>
+                <div id="BOI" ng-if="banknameselection=='BOI'">
+                    <h4 style="margin-left:562px;padding-top:18px;">{{b1}}&nbsp;{{b2}} &nbsp; &nbsp;{{b3}} &nbsp;&nbsp;{{b4}}  &nbsp;&nbsp;{{b5}} &nbsp;&nbsp;{{b6}} &nbsp;&nbsp;{{b7}} &nbsp;&nbsp;  {{b8}} </h4>
+                    <h5 style="margin-left:320px;"> {{AccPayName | uppercase}}</h5>
+                    <h5 style="margin-left:80px;padding-top:11px;">{{minamess | uppercase}}</h5>
+                    <h5 style="margin-left:127px;padding-top:16px;">{{wordsss | uppercase}} Rupees Only </h5>
+                    <h5 style="margin-left:580px;padding-top:13px;font-size:15px;"> **{{roundoffttltwo}} </h5>
+                </div>
+
+            </div>-->
+
+            <div class="modal-footer">
+                c
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            iv
+        </div>
+        iv
+    </div>
+    iv
+</div>
+
+
+
+<div id="OTPgenration" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        al
+        
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title text-white text-center">
+                    OTP Genartion
+                </h4>
+
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Voucher OTP  Generation</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6 form-horizontal col-sm-offset-2">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Login Password :<span style="color:red;">*</span></label>
+                                        <div class="col-sm-8">
+                                            <input id="form4" type="password" class="form-control" name="password" data-ng-model="Password" maxlength="20">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Email OTP :<span style="color:red;">*</span></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" name="affl" ng-model="EMAILOTP" allow-pattern="(\s|[0-9])" ng-paste="$event.preventDefault()" class="form-control" placeholder="ENTER OTP" autocomplete="off" maxlength="7" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4"> Check Email </label>
+                                        <div class="col-sm-8">
+                                            <input type="email" class="form-control" placeholder="Check Email" ng-disabled="forgetEMaildisable" ng-model="forgetEmail_id" ng-paste="$event.preventDefault()" autocomplete="off" maxlength="30" />
+                                        </div>
+
+                                    </div>
+                                    <div class="text-center">
+                                        <br />
+                                        <button type="button" class="btn btn-primary" ng-click="sendotpsms(otptype)">Verified OTP</button>
+                                        <button type="button" class="btn btn-danger" ng-click="VERIFIEOTP(otptype)">Resend  OTP</button>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="UploadBudget" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Check Book  Changed Cheque Number
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-7 col-sm-offset-2">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Cheque No <span style="color:red">*</span> :</label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="iamounqqtchk" ng-model="$parent.obj.VPAYVOU_ChequeNo" theme="bootstrap"
+                                                   ng-keyup="searchfilter($select,ts.optradio);" title="Select Cheque No">
+                                            <ui-select-match ng-trim="false" placeholder="Select Or Search Cheque No">
+                                                {{$select.selected.vpayvoU_ChequeNo}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="catgry in CheckbookSource | filter: $select.search" value="{{catgry.vpayvoU_ChequeNo}}"
+                                                               ng-selected="{{catgry.Selected == true}}">
+                                                <div ng-bind-html="catgry.vpayvoU_ChequeNo | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(myForm.iamounqqtchk)" ng-messages="myForm.iamounqqtchk.$error">
+                                            <div ng-message="required">Enter Cheque No</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Old Cheque No Remark <span style="color:red">*</span> :</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" rows="2" id="cltrName" name="ccc" ng-model="ChecqRemarkOld" placeholder="Old Cheque No Remark"></textarea>
+
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                <br />
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Check Email </label>
+                                    <div class="col-sm-8">
+                                        <input type="email" class="form-control" placeholder="Check Email" ng-disabled="true" ng-model="forgetEmail_id" ng-paste="$event.preventDefault()" autocomplete="off" maxlength="30" />
+                                    </div>
+
+                                </div>
+                                <br />
+                                <br />
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Email OTP :<span style="color:red;">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="affl" ng-model="EMAILOTP" allow-pattern="(\s|[0-9])" ng-paste="$event.preventDefault()" class="form-control" placeholder="ENTER OTP" autocomplete="off" maxlength="7" />
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-sm-12 text-center">
+                                <br />
+                                <button type="button" class="btn btn-danger" ng-click="UploadCheque()">Resend  OTP</button>
+
+                                <md-button type="submit" class="md-raised md-primary" ng-click="InterChangeCheque()" ng-disabled="EMAILOTP==null || EMAILOTP=='' || ChecqRemarkOld==null || ChecqRemarkOld==''" id="save-btn">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Update New  Cheque No
+                                </md-button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

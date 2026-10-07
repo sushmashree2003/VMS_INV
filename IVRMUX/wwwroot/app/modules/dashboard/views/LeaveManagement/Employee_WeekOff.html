@@ -1,0 +1,221 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        /*border: 1px solid #3e85a0;*/
+        padding: 12px;
+        /*min-height: 371px;*/
+        /*border-radius: 5px;*/
+    }
+
+    .file-bluedd:before {
+        content: 'Download Template';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .file-bluenew:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e85a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+        .box-label:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+<section class="content" ng-init="OnLoad_EmpName()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Employee_WeekOff </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="box-content">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" style="padding-top: 5px">Employee Name : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-8">
+                                <ui-select id="id2" name="empname" ng-model="$parent.HRME_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Employee "
+                                           ng-change="OnChangeBehaviourEmployee('Appearance')"
+                                           ng-disabled="empflag" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">
+                                        {{$select.selected.EmployeeName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in getuserName | filter: $select.search"
+                                                       value="{{catgry.hrmE_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.EmployeeName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted2(myForm.empname)" ng-messages="myForm.empname.$error">
+                                    <div ng-message="required">Select Employee </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-6 font-weight-bold" style="padding-top: 0px">
+                            <b> Date:</b><span style="color:red;">*</span>
+                            <span>
+                                <md-datepicker ng-model="ismtpL_StartDate" onkeypress="return false" name="startdate" id="date1" md-placeholder="Enter date" md-min-date="plMaxdate" required></md-datepicker>
+                            </span>
+                        </label>
+                        <div class="error-messages" ng-if="interacted(myForm.startdate) && myForm.startdate.$error.required" ng-messages="myForm.startdate.$error">
+                            <!--<div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">-->
+                            <div class="col-sm-8 col-sm-offset-6">Select Date</div>
+                        </div>
+                    </div>
+
+                    <div class="box-footer">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="SaveData(user)">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+            </div>
+        </div>
+
+    </form>
+
+
+    <div class="box box-primary" ng-show="getSalesDrData.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">MASTER SALESDRBLOCKED LIST</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <!-- /.box-header -->
+        <div class="box-body">
+
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{getSalesDrData.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No.
+                        </th>
+                        <th>
+                            <a href="">EmployeeName</a>
+                        </th>
+                        <th>
+                            <a href="">Scenario</a>
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in alldata = (getSalesDrData | filter : search) | orderBy:sortKey:sortReverse  | itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                        <!--<tr ng-repeat="user in getSalesDrData">-->
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <!--<td>{{$index+1}}</td>-->
+                        <td>{{user.EmpolyeeName}}</td>
+                        <td>{{user.Scenario}}</td>
+                        <td style="text-align:center">
+
+                            <span ng-if="user.ActiveFlag==false">
+                                <a href="" ng-click="deactiveY(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                            <span ng-if="user.ActiveFlag==true">
+                                <a href="" ng-click="deactiveY(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+
+
+
+</section>
+
+
+
+
+
+
+

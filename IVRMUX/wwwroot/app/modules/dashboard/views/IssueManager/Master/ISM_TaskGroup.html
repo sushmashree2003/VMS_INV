@@ -1,0 +1,237 @@
+﻿<style>
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;       
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Task Group </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4 ">Group Name :<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <input class="form-control" name="group" id="group" type="text" ng-model="ISMMTGRP_TaskGroupName
+" required placeholder="Please Enter Group Name" allow-pattern="([a-zA-Z\s.])" style="margin-left: 8px;">
+                            <div class="error-messages" ng-if="interacted(myForm.group)" ng-messages="myForm.group.$error">
+                                <div ng-message="required">Enter the Group Name</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                       <div class="col-sm-12">
+                           <div class="row">
+                               <div class="col-sm-4">
+                                   <label class="control-label "> Remark :<span style="color:red;">*</span></label>
+                               </div>
+                               <div class="col-sm-8">
+                                   <input class="form-control" name="remarks" id="remarks" type="text" ng-model="ISMMTGRP_TGRemarks
+" required placeholder="Please Enter Remark" allow-pattern="([a-zA-Z\s.])">
+                                   <div class="error-messages" ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                       <div ng-message="required">Enter the Remark</div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label for="sel2" class="control-label">Department : <span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">                                   
+                                    <input class="form-control  " ng-model="searchchkbx1" type="text" placeholder="Search Department here..." style="margin-left: 8px; margin-bottom: 3px;">                                   
+                                    <div class="multiselect col-sm-8 aaa1">
+                                        <label>
+                                            <input name="clsoption" value="all" data-ng-model="usercheckC" type="checkbox" ng-click="all_checkC()" >
+                                            <span class="lbl padding-8">
+                                                <b> All </b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="dept in department_list | filter:searchchkbx1" value="{{dept.hrmD_Id}}">
+                                            <input type="checkbox" data-ng-model="dept.selected" ng-click="togchkbxC()" ng-required="isOptionsRequired()" name="department" />
+                                            <span class="lbl padding-8">{{dept.hrmD_DepartmentName}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.department)" ng-messages="myForm.department.$error">
+                                        <div ng-message="required">Please Select Any One Department Name</div>
+                                    </div>                                  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>       
+        <hr />
+        <div class="text-center">
+            <input type="hidden" ng-model="ismmtgrP_Id " value="{{ismmtgrP_Id}}" />
+            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                Save
+            </md-button>
+            <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                Cancel
+            </md-button>
+        </div>
+        </div>
+    </form>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Master Task Group List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{alldata.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="search!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No.
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('ismmtgrP_TaskGroupName')">Group Name </a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('ismmtgrP_TGRemarks')">Remarks</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('hrmD_DepartmentName')">Department Name</a>
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue=(alldata | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td style="text-align:left">{{user.ismmtgrP_TaskGroupName}}</td>
+                        <td style="text-align:left">{{user.ismmtgrP_TGRemarks}}</td>
+                        <td>
+
+                            <span>
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View Departments" data-target="#popup11" ng-click="viewdept(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </td>                        
+                        <td style="text-align:left">
+                            <a href="javascript:void(0)" ng-click="Editdata(user)" class="text-aqua" data-placement="bottom" data-toggle="tooltip" title="edit Client data">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            <span ng-if="user.ismmtgrP_ActiveFlag==false">
+                                <a href="" ng-click="clientDecative(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                            <span ng-if="user.ismmtgrP_ActiveFlag==true">
+                                <a href="" ng-click="clientDecative(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    De-Activate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">VIEW DEPARTMENT LIST</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>Department Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documents in uploaddeptdetails">
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-left">{{documents.hrmD_DepartmentName}}</td>
+                                <td class="text-center">
+                                    <span ng-if="documents.ismmtgrpD_ActiveFlag==false">
+                                        <a href="" ng-click="DeptDeactive(documents)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                            Activate
+                                        </a>
+                                    </span>
+                                    <span ng-if="documents.ismmtgrpD_ActiveFlag==true">
+                                        <a href="" ng-click="DeptDeactive(documents)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                            De-Activate
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,289 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Notification </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="startDate" name="startdate" id="date1" md-placeholder="Enter date" md-min-date="plMaxdate"></md-datepicker>
+                        </div>
+                        <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                            <div ng-message="required">Select Start Date</div>
+                            <div ng-message="valid">The entered value is not Valid!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="endDate" name="endate" ng-disabled="!ismtpL_StartDate" md-min-date="startDate" md-placeholder="Enter Date" required></md-datepicker>
+                        </div>
+                        <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                            <div ng-message="required">Select End Date</div>
+                            <div ng-message="valid">The entered value is not Valid!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="search()" id="save-btn">
+                        <i class="fa fa-search-minus" aria-hidden="true"></i>
+                        Search
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Notification's Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Notification :</b>
+                            <label class="badge">
+                                {{totalnotification}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="get_notifications.length>0">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('ismtcR_TaskNo')">Notification</a></th>
+                                <th><a href="" ng-click="sortBy('ismtcR_TaskNo')">Notification Type</a></th>
+                                <th><a href="" ng-click="sortBy('hrmD_DepartmentName')">Date Time</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue = (get_notifications | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left text-head">
+                                    <a ng-model="user.ISMNO_Id" data-ng-click="Viewnotification(user)">{{user.ISMNO_Notification}}</a>
+                                </td>
+                                <td class="text-left">
+                                    {{user.tasktype}}
+                                </td>
+                                <td class="text-left">{{user.ISMNO_NoticationDate | date:'MM/dd/yyyy  h:mma'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div ng-if="get_notifications.length==0">
+                    <h4>No Notification Found.....!!</h4>
+                </div>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </form>
+    <!--****************************************Model********************************-->
+    <div id="myModalNotification" class="modal fade" role="dialog" style="z-index:9999;" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="width: 85%;">
+            <div class="modal-content">
+                <div ng-if="notificationType=='DR'">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <center><h4 class="modal-title text-white">Daily Report</h4></center>
+                    </div>
+                    <div class="box-body">
+                        <div class="row margin-bottom-10">
+                            <div class="col-sm-5 col-sm-offset-1 text-body">
+                                <div class="form-group">
+                                    <b class="col-sm-4">Date </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{drdate | date:'dd-MM-yyyy'}} </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Name </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{employeename}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Completed </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{completedper}}%</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 text-body">
+                                <div class="form-group">
+                                    <b class="col-sm-4">Department</b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{department}} </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Designation </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{designation}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Deviation </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{deviationper}}%</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('ISSUE ID')">TASK ID</a></th>
+                                    <th><a href="" ng-click="sortBy('ISMTCR_Title')">TASK TITLE</a></th>
+                                    <th><a href="" ng-click="sortBy('ACTIVITY')">ACTIVITY</a></th>
+                                    <th><a href="" ng-click="sortBy('Client')">CLIENT</a></th>
+                                    <th><a href="" ng-click="sortBy('PRIORITY')">PRIORITY</a></th>
+                                    <th><a href="" ng-click="sortBy('DESCRIPTION')">DESCRIPTION</a></th>
+                                    <th><a href="" ng-click="sortBy('STATUS')"> STATUS</a></th>
+                                    <th><a href="" ng-click="sortBy('SUBMITTED')"> SUBMITTED BY</a></th>
+                                    <th><a href="" ng-click="sortBy('DATE')"> SUBMITTED DATE</a></th>
+                                    <th><a href="" ng-click="sortBy('EFFORT')"> EFFORT</a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in get_dailyreportdetails">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left"> {{user.ISMTCR_TaskNo}}</td>
+                                    <td class="text-left"> {{user.ISMTCR_Title}}</td>
+                                    <td class="text-left"> {{user.ISMTCR_BugOREnhancementFlg}}</td>
+                                    <td class="text-left"> {{user.ISMMCLT_ClientName}}</td>
+                                    <td class="text-left"> {{user.HRMP_Name}}</td>
+                                    <td class="text-left"> {{user.ISMDRPT_Remarks}}</td>
+                                    <td class="text-left"> {{user.ISMDRPT_Status}}</td>
+                                    <td class="text-left"> {{user.assignedby}}</td>
+                                    <td class="text-left"> {{user.ISMDRPT_Date | date:'dd-MM-yyyy'}}</td>
+                                    <td class="text-left"> {{user.ISMDRPT_TimeTakenInHrs}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div ng-if="notificationType=='PL'">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <center><h4 class="modal-title text-white">Planner Details</h4></center>
+                    </div>
+                    <div class="box-body">
+                        <div class="row margin-bottom-10">
+                            <div class="col-sm-5 col-sm-offset-1 text-body">
+                                <div class="form-group">
+                                    <b class="col-sm-4">Planner Date </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{planstartdate | date:'dd-MM-yyyy'}} To {{planenddate | date:'dd-MM-yyyy'}} </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Planner Name </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{plannername}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Planned By </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{plannedby}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 text-body">
+                                <div class="form-group">
+                                    <b class="col-sm-4">Department</b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{department}} </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Designation </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{designation}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <b class="col-sm-4">Total Effort </b>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{plannereffort}} Hour</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('ISSUE ID')">TASK ID</a></th>
+                                    <th><a href="" ng-click="sortBy('ISMTCR_Title')">TASK TITLE</a></th>
+                                    <th><a href="" ng-click="sortBy('ISMTPLTA_StartDate')">START DATE</a></th>
+                                    <th><a href="" ng-click="sortBy('ISMTPLTA_EndDate')">END DATE</a></th>
+                                    <th><a href="" ng-click="sortBy('ACTIVITY')">ACTIVITY</a></th>
+                                    <th><a href="" ng-click="sortBy('Client')">CLIENT</a></th>
+                                    <th><a href="" ng-click="sortBy('PRIORITY')">PRIORITY</a></th>
+                                    <th><a href="" ng-click="sortBy('DESCRIPTION')">DESCRIPTION</a></th>
+                                    <th><a href="" ng-click="sortBy('SUBMITTED')"> PLANNED BY</a></th>
+                                    <th><a href="" ng-click="sortBy('EFFORT')"> EFFORT</a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in get_plannerdetails">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left"> {{user.ISMTCR_TaskNo}}</td>
+                                    <td class="text-left"> {{user.ISMTCR_Title}}</td>
+                                    <td class="text-left"> {{user.ISMTPLTA_StartDate | date:'dd-MM-yyyy'}}</td>
+                                    <td class="text-left"> {{user.ISMTPLTA_EndDate | date:'dd-MM-yyyy'}}</td>
+                                    <td class="text-left"> {{user.ISMTCR_BugOREnhancementFlg}}</td>
+                                    <td class="text-left"> {{user.ISMMCLT_ClientName}}</td>
+                                    <td class="text-left"> {{user.HRMP_Name}}</td>
+                                    <td class="text-left"> {{user.ISMTPLTA_Remarks}}</td>
+                                    <td class="text-left"> {{user.assignedby}}</td>
+                                    <td class="text-left"> {{user.ISMTPLTA_EffortInHrs}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <br />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</section>

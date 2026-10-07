@@ -1,0 +1,889 @@
+﻿<style>
+    button, input, select, textarea {
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+        width: 102px;
+    }
+</style>
+<section class="content">
+    <div class="well">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormdemo" method="post" ng-init="LoadData()" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <!--<h3 class="box-title">Sales Lead Demo Creation</h3>-->
+                    <h3 class="box-title">Lead demo schedule</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Lead:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8" ng-if="ISMSLE_LeadName !=null && ISMSLE_LeadName !='' && edibl >0">
+                                        <input type="text" ng-model="ISMSLE_LeadName" class="form-control" ng-disabled="true" />
+                                    </div>
+                                    <div class="col-sm-8" ng-show="edibl == 0">
+                                        <ui-select id="sel1" name="client" ng-model="$parent.ISMSLE_Id" theme="bootstrap"
+                                                   ng-keyup="searchfilter($select,ts.optradio);" title="Select Lead Name" ng-change="get_ContactPerson()" ng-required="edibl==0">
+                                            <ui-select-match ng-trim="false" placeholder="Select Or Search Lead Name">
+                                                {{$select.selected.ISMSLE_LeadName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="catgry in lead_list_dd | filter: $select.search" value="{{catgry.ISMSLE_Id}}"
+                                                               ng-selected="{{catgry.Selected == true}}">
+                                                <div ng-bind-html="catgry.ISMSLE_LeadName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interactednew(myFormdemo.client)" ng-messages="myFormdemo.client.$error">
+                                            <div ng-message="required">Lead Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Demo Type:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ISMSLEDM_DemoType" name="demotype" required>
+                                            <option value="">--Select Demo Type--</option>
+                                            <option value="Online">Online</option>
+                                            <option value="Offline">Offline</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interactednew(myFormdemo.demotype)" ng-messages="myFormdemo.demotype.$error">
+                                        <div ng-message="required">Select Demo Type</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Demo Assigned To:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="HRME_Id" name="demogiven" required>
+                                            <option value="">--Select Employee--</option>
+                                            <option ng-repeat="emp in hrme_list_dd" value="{{emp.hrmE_Id}}" ng-selected="{{emp.Selected==true}}">
+                                                {{emp.employeename}} / {{emp.hrmD_DepartmentName}}
+                                            </option>
+                                        </select>
+
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interactednew(myFormdemo.demogiven)" ng-messages="myFormdemo.demogiven.$error">
+                                        <div ng-message="required">Select Demo Given Name</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Contact Person:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" rows="4" name="personName" id="comment" ng-model="ISMSLE_ContactPerson" placeholder="Enter Contact Person" required />
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interactednew(myFormdemo.personName)" ng-messages="myFormdemo.personName.$error">
+                                        <div ng-message="required">Enter Contact Person name</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Room Name:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="HRMR_Id" name="roomname" required ng-change="RoomList();">
+                                            <option value="">--Select Room name--</option>
+                                            <option ng-repeat="room in hrmr_list_dd" value="{{room.hrmR_Id}}" ng-selected="{{room.hrmR_Id==HRMR_Id}}">
+                                                {{room.hrmR_RoomName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interactednew(myFormdemo.roomname)" ng-messages="myFormdemo.roomname.$error">
+                                        <div ng-message="required">Select Room Name</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Demo Scheduled By:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ISMSLEDM_DemoScheduledBy" ng-change="Demo_Scheduled();" name="demoscheduled" required>
+                                            <option value="">--Select Employee--</option>
+                                            <option ng-repeat="emp in hrme_list_ddd" value="{{emp.hrmE_Id}}" ng-selected="{{emp.hrmE_Id==ISMSLEDM_DemoScheduledBy}}">
+                                                {{emp.hrmE_EmployeeFirstName}}
+                                            </option>
+                                        </select>
+
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interactednew(myFormdemo.demoscheduled)" ng-messages="myFormdemo.demoscheduled.$error">
+                                        <div ng-message="required">Select Demo Scheduled By</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Demo Date:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+
+                                        <md-datepicker name="demodate1" ng-model="ISMSLEDM_DemoDate" md-placeholder="Enter Date" onkeydown="return false" required></md-datepicker>
+
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interactednew(myFormdemo.demodate1)" ng-messages="myFormdemo.demodate1.$error">
+                                        <div ng-message="required">Enter Demo Date</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Demo Address:<span style="color:red">*</span></label>
+                                    <div class="col-sm-8">
+
+                                        <textarea class="form-control" rows="4" ng-paste="$event.preventDefault()" id="comment" ng-model="ISMSLEDM_DemoAddress" placeholder="Enter Address" name="demoadd" required></textarea>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interactednew(myFormdemo.demoadd)" ng-messages="myFormdemo.demoadd.$error">
+                                        <div ng-message="required">Enter Demo Address</div>
+                                    </div>
+                                </div>
+
+                                <!--<div class="form-group">
+                                    <label class="control-label col-sm-3"> Remark:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ISMSLEDM_Remarks" required>
+                                            <option value="">--Select Remark Type--</option>
+                                            <option value="Visited">Visited</option>
+                                            <option value="Not Visited">Not Visited</option>
+                                            <option value="Executed">Executed</option>
+                                            <option value="Not Executed">Not Executed</option>
+                                        </select>
+                                    </div>
+
+                                </div>-->
+
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Remark:</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" placeholder="Enter Remark" rows="2" id="comment" ng-model="ISMSLEDM_Remarks" />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Demonstration</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <table class="table table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">SL.NO.</th>
+                                    <th style="width: 275px;"><a href="" ng-click="sort('')">Product</a></th>
+                                    <!--<th>Package</th>-->
+                                    <th><a href="" ng-click="sort('')">Discussion Points</a></th>
+                                    <th>Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="objr in demonstration" ng-form="dataform1">
+                                    <td>{{$index+1}}</td>
+
+                                    <td>
+                                        <select class="form-control" id="sel1" name="stat" ng-model="objr.ismsmpR_Id" required>
+                                            <option value="">--Select--</option>
+                                            <option ng-repeat="product in product_list_dd" value="{{product.ismsmpR_Id}}" ng-selected="{{product.ismsmpR_Id ==objr.ismsmpR_Id}}">
+                                                {{product.ismsmpR_ProductName}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(dataform1.stat)" ng-messages="dataform1.stat.$error">
+                                            <div ng-message="required">Select Product </div>
+                                        </div>
+                                    </td>
+                                    <!--<td>
+                                        <select class="form-control" id="sel1" name="stsssat" ng-model="objr.ismsboM_Id" ng-change="OnChangeproduct(objr)" required>
+                                            <option value="">--Select--</option>
+                                            <option ng-repeat="product in objr.bomList" value="{{product.ISMSBOM_Id}}" ng-selected="{{product.ISMSBOM_Id ==objr.ismsboM_Id}}">
+                                                {{product.ISMSBOM_BOMName}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(dataform1.stsssat)" ng-messages="dataform1.stsssat.$error">
+                                            <div ng-message="required">Select Product </div>
+                                        </div>
+                                    </td>-->
+                                    <td>
+                                        <input class="form-control" name="point" ng-model="objr.ISMSLEDMPR_DiscussionPoints" type="text" placeholder="Discussion Points" required />
+                                        <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(dataform1.point)" ng-messages="dataform1.point.$error">
+                                            <div ng-message="required">Enter Discussion Points </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="" ng-hide="pirows.length > 4">
+                                            <a href="" ng-show="$last" ng-click="addpirows()">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="" id="remove" ng-hide="Demonstration.length ==1">
+                                            <a href="" ng-click="removepirows($index,objg)">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+
+                            <div class="text-center">
+                                <input type="hidden" ng-model="id" />
+                                <!--<md-button type="button" class="md-raised md-primary" data-ng-click="Savedata_td()" id="save-btn">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Save
+                                </md-button>-->
+
+                                <md-button type="button" class="md-raised md-primary" data-ng-click="Savedata_Modal()" id="save-btn">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Save
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Sales Lead Demo List </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{demo_listnew.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label" ng-if="searchValue!=''">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th>Lead Title</th>
+                            <th>Demo Type</th>
+                            <th>Demo Schedule By</th>
+                            <th>Demo Assigned To</th>
+                            <th>Health</th>
+                            <th>Contact Person</th>
+                            <th>Demo Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                            <th>Re-sch</th>
+                            <th>Swapping</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="fl in filterValue1 = (demo_listnew | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}
+                            <td class="text-center">{{fl.ismslE_LeadName}}</td>
+                            <td class="text-center">{{fl.ismsledM_DemoType}}</td>
+                            <td class="text-center">{{fl.employeenamesch}}</td>
+                            <td class="text-center">{{fl.employeename}}</td>
+                            <td class="text-center">{{fl.ismsmsT_StatusName}}</td>
+                            <td class="text-center">{{fl.ismsledM_ContactPerson}}</td>
+                            <td class="text-center">{{fl.ismsledM_DemoDate| date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">
+                                <span ng-if="fl.ismsledM_Status_Flg === 1">
+                                    <a class="text-green" data-placement="bottom" data-toggle="tooltip" title="Complete">
+                                        Complete
+                                    </a>
+                                </span>
+                                <span ng-if="fl.ismsledM_Status_Flg === null">
+                                    <a class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Open">
+                                        Open
+                                    </a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a class="text-aqua" href="" ng-if="fl.ismsledM_RescheduleFlag == 1 " ng-click="edit(fl)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    |
+                                </a>
+
+                                <a href="javascript:void(0)" ng-if="fl.ismsledM_Status_Flg !== 1" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" data-ng-model="buspassdetails" data-target="#myModalgetclasslist" ng-click="view(fl)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+
+                                </a>
+                                <a href="javascript:void(0)" ng-if="fl.ismsledM_Status_Flg == 1" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views123" data-ng-model="buspassdetails" data-target="#myModalgetclasslist_1" ng-click="view(fl,vi)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <span ng-if="fl.ismsledM_RescheduleFlag == 1">
+                                    <i class="fa fa-check" style="color:green" aria-hidden="true"></i>
+                                </span>
+
+                            </td>
+                            <!--<td>
+                                <span>
+                                    <input type="checkbox" ng-model="fl.selected" ng-change="swap(fl)">
+                                    <span class="lbl padding-8"></span>
+
+                                </span>
+                            </td>-->
+                            <td>
+                                <!--ng-if="fl.ismsledM_Status_Flg === null"-->
+                                <span>
+                                    <input type="checkbox" ng-model="fl.selectedSwap" data-target="#SwapModel" ng-change="swap(fl)">
+                                    <span class="lbl padding-8"></span>
+
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModalgetclasslist" class="modal fade" role="dialog" data-backdrop="false" ng-show="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom">Sales Lead Demo</h4></center>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Lead Title:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ismslE_LeadName_s}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Contact Person:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ISMSLE_ContactPerson}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Address:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ismslE_LeadAddress_s}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Remarks:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ISMSLE_Remarks_s}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h4>Product Details</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SLNo</th>
+                                <th>Product Name</th>
+                                <th>Discussion Points</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-repeat="crd in product_dd_s">
+                                <td>{{ $index + 1 }}</td>
+                                <td class="text-center">{{crd.ismsmpR_ProductName}}</td>
+                                <td class="text-center">{{crd.ismsledmpR_DiscussionPoints}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+                <button type="button" class="btn btn-default" ng-click="close()">Close</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!--///////////////-->
+    <div id="myModalgetclasslist_1" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom">Sales Lead Demo</h4></center>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Lead Title:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ismslE_LeadName_s}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Contact Person:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ISMSLEDM_ContactPerson_s}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Address:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ISMSLE_LeadAddress_s}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3 "><b>Remarks:</b></label>
+                                    <div class="col-sm-8 text-left">
+                                        {{ISMSLE_Remarks_s}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h4>Product Details</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SLNo</th>
+                                <th>Product Name</th>
+                                <th>Discussion Points</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+                            <tr ng-repeat="crd in product_dd_s">
+                                <td>{{ $index + 1 }}</td>
+                                <td class="text-center">{{crd.ismsmpR_ProductName}}</td>
+                                <td class="text-center">{{crd.ismsledmpR_DiscussionPoints}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="modal-content">
+
+                <div class="modal-body">
+
+
+                    <h4>Response Details</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SLNo</th>
+                                <th>Product Name</th>
+                                <th>Package</th>
+                                <th>Discussion Points</th>
+                                <th>StatusName</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+                            <tr ng-repeat="crd in demo_response_details">
+
+
+                                <!--<tr dir-paginate="crd in filterValue3 = (demo_response_details)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+
+                                <td>{{ $index + 1 }}</td>
+                                <td class="text-center">{{crd.ismsmpR_ProductName}}</td>
+                                <td class="text-center">{{crd.ismsboM_BOMName}}</td>
+                                <td class="text-center">{{crd.ismsledmpR_DiscussionPoints}}</td>
+                                <td class="text-center">{{crd.ismsmsT_StatusName}}</td>
+                                <td class="text-center">{{crd.ismsledmpR_Remarks}}</td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+                <button type="button" class="btn btn-default" ng-click="close()">Close</button>
+            </div>
+        </div>
+    </div>
+    <!--//////////////////////-->
+
+    <div id="myModalgetdemoresponselist" class="modal fade" role="dialog" data-backdrop="false" name="formm">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="modal-body">
+
+                    <h4>Demo Response</h4>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input name="clsoption" ng-true-value="true" ng-false-value="false" ng-model="usercheckC2" type="checkbox" ng-click="all_checkC2()">
+                                        <span class="lbl padding-3">
+                                        </span>
+                                    </label>
+
+                                </th>
+                                <th>SL NO</th>
+                                <th>Product</th>
+                                <th>Discussion Points</th>
+                                <th>Status</th>
+                                <th>Remark</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+                            <!--<tr ng-repeat="crd in demo_response_list">-->
+
+
+                            <tr dir-paginate="evet in filterValue13 = (demo_response_list)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td>
+                                    <label>
+                                        <input type="checkbox" ng-model="evet.selectedd2" ng-true-value="true" ng-false-value="false" ng-change="get_evalistt(evet)" />
+                                        <span class="lbl padding-3"></span>
+                                    </label>
+                                </td>
+                                <td>{{ $index + 1 }}</td>
+                                <td class="text-center">{{evet.ismsmpR_ProductName}}</td>
+
+                                <td class="text-center">{{evet.ismsledmpR_DiscussionPoints}}</td>
+
+                                <td class="text-center">
+
+                                    <select ng-model="evet.ISMSMST_Id" name="sts" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="p in status_demo_master" value="{{p.ismsmsT_Id}}" ng-selected="{{p.Selected==true}}">
+                                            {{p.ismsmsT_StatusName}}
+                                        </option>
+                                    </select>
+                                    <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1.sts)" ng-messages="myForm1.sts.$error">
+                                        <div ng-message="required">Enter Contact Person name</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="col-sm-12 ">
+                                        <input class="form-control" name="remark" ng-model="evet.ISMSLEDMPR_Remarks" />
+                                    </div>
+                                </td>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer custom-footer">
+
+                    <md-button type="submit" class="md-raised md-primary" ng-click="Save_response(evet)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="mailModal" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom">Sales Lead Demo</h4></center>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div contenteditable="true">
+                                <div id="ordertemplate">
+                                    <p style="line-height: 108%; margin-left: 4.5in; text-indent: 0.5in; margin-bottom: 0in">
+                                        Date:  <strong>{{ISMSLEDM_DemoDate | date:'dd/MM/yyyy'}}</strong>
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">To:</p>
+                                    <p style="line-height: 100%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 100%; margin-bottom: 0in">
+                                        <font face="Calibri, serif">
+                                            <font color="#000000">
+                                                <font face="Calibri, serif">
+                                                    {{ismslE_ContactDesignation}}
+                                                </font>
+                                            </font>
+                                        </font>
+                                    </p>
+                                    <p style="line-height: 100%; margin-bottom: 0in">
+                                        <font face="Calibri, serif">
+                                            <font color="#000000">
+                                                <font face="Calibri, serif">
+                                                    {{ismslE_LeadName}}
+                                                </font>
+                                            </font>
+                                        </font>
+                                    </p>
+                                    <p style="line-height: 100%; margin-bottom: 0in">
+                                        <font face="Calibri, serif">
+                                            <font color="#000000">
+                                                <font face="Calibri, serif">
+                                                    Mobile Number : {{ismslE_ContactNo}}
+                                                </font>
+                                            </font>
+                                        </font>
+                                    </p>
+                                    <p style="line-height: 100%; margin-bottom: 0in">
+                                        <font face="Calibri, serif">
+                                            <font color="#000000">
+                                                <font face="Calibri, serif">
+                                                    Email  : {{ismslE_EmailId}}
+                                                </font>
+                                            </font>
+                                        </font>
+                                    </p>
+                                    <p style="line-height: 100%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">Dear Sir,</p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-left: 0.39in; text-indent: -0.39in; margin-bottom: 0in">
+                                        <b>
+                                            Sub:	Implementation of Digital Campus project for your
+                                            organization &ndash; request for demo date.
+
+                                        </b>
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-left: 0.39in; text-indent: -0.39in; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-left: 0.39in; text-indent: -0.39in; margin-bottom: 0in">
+                                        <b>
+                                            Ref: <strong> {{ISMSLE_Reference}}</strong>   Conference held in <strong> {{hrmR_RoomName}}</strong> from <strong>{{ISMSLEDM_DemoDate | date:'dd/MM/yyyy'}}</strong> to
+                                            <strong>{{ISMSLEDM_DemoDate | date:'dd/MM/yyyy'}}</strong>.
+                                        </b>
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-left: 0.39in; text-indent: -0.39in; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-left: 0.39in; text-indent: -0.39in; margin-bottom: 0in">
+                                        Warm Greetings.
+                                    </p>
+                                    <p style="line-height: 108%; margin-left: 0.39in; text-indent: -0.39in; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-bottom: 0in">
+                                        We
+                                        are extremely delighted with your visit to our in Vaps Technosoft PVT LTD.
+
+                                        Conference held in   {{hrmR_RoomName}}  from   {{ISMSLEDM_DemoDate | date:'dd/MM/yyyy'}}   to      {{ISMSLEDM_DemoDate | date:'dd/MM/yyyy'}}.  We are also
+                                        happy about your keen interest on our VAPS Digital Campus Project.
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-bottom: 0in">
+                                        Subsequent
+                                        to our brief interactions during the conference, our tele calling
+                                        team approached you requesting for an appointment to give detailed
+                                        demo to you and your team about our unique product and you have
+                                        accepted our request for appointment.  Accordingly, our technical
+                                        team would be visiting your campus to give detailed demo of our VAPS
+                                        Digital Campus project to you and your team.
+                                    </p>
+                                    <p align="justify" style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        We request you to
+                                        kindly confirm the appointment, so that we can plan accordingly.
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">Thanking you</p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">Yours sincerely</p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <b>
+                                            For VAPS
+                                            TECHNOSOFT PVT LTD
+                                        </b>
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <b>
+                                            Ramesh Babu Athmuri
+                                        </b>
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <b>
+
+                                            (Project Manager)
+                                        </b>
+                                    </p>
+
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in"><b></b></p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                    <p style="line-height: 108%; margin-bottom: 0in">
+                                        <br />
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" data-ng-click="Savedata_td()" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="SwapModel" role="dialog" ng-show="isModalVisibleSwap">
+        <div class="modal-dialog modal-lg" style="width: 75%;">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                </div>
+                <div class="modal-body">
+                    <div class="box-body">
+                        <h4 style="display: flex; justify-content: center; align-items: center;">Select Employee For Swapping </h4>
+                        <div class="col-sm-6 col-sm-offset-4">
+                            <form name="myForm" novalidate ng-submit="submitForm()">
+                                <ui-select id="id2" name="empname" ng-model="$parent.HRME_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Employee "
+                                           ng-change="OnChangeBehaviourEmployee('Appearance')"
+                                           ng-disabled="empflag" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">
+                                        {{$select.selected.EmployeeName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in sales_swappingEmpData | filter: $select.search"
+                                                       value="{{catgry.hrmE_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.EmployeeName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted2(myForm.empname)" ng-messages="myForm.empname.$error">
+                                    <div ng-message="required">Select Employee </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer custom-footer" style="display: flex; justify-content: center; align-items: center;">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="swapSave(fll)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancelSwap()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancelSwap()">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</section>
+
+

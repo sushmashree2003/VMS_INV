@@ -1,0 +1,341 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<style>
+    .tdd {
+        background: #fff !important;
+        color: #131212 !important;
+    }
+</style>
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Demo Ratings </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-6 padding-left-2px">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 8px;width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+                            <label>
+                                <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-click="all_checkdept(departmentselectedAll)">
+                                <span class="lbl padding-8">
+                                    <b> All Department</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                <input name="dept" ng-model="user.selected" type="checkbox" ng-click="togchkbxdept();" title="Select Employee" ng-required="isOptionsRequired11()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.HRMDC_Name}}:{{user.MI_Name}}</b>
+                                </span>
+                            </label>
+                        </div>
+                        <!--<div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">-->
+                        <div class="error-messages" ng-if="isErrorMessageVisible" ng-messages="myForm.dept.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Department</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 padding-left-none">
+                    <div class="form-group">
+                        <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                            <span>
+                                <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                            </span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                            <label>
+                                <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                <span class="lbl padding-8">
+                                    <b> All Designation</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in filterValue11=(designationdropdown  | filter:filterValue1122) ">
+                                <input name="desg" ng-model="user.selected" type="checkbox" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                </span>
+                            </label>
+                        </div>
+                        <!--<div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">-->
+                        <div class="error-messages" ng-if="isErrorMessageVisible1" ng-messages="myForm.desg.$error">
+                            <div ng-message="required" class="col-sm-8">Please Select Designation</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select style="text-align: center;" class="form-control" name="Year" id="sel1" ng-model="IMFY_FinancialYear" required>
+                                    <option value="">--Select Year--</option>
+                                    <option ng-repeat="employee in finacialYear" value="{{employee.imfY_FinancialYear}}" ng-selected="{{employee.imfY_FinancialYear===IMFY_FinancialYear}}">
+                                        {{employee.imfY_FinancialYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.Year)" ng-messages="myForm.Year.$error">
+                                    <div ng-message="required">Select Year </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="Month" id="sel1" ng-model="IVRM_Month_Id" required>
+                                    <option value="">Select Month</option>
+                                    <option ng-repeat="employee in Months" value="{{employee.ivrM_Month_Id}}" ng-selected="{{employee.ivrM_Month_Id===IVRM_Month_Id}}">
+                                        {{employee.ivrM_Month_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.Month)" ng-messages="myForm.Month.$error">
+                                    <div ng-message="required">Select Month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="get_userEmplist.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Demo Ratings</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span><sapn>
+                                </sapn>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover table-responsive table-bordered" id="table">
+                        <thead>
+                            <tr>
+                                <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                                <th class="hdTH">
+                                    <label>
+                                        <input type="checkbox" value="" ng-model="obj.allLead" ng-click="toggleAll()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th><a href="" ng-click="sortBy('empname')"><b>Employee</b></a> </th>
+                                <th>
+                                    Demo Date
+                                </th>
+                                <th>
+                                    Product
+                                </th>
+                                <th>
+                                    Ratings
+                                </th>
+                                <th>
+                                    Remark
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr dir-paginate="user in filterValue=(get_userEmplist |filter:searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                                current-page="currentPage" pagination-id="page2">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                                <td class="text-center  hdTD">
+
+                                    <input type="checkbox" ng-model="user.selected">
+                                    <span class="lbl padding-8"></span>
+
+                                <td style="text-align:left !important">
+                                    <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                </td>
+                                <td>
+                                    <md-datepicker ng-model="user.ICDR_DemoDate" name="sdate" md-placeholder="Demo Start Date" ng-required="user.selected"></md-datepicker>
+                                </td>
+                                <td>
+
+                                    <select class="form-control" id="sel1" name="stat" ng-model="user.ICDR_ProductID" ng-required="user.selected">
+                                        <option value="">--Select Product--</option>
+                                        <option ng-repeat="product in product_list_dd" value="{{product.ismsmpR_Id}}" ng-selected="{{product.ismsmpR_Id ==user.ICDR_ProductID}}">
+                                            {{product.ismsmpR_ProductName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stat)" ng-messages="myForm.stat.$error">
+                                        <div ng-message="required">Select Product </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="text" placeholder="Enter Rating" class="form-control" ng-model="user.ICDR_Ratings" name="stadddt" ng-required="user.selected" />
+
+                                    <div class="error-messages" ng-if="interacted(myForm.stadddt)" ng-messages="myForm.stadddt.$error">
+                                        <div ng-message="required">Enter  Rating </div>
+                                    </div>
+
+                                </td>
+                                <td>
+                                    <textarea class="form-control" placeholder="Enter Remark" rows="4" ng-paste="$event.preventDefault()" id="comment" ng-model="user.ICDR_Remarks"></textarea>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <dir-pagination-controls max-size="5" pagination-id="page2"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+                <div class="col-sm-12">
+                    <hr />
+
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="Report()" id="save-btn">
+                            <i class="fa fa-search-minus" aria-hidden="true"></i>
+                            SAVE
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+</section>
+<!--ng-if="get_userEmplist.length > 0"-->
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Demo Ratings</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+        </div>
+    </div>
+    <div>
+        <div class="box-body">
+            <div class="col-sm-12">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span><sapn>
+                            </sapn>
+                            <input class="form-control" ng-model="searchValueNew" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('sno')"><b>SL.No.</b></a></th>
+                            <!--Employee-->
+                            <th><a href="" ng-click="sortBy('empname')"><b>Given By</b></a> </th>
+                            <th>
+                                Given To
+                            </th>
+
+                            <th>
+                                Product
+                            </th>
+                            <th>
+                                Year
+                            </th>
+                            <th>
+                                Month
+                            </th>
+                            <th>
+                                Ratings
+                            </th>
+                            <th>
+                                Demo Date
+                            </th>
+                            <th>
+                                Remark
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr dir-paginate="user in filterValue=(empdRawReports |filter:searchValueNew) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage1"
+                            current-page="currentPage1" pagination-id="page3">
+                            <td class="text-center">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td style="text-align:left !important">
+                                <b>  {{user.GivenBy}}</b>
+                            </td>
+                            <td style="text-align:left !important">
+                                <b>  {{user.GivenTo}}</b>
+                            </td>
+                            <td>
+                                {{user.ISMSMPR_ProductName}}
+                            </td>
+                            <td>
+                                {{user.IMFY_FinancialYear}}
+                            </td>
+                            <td>
+                                {{user.IVRM_Month_Name}}
+                            </td>
+                            <td>
+                                {{user.ICDR_Ratings}}
+                            </td>
+                            <td>
+                                {{user.ICDR_DemoDate | date:'dd-MM-yyyy'}}
+                            </td>
+                            <td>
+                                {{user.ICDR_Remarks}}
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5" pagination-id="page3"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+
+        </div>
+    </div>
+
+
+</div>

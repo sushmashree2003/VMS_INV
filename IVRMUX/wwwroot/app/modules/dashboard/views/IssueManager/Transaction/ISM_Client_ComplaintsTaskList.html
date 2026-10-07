@@ -1,0 +1,305 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e85a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+        .box-label:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }
+
+    .file-bluedd:before {
+        content: 'Download Template';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .multiselect {
+        width: 100%;
+        height: 11em;
+        /*border: solid 1px #5cb7ff;*/
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .md-icon-button + .md-datepicker-input-container {
+        margin-left: -10px;
+        width: 53%;
+    }
+
+    .data-box, .droupdown-box {
+        box-shadow: 0px 10px 10px rgba(0,0,0,0.1);
+    }
+
+    /*.callout, .droupdown-box {
+        font-size: 15px;
+        font-family: FontAwesome;
+        font-weight: 600;
+        color: white;
+        transition: all ease-in-out 300ms;
+        background-color: rgb(122, 187, 123);
+        border-left: 7px solid;
+        padding: 5px;
+    }
+
+        .callout:hover, .droupdown-box:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }*/
+
+    .md-datepicker-calendar-pane {
+        z-index: 9999;
+    }
+</style>
+
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Complaints & Task List </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" ng-click="refresh()"><i class="fa fa-refresh"></i></button>
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="col-sm-10">
+                            <div class="box-label" style="width:100%;">
+                                <a class="small-box-footer" ng-model="totaltask" ng-click="gettotalcount()" title="Total Task">
+                                    Total Open Task
+                                    <span class="label pull-right bg-red" style="font-size: 100%;">{{pendingcount}}</span>
+                                </a>
+                            </div>
+                            <div class="box-label" style="width:100%;">
+                                <a class="small-box-footer" ng-model="totaltask" ng-click="gettotalcount()" title="Total Task">
+                                    Total Task
+                                    <span class="label pull-right bg-green" style="font-size: 100%;">{{totaltask}}</span>
+                                </a>
+                            </div>
+                        </div>
+                        <!--<div class="col-sm-10">
+                            <div class="box-label" style="width:100%;">
+                                <a class="small-box-footer" ng-model="taskpending" value="PT" ng-click="getpendingcount()" title="Total Task">
+                                    Pending Task
+                                    <span class="label pull-right bg-blue" style="font-size: 100%;">{{pendingcount}}</span>
+                                </a>
+                            </div>
+                        </div>-->
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="multiselect col-sm-8">
+                                    <span ng-show="get_client.length>0">
+                                        <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="search Client here...">
+                                    </span>
+                                    <label ng-show="get_client.length>0">
+                                        <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in get_client | filter : searchValueUEM">
+                                        <input name="client" ng-model="user.cltck" type="checkbox" ng-click="togchkbx();" title="Select Client" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            {{user.ismmclT_ClientName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                    <div ng-message="required" class="col-sm-12">Please Select Atleast One checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-sm-offset-1">
+                            <div class="form-group">
+                                <div class="multiselect col-sm-8">
+                                    <span ng-show="get_Status.length>0">
+                                        <input class="form-control" ng-model="searchValueS" type="text" placeholder="search Status here...">
+                                    </span>
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkallS" type="checkbox" ng-click="all_checkS(checkallS)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in get_Status | filter : searchValueS">
+                                        <input name="status" ng-model="user.stck" type="checkbox" ng-click="togchkbxS();" title="Select Status">
+                                        <span class="lbl padding-8">
+                                            {{user.value}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="searchtasks()" id="save-btn">
+                                <i class="fa fa-search-minus" aria-hidden="true"></i>
+                                Search
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body" ng-if="get_clientcomptasklistpending.length>0">
+                <div class="box-content">
+                    <div class="clearfix">
+                        <div style="width:100%;overflow:auto;">
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table table-responsive table-bordered clearfix">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th width="40%"><a href="" ng-click="sort('invmI_Id')">Issue/Task</a></th>
+                                        <th><a href="" ng-click="sort('invmI_Id')">Type</a></th>
+                                        <th><a href="" ng-click="sort('invmI_Id')">Date</a></th>
+                                        <th><a href="" ng-click="sort('invmuoM_Id')">Client/Office</a></th>
+                                        <th><a href="" ng-click="sort('invtsL_SalesQty')">Status</a></th>
+                                        <th><a href="" ng-click="sort('invtsL_SalesPrice')">Created By</a></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="objs in filterValue = (get_clientcomptasklistpending | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-left">
+                                            <span>
+                                                <a class="text-body col-sm-8 text-left" ng-model="objs.ISMTCR_Id" data-toggle="modal" data-target="#myModalResponse" data-ng-click="viewresponse(objs)">{{objs.ISMTCR_Title}}</a>
+                                                <label class="control-label col-sm-10 text-left">{{objs.ISMTCR_TaskNo}} </label>
+                                            </span>
+                                        </td>
+                                        <td class="text-left">
+                                            <label class="control-label text-left">{{objs.ISMTCR_BugOREnhancementFlg}} </label>
+                                        </td>
+                                        <td class="text-left">
+                                            <label class="control-label">{{objs.ISMTCR_CreationDate | date:'dd-MM-yyyy'}}</label>
+                                        </td>
+                                        <td class="text-left">
+                                            <span>
+                                                <span ng-if="objs.ISMMCLT_ClientName!=null">{{objs.ISMMCLT_ClientName}}</span>
+                                                <span ng-if="objs.ISMMCLT_ClientName==null"><label style="color:green;">NA</label></span>
+                                            </span>
+                                        </td>
+                                        <td class="text-left">
+                                            <b>{{objs.ISMTCR_Status}}</b>
+                                        </td>
+                                        <td class="text-left">
+                                            <label class="control-label">{{objs.createdby}}</label>
+                                        </td>
+                                        <td class="text-left" hidden="hidden">{{objs.ismtcrastO_Id}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                    <hr />
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- ============================MODEL TASk DETAILS=================================== -->
+    <div id="myModalResponse" class="modal fade" role="dialog" style="z-index:9999;" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    <h4 class="modal-title text-white">	Task Details </h4>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <span class="text-head col-sm-10 text-left" style="font-size:20px;" ng-model="ISMTCR_Id">{{tasktitle}}</span>
+                                <label class="control-label col-sm-10 text-body text-left" style="font-size:15px;">{{taskno}} </label>
+                                <label class="control-label col-sm-10 text-body text-left" style="font-size:15px;">
+                                    {{tasktype}} &nbsp;&nbsp;
+                                    <span ng-if="(tsakpriority=='High')|| (tsakpriority=='HIGH')"><label style="color:red;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Normal')||(tsakpriority=='NORMAL')"><label style="color:orange;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Low')||(tsakpriority=='LOW')"><label style="color:green;"><b>{{tsakpriority}}</b></label></span>
+                                </label>
+                                <label class="control-label col-sm-10 text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Created By :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{created_by}}
+                                    </label>
+                                </label>
+                                <label class="control-label col-sm-10 text-body">
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        Date :
+                                    </label>
+                                    <label class="control-label text-body" style="font-size:15px;">
+                                        {{taskdate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-6 margin-top-10">
+                                    <label class="control-label  text-body"><b>Description :</b> </label>
+                                </div>
+                                <div class="col-sm-12 margin-top-10">
+                                    <textarea class="form-control" name="response" type="text" placeholder="Task Description .... " ng-disabled="true" ng-model="taskdescription" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+
+
+</section>
+

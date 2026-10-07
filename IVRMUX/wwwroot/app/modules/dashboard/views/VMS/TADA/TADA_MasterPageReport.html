@@ -1,0 +1,250 @@
+﻿
+<section class="content">
+    <div data-ng-init="onpageload()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TA-DA City Mapping Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-offset-2">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">State:</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="sel1" name="Pos" ng-model="IVRMMS_Id" ng-change="Dropdown_State()" required>
+                                            <option value="">--Select--</option>
+                                            <option ng-repeat="chk in getstate" value="{{chk.ivrmmS_Id}}" ng-selected="{{chk.Selected == true}}">
+                                                {{chk.ivrmmS_Name}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.Pos)"
+                                             ng-messages="myForm.Pos.$error">
+                                            <div ng-message="required">Select State </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-group" style="padding-right: 62px;">
+                                    <label for="sel2" class="control-label col-sm-2">Designation : <span style="color:red;">*</span></label>
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" data-ng-model="searchcomapny" type="text" placeholder="Search here..." />
+                                        <label>
+                                            <input name="clsoption" value="all" data-ng-model="hrmdeS_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkCCCC()">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="room in grneTLIst | filter:searchcomapny" value="{{room.hrmdeS_Id}}">
+                                            <input type="checkbox" data-ng-model="room.selected" ng-click="togchkbxCCCC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequiredtwo()" name="Company" />
+                                            <span class="lbl padding-8">{{room.hrmdeS_DesignationName}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.Company)" ng-messages="myForm.Company.$error">
+                                        <div ng-message="required">Please Select Any One Designation</div>
+                                    </div>
+                                </div>
+
+                                <br />
+                                <!--removecontent-->
+                               
+                                   
+                                  
+                                    <br />
+                                </div>
+                            </div>
+                </div>
+                <!--------Inserting Items-------->
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="getReport()">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button type="button" ng-click="exportToExcel()" target="_blank" class="md-raised md-primary" ng-show="report">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-show="report">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        print
+                    </md-button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">TA-DA City Mapping Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <!---->
+        <div class="box-body" ng-show="get_CityMapping.length>0">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No
+                        </th>
+                        <th>
+                            Designation
+                        </th>
+                        <th>
+                            City
+                        </th>
+                        <th>
+                            Food Amount
+                        </th>
+                        <th>
+                            Accommodation Amount
+                        </th>
+                        <th>
+                            Travel Amount
+                        </th>
+                        <th>
+                            Travel Hour
+                        </th>
+                    </tr>
+                </thead>
+                <!---->
+                <tbody dir-paginate="user in filterValue1 = (employeeid| filter : searchValue) |orderBy:propertyName:reverse|filter:searchValue |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.hrmdeS_DesignationName}}</b></td>
+                    </tr>
+                    <tr dir-paginate="planner in filterValue1 = (user.plannerdetails| filter : searchValue) |orderBy:propertyName:reverse|filter:searchValue |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                        <td>
+                            {{planner.ivrmmcT_Name}}
+                        </td>
+                        <td>
+                            {{planner.vtadacM_FoodAmt}}
+                        </td>
+                        <td>
+                            {{planner.vtadacM_AccommodationAmt}}
+                        </td>
+                        <td>
+                            {{planner.vtadacM_TransportAmt}}
+                        </td>
+                        <td>
+                            {{planner.vtadacM_TravelHour}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="xyz">
+            </dir-pagination-controls>
+            <div id="tablegrp" style="display :none;">
+                <table class="table table-bordered table-condensed text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="row" ng-if="imagenew!=null && imagenew!=''">
+                                    <div>
+                                        <img src="{{imagenew}}" class="img-responsive" alt="vaps" height="103" />
+                                    </div>
+                                </div>
+                                <div class="row text-center">
+                                    <h4 style="text-align:center"><b>{{company_name}} ( City Mapping {{state}} ) </b></h4>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>                    
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Designation
+                            </th>
+                            <th>
+                                City
+                            </th>
+                            <th>
+                                Food Amount
+                            </th>
+                            <th>
+                                Accommodation Amount
+                            </th>
+                            <th>
+                                Travel Amount
+                            </th>
+                            <th>
+                                Travel Hour
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in  employeeid">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.hrmdeS_DesignationName}}</b></td>
+                        </tr>
+                        <tr ng-repeat="planner in (user.plannerdetails) ">
+                            <td>
+                                {{planner.ivrmmcT_Name}}
+                            </td>
+                            <td>
+                                {{planner.vtadacM_FoodAmt}}
+                            </td>
+                            <td>
+                                {{planner.vtadacM_AccommodationAmt}}
+                            </td>
+                            <td>
+                                {{planner.vtadacM_TransportAmt}}
+                            </td>
+                            <td>
+                                {{planner.vtadacM_TravelHour}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

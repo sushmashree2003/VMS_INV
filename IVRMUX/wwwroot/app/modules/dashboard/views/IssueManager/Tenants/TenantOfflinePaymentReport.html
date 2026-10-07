@@ -1,0 +1,315 @@
+﻿<section class="content" ng-init="Loaddata()">
+
+    <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Tenant Offline Payment Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8" ng-hide="chkfo">
+                        <div class="well text-center">
+                            <input type="radio" value="Advance" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)" required>
+                            <span class="lbl padding-8">Advance Payment</span>
+                            <input type="radio" value="Rent" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)" required>
+                            <span class="lbl padding-8">Rent Payment</span>
+                            <input type="radio" value="Electrical" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)" required>
+                            <span class="lbl padding-8">Electricity Bill</span>
+                            <input type="radio" value="WaterBill" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)" required>
+                            <span class="lbl padding-8">Water Bill</span>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.allind)" ng-messages="myForm.allind.$error">
+                            <div ng-message="required">Choose One Of The Payment</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+
+                <br /><br />
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="form-group col-sm-4">
+                        <label class="control-label col-sm-8">
+
+                            Year:<span style="color:red;">*</span>
+
+                        </label>
+                        <div class="col-sm-12">
+                            <select class="form-control" ng-model="fmtP_Years" name="yrrrrs" ng-disabled="yeardisable" required>
+                                <option value="">Select</option>
+                                <option ng-repeat="year in getyear">{{year.hrmlY_LeaveYear}}</option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.yrrrrs)" ng-messages="myForm.yrrrrs.$error">
+                                <div ng-message="required">Select Year</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-4">
+                        <label class="control-label col-sm-8">Month :<strong style="color:red;">*</strong></label>
+
+
+
+                        <div class="multiselect col-sm-12" style="width: 90% !important;">
+
+                            <label>
+                                <input name="all" value="1" ng-model="checkallm" type="checkbox" ng-click="all_check()">
+                                <span class="lbl padding-8">
+                                    <b>  All Months</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="user in monthlist_temp ">
+                                <input name="month" ng-model="user.selected" type="checkbox" ng-click="togchkbx();" title="Select Month" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8" value="{{user.ivrM_Month_Id}}">
+                                    <b>  {{user.ivrM_Month_Name}}</b>
+                                </span>
+                            </label>
+
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.month)" ng-messages="myForm.month.$error">
+                            <div ng-message="required" class="col-sm-8">Select Month</div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+                <div class="row text-center">
+                    <!--<md-button type="submit" ng-model="submitted" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="get_report()" id="save-btn">-->
+                    <md-button type="submit" ng-model="submitted" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="get_report()" id="save-btn">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="consolidateData.length==0" ng-show="consolidateData.length>0" ng-click="Print()" id="save-btn">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="consolidateData.length==0" ng-show="consolidateData.length>0" ng-click="exportToExceldetails()" id="save-btn">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+    <div class="box box-primary" ng-show="DisplayData1.length>0">
+        
+        <div class="box-header with-border">
+            <h3 class="box-title">Tenant Offline Payment Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{TLength}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model=" SearchHere" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="overflow-x:scroll;">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.NO</th>
+                            <th>Tenant Name</th>
+                            <th>Building</th>
+                            <th>Payment Month</th>
+                            <th>Amount</th>
+                            <th>Due Day</th>
+                            <th>Paid Date</th>
+                            <!--<th ng-model="advanceid">Advance Payment</th>-->
+                            <th>Receipt View Button</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="x in DisplayData1 | filter : SearchHere ">-->
+                        <tr dir-paginate="x in filterValue =(DisplayData1 | filter : SearchHere) | orderBy :sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center">{{x.tenantname}}</td>
+                            <td class="text-center">{{x.building}}</td>
+                            <td class="text-left" value="{{x.ivrM_Month_Id}}">{{x.monthnam}}</td>
+                            <td class="text-left">{{x.amount}}</td>
+                            <td class="text-left">{{x.duedate}}</td>
+                            <td class="text-left">{{x.paiddate | date : "dd/MM/yyyy"}}</td>
+                            <!--<td class="text-left">{{x.flag}}</td>-->
+                            <td class="text-center">
+                                <!--tenantagrpaY_Id-->
+                                <span ng-show="obj.RCNT!=0">
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="viewdocument(x.TENANTAGRPAY_ID,x.ivrM_Month_Id);"> <i class="fa fa-eye text-blue"></i></a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+</section>
+
+
+
+<!--<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="row" id="printmodal">
+
+
+            </div>
+        </div>
+    </div>
+</div>-->
+
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printData();" style="float:right;margin-right:52px;">Print</button>
+                <h4 class="modal-title text-white">Payment Receipt</h4>
+            </div>
+            <div class="modal-body" id="printDeviation">
+                <div class="box-body margin-top-10">
+                    <div class="col-sm-12">
+                        <div class="printmodal clearfix">
+                            <div class="col-sm-12" style="">
+                                <img src="{{imagenew}}" alt="baldwin" style="width:80%;height:100px">
+                            </div>
+
+                            <div class="col-sm-12 text-center" style="margin-top:25px!important;padding-bottom:25px!important">
+                                <h4> Receipt </h4>
+                            </div>
+                            <hr />
+                            <div class="row" style="padding:20px;">
+                                <div class="row margin-bottom-10">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Name</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp;<b> {{name}} </b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Receipt No : </label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; <b> {{tenantagrpaY_ReceiptNo}} </b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row margin-bottom-10">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Phone Number </label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; {{phonenumber}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Email : </label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; {{email}}   </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row margin-bottom-10">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Agreement from Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: &nbsp; &nbsp; {{agreementfromdate | date : "dd/MM/yyyy"}} </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Agreement To Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">:  &nbsp; &nbsp; {{agreementtodate | date : "dd/MM/yyyy"}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row margin-bottom-10">
+                                    <table class="table table-hover table-responsive table-bordered table-width text-center" id="modaltblr">
+                                        <thead>
+                                            <tr>
+                                                <th>SL:NO</th>
+                                                <th>Payment Month</th>
+                                                <th>Payment type</th>
+                                                <th>Paid Amount</th>
+                                                <th>Paid date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in uploadfilesdetails">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{user.ivrM_Month_Name}}</td>
+                                                <td>{{user.tenantagrpaY_Flag}}</td>
+                                                <td>{{user.tenantagrpaY_Amount}}</td>
+                                                <td>{{user.tenantagrpaY_PaymentDate | date : "dd/MM/yyyy"}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <h5><b style="color:black">NOTE : Signature is not required because it is a computer generated receipt.</b></h5>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

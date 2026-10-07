@@ -1,0 +1,1069 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Year Planner Approval Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>Select Company:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="Pos" ng-model="MI_Id" ng-change="institutionlist()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="chk in instiutionlist" value="{{chk.MI_Id}}" ng-selected="{{chk.Selected == true}}">
+                                        {{chk.MI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages col-sm-6 col-sm-offset-1" ng-if="interacted(myForm.Pos)"
+                                     ng-messages="myForm.Pos.$error">
+                                    <div ng-message="required">Select Company </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group" ng-init="hrmD_Id='0'">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>Select Department:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="dept" ng-model="hrmD_Id" ng-change="deptemplist()" required>
+                                    <option value="0">--Select--</option>
+                                    <option ng-repeat="chk in get_department" value="{{chk.hrmD_Id}}" ng-selected="{{chk.Selected == true}}">
+                                        {{chk.hrmD_DepartmentName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages col-sm-6 col-sm-offset-1" ng-if="interacted(myForm.dept)"
+                                     ng-messages="myForm.dept.$error">
+                                    <div ng-message="required">Select department </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+         
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>Select Employee:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="id2" name="empname" ng-model="$parent.HRME_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Or Search Employee "
+                                           ng-change="OnChangeBehaviourEmployee()"
+                                           ng-disabled="empflag" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Employee">
+                                        {{$select.selected.EmployeeName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in getuserName | filter: $select.search"
+                                                       value="{{catgry.hrmE_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.EmployeeName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.empname)" ng-messages="myForm.empname.$error">
+                                <div ng-message="required"><b>Select Select Employee</b></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group" style="padding-top: 5%;">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>From Date:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="fromdate" onkeypress="return false" name="fromdate" md-placeholder="Select date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.fromdate)" ng-messages="myForm.fromdate.$error">
+                                <div ng-message="required"><b>Select From Date</b></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="form-group" style="padding-top: 5%;">
+                            <label class="control-label col-sm-4 font-weight-bold"><b>To Date:</b><span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="todate" onkeypress="return false" name="todate" md-placeholder="Select date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.todate)" ng-messages="myForm.todate.$error">
+                                <div ng-message="required"><b>Select To Date</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                        <i class="fa fa-search-minus" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()" ng-if="getchecklistarray.length>0">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#modulefeedback')" ng-if="getchecklistarray.length>0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="" ng-show="getchecklistarray.length>0">
+            <div class="">
+                <div class="clearfix">
+                    <div style="width:100%;overflow:auto;">
+                        <div class="col-sm-12 well">
+                            <div class="col-sm-3">
+                                <div class="form-group text-center">
+                                    <label class="control-label text-body">
+                                        <b style="font-size:20px;color:darkred">Overall Tasks  : </b>
+                                        <label class="badge text-body text-white" style="font-size: 16px;" ng-if="getchecklistarray.length!=null">
+                                            {{getchecklistarray.length}}
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group text-center">
+                                    <label class="control-label text-body">
+                                        <b style="font-size:20px;color:darkred">Overall Planner Effort : </b>
+
+                                        <label class="badge text-body text-white" title="" style="font-size: 16px;">
+                                            {{OverallEffort}} Hr's
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group text-center">
+                                    <label class="control-label text-body">
+                                        <b style="font-size:20px;color:darkred"  ><a class="fa-solid fa-eye" ng-click="Viewdeparteffort()">View Overall Dept Effort :</a></b>
+
+                                        <label class="badge text-body text-white" title="" style="font-size: 16px;">
+                                            {{TotalTimedept}} Hr's
+                                        </label>    
+                                    </label>
+                                </div>
+                            </div>
+                            <!--<div class="col-sm-4">
+        <div class="form-group text-center">
+            <a>
+                <label class="control-label text-body">
+                    <b style="font-size:20px;color:darkred" class="fa fa-arrow-right fa-1x" ng-click="Viewdeparteffort()">View Overall Dept Effort</b>
+
+                </label>
+            </a>
+
+        </div>
+    </div>-->
+
+
+                        </div>
+                        <div ng-if="get_effortdetails.length>0">
+
+
+                            <div class="col-sm-12 well" ng-if="get_effortdetails.length>0">
+
+
+                                <h4>
+                                    <span style="color:red">CATEGORY WISE EFFORTS CREATED AND ASSIGNED BY THEMSELVES</span> &nbsp; &nbsp;&nbsp; &nbsp;<span>
+                                        <b style="font-size:18px">Total Effort : </b>
+                                        <label class="badge text-body text-white" title="" style="font-size: 18px;">
+                                            {{TotalTime}} Hr's
+                                        </label>
+                                    </span>
+                                </h4>
+                                <table class="table table-responsive table-bordered clearfix" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                PLANNER NAME
+                                            </th>
+                                            <th>
+                                                CREATED BY
+                                            </th>
+                                            <th>
+                                                ASSIGNED TO
+                                            </th>
+                                            <th>
+                                                DEPARTMENT NAME
+                                            </th>
+                                            <th>
+                                                CATEGORY NAME
+                                            </th>
+                                            <th>
+                                                EFFORT
+                                            </th>
+                                            <th>
+                                                VIEW
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="ef in get_effortdetails">
+                                            <td>
+                                                {{ef.ISMMIMPPL_PlannerName}}
+                                            </td>
+                                            <td>
+                                                {{ef.CreatedEmployeeName}}
+                                            </td>
+                                            <td>
+                                                {{ef.AssginEmployeeName}}
+                                            </td>
+                                            <td>
+                                                {{ef.HRMD_DepartmentName}}
+                                            </td>
+
+                                            <td>
+                                                {{ef.ISMMTCAT_TaskCategoryName}}
+                                            </td>
+                                            <td style="font-size: 18px;">
+                                                <b> {{ef.Time}}</b> Hr
+                                            </td>
+                                            <td>
+                                                <a ng-click="Viewtaskdetails(ef)">
+                                                    <i class="fa fa-eye text-black" title="View Tasks"></i>
+                                                </a>
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div ng-if="get_taskdetails.length>0">
+                            <div class="col-sm-12 well">
+                                <!--<div class="col-sm-2">
+                <div class="form-group text-center">
+                    <label class="control-label text-body">
+                        <b style="font-size:20px">Total Task  : </b>
+                        <label class="badge text-body text-white" style="font-size: 16px;" ng-if="getchecklistarray.length!=null">
+                            {{getchecklistarray.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>-->
+                                <!--<div class="col-sm-4">
+                <div class="form-group text-center">
+                    <label class="control-label text-body">
+                        <b style="font-size:20px">Total Effort : </b>
+
+                        <label class="badge text-body text-white" title="" style="font-size: 16px;">
+                            {{TotalTime1}} Hr's
+                        </label>
+                    </label>
+                </div>
+            </div>-->
+                            </div>
+                            <div class="col-sm-12 well" ng-if="get_taskdetails.length>0">
+
+
+                                <h4>
+                                    <span style="color:red">INTER DEPARTMENT TASKS</span> &nbsp; &nbsp;&nbsp; &nbsp;<span>
+                                        <b style="font-size:18px">Total Effort : </b>
+                                        <label class="badge text-body text-white" title="" style="font-size: 18px;">
+                                            {{TotalTime1}} Hr's
+                                        </label>
+                                    </span>
+                                </h4>
+                                <!--<span>
+                <b style="font-size:20px">Total Effort : </b>
+                <label class="badge text-body text-white" title="" style="font-size: 18px;">
+                    {{TotalTime1}} Hr's
+                </label>
+            </span>-->
+
+                                <table class="table table-responsive table-bordered clearfix" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                PLANNER NAME
+                                            </th>
+                                            <th>
+                                                CREATED BY
+                                            </th>
+                                            <th>
+                                                ASSIGNED TO
+                                            </th>
+                                            <th>
+                                                DEPARTMENT NAME
+                                            </th>
+                                            <th>
+                                                CATEGORY NAME
+                                            </th>
+                                            <th>
+                                                EFFORT
+                                            </th>
+                                            <th>
+                                                VIEW
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="ef in get_taskdetails">
+                                            <td>
+                                                {{ef.ISMMIMPPL_PlannerName}}
+                                            </td>
+                                            <td>
+                                                {{ef.CreatedEmployeeName}}
+                                            </td>
+                                            <td>
+                                                {{ef.AssginEmployeeName}}
+                                            </td>
+                                            <td>
+                                                {{ef.HRMD_DepartmentName}}
+                                            </td>
+
+                                            <td>
+                                                {{ef.ISMMTCAT_TaskCategoryName}}
+                                            </td>
+                                            <td style="font-size: 18px;">
+                                                <b> {{ef.Time}}</b> Hr
+                                            </td>
+                                            <td>
+                                                <a ng-click="Viewsaaigntaskdetails(ef)">
+                                                    <i class="fa fa-eye text-black" title="View Tasks"></i>
+                                                </a>
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="">
+                            <h3 class="box-title">Task Details</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        <b> Total Grid Records :</b>
+                                        <label class="badge">
+                                            {{getchecklistarray.length}}
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group text-center">
+                                    <label class="control-label text-body">
+                                        <b style="font-size:20px">Total Planner Tasks  : </b>
+                                        <label class="badge text-body text-white" style="font-size: 16px;" ng-if="getchecklistarray.length!=null">
+                                            {{getchecklistarray.length}}
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="overflow:auto;width:100%;" id="yearplanreport">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <a href="" ng-click="sort('sno')">SL.No.</a>
+                                            </th>
+                                            <!--<th width="50">SELECT</th>-->
+                                            <th class="hdTH">
+                                                <label>
+                                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </th>
+                                            <th width="30%"><a href="" ng-click="sort('ISMTCR_TaskNo')">Task Details</a></th>
+                                            <th width="25%"><a href="" ng-click="sort('ISMMCLT_ClientName')">Client-Module-Category </a> </th>
+
+                                            <th width="9%"><a href="" ng-click="sort('ISMTCR_CreationDate')">Date</a> </th>
+
+                                            <th width="50%"><a href="" ng-click="sort('ISMTCR_Desc')">Description </a> </th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="user in filterValue = (getchecklistarray | filter : searchValue)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                            <!--<td>
+                            <label class="control-label">
+                                <input type="checkbox" name="dfsd_{{$index}}" ng-model="user.usercheck" ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-12"></span>
+                            </label>
+                            <div class="error-messages" ng-if="interacted(myForm['dfsd_'+$index])"
+                                 ng-messages="myForm['dfsd_'+$index].$error">
+                                <div ng-message="required"> Select Checkbox <i class="fa fa-warning"></i> </div>
+                            </div>
+                        </td>-->
+                                            <td class="text-center  hdTD">
+                                                <label>
+                                                    <input type="checkbox" data-ng-model="user.usercheck" ng-change="optionToggled(user)">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </td>
+                                            <td class="text-left">
+                                                <span>
+                                                    <label class="control-label col-sm-12 text-left" style="padding-left:0 !important">
+                                                        <span class="col-sm-12 text-left">
+
+                                                            <b> {{user.ISMTCR_TaskNo}}</b><br />
+                                                            {{user.ISMTCR_Title}} <br />
+                                                            <label class="control-label"><b>l-{{user.ISMTCR_BugOREnhancementFlg}}</b></label>
+                                                            <span ng-if="user.HRMP_Name!=null && user.HRMP_Name!=''"><label style="color:red;"><b>:-{{user.HRMP_Name}}</b></label></span>
+
+                                                            <span ng-if="user.ISMTCR_Status=='Open' || user.ISMTCR_Status=='ReOpen'">
+                                                                - <span style="font-weight:500 !important;font-size: larger;color: red;">{{user.ISMTCR_Status}}</span>
+                                                            </span>
+                                                            <span ng-if="user.ISMTCR_Status!='Open' && user.ISMTCR_Status!='ReOpen'">
+                                                                - <span style="font-weight:500 !important;font-size: larger;color: blue;">{{user.ISMTCR_Status}}</span>
+                                                            </span><br />
+                                                            <span>
+                                                                <span style="font-weight:bold !important;">Dept : {{user.HRMD_DepartmentName}}</span>
+                                                            </span>
+
+                                                            <span>
+                                                                <br><label style="color:rgb(216 115 90)"><b class="ng-binding">Yearly Planner :{{user.ISMMIMPPL_PlannerName}}</b></label>
+                                                            </span>
+                                                        </span>
+                                                    </label>
+                                                </span>
+
+                                            </td>
+                                            <td class="text-left">
+                                                <span>
+                                                    Client: {{user.ISMMCLT_ClientName}}
+                                                </span><br />
+                                                <span>
+                                                    Module:   {{user.IVRMM_ModuleName}}
+                                                </span><br />
+
+                                                <span>
+                                                    Category: <span style="font-weight: 500 !important;font-size: larger;color: blue;">{{user.ISMMTCAT_TaskCategoryName}}</span>
+
+                                                </span>
+                                            </td>
+
+
+                                            <td class="text-left">{{user.ISMTCR_CreationDate}}</td>
+
+
+                                            <td class="text-left">{{user.ISMTCR_Desc}}</td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <dir-pagination-controls max-size="5"
+                                                         direction-links="true"
+                                                         boundary-links="true">
+                                </dir-pagination-controls>
+
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="Approveyearplan('1')" id="save-btn">
+                                <i class="" aria-hidden="true"></i>
+                                Approve
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="Approveyearplan('0')" id="save-btn">
+                                <i class="" aria-hidden="true"></i>
+                                Reject
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+    </form>
+
+
+
+</section>
+
+
+
+
+
+
+
+<div ng-show="taskdetails" id="viewcataskdetails" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="sort('sno')">SL.No.</a>
+                                        </th>
+                                        <!--<th width="50">SELECT</th>-->
+                                        <!--<th class="hdTH">
+                                            <label>
+                                                <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>-->
+                                        <th width="30%"><a href="" ng-click="sort('ISMTCR_TaskNo')">Task Details</a></th>
+                                        <th width="25%"><a href="" ng-click="sort('ISMMCLT_ClientName')">Client-Module-Category </a> </th>
+
+                                        <th width="9%"><a href="" ng-click="sort('ISMTCR_CreationDate')">Date</a> </th>
+
+                                        <th width="50%"><a href="" ng-click="sort('ISMTCR_Desc')">Description </a> </th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!--<tr dir-paginate="user in filterValue = (cateviewdetails | filter : searchValue)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+                                       <tr ng-repeat="user in cateviewdetailsdea">
+                                                <td class="text-center">{{$index+1}}</td>
+                                        <!--<td>
+                    <label class="control-label">
+                        <input type="checkbox" name="dfsd_{{$index}}" ng-model="user.usercheck" ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-12"></span>
+                    </label>
+                    <div class="error-messages" ng-if="interacted(myForm['dfsd_'+$index])"
+                         ng-messages="myForm['dfsd_'+$index].$error">
+                        <div ng-message="required"> Select Checkbox <i class="fa fa-warning"></i> </div>
+                    </div>
+                </td>-->
+                                        <!--<td class="text-center  hdTD">
+                                            <label>
+                                                <input type="checkbox" data-ng-model="user.usercheck" ng-change="optionToggled(user)">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>-->
+                                        <td class="text-left">
+                                            <span>
+                                                <label class="control-label col-sm-12 text-left" style="padding-left:0 !important">
+                                                    <span class="col-sm-12 text-left">
+
+                                                        <b> {{user.ISMTCR_TaskNo}}</b><br />
+                                                        {{user.ISMTCR_Title}} <br />
+                                                        <label class="control-label"><b>l-{{user.ISMTCR_BugOREnhancementFlg}}</b></label>
+                                                        <span ng-if="user.HRMP_Name!=null && user.HRMP_Name!=''"><label style="color:red;"><b>:-{{user.HRMP_Name}}</b></label></span>
+
+                                                        <span ng-if="user.ISMTCR_Status=='Open' || user.ISMTCR_Status=='ReOpen'">
+                                                            - <span style="font-weight:500 !important;font-size: larger;color: red;">{{user.ISMTCR_Status}}</span>
+                                                        </span>
+                                                        <span ng-if="user.ISMTCR_Status!='Open' && user.ISMTCR_Status!='ReOpen'">
+                                                            - <span style="font-weight:500 !important;font-size: larger;color: blue;">{{user.ISMTCR_Status}}</span>
+                                                        </span><br />
+                                                        <span>
+                                                            <span style="font-weight:bold !important;">Dept : {{user.HRMD_DepartmentName}}</span>
+                                                        </span>
+
+                                                        <span>
+                                                            <br><label style="color:rgb(216 115 90)"><b class="ng-binding">Yearly Planner :{{user.ISMMIMPPL_PlannerName}}</b></label>
+                                                        </span>
+                                                    </span>
+                                                </label>
+                                            </span>
+
+                                        </td>
+                                        <td class="text-left">
+                                            <span>
+                                                Client: {{user.ISMMCLT_ClientName}}
+                                            </span><br />
+                                            <span>
+                                                Module:   {{user.IVRMM_ModuleName}}
+                                            </span><br />
+                                           
+                                            <span>
+                                                Category: <span style="font-weight: 500 !important;font-size: larger;color: blue;">{{user.ISMMTCAT_TaskCategoryName}}</span>
+
+                                            </span>
+                                        </td>
+
+
+                                        <td class="text-left">{{user.ISMTCR_CreationDate}}</td>
+
+
+                                        <td class="text-left">{{user.ISMTCR_Desc}}</td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!--dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div ng-show="taskdetails1" id="viewcataskdetails1" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="sort('sno')">SL.No.</a>
+                                        </th>
+                                        <!--<th width="50">SELECT</th>-->
+                                        <!--<th class="hdTH">
+                                            <label>
+                                                <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>-->
+                                        <th width="30%"><a href="" ng-click="sort('ISMTCR_TaskNo')">Task Details</a></th>
+                                        <th width="25%"><a href="" ng-click="sort('ISMMCLT_ClientName')">Client-Module-Category </a> </th>
+
+                                        <th width="9%"><a href="" ng-click="sort('ISMTCR_CreationDate')">Date</a> </th>
+
+                                        <th width="50%"><a href="" ng-click="sort('ISMTCR_Desc')">Description </a> </th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!--<tr dir-paginate="user in filterValue = (cateviewdetails | filter : searchValue)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+                                    <tr ng-repeat="user in cateviewdetailsdea1">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <!--<td>
+                                            <label class="control-label">
+                                                <input type="checkbox" name="dfsd_{{$index}}" ng-model="user.usercheck" ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-12"></span>
+                                            </label>
+                                            <div class="error-messages" ng-if="interacted(myForm['dfsd_'+$index])"
+                                                 ng-messages="myForm['dfsd_'+$index].$error">
+                                                <div ng-message="required"> Select Checkbox <i class="fa fa-warning"></i> </div>
+                                            </div>
+                                        </td>-->
+                                        <!--<td class="text-center  hdTD">
+                                            <label>
+                                                <input type="checkbox" data-ng-model="user.usercheck" ng-change="optionToggled(user)">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>-->
+                                        <td class="text-left">
+                                            <span>
+                                                <label class="control-label col-sm-12 text-left" style="padding-left:0 !important">
+                                                    <span class="col-sm-12 text-left">
+
+                                                        <b> {{user.ISMTCR_TaskNo}}</b><br />
+                                                        {{user.ISMTCR_Title}} <br />
+                                                        <label class="control-label"><b>l-{{user.ISMTCR_BugOREnhancementFlg}}</b></label>
+                                                        <span ng-if="user.HRMP_Name!=null && user.HRMP_Name!=''"><label style="color:red;"><b>:-{{user.HRMP_Name}}</b></label></span>
+
+                                                        <span ng-if="user.ISMTCR_Status=='Open' || user.ISMTCR_Status=='ReOpen'">
+                                                            - <span style="font-weight:500 !important;font-size: larger;color: red;">{{user.ISMTCR_Status}}</span>
+                                                        </span>
+                                                        <span ng-if="user.ISMTCR_Status!='Open' && user.ISMTCR_Status!='ReOpen'">
+                                                            - <span style="font-weight:500 !important;font-size: larger;color: blue;">{{user.ISMTCR_Status}}</span>
+                                                        </span><br />
+                                                        <span>
+                                                            <span style="font-weight:bold !important;">Dept : {{user.HRMD_DepartmentName}}</span>
+                                                        </span>
+
+                                                        <span>
+                                                            <br><label style="color:rgb(216 115 90)"><b class="ng-binding">Yearly Planner :{{user.ISMMIMPPL_PlannerName}}</b></label>
+                                                        </span>
+                                                    </span>
+                                                </label>
+                                            </span>
+
+                                        </td>
+                                        <td class="text-left">
+                                            <span>
+                                                Client: {{user.ISMMCLT_ClientName}}
+                                            </span><br />
+                                            <span>
+                                                Module:   {{user.IVRMM_ModuleName}}
+                                            </span><br />
+                                            
+                                            <span>
+                                                Category: <span style="font-weight: 500 !important;font-size: larger;color: blue;">{{user.ISMMTCAT_TaskCategoryName}}</span>
+
+                                            </span>
+                                        </td>
+
+
+                                        <td class="text-left">{{user.ISMTCR_CreationDate}}</td>
+
+
+                                        <td class="text-left">{{user.ISMTCR_Desc}}</td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <!--dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div ng-show="departmenteffort" id="departmenteffort" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 well" ng-if="cateviewindividualdetails.length>0">
+
+
+                        <h4>
+                            <span style="color:red">OVERALL EFFORT</span> &nbsp; &nbsp;&nbsp; &nbsp;<span>
+                                <b style="font-size:18px">Total Effort : </b>
+                                <label class="badge text-body text-white" title="" style="font-size: 18px;">
+                                    {{Totalindieffort}} Hr's
+                                </label>
+                            </span>
+                        </h4>
+
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        SL NO
+                                    </th>
+                                    <th>
+                                        PLANNER NAME
+                                    </th>
+                                    <th>
+                                        CREATED BY
+                                    </th>
+                                    <th>
+                                        ASSIGNED TO
+                                    </th>
+                                    <th>
+                                        DEPARTMENT NAME
+                                    </th>
+                                    <th>
+                                        CATEGORY NAME
+                                    </th>
+                                    <th>
+                                        EFFORT
+                                    </th>
+                                    <th>
+                                        VIEW
+                                    </th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--<tr ng-repeat="ef in cateviewindividualdetails">-->
+                                <tr dir-paginate="ef in filterValue = (cateviewindividualdetails | filter : searchValue)  |itemsPerPage:itemsPerPage3" current-page="currentPage3" pagination-id="page3">
+                                    <td class="text-center">{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+                                    <td>
+                                        {{ef.ISMMIMPPL_PlannerName}}
+                                    </td>
+                                    <td>
+                                        {{ef.CreatedEmployeeName}}
+                                    </td>
+                                    <td>
+                                        {{ef.AssginEmployeeName}}
+                                    </td>
+                                    <td>
+                                        {{ef.HRMD_DepartmentName}}
+                                    </td>
+
+                                    <td>
+                                        {{ef.ISMMTCAT_TaskCategoryName}}
+                                    </td>
+                                    <td style="font-size: 18px;">
+                                        <b> {{ef.Time}}</b> Hr
+                                    </td>
+
+                                    <td>
+                                        <a ng-click="Viewinddepataskdetails(ef)">
+                                            <i class="fa fa-eye text-black" title="View Tasks"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5" pagination-id="page3"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div ng-show="departmentempeffort" id="departmentempeffort" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 well" ng-if="get_extratasklist.length>0">
+
+
+                        <h4>
+                            <span style="color:red">OVERALL DEPARTMENT EFFORT</span> &nbsp; &nbsp;&nbsp; &nbsp;<span>
+                                <b style="font-size:18px">Total Department Effort : </b>
+                                <label class="badge text-body text-white" title="" style="font-size: 18px;">
+                                    {{TotalTimedept}} Hr's
+                                </label>
+                            </span>
+                        </h4>
+
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        SL NO
+                                    </th>
+                                    <th>
+                                        PLANNER NAME
+                                    </th>
+                                    <th>
+                                        EMPLOYEE NAME
+                                    </th>
+                                    <th>
+                                        DEPARTMENT NAME
+                                    </th>
+
+                                    <th>
+                                        TOTAL EFFORT
+                                    </th>
+                                    <th>
+                                        VIEW
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--<tr ng-repeat="ef in get_extratasklist">-->
+                                    <tr dir-paginate="ef in filterValue = (get_extratasklist | filter : searchValue)  |itemsPerPage:itemsPerPage2" current-page="currentPage1" pagination-id="page1">
+                                    <td class="text-center">{{itemsPerPage2 *(currentPage1-1)+$index+1}}</td>
+                                    <td>
+                                        {{ef.ISMMIMPPL_PlannerName}}
+                                    </td>
+                                    <td>
+                                        {{ef.EmployeeName}}
+                                    </td>
+                                    <td>
+                                        {{ef.HRMD_DepartmentName}}
+                                    </td>
+
+                                    <td style="font-size: 18px;">
+                                        <b> {{ef.Time}}</b> Hr
+                                    </td>
+                                    <td>
+                                        <a ng-click="Viewindividualteffort(ef)">
+                                            <i class="fa fa-eye text-black" title="View Tasks"></i>
+                                        </a>
+                                    </td>
+
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div ng-show="indemptaskdetails" id="indemptaskdetails" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class=" col-sm-0 pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:auto">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="sort('sno')">SL.No.</a>
+                                        </th>
+                                        <!--<th width="50">SELECT</th>-->
+                                        <!--<th class="hdTH">
+                                            <label>
+                                                <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>-->
+                                        <th width="30%"><a href="" ng-click="sort('ISMTCR_TaskNo')">Task Details</a></th>
+                                        <th width="25%"><a href="" ng-click="sort('ISMMCLT_ClientName')">Client-Module-Category </a> </th>
+
+                                        <th width="9%"><a href="" ng-click="sort('ISMTCR_CreationDate')">Date</a> </th>
+
+                                        <th width="50%"><a href="" ng-click="sort('ISMTCR_Desc')">Description </a> </th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!--<tr dir-paginate="user in filterValue = (cateviewdetails | filter : searchValue)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+                                    <tr ng-repeat="user in taskempdetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <!--<td>
+                                            <label class="control-label">
+                                                <input type="checkbox" name="dfsd_{{$index}}" ng-model="user.usercheck" ng-true-value="1" ng-false-value="0" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-12"></span>
+                                            </label>
+                                            <div class="error-messages" ng-if="interacted(myForm['dfsd_'+$index])"
+                                                 ng-messages="myForm['dfsd_'+$index].$error">
+                                                <div ng-message="required"> Select Checkbox <i class="fa fa-warning"></i> </div>
+                                            </div>
+                                        </td>-->
+                                        <!--<td class="text-center  hdTD">
+                                            <label>
+                                                <input type="checkbox" data-ng-model="user.usercheck" ng-change="optionToggled(user)">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>-->
+                                        <td class="text-left">
+                                            <span>
+                                                <label class="control-label col-sm-12 text-left" style="padding-left:0 !important">
+                                                    <span class="col-sm-12 text-left">
+
+                                                        <b> {{user.ISMTCR_TaskNo}}</b><br />
+                                                        {{user.ISMTCR_Title}} <br />
+                                                        <label class="control-label"><b>l-{{user.ISMTCR_BugOREnhancementFlg}}</b></label>
+                                                        <span ng-if="user.HRMP_Name!=null && user.HRMP_Name!=''"><label style="color:red;"><b>:-{{user.HRMP_Name}}</b></label></span>
+
+                                                        <span ng-if="user.ISMTCR_Status=='Open' || user.ISMTCR_Status=='ReOpen'">
+                                                            - <span style="font-weight:500 !important;font-size: larger;color: red;">{{user.ISMTCR_Status}}</span>
+                                                        </span>
+                                                        <span ng-if="user.ISMTCR_Status!='Open' && user.ISMTCR_Status!='ReOpen'">
+                                                            - <span style="font-weight:500 !important;font-size: larger;color: blue;">{{user.ISMTCR_Status}}</span>
+                                                        </span><br />
+                                                        <span>
+                                                            <span style="font-weight:bold !important;">Dept : {{user.HRMD_DepartmentName}}</span>
+                                                        </span>
+
+                                                        <span>
+                                                            <br><label style="color:rgb(216 115 90)"><b class="ng-binding">Yearly Planner :{{user.ISMMIMPPL_PlannerName}}</b></label>
+                                                        </span>
+                                                    </span>
+                                                </label>
+                                            </span>
+
+                                        </td>
+                                        <td class="text-left">
+                                            <span>
+                                                Client: {{user.ISMMCLT_ClientName}}
+                                            </span><br />
+                                            <span>
+                                                Module:   {{user.IVRMM_ModuleName}}
+                                            </span><br />
+
+                                            <span>
+                                                Category: <span style="font-weight: 500 !important;font-size: larger;color: blue;">{{user.ISMMTCAT_TaskCategoryName}}</span>
+
+                                            </span>
+                                        </td>
+
+
+                                        <td class="text-left">{{user.ISMTCR_CreationDate}}</td>
+
+
+                                        <td class="text-left">{{user.ISMTCR_Desc}}</td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!--dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

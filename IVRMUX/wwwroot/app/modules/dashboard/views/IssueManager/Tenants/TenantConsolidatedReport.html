@@ -1,0 +1,355 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<style>
+    .multiselect {
+        width: 92%;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Tenant Consolidated Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Institution:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="mI_Id" name="msint" required ng-change="institutionchange();">
+                                        <option ng-repeat="val in institutionlist" value="{{val.mI_Id}}" ng-selected="val.mI_Id==mI_Id">
+                                            {{val.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.msint)" ng-messages="myForm.msint.$error">
+                                        <div ng-message="required">Select Institution</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <div class="radio text-center well teststyle" ng-init="allindividual='all'">
+                                    <label>
+                                        <input name="allindividual" type="radio" value="all" data-ng-model="allindividual" required>
+                                        <span class="lbl padding-8">All</span>
+                                    </label>
+                                    <label>
+                                        <input name="allindividual" type="radio" value="individual" data-ng-model="allindividual" required>
+                                        <span class="lbl padding-8">Individual</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.allindividual)" ng-messages="myForm.allindividual.$error">
+                                    <div ng-message="required">Select any one of the radio button</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                        <div class="form-group col-sm-3" style="margin:20px;">
+                            <label for="sel2" class="control-label col-sm-10">Building Name : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-10">
+                                <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="usercheckC" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+
+                                <label ng-repeat="option in building | filter:searchchkbx1" value="{{room.hrmB_Id}}">
+                                    <input type="checkbox" data-ng-model="option.selected" ng-click="togchkbxC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired()" name="building" />
+                                    <span class="lbl padding-8">{{option.hrmB_BuildingName}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.building)" ng-messages="myForm.building.$error">
+                                <div ng-message="required">Please Select Any One Building Name</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group  col-sm-3" style="margin:20px;">
+                            <label for="sel2" class="control-label col-sm-10">Floor Name : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-10">
+                                <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="usercheckC1" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC1()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+
+                                <label ng-repeat="option in getfloordetails | filter:searchchkbx1" value="{{option.hrmF_Id}}">
+                                    <input type="checkbox" data-ng-model="option.selected1" ng-click="togchkbxC1()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired1()" name="floor" />
+                                    <span class="lbl padding-8">{{option.hrmF_FloorName}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.floor)" ng-messages="myForm.floor.$error">
+                                <div ng-message="required">Please Select Any One Floor Name</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group  col-sm-3" style="margin:20px;">
+                            <label for="sel2" class="control-label col-sm-10">Flat Name : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-10">
+                                <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="usercheckC2" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC2(usercheckC2)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+
+                                <label ng-repeat="room1 in rooms | filter:searchchkbx1" value="{{room.hrmR_Id}}">
+                                    <input type="checkbox" data-ng-model="room1.selected2" ng-click="TenantDetails()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired2() && selected2 == true" name="flat" />
+                                    <span class="lbl padding-8">{{room1.hrmR_RoomName}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.flat)" ng-messages="myForm.flat.$error">
+                                <div ng-message="required">Please Select Any One Room Name</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Tenant Name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel16" name="tenant" ng-model="$parent.tenantagR_Id" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                               title="Select emp" ng-required="radiomodal=='individual'" ng-disabled="allindividual=='all'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or Search Tenant">
+                                            {{$select.selected.tenantagR_TenantName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in tenantdetails | filter: $select.search " value="{{option.tenantagR_Id}}" ng-selected="{{option.Selected == true}}" ng-required="allindividual == 'individual'">
+                                            <div ng-bind-html="(option.tenantagR_TenantName) | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.tenant)" ng-messages="myForm.tenant.$error">
+                                        <div ng-message="required">Select Tenant</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="radio text-center well teststyle" ng-init="activevacant='active'">
+                                    <label>
+                                        <input name="optradio3" type="radio" value="active" data-ng-model="activevacant" required>
+                                        <span class="lbl padding-8">Active</span>
+                                    </label>
+                                    <label>
+                                        <input name="optradio3" type="radio" value="vacant" data-ng-model="activevacant" required>
+                                        <span class="lbl padding-8">Vacant</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.optradio3)" ng-messages="myForm.optradio3.$error">
+                                    <div ng-message="required">Select any one of the radio button</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-sm-12" hidden>
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="start_Date" ng-disabled="plannerflg" name="startdate" id="date1" onkeydown="return false" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                    <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="end_Date" name="endate" ng-disabled="plannerflg" md-min-date="start_Date" onkeypress="return false" md-placeholder="Enter Date" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                    <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+                <md-button ng-show="getloaddata.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printDeviation')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+                <md-button ng-if="getloaddata.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+
+
+
+            </div>
+        </div>
+    </form>
+
+
+    <div class="box box-primary" ng-show="getloaddata.length>0" id="get_printdetail">
+        <div class="box-header with-border">
+            <h3 class="box-title">Tenant Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-sm-12" id="printDeviation" style="overflow:auto;padding:0px;">
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Tenant Name</th>
+                            <th>Rent Total Payable</th>
+                            <th>Rent Total Paid</th>
+                            <th>Water Bill Total Payable </th>
+                            <th>Water Bill Total Paid</th>
+                            <th>Electricity Bill Total Payable</th>
+                            <th>Electricity Bill Total Paid</th>
+                            <th>Fine Total</th>
+                            <th>Fine Paid</th>
+                            <th>Total Other Charges</th>
+                            <th>Total Other Paid</th>
+                            <th>Total Payable</th>
+                            <th>Total Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr ng-repeat="user2 in getloaddata">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td hidden="hidden">{{user2.TENANTAGR_Id}}</td>
+                            <td class="text-left">{{user2.TENANTAGR_TenantName}}</td>
+                            <td class="text-left"><span ng-click="rentmonthlypayment(user2)">{{user2.rent_total_payable}}</span></td>
+                            <td class="text-left"><span ng-click="other()">{{user2.rent_total_paid}}</span></td>
+                            <td class="text-left"><span ng-click="watermonthlypayment(user2)">{{user2.water_total_payable}}</span></td>
+                            <td class="text-left"><span ng-click="other()">{{user2.water_total_paid}}</span></td>
+                            <td class="text-left"><span ng-click="electricitymonthlypayment(user2)">{{user2.electricity_total_payable}}</span></td>
+                            <td class="text-left"><span ng-click="other()">{{user2.electricity_total_paid}}</span></td>
+                            <td class="text-left">{{user2.fine_total_payable}}</td>
+                            <td class="text-left">{{user2.fine_total_paid}}</td>
+                            <td class="text-left">{{user2.other_total_payable}}</td>
+                            <td class="text-left">{{user2.other_total_paid}}</td>
+                            <td class="text-left">{{user2.total_payable}}</td>
+                            <td class="text-left">{{user2.total_paid}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+        </dir-pagination-controls>
+    </div>
+
+
+    <!--</div>-->
+
+
+
+
+</section>
+
+
+<div id="GetTenantMontlyData" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Tenant Monthly {{paymenttype}} Details</h4>
+            </div>            
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-responsive table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Month And Year</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="dd in tenant_array">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">{{dd.TOMEET}}</td>
+                                        <td class="text-left">{{dd.ASSIGNEDBY}}</td>
+                                        <td class="text-left">{{dd.VMVTMT_DateTime}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                close
+                            </md-button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

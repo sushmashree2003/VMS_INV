@@ -1,0 +1,168 @@
+﻿<style>
+    .multiselect {
+        width: 24.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 0;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<section class="content">
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Product Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-offset-2" ng-hide="staffcheck=='Staff'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Institutions:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel112" ng-model="MI_Id" ng-change="onclickchange()" name="yr" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="mi1 in get_mi_list" value="{{mi1.MI_Id}}" ng-selected="{{mi1.Selected==true}}"> {{mi1.MI_Name}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yr)" ng-messages="myForm.yr.$error">
+                                        <div ng-message="required">Select Institutions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-sm-offset-2">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Product Name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="invmP_Id" name="grps" ng-change="getdata()" ng-required="MI_Id>0">
+                                        <option value="">--Select Product-- </option>
+                                        <option ng-repeat="option in get_product" value="{{option.invmP_Id}}" ng-selected="{{option.selected == true}}">
+                                            {{option.invmP_ProductName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.grps)" ng-messages="myForm.grps.$error">
+                                        <div ng-message="required">Please Select Product</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="getreport()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-list-alt" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                    <md-button type="button" ng-show="templist.length>0" ng-click="printData()" class="md-raised md-primary">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        print
+                    </md-button>
+                </div>
+            </div>
+        </form>
+
+        <div class="box box-primary" ng-show="templist.length > 0">
+            <!--ng-show="EmployeeDis"-->
+            <div class="box-header with-border">
+                <h3 class="box-title">Product Report Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="text-center">Product Report Details</h4>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('sno')">SL.No.</a></th>
+                            <th>Product Name</th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item Name</a></th>
+                            <th><a href="" ng-click="sortBy('INVAAT_AssetId')">Item Qty</a> </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (templist | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{$index+1}}</td>
+                            <td>{{user.INVMP_ProductName}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVMPI_ItemQty}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div ng-hide="true">
+        <div id="printtag">
+            <div class="text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="checkin" width="950" style="font-size:20px;">
+            </div>
+            <h4 class="text-center" style="font-size:20px;">Product Report Details</h4>
+            <table class="table table-hover table-responsive table-bordered text-center" width="900" style="font-size:20px;">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No.
+                        </th>
+                        <th>Product Name</th>
+                        <th>Item Name</th>
+                        <th>Item Qty </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr ng-repeat="user in templist">
+                        <td>{{$index+1}}</td>
+                        <td>{{user.INVMP_ProductName}}</td>
+                        <td>{{user.INVMI_ItemName}}</td>
+                        <td>{{user.INVMPI_ItemQty}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

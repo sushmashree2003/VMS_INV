@@ -1,0 +1,317 @@
+﻿<style>
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+</style>
+<section class="content">
+    <div class="box box-primary" data-ng-init="onloadGetData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">HR Additional Lop Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <form class="form-horizontal" role="form" name="myForm" data-ng-submit="saveData(user)" novalidate>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 font-weight-bold"><b>Lop Type:</b><span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <select name="LopType" class="form-control active" data-ng-model="loptype" ng-change="resetInteracted(myForm.LopType)" id="LopType" required>
+                                        <option value="" disabled selected>Select Lop Type</option>
+                                        <option value="ConCall Lop">ConCall Lop</option>
+                                        <option value="Food Lop">Food Lop</option>                                 
+                                        <option value="CA-Demo Not Coducted">CA-Demo Not Coducted</option>
+                                        <option value="TM-Demo Not Scheduled">TM-Demo Not Scheduled</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.LopType)" ng-messages="myForm.LopType.$error">
+                                        <div ng-message="required">Lop type is required</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 font-weight-bold"><b>Employee :</b><strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <div>
+                                        <ui-select id="sel2" name="employee" ng-model="$parent.hrmE_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Candidate" required>
+                                            <ui-select-match placeholder="Select OR Search Employee in the list...">
+                                                {{$select.selected.hrmE_EmployeeFirstName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="option in employeedropdown | propsFilter: {hrmE_EmployeeFirstName: $select.search}"
+                                                               ng-disabled="editflag==true" value="{{option.hrmE_Id}}" ng-selected="{{option.select == true}}">
+                                                <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                        <div ng-message="required">Select Employee Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 font-weight-bold"><b>Remarks:</b><span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" name="remarks" type="text" placeholder="Remarks.... " ng-model="remarks" rows="6"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+
+                            <div class="form-group" style="padding-top: 5%;">
+                                <label class="control-label col-sm-3 font-weight-bold"><b>Date:</b><span style="color:red;">*</span></label>
+                                <div class="col-sm-3">
+                                    <md-datepicker ng-model="start_Date" onkeypress="return false" key name="startdate" id="date1" md-placeholder="Enter date" md-min-date="plMaxdate"></md-datepicker>
+                                </div>
+                                <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                    <div ng-message="required">Select Start Date</div>
+                                    <div ng-message="valid">The entered value is not Valid!</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group margin-top-15">
+                                <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No.</th>
+                                            <th>Upload</th>
+                                            <th>View</th>
+                                            <!--<th>Remark</th>
+                                            <th>Action</th>-->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center">
+                                                {{$index+1}}
+                                            </td>
+                                            <td>
+                                                <label class="custom-file-input file-blue1" style="width:60%;margin:auto;">
+                                                    <input id="documentid" type="file" name="doc" data-ng-model="hrelT_SupportingDocument" onchange="angular.element(this).scope().selectFileforUploadzdBOSBOE1(this)">
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <span ng-if="filepath !=null && filepath !=''">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-ng-click="showmodaldetailsBOSBOE(filepath)"> view</a>
+                                                    <!--<a ng-if="extention=='pdf'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#showpdf" data-ng-click="showmodaldetailsBOSBOE()"> view</a>-->
+                                                </span>
+                                            </td>
+                                            <!--<td>
+                                                <textarea maxlength="250" name="remark" ng-model="materal.VTADAAF_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+                                            </td>-->
+                                            <!--<td>
+                                                <span>
+                                                    <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                    <a href="" ng-click="removegrnrows($index,objg)">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>-->
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div><p style="color:#2e580e;margin-top: -4%"><b style="color:red">Accept File:</b> jpg, jpeg, png, doc, ppt, excel, mp3, mp4, wmv, pdf </p></div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+                        <div class="col-sm-12" style="margin-top:10px;">
+                            <div class="form-group">
+                                <div class="text-center">                                 
+                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                        Save
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box box-primary" ng-show="griddata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">HR Additional Lop Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{griddata.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No.
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('HRMEMNO_RequestedBy')">Employee Name</a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('end_Date')">Department</a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('HRMEVER_RequestedCompanyName')">Type</a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('hrmE_EmployeeFirstName')">Date</a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('hrmE_EmployeeFirstName')">Reason</a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('hrmE_EmployeeFirstName')">Document</a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('HRALD_Activeflag')">Status</a>
+
+                        </th>
+                        <!--<th>
+        <a href="" ng-click="sort('hrmE_EmployeeFirstName')">Updated by</a>
+
+    </th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="itm in griddata | filter : search">
+                        <td width="30px">{{ $index+1 }}</td>
+                        <td>{{itm.HRME_EmployeeFirstName}}:{{itm.HRME_EmployeeCode}}</td>
+                        <td>{{itm.HRMD_DepartmentName}}</td>
+                        <td>{{itm.HRALD_Type}}</td>
+                        <td>{{itm.HRALD_Date|date:'dd/MM/yyyy'}}</td>
+                        <td>{{itm.HRALD_Remarks}}</td>
+                        <td>
+                            <span ng-if="itm.HRALD_File !=null && itm.HRALD_File !=''">
+                                <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-ng-click="showmodaldetailsBOSBOE(itm.HRALD_File)"> view</a>
+                                <!--<a ng-if="extention=='pdf'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#showpdf" data-ng-click="showmodaldetailsBOSBOE()"> view</a>-->
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span ng-if="itm.HRALD_Activeflag === true">
+                                <a href="" ng-click="deactive(itm)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                            <span ng-if="itm.HRALD_Activeflag === false">
+                                <a href="" ng-click="deactive(itm)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+
+
+
+<!--==================== Image Preview Model ===========================-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{filenames}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="img-zoom-in-out">
+    <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img id="preview" class="img-responsive" />
+                </div>
+                <div class="modal-footer">
+                    <div class="text-center">
+                        <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                        <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                    </div>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

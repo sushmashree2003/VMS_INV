@@ -1,0 +1,420 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 0;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<section class="content" ng-init="Loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Block Employee </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+
+            </div>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3 text-center">Employee's :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <label class="control-label" style="width: 100%;">
+                                    <span ng-show="get_Emplist.length>0">
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search Employee here...">
+                                    </span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in get_Emplist | filter : searchValue">
+                                        <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="user.disableEmp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b> {{user.employeeName}} </b> : <b>({{user.HRMD_DepartmentName}})</b> - {{user.MI_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-3">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <md-datepicker ng-model="ismbE_BlockDate" ng-disabled="plannerflg" name="startdate" id="date1" md-placeholder="Enter date" md-max-date="end_Date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select Start Date</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <label class="Block">
+                                    <input type="checkbox" name="Block" ng-model="BlockedDR">
+                                    <span class="lbl padding-8"></span>  Block Auto Planner/ Block DR
+                                </label>
+                            </div>
+
+                        </div>
+                        <!--<div class="form-group">
+        <label class="control-label col-sm-4">Block To:<span style="color:red;">*</span></label>
+        <div class="col-sm-8">
+            <md-datepicker ng-model="end_Date" name="endate" ng-disabled="plannerflg" md-min-date="start_Date" md-placeholder="Enter Date" required></md-datepicker>
+        </div>
+        <div class="error-messages" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+            <div ng-message="required" class="col-sm-8 col-sm-offset-6">Select End Date</div>
+        </div>
+    </div>-->
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="col-sm-8">
+                                <textarea name="reason" id="reservation" class="form-control" placeholder="Enter Reason for blocking" rows="3" data-ng-model="ismbE_Reason" required></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.reason)" ng-messages="myForm.reason.$error">
+                                    <div ng-message="required">Enter Reason</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ismmclT_Id" value="{{ismmclT_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="addnewrow()" id="save-btn">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        Add
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" ng-click="exportToExcel('#table1')" target="_blank" class="md-raised md-primary" ng-if="get_blockedEmplist.length > 0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="tempEmp.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SLNO</th>
+                        <th>Company Name</th>
+                        <th>Department Name </th>
+                        <th>Employee Name </th>
+                        <th>Employee Code </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="bk in tempEmp ">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{bk.MI_Name}}</td>
+                        <td class="text-left">{{bk.HRMD_DepartmentName}}</td>
+                        <td class="text-left">{{bk.employeeName}}</td>
+                        <td class="text-left">{{bk.HRME_EmployeeCode}}</td>
+                        <td class="text-center">
+                            <span class="">
+                                <a href="javascript:void(0)" ng-click="delete(bk,$index);">
+                                    <i class="fa fa-close text-danger"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" ng-click="savedata()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Block
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="box box-primary" ng-show="get_blockedEmplist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Blocked Employee Details</h3>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{get_blockedEmplist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">SL NO</th>
+                            <th class="text-center" width="15%"><a href="" ng-click="sort('MI_Name')">Company Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sort('HRMD_DepartmentName')">Department Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sort('employeeName')">Employee Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sort('HRME_EmployeeCode')">Employee Code</a></th>
+                            <th class="text-center"><a href="" ng-click="sort('ISMBE_BlockFlg')">Blocked</a></th>
+                            <th class="text-center"><a href="" ng-click="sort('ISMBE_Reason')">Block Reason </a></th>
+                            <th class="text-center"><a href="" ng-click="sort('ISEBE_UnblockDate')">Blocked Date</a></th>
+                            <th class="text-center"><a href="" ng-click="sort('ISEBE_UnblockDate')">Unblocked Date</a></th>
+                            <th class="text-center" width="10%"><a href="" ng-click="sort('blockedby')">BlockedBy </a></th>
+                            <th class="text-center"><a href="" ng-click="sort('blockunblock')">Action</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="UserB in filtervalue = (get_blockedEmplist | filter : searchValueU)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPageU"
+                            current-page="currentPageU" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                            <td class="text-left">{{UserB.MI_Name}}</td>
+                            <td class="text-left">{{UserB.HRMD_DepartmentName}}</td>
+                            <td class="text-left">{{UserB.employeeName}}</td>
+                            <td class="text-left">{{UserB.HRME_EmployeeCode}}</td>
+
+                            <td class="text-center">
+                                <i ng-if="UserB.ISMBE_BlockFlg==true" class="fa fa-check text-green" title="Blocked"></i>
+                                <i ng-if="UserB.ISMBE_BlockFlg==false" class="fa fa-times text-red" title="Unblocked"></i>
+                            </td>
+                            <td class="text-left">{{UserB.ISMBE_Reason}}</td>
+                            <td class="text-left">{{UserB.ISMBE_BlockDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-left">
+                                <span ng-if="UserB.ISEBE_UnblockDate==null" class="text-center">--</span>
+                                <span ng-if="UserB.ISEBE_UnblockDate!==null">{{UserB.ISEBE_UnblockDate | date:'dd/MM/yyyy'}}</span>
+                            </td>
+                            <td class="text-left">{{UserB.blockedby}}</td>
+                            <td class="text-center">
+                                <span ng-if="UserB.ISMBE_BlockFlg==true">
+                                    <a href="javascript:void(0)" class="text-primary text-danger" data-placement="bottom" data-toggle="modal" title="Un-block" data-ng-model="Unblock"
+                                       data-target="#myModalUnblock" data-ng-click="viewunblock(UserB)">
+                                        <!--<b> <i class="fa fa-eye" aria-hidden="true">{{UserB.blockunblock}}</i></b>-->
+                                        {{UserB.blockunblock}}
+                                    </a>
+                                </span>
+                                <span ng-if="UserB.ISMBE_BlockFlg==false">
+                                    <a href="javascript:void(0)" class="text-primary text-green" data-placement="bottom" data-toggle="modal" title="View Details" data-ng-model="View"
+                                       data-target="#myModalUnblockDetails" data-ng-click="viewunblock(UserB)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true">{{UserB.blockunblock}}</i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td hidden="hidden">{{UserB.ISMBE_Id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+        <div id="printareaId" ng-show="tadprint">
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                <thead>
+                    <tr>
+                        <th class="text-center">SL NO</th>
+                        <th class="text-center" width="15%"><a href="" ng-click="sort('MI_Name')">Company Name</a></th>
+                        <th class="text-center"><a href="" ng-click="sort('HRMD_DepartmentName')">Department Name</a></th>
+                        <th class="text-center"><a href="" ng-click="sort('employeeName')">Employee Name</a></th>
+                        <th class="text-center"><a href="" ng-click="sort('HRME_EmployeeCode')">Employee Code</a></th>
+                        <!--<th class="text-center"><a href="" ng-click="sort('ISMBE_BlockFlg')">Blocked</a></th>-->
+                        <th class="text-center"><a href="" ng-click="sort('ISMBE_Reason')">Block Reason </a></th>
+                        <th class="text-center"><a href="" ng-click="sort('ISEBE_UnblockDate')">Blocked Date</a></th>
+                        <th class="text-center"><a href="" ng-click="sort('ISEBE_UnblockDate')">Unblocked Date</a></th>
+                        <th class="text-center" width="10%"><a href="" ng-click="sort('blockedby')">BlockedBy </a></th>
+                        <th class="text-center"><a href="" ng-click="sort('blockunblock')">Block Status</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="UserB in get_blockedEmplist">
+                        <td class="text-center">{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                        <td class="text-left">{{UserB.MI_Name}}</td>
+                        <td class="text-left">{{UserB.HRMD_DepartmentName}}</td>
+                        <td class="text-left">{{UserB.employeeName}}</td>
+                        <td class="text-left">{{UserB.HRME_EmployeeCode}}</td>
+
+                        <!--<td class="text-center">
+                            <i ng-if="UserB.ISMBE_BlockFlg==true" class="fa fa-check text-green" title="Blocked"></i>
+                            <i ng-if="UserB.ISMBE_BlockFlg==false" class="fa fa-times text-red" title="Unblocked"></i>
+                        </td>-->
+                        <td class="text-left">{{UserB.ISMBE_Reason}}</td>
+                        <td class="text-left">{{UserB.ISMBE_BlockDate | date:'dd/MM/yyyy'}}</td>
+                        <td class="text-left">
+                            <span ng-if="UserB.ISEBE_UnblockDate==null" class="text-center">--</span>
+                            <span ng-if="UserB.ISEBE_UnblockDate!==null">{{UserB.ISEBE_UnblockDate | date:'dd/MM/yyyy'}}</span>
+                        </td>
+                        <td class="text-left">{{UserB.blockedby}}</td>
+                        <td class="text-center">
+                            <span ng-if="UserB.ISMBE_BlockFlg==true" style="color:red;font-weight:bold">
+                                Blocked
+                            </span>
+                            <span ng-if="UserB.ISMBE_BlockFlg==false" style="color:red;font-weight:bold">
+                                UnBlocked
+                            </span>
+                            <!--<span ng-if="UserB.ISMBE_BlockFlg==false">
+                                <a href="javascript:void(0)" class="text-primary text-green" data-placement="bottom" data-toggle="modal" title="View Details" data-ng-model="View"
+                                   data-target="#myModalUnblockDetails" data-ng-click="viewunblock(UserB)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">{{UserB.blockunblock}}</i>
+                                </a>
+                            </span>-->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- *******************************************Model Unblock************************************************ -->
+    <div id="myModalUnblock" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="z-index:9999;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">	Unblock </h4>
+                    <h4 class="modal-title text-white">	{{emplname}} : {{emplcode}}</h4>
+                </div>
+                <div class="box-body">
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Blocked Date :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{blockeddate | date:'dd/MM/yyyy'}}</b></label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label text-head col-sm-5" style="font-size:17px;">Blocked Reason :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-head text-left" style="font-size:18px;"><b>{{blockedreason}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <b class="control-label text-head col-sm-5 col-sm-offset-3" style="font-size:17px;">Unblock Date</b>
+                                <div class="col-sm-7 col-sm-offset-3">
+                                    <h4>{{isebE_UnblockDate | date:'dd/MM/yyyy'}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+            <div class="modal-footer text-center">
+                <md-button type="button" class="md-raised md-warn" aria-disabled="false" ng-click="unblockEmployee()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>Unblock
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- *******************************************Model Unblock Details************************************************ -->
+    <div id="myModalUnblockDetails" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="z-index:9999;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">	Unblock Details </h4>
+                </div>
+                <div class="box-body">
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Employee Name :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{emplname}}</b></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Blocked Date :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{blockeddate | date:'dd/MM/yyyy'}}</b></label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label text-head col-sm-5" style="font-size:17px;">Blocked Reason :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-head text-left" style="font-size:18px;"><b>{{blockedreason}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Employee Code :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{emplcode}}</b></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-head col-sm-5" style="font-size:17px;">Unblocked Date  :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{unblockeddate | date:'dd/MM/yyyy'}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+
+
+</section>

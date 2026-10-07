@@ -1,0 +1,224 @@
+﻿<style>
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+
+    .well {
+        position: relative;
+        border-radius: 3px;
+        background: #ffffff !important;
+        border-top: 3px solid #d2d6de !important;
+        padding: 5px !important;
+        margin-bottom: 5px !important;
+        width: 66%;
+        -webkit-box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+        box-shadow: 0 0px 5px rgba(0,0,0,.2) !important;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Remainders User Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Remainder Template :<span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="VMS_IVRMTemplate_Name" name="iamount" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="dd in GetMasterTemplateDetails" value="{{dd.vmS_IVRMTemplate_Name}}"
+                                                ng-selected="{{dd.Selected == true}}">
+                                            {{dd.vmS_IVRMTemplate_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.iamount)" ng-messages="myForm.iamount.$error">
+                                        <div ng-message="required">Enter Reminder Days</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Client :<span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="stdnamere" ng-model="$parent.ISMMCLT_Id" ng-change="OnChangeClient(VMS_IVRMTemplate_Name)" theme="bootstrap" ng-keyup="searchfilter($select,user.status);" title="Select Client">
+                                        <ui-select-match ng-trim="false" placeholder="Select or Search Client">{{$select.selected.ismmclT_ClientName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in GetInstitutionDetails | filter: $select.search" value="{{name.ismmclT_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stdnamere)" ng-messages="myForm.stdnamere.$error">
+                                        <div ng-message="required">Select Client</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div ng-if="GetUserDetails.length>0">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">User Name :<span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="stdusername" ng-model="$parent.UserId" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,user.status);" title="Select Student">
+                                        <ui-select-match ng-trim="false" placeholder="Select or Search Client">{{$select.selected.UserName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in GetUserDetails | filter: $select.search" value="{{name.Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.UserName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stdusername)" ng-messages="myForm.stdusername.$error">
+                                        <div ng-message="required">Select User Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group text-center">
+                                <md-button type="button" class="md-raised md-primary" ng-click="AddToCart(UserId)" id="save-btn">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Add To Cart
+                                </md-button>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Content :<strong class="text-red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="content" rows="5" ng-model="ISMS_TemplateContent" required></textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="TempAddUser.length>0">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <td>Sl.No</td>
+                                    <th>UserName</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="dd in TempAddUser">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{dd.UserName}}</td>
+                                    <td class="text-center">
+                                        <span class="text-center text-red">
+                                            <a href="" title="Delete Record" ng-click="DeleteRecord(dd,$index)">
+                                                <i class="fa fa-trash text-red"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row col-sm-12" ng-if="GetMappedUserDetails.length>0">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Mapped User Details</h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-sm-4 pull-right">
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    </div>
+                                </div>
+                                <div class="row col-sm-12">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="hdTH">Remove</th>
+                                                <th>Sl.No.</th>
+                                                <th>User Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr ng-repeat="user in GetMappedUserDetails |filter :searchValue">
+                                                <td class="text-center">
+                                                    <label>
+                                                        <input type="checkbox" ng-model="user.selected" value="{{user.userId}}"
+                                                               ng-change="optionToggled(user,$index)">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="text-center">{{$index+1}}</td>
+                                                <td class="text-left">{{user.userName}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="ismcltprP_Id " value="{{ismcltprP_Id}}" />
+                        <md-button type="button" class="md-raised md-primary" ng-click="savedata(ISMS_TemplateContent,VMS_IVRMTemplate_Name)"
+                                   id="save-btn" ng-disabled="ISMS_TemplateContent==''">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

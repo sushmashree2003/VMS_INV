@@ -1,0 +1,407 @@
+﻿
+<section class="content" data-ng-init="onLoadGetData()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Checklist Approval Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm1">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">Checklist Type :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="sel1" name="PosId" data-ng-model="chklst.ismclT_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="chk in checklisttypeList" value="{{chk.ismclT_Id}}" ng-selected="{{chk.Selected == true}}">
+                                        {{chk.ismclT_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.PosId)" ng-messages="myForm1.PosId.$error">
+                                    <div ng-message="required">Select Checklist Type</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">Floor :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="sel2" name="floorname" data-ng-model="chklst.hrmF_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="floor in floorList" value="{{floor.hrmF_Id}}" ng-selected="{{floor.Selected == true}}">
+                                        {{floor.hrmF_FloorName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.floorname)" ng-messages="myForm1.floorname.$error">
+                                    <div ng-message="required">Select Floor</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">From Date : <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-7" style="text-align:left">
+                                <md-datepicker name="sch_date" ng-model="chklst.myDate_from" md-placeholder="Select date" onkeydown="return false" md-min-date="plMaxdate" md-max-date="newdate" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted1(myForm1.sch_date)" ng-messages="myForm1.sch_date.$error">
+                                    <div ng-message="required">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">To Date : <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-7" style="text-align:left">
+                                <md-datepicker name="tdate" ng-model="chklst.myDate_to" md-placeholder="Select date" onkeydown="return false" md-min-date="chklst.myDate_from" md-max-date="newdate" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted1(myForm1.tdate)" ng-messages="myForm1.tdate.$error">
+                                    <div ng-message="required">Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer text-center">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="Report()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </form>
+        <!--==================== Image Preview Model ===========================-->
+        <div id="myimagePreview" class="modal fade" role="dialog">
+            <div class="modal-dialog" style="width:55%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h3 class="text-white"> Checklist Approval Report  </h3>
+
+                    </div>
+                    <div class="modal-body">
+                        <div class="box">
+                            <div class="box-body">
+                                <img id="preview" class="img-responsive" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--====================PDF view========-->
+        <div id="showpdf" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <form id="qqqq">
+
+                    <div class="modal-content">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+
+
+                        <div id="pdfIdzz">
+
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--<table class="table table-hover table-responsive table-bordered">
+                                  <tr ng-repeat="roles in userrolearray">
+                                      <td>
+                                          <span ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy') && column.role==roles">{{column.quantity}}</span>
+                                          <span ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')!==(columnname|date:'dd/MM/yyyy') && column.role!==roles">&nbsp;&nbsp;</span>
+                                      </td>
+                                  </tr>
+                              </table>-->
+    <div class="box box-primary" ng-show="EmployeeDis">
+        <div class="box-header with-border">
+            <h3 class="box-title">Check list Approval Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header   -->
+        <div class="box-body" style="overflow:scroll" ng-if="userrole != 'ADMIN'">
+            <div id="Table">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr><th colspan="{{columnnum}}">Check List Report from {{chklst.myDate_from | date:'dd-MM-yyyy'}} to {{chklst.myDate_to | date:'dd-MM-yyyy'}}</th></tr>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Check Item Name</th>
+                            <th>Verify/Remark</th>
+                            <th ng-repeat="columnname in columnnames" nowrap>{{ columnname | date:'dd-MMM'}}<br /> {{ columnname | date:'EEEE' | limitTo:3}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in yearlyemprep|orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                            <td>{{$index+1}}</td>
+                            <td>{{user.ismcL_Name}}</td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <tr><td>Verify</td></tr>
+                                    <tr><td>Morning Quantity</td></tr>
+                                    <tr><td>Evening Quantity</td></tr>
+                                    <tr><td>Remark</td></tr>
+                                    <tr>
+                                        <td>
+                                            View File
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td ng-repeat="columnname in columnnames">
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <tr>
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy')">YES</td>
+                                    </tr>
+                                    <tr>
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy')">{{column.MorningQty}}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy')">{{column.EveningQty}}</td>
+
+                                    </tr>
+                                    <tr>
+
+
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy')">{{column.remark}}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy')">
+
+                                            <span ng-show="column.ismclTFilePath!=null && column.ismclTFilePath!=''">
+
+
+                                                <a ng-if="column.ismclTFilePath  !=null && column.ismclTFilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(column.ismclTFilePath)">
+                                                    view
+
+                                                </a>
+
+                                            </span>
+
+                                            <!--<span ng-show="column.ismclTFilePath = null && column.ismclTFilePath =''">
+
+
+                No File
+
+            </span>-->
+
+
+
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center">
+                <md-button type="button" ng-click="printToCart('Baldwin')" class="md-raised md-primary">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    print
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+                <md-button type="submit" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#Table')">
+                    <i class="fa fa-file-excel-o"></i>
+                    Export to Excel
+                </md-button>
+            </div>
+        </div>
+        <div class="box-body" style="overflow:scroll" ng-if="userrole == 'ADMIN'">
+            <div id="Tableadmin">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+
+
+                            </th>
+                            
+                            <th colspan="{{columnnum}}">Check List Report from {{chklst.myDate_from | date:'dd-MM-yyyy'}} to {{chklst.myDate_to | date:'dd-MM-yyyy'}}</th>
+                        
+                        
+                        </tr>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Check Item Name</th>
+                            <th>User Role</th>
+                            <th>Verify/Remark</th>
+                            <th ng-repeat="columnname in columnnames" nowrap>{{ columnname | date:'dd-MMM'}}<br /> {{ columnname | date:'EEEE' | limitTo:3}}</th>
+                            <!--<th ng-repeat="columnname in columnnames" nowrap>{{ columnname | date:'dd-MMM'}}<br /> {{ columnname | date:'EEEE' | limitTo:3}}</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in yearlyemprep|orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                            <td>{{$index+1}}</td>
+                            <td>{{user.ismcL_Name}}</td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <tr ng-repeat="role in userrolearray">
+                                        <td>{{role}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <tr><td>Verify</td></tr>
+                                    <tr><td>Morning Quantity</td></tr>
+                                    <tr><td>Evening Quantity</td></tr>
+                                    <tr><td>Remark</td></tr>
+                                    <tr>
+                                        <td>
+                                            View File
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td ng-repeat="columnname in columnnames">
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <tr ng-repeat="roles in userrolearray">
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy') && column.role==roles">YES</td>
+                                    </tr>
+
+                                    <tr ng-repeat="roles in userrolearray">
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy') && column.role==roles ">{{column.MorningQty}}</td>
+
+                                    </tr>
+                                    <tr ng-repeat="roles in userrolearray">
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy') && column.role==roles ">{{column.EveningQty}}</td>
+
+                                    </tr>
+                                    <tr ng-repeat="roles in userrolearray">
+
+
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy') && column.role==roles">{{column.remark}}</td>
+
+                                    </tr>
+                                    <tr ng-repeat="roles in userrolearray">
+                                        <td ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy')  && column.role==roles">
+
+                                            <span ng-show="column.ismclTFilePath!=null && column.ismclTFilePath!=''">
+
+
+                                                <a ng-if="column.ismclTFilePath  !=null && column.ismclTFilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(column.ismclTFilePath)">
+                                                    view
+
+                                                </a>
+
+                                            </span>
+
+                                            <!--<span ng-show="column.ismclTFilePath = null && column.ismclTFilePath =''">
+
+
+                No File
+
+            </span>-->
+
+
+
+                                        </td>
+
+                                    </tr>
+
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center">
+                <md-button type="button" ng-click="printToCartadmin('Baldwin')" class="md-raised md-primary">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    print
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+                <md-button type="submit" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExceladmin('#Tableadmin')">
+                    <i class="fa fa-file-excel-o"></i>
+                    Export to Excel
+                </md-button>
+            </div>
+        </div>
+        <!--<div class="box-body" style="overflow:scroll" ng-if="userrole == 'ADMIN'">
+        <div id="Tableadmin">
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr><th colspan="{{columnnum}}">Check List Report from {{chklst.myDate_from | date:'dd-MM-yyyy'}} to {{chklst.myDate_to | date:'dd-MM-yyyy'}}</th></tr>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Check Item Name</th>
+                        <th>Approval Levels</th>
+                        <th ng-repeat="columnname in columnnames" nowrap>{{ columnname | date:'dd-MMM'}}<br /> {{ columnname | date:'EEEE' | limitTo:3}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in yearlyemprep|orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                        <td>{{$index+1}}</td>
+                        <td>{{user.ismcL_Name}}</td>
+                        <td>
+                            <table class="table table-hover table-responsive table-bordered">
+                                <tr ng-repeat="role in userrolearray">
+                                    <td>{{role}}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td ng-repeat="columnname in columnnames">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <tr ng-repeat="roles in userrolearray">
+                                    <td>
+                                        <span ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')==(columnname|date:'dd/MM/yyyy') && column.role==roles">YES  / Qty- {{column.quantity}}</span>
+                                        <span ng-repeat="column in user.pdate" ng-if="(column.checkdate|date:'dd/MM/yyyy')!==(columnname|date:'dd/MM/yyyy') && column.role!==roles">&nbsp;&nbsp;</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center">
+            <md-button type="button" ng-click="printToCartadmin('Baldwin')" class="md-raised md-primary">
+                <i class="fa fa-print" aria-hidden="true"></i>
+                print
+            </md-button>
+            <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                Cancel
+            </md-button>
+            <md-button type="submit" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExceladmin('#Tableadmin')">
+                <i class="fa fa-file-excel-o"></i>
+                Export to Excel
+            </md-button>
+        </div>
+    </div>-->
+
+
+
+    </div>
+</section>

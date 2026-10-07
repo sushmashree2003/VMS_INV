@@ -1,0 +1,1369 @@
+﻿<style>
+    .teststyle {
+        width: 98%;
+    }
+
+    .multiselect {
+        width: 24.1em;
+        height: 12em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: -0.3%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        /*min-height: 280px;*/
+        border-radius: 5px;
+    }
+
+    .oldd {
+        background-color: coral;
+    }
+
+    .neww {
+        background-color: white;
+    }
+</style>
+
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Visitor Information</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="md-raised md-primary" ng-click="SearchAppVisitors()" ng-disabled="edit==true" id="save-btn">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        Search Appointment Visitors
+                    </button>
+
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="container">
+                    <div class="row" ng-show="institutionlist.length > 1">
+                        <!-- Form Column -->
+                        <div class="col-sm-6 d-flex align-items-start">
+                            <div class="form-group w-100">
+                                <label class="control-label col-sm-4">Company Name:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="mI_Id" name="msint" required ng-change="loadgrid();" ng-disabled="institute_flag">
+                                        <option ng-repeat="val in institutionlist" value="{{val.mI_Id}}" ng-selected="val.mI_Id==mI_Id">
+                                            {{val.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.msint)" ng-messages="myForm.msint.$error">
+                                        <div ng-message="required">Select Institution</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+                <div class="row">
+                    <div class="col-sm-6 ">
+                        <div class="form-group">
+                            <div class="radio text-center well teststyle" ng-init="optradio2 ='int_dept'">
+                                <label style="text-align:left">Staff Type</label>
+                                <label>
+                                    <input name="optradio2" type="radio" value="int_dept" data-ng-model="radiomodal" ng-change="onChangeradio(radiomodal)" required>
+                                    <span class="lbl padding-8">Internal Dept</span>
+                                </label>
+                                <label>
+                                    <input name="optradio2" type="radio" value="out_dept" data-ng-model="radiomodal" ng-change="onChangeradio(radiomodal)" required>
+                                    <span class="lbl padding-8">External Dept</span>
+                                </label>
+                                <label>
+                                    <input name="optradio2" type="radio" value="tenentvisitors" data-ng-model="radiomodal" ng-change="onChangeradio(radiomodal)" required>
+                                    <span class="lbl padding-8">Tenent Visitors</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.optradio2)" ng-messages="myForm.optradio2.$error">
+                                <div ng-message="required">Select any one of the radio button</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Visitor Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="visname1" ng-model="VMMV_VisitorName" allow-pattern="(\s|[a-zA-Z])" placeholder="Enter Visitor Name." required ng-maxlength="200" id="sel1" ng-paste="$event.preventDefault()">
+                                <div class="error-messages" ng-if="interacted(myForm.visname1)" ng-messages="myForm.visname1.$error">
+                                    <div ng-message="required">Enter Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Email Id:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="mail" ng-model="VMMV_VisitorEmailid" ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" placeholder="Enter Email Id." required id="se13">
+                                <div class="error-messages" ng-if="interacted(myForm.mail)" ng-messages="myForm.mail.$error">
+                                    <div ng-message="required">Enter an Email Id</div>
+                                    <div ng-message="pattern">Please enter valid Email which contains '@' and '.'</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Card No:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" name="card" data-ng-model="VMMV_CardNo" placeholder="Enter Card No">
+                                <!--<input type="text" class="form-control" name="card" ng-model="VMMV_CardNo" placeholder="Enter Card No" required id="sel5" ng-paste="$event.preventDefault()">-->
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="plac" ng-model="VMMV_FromPlace" id="sel7" required placeholder="Enter From Place.">
+                                <div class="error-messages" ng-if="interacted(myForm.plac)" ng-messages="myForm.plac.$error">
+                                    <div ng-message="required">Enter From Place.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Meeting Duration:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <!--<div uib-timepicker name="mitting" id="sel9" ng-model="VMMV_MeetingDuration" hour-step="hstep" minute-step="mstep"  required  ng-paste="$event.preventDefault()"></div>-->
+                                <input class="form-control" type="text" name="mitting" id="sel9" ng-model="VMMV_MeetingDuration" placeholder="Enter your Duration in Munuits" required>
+                                <div class="text-left error-messages" ng-if="interacted(myForm.mitting)" ng-messages="myForm.mitting.$error">
+                                    <div ng-message="required">Enter Meeting Duration</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-top: 29px;">Meeting Time:<span style="color:red;">*</span></label>
+                            <div uib-timepicker name="sch_time1" ng-model="VMMV_EntryDateTime" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" id="sel11" ng-paste="$event.preventDefault()" required></div>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.sch_time1)" ng-messages="myForm.sch_time1.$error">
+                                <div ng-message="required">Select Time</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Persons Accompanying:</label>
+                            <div class="col-sm-8">
+                                <input type="text" id="sel13" class="form-control" name="Perso" ng-model="VMMV_PersonsAccompanying" placeholder="Enter Persons Accompanying">
+                                <!--<div class="error-messages" ng-if="interacted(myForm.Perso)" ng-messages="myForm.Perso.$error">
+                                    <div ng-message="required">Enter Persons Accompanying</div>
+                                </div>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="radiomodal=='tenentvisitors'">
+                            <label class="control-label col-sm-4">Building :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8" ng-if="radiomodal=='tenentvisitors'">
+                                <ui-select id="sel16" name="buildingname" ng-model="obj1.buildingname" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           ng-change="get_roomdetails($parent.obj1)" title="Select emp" ng-required="radiomodal=='tenentvisitors'">
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Building">
+                                        {{$select.selected.hrmB_BuildingName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in buildinglist | filter: $select.search " value="{{option.hrmB_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmB_BuildingName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.buildingname)" ng-messages="myForm.buildingname.$error">
+                                    <div ng-message="required">Select Building</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="radiomodal=='tenentvisitors'">
+                            <label class="control-label col-sm-4">Room :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8" ng-if="radiomodal=='tenentvisitors'">
+                                <ui-select id="sel16" name="roomname" ng-model="obj1.roomname" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           ng-change="get_tenantdetails($parent.obj1)" title="Select emp" ng-required="radiomodal=='tenentvisitors'">
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Room">
+                                        {{$select.selected.hrmR_RoomName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in roomlistdetails | filter: $select.search " value="{{option.hrmR_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmR_RoomName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.roomname)" ng-messages="myForm.roomname.$error">
+                                    <div ng-message="required">Select Room</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"><b>To Meet :</b><span style="color:Red">*</span></label>
+                            <div class="col-sm-8" ng-if="radiomodal=='out_dept'">
+                                <input type="text" class="form-control" name="Perso" ng-model="obj1.VMMV_PersonToMeet" placeholder="Enter Person To Meet"
+                                       ng-disabled="radiomodal=='int_dept'" id="sel16" ng-required="radiomodal=='out_dept'">
+                                <div class="error-messages" ng-if="interacted(myForm.Perso)" ng-messages="myForm.Perso.$error">
+                                    <div ng-message="required">Enter To Meet</div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-8" ng-if="radiomodal=='int_dept'">
+                                <ui-select id="sel16" name="studentname" ng-model="obj1.ToMeetHRMEId" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           ng-change="get_empdetails($parent.emp1)" title="Select emp" ng-required="radiomodal=='int_dept'">
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Employee">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in emplist | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmE_EmployeeFirstName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                    <div ng-message="required">Select To Meet</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8" ng-if="radiomodal=='tenentvisitors'">
+                                <ui-select id="sel16" name="studentname" ng-model="obj1.ToMeetTenenet" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           ng-change="get_empdetails($parent.emp1)" title="Select emp" ng-required="radiomodal=='tenentvisitors'">
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Tenant">
+                                        {{$select.selected.tenantagR_TenantName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in tenantdetails | filter: $select.search " value="{{option.tenantagR_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.tenantagR_TenantName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                    <div ng-message="required">Select To Meet</div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">OTP Flag:</label>
+                            <div class="col-sm-8">
+
+                                <label class="lablehalfday">
+                                    <input type="checkbox" name="adcheckthalfday" ng-model="TriggerOTP" class="ng-pristine ng-untouched ng-valid" aria-checked="false" aria-invalid="false">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">VIP Flag:</label>
+                            <div class="col-sm-8">
+
+                                <label class="lablehalfday">
+                                    <input type="checkbox" name="adcheckthalfday" ng-model="VMMV_VIPFlg" class="ng-pristine ng-untouched ng-valid" aria-checked="false" aria-invalid="false">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-6 ">
+                        <div class="form-group">
+                            <div class="radio text-center well teststyle" ng-init="searchtype='VN'">
+                                <label style="text-align:left">Search Type</label>
+                                <label>
+                                    <input name="optradio3" type="radio" value="VN" data-ng-model="searchtype" ng-change="clearsearch()">
+                                    <span class="lbl padding-8">Visitor Name</span>
+                                </label>
+                                <label>
+                                    <input name="optradio3" type="radio" value="MN" data-ng-model="searchtype" ng-change="clearsearch()">
+                                    <span class="lbl padding-8">Mobile No</span>
+                                </label>
+                                <label>
+                                    <input name="optradio3" type="radio" value="EI" data-ng-model="searchtype" ng-change="clearsearch()">
+                                    <span class="lbl padding-8">Email Id</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Search Visitor Name: </label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="visitorListdddd" ng-model="$parent.vmmV_Id" ng-disabled="edit==true"
+                                           ng-change="visitornameschangeddetails(obj)" theme="bootstrap"
+                                           ng-keyup="searchfilters($select);" title="Select Student">
+                                    <ui-select-match ng-trim="false" placeholder="Select or search visitor in the list...">{{$select.selected.vmmV_VisitorName}}</ui-select-match>
+                                    <ui-select-choices repeat="name in visitorList | filter: $select.search" value="{{name.vmmV_Id}}"
+                                                       ng-selected="{{name.Selected == true}}">
+                                        <div ng-bind-html="(name.vmmV_VisitorName)| highlight: $select.search"></div>
+
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Contact No:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" name="contactno" data-ng-model="vmmV_VisitorContactNo" placeholder="Enter Visitor Contact No." allow-pattern="\d" maxlength="10" minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" required>
+                                <!--<input type="text" class="form-control" name="cnum" ng-model="vmmV_VisitorContactNo" placeholder="Enter Visitor Contact No." ng-paste="$event.preventDefault()" required>-->
+                                <div class="error-messages" ng-if="interacted(myForm.contactno)" ng-messages="myForm.contactno.$error">
+                                    <div ng-message="required">Enter Contact No</div>
+                                    <div ng-message="pattern">Enter Valid Mobile Number</div>
+                                    <div ng-message="maxlength">Enter Valid Mobile Number</div>
+                                    <div ng-message="minlength">Enter Valid Mobile Number</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Identity Type:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="VMMV_IdentityCardType" name="idoption" required id="sel4">
+                                    <option value="">--Select--</option>
+                                    <option value="PAN Card">PAN Card</option>
+                                    <option value="Adhar Card">Adhar Card</option>
+                                    <option value="Voter Card">Voter Card</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.idoption)" ng-messages="myForm.idoption.$error">
+                                    <div ng-message="required">Select Identity option</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Visit Type:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="visittyp" ng-model="VMMV_VisitTypeFlg" id="sel6" required>
+                                    <option value="">--Select--</option>
+                                    <option value="Personal">Personal </option>
+                                    <option value="Official">Official</option>
+                                </select>
+                                <div class="text-left error-messages" ng-if="interacted(Form.visittyp)" ng-messages="myForm.visittyp.$error">
+                                    <div ng-message="required">Enter Visit Type</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Meeting Location:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="loca" id="sel8" ng-model="VMMV_MeetingLocation" placeholder="Enter Meeting Location.">
+                                <div class="error-messages" ng-if="interacted(myForm.loca)" ng-messages="myForm.loca.$error">
+                                    <div ng-message="required">Enter Location</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <!--md-min-date="minDate"-->
+                            <label class="control-label col-sm-4" style="padding-top: 9px;">Meeting Date : <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="entdate" id="sel10" ng-model="VMMV_MeetingDateTime" onkeydown="return false" md-max-date="maxDate"
+                                               md-min-date="plMaxdate" md-placeholder="Select date" ng-paste="$event.preventDefault()" required></md-datepicker>
+                                <div class="error-messages col-sm-offset-1" ng-if="interacted(myForm.entdate)" ng-messages="myForm.entdate.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Purpose:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" id="sel12" class="form-control" name="Purpos" ng-model="VMMV_MeetingPurpose"
+                                       placeholder="Enter Meeting Purpose." required>
+                                <div class="error-messages" ng-if="interacted(myForm.Purpos)" ng-messages="myForm.Purpos.$error">
+                                    <div ng-message="required">Enter Purpose</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Address:</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="sel14" name="address" ng-model="VMMV_FromAddress" placeholder="Enter Full Address" />
+                                <div class="error-messages" ng-if="interacted(myForm.address)" ng-messages="myForm.address.$error">
+                                    <div ng-message="required">Enter Full Address</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Remarks:</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="sel15" name="remarks" ng-model="VMMV_Remarks" placeholder="Enter Remarks." maxlength="250" />
+                                <div class="error-messages" ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                    <div ng-message="required">Enter Remarks</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Authorisation By :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8" ng-if="radiomodal=='out_dept' || radiomodal=='tenentvisitors'">
+                                <input type="text" class="form-control" name="Perso" id="sel17" ng-model="obj1.VMMV_AuthorisationBy" placeholder="Enter Authorisation Person"
+                                       ng-disabled="radiomodal=='int_dept'" ng-required="radiomodal=='out_dept' || radiomodal=='tenentvisitors'">
+                                <div class="error-messages" ng-if="interacted(myForm.Perso)" ng-messages="myForm.Perso.$error">
+                                    <div ng-message="required">Enter Authorisation By </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-8" ng-hide="radiomodal=='out_dept' || radiomodal=='tenentvisitors'" ng-if="radiomodal!='tenentvisitors'">
+                                <ui-select id="sel16" name="studentnamed1" ng-model="obj1.ToAuthHRMEId" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           ng-change="get_empdetails($parent.emp12)" title="Select emp" ng-required="radiomodal=='int_dept'">
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Employee">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in emplistautjorizedby | filter: $select.search " value="{{option.hrmE_Id}}"
+                                                       ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmE_EmployeeFirstName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.studentnamed1)" ng-messages="myForm.studentnamed1.$error">
+                                    <div ng-message="required">Select Authorisation By</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"> ADD MULTIPLE VISITOR </h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="row" ng-repeat="vi in morevisitor">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Visitor Name:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control" name="visname" ng-model="vi.vmmvvI_VisitorName"
+                                                           allow-pattern="(\s|[a-zA-Z])" placeholder="Enter Visitor Name." ng-maxlength="200">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Contact No:</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="mb2{{$index}}" id="catgr1y" type="text{{$index}}"
+                                                           ng-model="vi.vmmvvI_VisitorContactNo" placeholder="Enter Phone No" maxlength="10" minlength="10"
+                                                           allow-pattern="\d" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" ng-paste="$event.preventDefault()">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Email:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="email" class="form-control" name="emal{{$index}}" ng-model="vi.vmmvvI_VisitorEmailId"
+                                                           pattern="[^ @]*@[^ @]*" placeholder="Enter your email">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Card No:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control" name="cardnum{{$index}}" ng-model="vi.vmmvvI_VisitorCardNo" placeholder="Enter your Cars Number" ng-paste="$event.preventDefault()">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4"> Address:</label>
+                                                <div class="col-sm-8">
+                                                    <textarea class="form-control" ng-model="vi.vmmvvI_VisitorAddress" placeholder="Full Address"
+                                                              name="adsss{{$index}}" rows="5" style="resize:none"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4"> Remarks :</label>
+                                                <div class="col-sm-8">
+                                                    <textarea class="form-control" ng-model="vi.vmmvvI_Remarks" placeholder="Remarks"
+                                                              name="adsssdd{{$index}}" rows="5" style="resize:none"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            &nbsp;
+                                        </div>
+                                        <div class="col-sm-4" style="margin-bottom: 10px; text-align:right">
+                                            <span class="" ng-hide="morevisitor.length > 9">
+                                                <button class="btn btn-primary" style="border-radius: 20px;" ng-show="$last" ng-click="addvisitor()">
+                                                    Add  <i class="fa fa-plus"></i>
+                                                </button>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="morevisitor.length ==1">
+                                                <button class="btn btn-warning" style="border-radius: 20px;" ng-click="removeaddvisitor($index)">
+                                                    Remove  <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+
+                <div class="text-center" ng-if="TriggerOTP==true">
+                    <input type="hidden" ng-model="VMMV_Id" value="{{vmmV_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getotp()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Send OTP
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+
+                <div class="text-center" ng-if="TriggerOTP==false">
+                    <input type="hidden" ng-model="VMMV_Id" value="{{vmmV_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData(obj1)" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="vis_list.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Visitors Pass</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="border" id="printSectionId">
+            <br />
+            <center>
+                <table class="table" style="height: 300px;width: 450px;">
+                    <thead style="background-color:white;">
+                        <tr>
+                            <th colspan="3"> <img style="height: 100px;width: 100%;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                        </tr>
+                        <tr>
+                            <th colspan="3" style="color:black;text-align: center;">Visitors Pass</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="vis in vis_list">
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"><a href="">Visitor ID</a></td>
+                            <td colspan="2">{{vis.vmmV_Id}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"><a href="">Name</a></td>
+                            <td colspan="2">{{vis.vmmV_VisitorName}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"> <a href="">From</a></td>
+                            <td colspan="2">{{vis.vmmV_FromPlace}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"><a href="">Date & Time</a></td>
+                            <td colspan="2">{{vis.vmmV_MeetingDateTime |date:'dd-MM-yyyy'}}&nbsp;&nbsp;{{vis.vmmV_EntryDateTime}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"><a href="">To Meet</a></td>
+                            <td colspan="2">{{vis.empname}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"><a href="">Purpose</a></td>
+                            <td colspan="2">{{vis.vmmV_MeetingPurpose}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"><a href="">Address</a></td>
+                            <td colspan="2">{{vis.vmmV_FromAddress}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px"><a href="">Location</a></td>
+                            <td colspan="2">{{vis.vmmV_MeetingLocation}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px">Signature</td>
+                            <td></td>
+                            <td>sign.Off Sup</td>
+                        </tr>
+                    </tfoot>
+                    <tfoot>
+                        <tr>
+                            <td style="text-align:left;padding-left:25px">QR Code</td>
+                            <td></td>
+                            <td>
+                                <div class="text-left" style="width: 100px; height: 100px; display: flex; justify-content: flex-end; align-items: center;">
+                                    <img src="{{image}}" class="img-thumbnail img-responsive" style="max-width: 100%; max-height: 100%;margin-left:100%" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+
+                </table>
+            </center>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="box box-primary" ng-show="gridoptions.length > 0 && radiomodal=='int_dept'">
+        <div class="box-header with-border">
+            <h3 class="box-title">Visitors Record</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridoptions.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue.vmmV_MeetingDateTime" type="text" placeholder="Search MeetingDateTime" />
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue.vmmV_VisitorName" type="text" placeholder="Search VisitorName...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.NO.</th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorName')">Visitor Name </a></th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorContactNo')">Contact No.</a></th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorEmailid')">Email Id</a></th>
+                        <th><a href="" ng-click="sort('empname')">To Meet</a></th>
+                        <th width="8%"><a href="" ng-click="sort('vmmV_MeetingDateTime')">Date</a></th>
+                        <th><a href="" ng-click="sort('vmmV_EntryDateTime')">Time</a></th>
+                        <th><a href="" ng-click="sort('vmmV_MeetingPurpose')">Purpose</a></th>
+                        <th><a href="" ng-click="sort('VMMV_VIPFlg')">VIP Flg</a></th>
+                        <th><a href="" ng-click="sort('vmmV_MeetingPurpose')">Update Status</a></th>
+                        <th><a href="" ng-click="sort('vmmV_MeetingPurpose')">Assign Details</a></th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="obj in filterValue1 = (gridoptions | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorName}}</td>
+                        <td class="text-center">{{obj.vmmV_VisitorContactNo}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorEmailid}}</td>
+                        <td class="text-left">{{obj.empname}}</td>
+                        <td class="text-center">{{obj.vmmV_MeetingDateTime | date:"yyyy-MM-dd"}}</td>
+                        <td class="text-center">{{obj.vmmV_EntryDateTime}}</td>
+                        <td class="text-left">{{obj.vmmV_MeetingPurpose}}</td>
+                        <td class="text-center">
+                            <a href="" ng-if="obj.vmmV_VIPFlg ==1" class="text-green">
+                                <i class="fa fa-check text-green" title="Meet"></i>
+                            </a>
+                            <a href="" ng-if="obj.vmmV_VIPFlg ==0" class="text-red">
+                                <i class="fa fa-times text-red" title="Not Meet"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="GetVisitorDetails(obj)" class="text-primary" data-placement="bottom"
+                               title="Update Status" data-target="#mymodalviewdetailsfirsttab" data-toggle="modal">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="GetVisitorAssginDetails(obj)" class="text-primary" data-placement="bottom"
+                               title="View Assign Details" data-target="#GetVisitorAssignDetails" data-toggle="modal">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <span ng-if="obj.vmmV_CkeckedInOutStatus!='Checked Out'">
+                                <a href="javascript:void(0)" ng-click="editdata(obj)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            </span>
+
+                            <label ng-if="obj.vmmV_CkeckedInOutStatus=='Checked Out'" style="color: green; font-weight:bold">Checked Out</label>
+                            <a ng-if="obj.count_subvisitors>0" href="javascript:void(0)" ng-click="GetVisitorDetail(obj)" class="text-primary" data-placement="bottom"
+                               title="View Multi Visitor Details" data-target="#GetAllVisitorDetails" data-toggle="modal">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="gridoptions.length > 0 && radiomodal=='out_dept'">
+        <div class="box-header with-border">
+            <h3 class="box-title">Visitors Record</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridoptions.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue.vmmV_MeetingDateTime" type="text" placeholder="Search MeetingDateTime" />
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue.vmmV_VisitorName" type="text" placeholder="Search VisitorName...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.NO.</th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorName')">Visitor Name </a></th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorContactNo')">Contact No.</a></th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorEmailid')">Email Id</a></th>
+                        <th><a href="" ng-click="sort('empname')">To Meet</a></th>
+                        <th><a href="" ng-click="sort('vmmV_MeetingDateTime')">Date</a></th>
+                        <th><a href="" ng-click="sort('vmmV_EntryDateTime')">Time</a></th>
+                        <th><a href="" ng-click="sort('vmmV_MeetingPurpose')">Purpose</a></th>
+                        <th>Update Status</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="obj in filterValue1 = (gridoptions | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorName}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorContactNo}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorEmailid}}</td>
+                        <td class="text-left">{{obj.empname}}</td>
+                        <td class="text-center">{{obj.vmmV_MeetingDateTime |date:"yyyy-MM-dd"}}</td>
+                        <td class="text-center">{{obj.vmmV_EntryDateTime}}</td>
+                        <td class="text-left">{{obj.vmmV_MeetingPurpose}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="GetVisitorDetails(obj)" class="text-primary" data-placement="bottom"
+                               title="Update Status" data-target="#mymodalviewdetailsfirsttab" data-toggle="modal">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="editdata(obj)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+
+    <div class="box box-primary" ng-if="gridoptions.length > 0 && radiomodal=='tenentvisitors'">
+        <div class="box-header with-border">
+            <h3 class="box-title">Visitors Record</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridoptions.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue.vmmV_MeetingDateTime" type="text" placeholder="Search MeetingDate" />
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue.vmmV_VisitorName" type="text" placeholder="Search VisitorName">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.NO.</th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorName')">Visitor Name </a></th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorContactNo')">Contact No.</a></th>
+                        <th><a href="" ng-click="sort('vmmV_VisitorEmailid')">Email Id</a></th>
+                        <th><a href="" ng-click="sort('empname')">To Meet</a></th>
+                        <th><a href="" ng-click="sort('vmmV_MeetingDateTime')">Date</a></th>
+                        <th><a href="" ng-click="sort('vmmV_EntryDateTime')">Time</a></th>
+                        <th><a href="" ng-click="sort('vmmV_MeetingPurpose')">Purpose</a></th>
+                        <th>Update Status</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="obj in filterValue1 = (gridoptions | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorName}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorContactNo}}</td>
+                        <td class="text-left">{{obj.vmmV_VisitorEmailid}}</td>
+                        <td class="text-left">{{obj.empname}}</td>
+                        <td class="text-center">{{obj.vmmV_MeetingDateTime | date:"yyyy-MM-dd"}}</td>
+                        <td class="text-center">{{obj.vmmV_EntryDateTime}}</td>
+                        <td class="text-left">{{obj.vmmV_MeetingPurpose}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="GetVisitorDetails(obj)" class="text-primary" data-placement="bottom"
+                               title="Update Status" data-target="#mymodalviewdetailsfirsttab" data-toggle="modal">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="editdata(obj)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+
+
+
+
+    
+
+
+
+
+
+</section>
+
+<div id="mymodalviewdetailsfirsttab" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Update Status</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Visitor Name :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{visitorname}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Meeting Date :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{MeetingDateTime | date:'dd/MM/yyyy'}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Remarks :<span style="color:red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <textarea  name="checkoutremark" ng-model="VMMV_Remarkss" rows="3" class="form-control" required></textarea>
+                                        <div class="error-messages col-sm-offset-4" ng-if="interacted1(myForm1.checkoutremark)" ng-messages="myForm1.checkoutremark.$error">
+                                            <div ng-message="checkoutremark">Enter Remarks</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" style="padding-top: 29px;">Exit Time:<span style="color:red;">*</span></label>
+                                    <div uib-timepicker name="sch_time12" ng-model="obsupdate.VMMV_ExitDateTimes" min="Mintime"  hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" id="sel11" required></div>
+                                    <div class="error-messages col-sm-offset-4" ng-if="interacted1(myForm1.sch_time12)" ng-messages="myForm1.sch_time12.$error">
+                                        <div ng-message="required">Select Time</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">To Meet :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{sempname}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Entry Time :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{EntryDateTime}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" style="padding-top: 9px;">Exit Date : <strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker name="entdate1" id="sel10" ng-model="VMMV_ExitDate" onkeydown="return false" md-max-date="maxDate1"
+                                                       md-min-date="minDate1" md-placeholder="Select date" required></md-datepicker>
+                                        <div class="error-messages col-sm-offset-1" ng-if="interacted1(myForm1.entdate1)" ng-messages="myForm1.entdate1.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="myForm1.$invalid" ng-click="UpdateStatus(obsupdate)" id="save-btn">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+        Save
+    </md-button>
+
+                            <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                close
+                            </md-button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="GetAllVisitorDetails" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Get Visitor Details</h4>
+            </div>
+            <div class="modal-body">
+              
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-responsive table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Visitors Name</th>
+                                        <th>Contact No.</th>
+                                        <th>Email Id</th>
+                                        <th>Address</th>
+                                        <th>Card No</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="dd in getmultivisitordetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">{{dd.vmmvvI_VisitorName}}</td>
+                                        <td class="text-left">{{dd.vmmvvI_VisitorContactNo}}</td>
+                                        <td class="text-left">{{dd.vmmvvI_VisitorEmailId}}</td>
+                                        <td class="text-left">{{dd.vmmvvI_VisitorAddress}}</td>
+                                        <td class="text-left">{{dd.vmmvvI_VisitorCardNo}}</td>
+                                        <td class="text-left">{{dd.vmmvvI_Remarks}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+
+                            <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                close
+                            </md-button>
+                        </div>
+                    </div>
+              
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalreadmit" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="removeall()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Visitors Appointment Details </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm2" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Visitor Name:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="stdnamere" ng-model="$parent.VMAPNew_Id" ng-change="OnchangeVisitorname()" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,user.status);" title="Select Student">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.vmaP_VisitorName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in getappvistiordetails | filter: $select.search" value="{{name.vmaP_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.vmaP_VisitorName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted2(myForm2.stuayear)" ng-messages="myForm2.stuayear.$error">
+                                        <div ng-message="required">
+                                            Select Visitor Name
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Visitor Name :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitorname}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Visitor Email Id :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitoremailid}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Metting Date Time :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitormeetingdatetime | date:'dd/MM/yyyy HH:mm'}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">To Meet  :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitortomeet}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Status  :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitorstatus}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Visitor Contact No. :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitorcontactno}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Visitor From Place :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitorfromplace}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Meeting Purpose :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitormettingpurpose}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Remarks :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{appvisitorremarks}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <md-button type="button" class="md-raised md-primary" data-ng-click="addtocart()">Populate Data To Visitors</md-button>
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            close
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="GetVisitorAssignDetails" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Get Visitor Assign Details</h4>
+            </div>
+            <div class="modal-body">            
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-responsive table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>To Meet </th>
+                                        <th>Assigned By</th>
+                                        <th>Date Time</th>
+                                        <th>Location</th>
+                                        <th>Meet Flag</th>                                       
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="dd in visitorassigndetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">{{dd.TOMEET}}</td>
+                                        <td class="text-left">{{dd.ASSIGNEDBY}}</td>
+                                        <td class="text-left">{{dd.VMVTMT_DateTime}}</td>
+                                        <td class="text-left">{{dd.VMVTMT_Location}}</td>
+                                        <td class="text-center">
+                                            <a href="" ng-if="dd.VMVTMT_MetFlg ==1" class="text-green">
+                                                <i class="fa fa-check text-green" title="Meet"></i>
+                                            </a>
+                                            <a href="" ng-if="dd.VMVTMT_MetFlg ==0" class="text-red">
+                                                <i class="fa fa-times text-red" title="Not Meet"></i>
+                                            </a>
+                                        </td>
+                                        <td class="text-left">{{dd.VMVTMT_Remarks}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                close
+                            </md-button>
+                        </div>
+                    </div>
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="otpverification" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width: 50%;">
+        <div class="modal-content">
+            <div class="model-header custom-header">
+                <center><h4 class="modal-title custom box-title" style="background-color:darkorange; color: #d9dde5 !important;">OTP VERIFICATION</h4></center>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" name="myForm2" role="form" novalidate>
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3 col-sm-offset-1">Enter OTP:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="otpvalid" ng-model="GPHS_OTP" allow-pattern="[0-9]" placeholder="Please Enter OTP Number" maxlength="8">
+                                <div class="error-messages" ng-if="interacted2(myForm2.otpvalid)" ng-messages="myForm2.otpvalid.$error">
+                                    <div ng-message="required">Enter OTP No</div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <p style="font-size:14px;color:darkblue">
+                                        <i class="fa fa-hand-o-right" style="font-size:18px;color:red"></i>&nbsp; : &nbsp;
+                                        OTP number will be expired within 15 min.If it is expired please resend the OTP
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <!--<div class="col-sm-12 text-center">
+                            <input type="hidden" ng-model="gphS_Id" value="{{gphS_Id}}" />
+                            <button type="button" class="btn btn-primary btn-xs text-center" ng-click="get_otpverification(gphS_Id)" ng-show="Veributton1">
+                                OTP Verification
+                            </button>
+                            &nbsp;&nbsp; &nbsp;&nbsp;
+                            <button type="button" class="btn btn-primary btn-xs text-center" ng-click="get_otpverification22(gphS_Id)" ng-show="Veributton2">
+                                OTP Verification
+                            </button>
+                            &nbsp;&nbsp; &nbsp;&nbsp;
+                            <button type="button" class="btn btn-primary btn-xs text-center" ng-click="resendotp(gphS_Id)">
+                                Resend OTP
+                            </button>
+                        </div>-->
+
+                        <div class="col-sm-12 text-center">
+                            <input type="hidden" ng-model="gphS_Id" value="{{gphS_Id}}" />
+                            <button type="button" class="btn btn-primary btn-xs text-center" ng-click="getnewotpverification(gphS_Id)">
+                                OTP Verification
+                            </button>
+                            &nbsp;&nbsp; &nbsp;&nbsp;
+                            <button type="button" class="btn btn-primary btn-xs text-center" ng-click="resendnewotp(gphS_Id)">
+                                Resend OTP
+                            </button>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="modal-footer custom-footer" style="background:#1c334b;height:50px;">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" style="padding-bottom:1px; padding-top:0px;">Close</button>
+                    </div>
+
+
+
+
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

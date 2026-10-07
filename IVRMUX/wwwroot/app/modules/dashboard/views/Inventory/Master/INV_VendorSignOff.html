@@ -1,0 +1,339 @@
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="savedata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Vendor Sign Off</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                            class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+                    <!-- Vendor Name Dropdown -->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Vendor Name :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="vendorName" name="vendorName" ng-model="mve_Id" ng-change="onVendorChange()"
+                                    required>
+                                    <option value="">--Select Vendor--</option>
+                                    <option ng-repeat="v in vendorList" value="{{v.mvE_Id || v.mve_Id || v.MVE_Id}}"
+                                        ng-selected="(v.mvE_Id || v.mve_Id || v.MVE_Id) == mve_Id">
+                                        {{v.mvE_VendorName || v.mve_VendorName || v.MVE_VendorName}}
+                                        {{(v.mvE_CompanyName || v.mve_CompanyName || v.MVE_CompanyName) ? ' - ' +
+                                        (v.mvE_CompanyName || v.mve_CompanyName || v.MVE_CompanyName) : ''}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.vendorName)"
+                                    ng-messages="myForm.vendorName.$error">
+                                    <div ng-message="required">Please Select Vendor Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document for Sign Off Date Picker -->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Sign Off Date :<span
+                                    style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="invmsO_SignOffDate" id="signOffDate" name="signOffDate"
+                                    md-placeholder="Select Date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.signOffDate)"
+                                    ng-messages="myForm.signOffDate.$error">
+                                    <div ng-message="required">Please Select Sign Off Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 15px;">
+                    <!-- MOU File Upload -->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">MOU File Upload :<span
+                                    style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <label class="custom-file-input file-blue">
+                                    <input type="file" name="mouFile"
+                                        onchange="angular.element(this).scope().uploadFile(this, 'invmsO_MOU_FilePath')"
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                </label>
+                                <div ng-if="invmsO_MOU_FilePath" style="margin-top:5px;">
+                                    <span class="text-blue" style="word-break:break-all;">{{mouFileName ||
+                                        invmsO_MOU_FilePath}}</span>
+                                    <a href="javascript:void(0)" title="Preview MOU"
+                                        ng-click="previewDocument(invmsO_MOU_FilePath)" style="margin-left:10px;">
+                                        <i class="fa fa-eye text-blue" style="font-size:16px;"></i> View
+                                    </a>
+                                </div>
+                                <div class="error-messages" ng-if="submitted && !invmsO_MOU_FilePath">
+                                    <div style="color:red;">Please Upload MOU File</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workorder File Upload -->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Workorder File Upload :<span
+                                    style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <label class="custom-file-input file-blue">
+                                    <input type="file" name="workOrderFile"
+                                        onchange="angular.element(this).scope().uploadFile(this, 'invmsO_WorkOrder_FilePath')"
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                </label>
+                                <div ng-if="invmsO_WorkOrder_FilePath" style="margin-top:5px;">
+                                    <span class="text-blue" style="word-break:break-all;">{{workOrderFileName ||
+                                        invmsO_WorkOrder_FilePath}}</span>
+                                    <a href="javascript:void(0)" title="Preview Workorder"
+                                        ng-click="previewDocument(invmsO_WorkOrder_FilePath)" style="margin-left:10px;">
+                                        <i class="fa fa-eye text-blue" style="font-size:16px;"></i> View
+                                    </a>
+                                </div>
+                                <div class="error-messages" ng-if="submitted && !invmsO_WorkOrder_FilePath">
+                                    <div style="color:red;">Please Upload Workorder File</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update and Cancel Buttons -->
+                <div class="text-center style-margin" style="margin-top:25px; margin-bottom:15px;">
+                    <input type="hidden" ng-model="invmsO_Id" value="0" />
+                    <button type="submit" class="btn btn-primary" style="min-width:110px; margin-right:15px;"
+                        ng-click="savedata()">
+                        <i class="fa fa-save" aria-hidden="true"></i> {{invmsO_Id > 0 ? 'Update' : ' Update'}}
+                    </button>
+                    <button type="button" class="btn btn-warning" style="min-width:110px;" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Vendor Sign Off Grid -->
+    <div class="box box-primary" style="margin-top:20px;">
+        <div class="box-header with-border">
+            <h3 class="box-title">Vendor Sign Off Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                        class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text"
+                                placeholder="Search Vendor Sign Off...">
+                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table table-hover table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Sl. No.</th>
+                            <th><a href="" ng-click="sortBy('mvE_VendorName')">Vendor Name</a></th>
+                            <th><a href="" ng-click="sortBy('mvE_CompanyName')">Company Name</a></th>
+                            <th><a href="" ng-click="sortBy('invmsO_SignOffDate')">Sign Off Date</a></th>
+                            <th>MOU Document</th>
+                            <th>Workorder Document</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in signoff_list | filter:searchValue | orderBy:propertyName:reverse | itemsPerPage: itemsPerPage"
+                            current-page="currentPage">
+                            <td>{{itemsPerPage * (currentPage - 1) + $index + 1}}</td>
+                            <td>{{user.mvE_VendorName || user.MVE_VendorName}}</td>
+                            <td>{{user.mvE_CompanyName || user.MVE_CompanyName || '-'}}</td>
+                            <td>{{(user.invmsO_SignOffDate || user.INVMSO_SignOffDate) | date:'dd/MM/yyyy'}}</td>
+                            <td>
+                                <a href="javascript:void(0)" title="View MOU"
+                                    ng-if="(user.invmsO_MOU_FilePath || user.INVMSO_MOU_FilePath || user.invmsO_MOU_filepath)"
+                                    ng-click="previewDocument(user.invmsO_MOU_FilePath || user.INVMSO_MOU_FilePath || user.invmsO_MOU_filepath)">
+                                    <i class="fa fa-eye text-blue" style="font-size:18px;"></i>
+                                </a>
+                                <span
+                                    ng-if="!(user.invmsO_MOU_FilePath || user.INVMSO_MOU_FilePath || user.invmsO_MOU_filepath)">-</span>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" title="View Workorder"
+                                    ng-if="(user.invmsO_WorkOrder_FilePath || user.INVMSO_WorkOrder_FilePath || user.invmsO_WorkOrder_filepath)"
+                                    ng-click="previewDocument(user.invmsO_WorkOrder_FilePath || user.INVMSO_WorkOrder_FilePath || user.invmsO_WorkOrder_filepath)">
+                                    <i class="fa fa-eye text-blue" style="font-size:18px;"></i>
+                                </a>
+                                <span
+                                    ng-if="!(user.invmsO_WorkOrder_FilePath || user.INVMSO_WorkOrder_FilePath || user.invmsO_WorkOrder_filepath)">-</span>
+                            </td>
+                        </tr>
+                        <tr ng-if="signoff_list.length == 0">
+                            <td colspan="6" class="text-center">No Vendor Sign Off records found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <dir-pagination-controls max-size="5" direction-links="true"
+                boundary-links="true"></dir-pagination-controls>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="myimagePreview" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Document Preview</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="preview" ng-src="{{imgpath}}" class="img-responsive"
+                        style="margin: 0 auto; max-height: 500px;" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Preview Modal -->
+    <div id="showpdf" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">PDF Document Preview</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="pdfIdzz"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Email Template for Vendor Sign Off -->
+    <div id="VendorSignOffMail" ng-hide="true">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px;">
+            <tr>
+                <td align="center">
+                    <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+                        <!-- Header -->
+                        <tr>
+                            <td style="background-color: #1976d2; color: #ffffff; padding: 25px; text-align: center;">
+                                <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px;">Vendor Sign-off Notification</h2>
+                            </td>
+                        </tr>
+                        <!-- Body Content -->
+                        <tr>
+                            <td style="padding: 30px;">
+                                <p style="font-size: 15px; color: #333333; margin-top: 0;">
+                                    Dear Sir / Madam,
+                                </p>
+
+                                <p style="font-size: 15px; line-height: 24px; color: #555555;">
+                                    Your Vendor Sign-off request has been processed and saved successfully.
+                                    Please find the summary of the sign-off details below:
+                                </p>
+
+                                <!-- Details Table -->
+                                <table width="100%" cellpadding="10" cellspacing="0" border="0" style="margin-top: 20px; border-collapse: collapse; font-size: 14px;">
+                                    <tr>
+                                        <td width="35%" style="font-weight: bold; background: #f5f5f5; border: 1px solid #e0e0e0; color: #333;">
+                                            Vendor Name
+                                        </td>
+                                        <td style="border: 1px solid #e0e0e0; color: #444;">
+                                            {{selectedVendorName || '##VendorName##'}}
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="selectedCompanyName">
+                                        <td style="font-weight: bold; background: #f5f5f5; border: 1px solid #e0e0e0; color: #333;">
+                                            Company Name
+                                        </td>
+                                        <td style="border: 1px solid #e0e0e0; color: #444;">
+                                            {{selectedCompanyName}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; background: #f5f5f5; border: 1px solid #e0e0e0; color: #333;">
+                                            Sign-off Date
+                                        </td>
+                                        <td style="border: 1px solid #e0e0e0; color: #444;">
+                                            {{(invmsO_SignOffDate | date:'dd-MMM-yyyy') || '##SignOffDate##'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; background: #f5f5f5; border: 1px solid #e0e0e0; color: #333;">
+                                            MOU Document
+                                        </td>
+                                        <td style="border: 1px solid #e0e0e0; color: #2e7d32; font-weight: bold;">
+                                            Uploaded & Confirmed
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; background: #f5f5f5; border: 1px solid #e0e0e0; color: #333;">
+                                            Work Order Document
+                                        </td>
+                                        <td style="border: 1px solid #e0e0e0; color: #2e7d32; font-weight: bold;">
+                                            Uploaded & Confirmed
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <br />
+
+                                <!-- Confirmation Box -->
+                                <div style="background: #e8f5e9; border-left: 5px solid #4caf50; padding: 15px; margin-top: 15px;">
+                                    <b style="color: #2e7d32;">Document Upload Confirmation:</b>
+                                    <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: #333; font-size: 14px;">
+                                        <li>MOU Document has been successfully uploaded and verified.</li>
+                                        <li>Work Order Document has been successfully uploaded and verified.</li>
+                                        <li>Sign-off status is complete.</li>
+                                    </ul>
+                                </div>
+
+                                <br />
+
+                                <!-- Support Information -->
+                                <div style="background: #fff8e1; border-left: 5px solid #ff9800; padding: 15px; margin-top: 10px;">
+                                    <b style="color: #e65100;">Contact Information for Support:</b>
+                                    <p style="margin-top: 8px; margin-bottom: 0; color: #444; font-size: 14px; line-height: 20px;">
+                                        If you have any questions or require assistance regarding this sign-off, please contact our support team:<br />
+                                        <b>Email:</b> support@vapstech.com<br />
+                                        <b>Phone:</b> +91 80 2345 6789
+                                    </p>
+                                </div>
+
+                                <br />
+
+                                <p style="font-size: 14px; color: #333; line-height: 22px;">
+                                    Regards,<br />
+                                    <b>Front Office Team</b><br />
+                                    VAPS Technosoft Pvt. Ltd.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</section>

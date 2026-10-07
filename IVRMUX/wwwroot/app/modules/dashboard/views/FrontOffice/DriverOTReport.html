@@ -1,0 +1,153 @@
+﻿
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
+    <body>
+        <section class="content">
+            <div data-ng-init="loaddata()">
+                <form class="form-horizontal" role="form" name="myForm" novalidate>
+                    <div class="box box-primary" ng-app="MyModule">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">
+                                DRIVER OT REPORT
+                            </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-6" style="text-align:center">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Driver Name : <strong style="color:red;">*</strong></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="sel" name="acd" ng-model="hrmE_Id" required ng-change="OnChangeOT(hrmE_Id,0)">
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="emp in employeelist" value="{{emp.hrmE_Id}}" ng-selected="{{emp.Selected == true}}">
+                                                    {{emp.hrmE_EmployeeFirstName}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.acd)" ng-messages="myForm.acd.$error">
+                                                <div ng-message="required">Enter Employee Name</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-6" style="text-align:center">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Year : <strong style="color:red;">*</strong></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="selyear" name="acdyear" ng-model="yearid" required>
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="year in yearlist" value="{{year.hrmlY_LeaveYear}}" ng-selected="{{year.Selected == true}}">
+                                                    {{year.hrmlY_LeaveYear}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.acdyear)" ng-messages="myForm.acdyear.$error">
+                                                <div ng-message="required">Select Year</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" style="text-align:center">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Month : <strong style="color:red;">*</strong></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="selt" name="acdmonth" ng-model="ivrM_Month_Id" required ng-change="OnChangeOT(hrmE_Id,ivrM_Month_Id,'Month')">
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="month in monthlist" value="{{month.ivrM_Month_Id}}" ng-selected="{{month.Selected == ivrM_Month_Id}}">
+                                                    {{month.ivrM_Month_Name}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.acdmonth)" ng-messages="myForm.acdmonth.$error">
+                                                <div ng-message="required">Select Month</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <md-button type="button" class="md-raised md-primary" data-ng-click="finalOT()">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Final OT Report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Clear
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="box box-primary" ng-show='disabledata'>
+                <div class="box-header with-border">
+                    <h3 class="box-title">Driver OT Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="scrollTable" style="overflow:scroll">
+                        <div id="Table2">
+                            <table class="table table-hover table-responsive table-bordered text-center" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Employee Code</th>
+                                        <th>Date</th>
+                                        <!--<th>Day</th>-->
+                                        <th>Punch-In</th>
+                                        <th>Late-By</th>
+                                        <th>Punch-Out</th>
+                                        <th>Early By</th>
+                                        <th>Total Late-In Time</th>
+                                        <th>OT By Today</th>
+                                        <th>Balance</th>
+                                        <th>Remarks</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="data in finalotreport">
+                                        <td style="text-align:left">{{$index +1}}</td>
+                                        <td class="text-left">{{data.HRME_EmployeeCode}}</td>
+                                        <td class="text-left">{{data.VMSDT_Punchdate|date:'dd-MM-yyyy'}}</td>
+                                        <!--<td class="text-left">{{data.fomstDayofWeek}}</td>-->
+                                        <td class="text-left">{{data.VMSDT_PunchIn}}</td>
+                                        <td class="text-left">{{data.VMSDT_LateIn}}</td>
+                                        <td class="text-left">{{data.VMSDT_PunchOut}}</td>
+                                        <td class="text-left">{{data.VMSDT_EarlyOut}}</td>
+                                        <td class="text-left">{{data.VMSDT_FinalLatein}}</td>
+                                        <td class="text-left">{{data.VMSDT_TotalOt}}</td>
+                                        <td class="text-left">{{data.VMSDT_FinalOt}}</td>
+                                        <td class="text-left">{{data.VMSDT_Remarks}}</td>
+                                        <td class="text-left">{{data.VSMDTA_Status}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <md-button class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button class="md-raised md-primary" ng-disabled="form.$invalid" id="exptoexcel" aria-disabled="false" ng-click="exptoex('#Table2');" target="_blank">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

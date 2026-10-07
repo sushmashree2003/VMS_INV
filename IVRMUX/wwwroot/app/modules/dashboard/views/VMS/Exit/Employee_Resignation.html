@@ -1,0 +1,1144 @@
+﻿<style>
+    .table-wrap {
+        height: 180px;
+        overflow-y: auto;
+    }
+
+    input[type="file"] {
+        display: none !important;
+    }
+
+
+
+    .file-blue:before {
+        /* content: 'Upload Photo'; */
+        content: 'Upload Document';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgb(0 0 0 / 50%);
+    }
+
+    #btn {
+        border: none;
+        color: white;
+        padding: 8px 25px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 5px 7px;
+        cursor: pointer;
+        background-color: #f44336;
+    }
+</style>
+
+<section class="content" data-ng-init="loadData()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Resignation/Relieving Application</h3>
+            <!--<div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>-->
+        </div>
+        <div class="row" ng-show="devaionvalidation==true">
+            <div class="text-center col-sm-12">
+                <!--<span style="color:red;font-size:large;font-weight:bold">Sorry!! Since Your Deviation is more than 0%, You are not eligible to send Resignation.</span>-->
+                <span style="color:red;font-size:large;font-weight:bold">Sorry!! Since Your Deviation is more than 0%, You are not eligible to Apply Resignation.</span>
+            </div>
+        </div>
+
+        <md-content style="padding-top:10px">
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Resignation Apply">
+                    <md-content class="md-padding">
+
+                        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Employee Data For Resignation</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body">
+                                    <!--ng-show="getdeviationreport.deviation <= 0"-->
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">HR Manager Name</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="Manager" id="usr1" type="text" ng-model="employeeManager" ng-pattern="/^[a-zA-Z /]+$/" allow-pattern="([a-zA-Z ])|/" ng-disabled="true" required>
+                                                    <div class="error-messages" ng-if="interacted(myForm.Manager)" ng-messages="myForm.Manager.$error">
+                                                        <div ng-message="required" style="padding-left: 30px;">Enter Manager Name</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">HR Manager Mail-Id</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="MEmailId" id="usr" type="text" placeholder="Enter Manager EmailId" ng-model="mngrEmailId" ng-disabled="true" ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" required>
+                                                </div>
+                                                <div class="error-messages  col-sm-offset-5" ng-if="interacted(myForm.MEmailId)" ng-messages="myForm.MEmailId.$error">
+                                                    <div ng-message="required">Enter Email-Id</div>
+                                                    <div ng-message="pattern">Enter Valid Email-id</div>
+                                                    <div ng-message="minlength">Field must contain atleast 6 characters</div>
+                                                    <div ng-message="maxlength">Field cannot take more than 50 characters</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Reason:<span style="color:Red">*</span></label>
+                                                <div class="col-sm-8">
+
+                                                    <select class="form-control" name="reason12" ng-model="ismresgmrE_Id" required ng-click="noticeperiodcalculation()">
+                                                        <option value="">--Select Reason--</option>
+                                                        <option ng-repeat="reason in resignation_list_dd" value="{{reason.ismresgmrE_Id}}" ng-selected="reason.ismresgmrE_Id==ismresgmrE_Id">
+                                                            {{reason.ismresgmrE_ResignationReasons}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.reason12)" ng-messages="myForm.reason12.$error">
+                                                    <div ng-message="required">Please Select Reason </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Notice Period In Days :<span style="color:red">*</span></label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" placeholder="Enter Notice Period" type="text" data-ng-model="noticeperiod" ng-disabled="true" name="noticep" required>
+                                                </div>
+                                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.noticep)" ng-messages="myForm.noticep.$error">
+                                                    <div ng-message="required">Enter Notice Period </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Department Head Name</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="TeamLead" id="usr2" type="text" ng-model="employeeTL" ng-pattern="/^[a-zA-Z /]+$/" ng-disabled="true" allow-pattern="([a-zA-Z ])|/">
+                                                    <div class="error-messages" ng-if="interacted(myForm.TeamLead)" ng-messages="myForm.TeamLead.$error">
+                                                        <div ng-message="required" style="padding-left: 30px;">Enter Team Lead Name</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Department Head Mail-Id</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="TLmailId" id="usr2" type="text" placeholder="Enter Department Head EmailId" ng-disabled="true" ng-model="teamleadEmailId" ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/">
+                                                </div>
+                                                <div class="error-messages  col-sm-offset-5" ng-if="interacted(myForm.TLmailId)" ng-messages="myForm.TLmailId.$error">
+                                                    <div ng-message="required">Enter Email-Id</div>
+                                                    <div ng-message="pattern">Enter Valid Email-id</div>
+                                                    <div ng-message="minlength">Field must contain atleast 6 characters</div>
+                                                    <div ng-message="maxlength">Field cannot take more than 50 characters</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Resignation Remark</label>
+                                                <div class="col-sm-8 input-group text-right">
+                                                    <textarea class="form-control textareaclass" name="disc" rows="5" ng-model="ISMRESG_Remarks" id="usrnn"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="row" ng-if="documentList.length>0">
+                                        <div class="col-sm-12" style="overflow:auto !important">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <label>
+                                                                <!--<input name="all" ng-true-value="true" ng-false-value="false" ng-model="obj.alltask" type="checkbox" ng-click="all_task()">
+                                <span class="lbl padding-8">
+                                </span>-->
+                                                            </label>
+                                                        </th>
+                                                        <th style="width:10%">SL NO.</th>
+                                                        <th style="width:40%">Document Handover details</th>
+                                                        <th style="width:30%">Upload</th>
+                                                        <th style="width:20%">Views</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="document in documentList track by $index" style="height:10%">
+                                                        <td>
+                                                            <label>
+                                                                <input type="checkbox" ng-model="document.selectedd2" ng-true-value="true" ng-false-value="false" ng-change="get_evalistt(document)" />
+                                                                <span class="lbl padding-3"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td class="text-center">{{$index+1}}</td>
+                                                        <td class="text-center">
+                                                            {{document.ismresgmcL_CheckListName}} <span style="color:Red" ng-if="document.ismresgmcL_OptionalFlg==true">*</span>
+
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <label ng-if="document.ismresgmcL_OptionalFlg==true" class="custom-file-input file-blue" style="width:100%;margin-bottom:5%">
+                                                                <input id="{{document.ismresgmcL_Id}}" type="file" name="doc1{{$index+1}}" accept="image/*, application/pdf,application/msword" data-ng-model="documentList[$index].document_Path" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().document)">
+                                                            </label>
+                                                            <label ng-if="document.ismresgmcL_OptionalFlg==false || document.ismresgmcL_OptionalFlg==null" class="custom-file-input file-blue " style="width:100%;margin-bottom:5%">
+                                                                <input id="{{document.ismresgmcL_Id}}" type="file" accept="image/*, application/pdf,application/msword" data-ng-model="documentList[$index].document_Path" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().document)">
+                                                            </label>
+                                                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if=" interacted(myForm.doc1{{$index+1}})" ng-messages="myForm.doc1{{$index+1}}.$error">
+                                                                <div ng-message="required"></div>
+                                                            </div>
+
+                                                            <div class="text-center  " style="padding-top:5px" ng-if="document.ismresgmcL_OptionalFlg==true && validationfordocument==true" ng-hide="document.document_Path.length>0  ">
+                                                                <span style="color:Red" ng-if="document.ismresgmcL_OptionalFlg==true && validationfordocument==true">Select Document</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div ng-if="document.ISMRESGMCL_Template !=null && document.ISMRESGMCL_Template !='' " ng-hide="document.document_Path.length>0 || $scope.extention === 'doc' || $scope.extention === 'docx' || $scope.extention === 'ppt' || $scope.extention === 'pptx' || $scope.extention === 'xlsx' || $scope.extention === 'xls'">
+                                                                <span ng-if="document.ISMRESGMCL_Template !=null && document.ISMRESGMCL_Template !='' ">
+                                                                    <a style="color:red;display:inline; font-weight: bold; text-decoration:underline;font-size:small;" data-toggle="modal" data-ng-click="showmodaldetailscheck(document.ISMRESGMCL_Template)">View</a>
+                                                                    |
+                                                                </span>
+                                                                <span ng-if="document.ISMRESGMCL_Template !=null && document.ISMRESGMCL_Template !='' ">
+                                                                    <a style="color: dodgerblue; text-decoration:underline; font-size:small" href="{{document.ISMRESGMCL_Template}}">
+                                                                        <i class="fa fa-download"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </div>
+
+                                                            <div ng-if="document.document_Path !=null && document.document_Path !='' ">
+                                                                <span ng-if="document.document_Path !=null && document.document_Path !='' " ng-hide=" $scope.extention === 'doc' || $scope.extention === 'docx' || $scope.extention === 'ppt' || $scope.extention === 'pptx' || $scope.extention === 'xlsx' || $scope.extention === 'xls'">
+                                                                    <a style="color:red;display:inline; font-weight: bold; text-decoration:underline;font-size:small;" data-toggle="modal" data-ng-click="showmodaldetailscheck(document.document_Path)">View</a>
+                                                                </span>|
+                                                                <span ng-if="document.document_Path !=null && document.document_Path !='' ">
+
+                                                                    <a style="color: dodgerblue; text-decoration:underline; font-size:small" href="{{document.document_Path}}">
+                                                                        <i class="fa fa-download"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </div>
+
+
+                                                        </td>
+                                                        <td hidden>
+                                                            <input type="hidden" ng-model="document.ismresgcL_Id" />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                            <div class="box-tools pull-right" ng-if="savebuttenvalidation.length>0">
+                                                <md-button type="button" class="md-raised md-primary" ng-click="uploadchecklist('Resignation')">
+                                                    <i class="fa fa-upload" aria-hidden="true"></i>
+                                                    Upload
+                                                </md-button>
+                                                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                    Cancel
+                                                </md-button>
+                                            </div>
+
+                                            <div class="text-center" ng-hide="savebuttenvalidation.length>0">
+                                                <!--<md-button type="button" ng-click="printData()" class="md-raised md-primary" hidden>
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    print
+                </md-button>-->
+                                                <md-button type="button" class="md-raised md-accent" ng-click="SendMail('Resignation')">
+                                                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                                                    Save Resignation
+                                                </md-button>
+                                                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                    Cancel
+                                                </md-button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr /> <!--ng-show="getdeviationreport.deviation <= 0"-->
+                                    <div class="text-center" hidden>
+                                        <input type="hidden" ng-model="" />
+                                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="Generate()">
+                                            <i class="fa fa-tags" aria-hidden="true"></i> Generate Letter
+                                        </md-button>
+                                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                        </md-button>
+                                    </div>
+
+                                    <div class="row" ng-if="ismcertreQ_AppRejFlag=='Approved'">
+                                        <div class="text-center">
+                                            <span style="color:red;font-weight:800">{{employeename}} NOC Is Approved By Managment</span><br />
+                                            <span style="color:red;font-weight:800">
+                                                NOC Certificate
+                                                <a href="javascript:void(0)" data-toggle="modal" data-placement="bottom" data-target="#noccertificate" ng-click="nocdetails()" title="View">
+
+                                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="text-center" ng-if="showmsgvalidation==true">
+                                        <label style="color:red;font-weight:800;font-size:large" ng-hide="showmsgvalidation1==true">
+                                            Now You Can Apply For Relieving Letter
+                                        </label><br />
+                                        <label style="color:red;font-weight:800;font-size:large">
+                                            {{lastworkingday|date:'dd/MM/yyyy'}} is Your Last Working Date
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="box box-primary" ng-show="resignview">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Employee Resignation Letter</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body">
+                                    <div id="calltemplate">
+                                        <div class="text-center">
+                                            <div>
+                                                <!-- <img style="height:15%;width:100%" src="https://dcampusstrg.blob.core.windows.net/files/1/InstitutionLogo/98281cf8-b2b6-4785-b914-8595082bcc76.jpg" />-->
+                                                <img style="height:20%;width:100%;margin-left:0%;border:none" src="{{MI_Logo}}" />
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <h3 style="font-size: 12px;text-transform: uppercase;color: #3a5999 !important;font-weight: 700;text-align:center;">
+                                                RESIGNATION LETTER
+                                            </h3>
+                                        </div>
+                                        <div style="font-size:12px;">
+                                            <table class="table table-hover table-responsive" style="width:100%;font-size:12px;">
+                                                <tr><td style="text-align:right;">Date : {{currentdate | date:"dd-MM-yyyy"}}</td></tr>
+                                                <tr><td style="text-align:left;">From.</td></tr>
+                                                <tr><td style="text-align:left;">{{hrmE_EmployeeFirstName}}</td></tr>
+                                                <tr><td style="text-align:left;">{{hrmE_PerStreet}}</td></tr>
+                                                <tr><td style="text-align:left;">{{hrmE_PerArea}}</td></tr>
+                                                <tr><td style="text-align:left;">{{hrmE_PerCity}} {{hrmE_PerPincode}}</td></tr>
+                                            </table>
+                                            <br />
+                                            <table class="table table-hover table-responsive" style="width:100%;font-size:12px;">
+                                                <tr><td style="text-align:left;">To.</td></tr>
+                                                <tr><td style="text-align:left;">{{employeeManager}}</td></tr>
+                                                <tr><td style="text-align:left;">{{companydetails.mI_Name}}</td></tr>
+                                                <tr><td style="text-align:left;">{{companydetails.mI_Address1}}</td></tr>
+                                                <tr><td style="text-align:left;">{{companydetails.mI_Address2}}</td></tr>
+                                                <tr><td style="text-align:left;">{{companydetails.ivrmmcT_Name}} {{companydetails.mI_Pincode}}</td></tr>
+                                            </table>
+                                            <br />
+                                            <div style="font-size:12px">
+                                                <p style="text-align:left;">Dear <b>{{employeeManager}}</b>,</p>
+                                                <br />
+                                                <p style="text-align:justify;">
+                                                    Please accept this letter as formal notice of my resignation from my position as <b>{{hrmdeS_DesignationName}}</b> at <b>{{companydetails.mI_Name}}</b> with effect from today i.e. <b>{{currentdate | date: 'dd/MM/yyyy'}}</b>. My Joining date was <b>{{hrmE_DOJ | date: 'dd/MM/yyyy'}}</b>. My last day of employment after completion of 3 months’ notice period will be <b>{{tentative_Leaving_Date | date: 'dd/MM/yyyy'}}</b>.
+                                                </p>
+                                                <br />
+                                                <p style="text-align:justify;">
+                                                    Thank you for giving me the opportunity to work in this position for the past <b>{{duration}}</b> days. I have thoroughly enjoyed working here and appreciate all of the opportunities you have given me. However, I have decided it is time for me to move on to my next challenge.
+                                                </p>
+                                                <br />
+                                                <p style="text-align:justify;">
+                                                    I would like to do anything I can to help with the transition, including wrapping up my responsibilities and training other team members. If I can be of any other assistance during this time, please let me know.
+                                                </p>
+                                                <br />
+                                                <p>
+                                                    Thank you again for the opportunity, and I wish you and {{companydetails.mI_Name}} all the best for the future.
+                                                </p>
+                                                <br />
+                                            </div>
+                                            <table class="table table-hover table-responsive" style="width:100%;font-size:12px;">
+                                                <tr>
+                                                    <td style="text-align:left;"><b>Yours sincerely,</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align:left;"><b>{{hrmE_EmployeeFirstName}}</b></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <md-button type="button" ng-click="printData()" class="md-raised md-primary">
+                                        <i class="fa fa-print" aria-hidden="true"></i>
+                                        print
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-accent" ng-click="SendMail('Resignation')">
+                                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                                        Send Mail
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+
+                            <!--Resignation Grid-->
+                            <div class="col-sm-12 box box-primary" ng-if="getGriddata.length>0">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Employee Resignation Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row" style="padding:10px">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>SL NO.</th>
+                                                    <th>Resignation Date</th>
+                                                    <th>Resignation Reason</th>
+                                                    <th>Resignation Remark</th>
+                                                    <th>Resignation Letter</th>
+                                                    <th>Documents</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="user in getGriddata">
+                                                    <td class="text-center">{{$index+1}}</td>
+                                                    <td class="text-center">{{user.ismresG_ResignationDate | date:'dd/MM/yyyy'}}</td>
+                                                    <td class="text-center">{{user.ismresgmrE_ResignationReasons}}</td>
+                                                    <td class="text-center">{{user.ismresG_Remarks}}</td>
+                                                    <td class="hidden">{{user.ismresG_Id}}</td>
+                                                    <td class="text-center">
+                                                        <span>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#myresignationletter"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                        </span>|
+                                                        <span>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="printData()"><i class="fa fa-print fa-1x" aria-hidden="true"></i></a>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="grid-action-cell">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#mymoduledocview" ng-click="viewcomment(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Pending'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" style="color:dodgerblue;font-weight:bold" title="View Comments"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Approved'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" style="color:forestgreen;font-weight:bold" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Rejected'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" style="color:orangered;font-weight:bold" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Partially Approved'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" style="color:dodgerblue;font-weight:bold" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+
+
+
+
+                    </md-content>
+                </md-tab>
+                <md-tab label="Relieving Apply">
+                    <md-content class="md-padding">
+
+                        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm2" novalidate>
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Employee Data For Relieving</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- /.box-header -->
+
+                                <div class="row" ng-if="ismcertreQ_AppRejFlag!=null && ismcertreQ_AppRejFlag!='Approved'">
+                                    <div class="text-center">
+                                        <span style="color:red;font-weight:800">Your NOC Is Not Approved By Managment So You Can't Apply For Relieving Letter</span><br />
+                                    </div>
+                                </div>
+                                <div class="row" ng-if="ismcertreQ_AppRejFlag=='Approved'">
+                                    <div class="text-center">
+                                        <span style="color:red;font-weight:800">{{employeename}} NOC Is Approved By Managment</span><br />
+                                        <span style="color:red;font-weight:800">
+                                            NOC Certificate
+                                            <a href="javascript:void(0)" data-toggle="modal" data-placement="bottom" data-target="#noccertificate" ng-click="nocdetails()" title="View">
+
+                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="box-body" ng-if="ismcertreQ_AppRejFlag=='Approved'">
+
+                                    <div class="row" ng-if="releavingdoc_list.length==0">
+                                        <span style="color:red;font-weight:800;margin-top:5%">Check List Not Entered For Your Designation</span>
+                                    </div>
+                                    <div class="row" ng-if="releavingdoc_list.length>0">
+                                        <div class="text-left">
+                                            <label style="color:red;font-weight:800;margin-left:2%">
+                                                Upload The Related Checklists For Relieving
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <label>
+                                                                <input name="all" ng-true-value="true" ng-false-value="false" ng-model="obj.alltaskrel" type="checkbox" ng-click="all_taskrel()">
+                                                                <span class="lbl padding-8">
+                                                                </span>
+                                                            </label>
+                                                        </th>
+                                                        <th style="width:10%">SL NO.</th>
+                                                        <th style="width:40%">Document Handover details</th>
+                                                        <th style="width:30%">Upload</th>
+                                                        <th style="width:20%">Views</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="document in releavingdoc_list track by $index" style="height:10%">
+                                                        <td>
+                                                            <label>
+                                                                <input type="checkbox" ng-model="document.selectedd2" ng-true-value="true" ng-false-value="false" ng-change="get_evalistt(document)" />
+                                                                <span class="lbl padding-3"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td class="text-center">{{$index+1}}</td>
+                                                        <td class="text-center">
+                                                            {{document.ismresgmcL_CheckListName}} <span style="color:Red" ng-if="document.ismresgmcL_OptionalFlg==true">*</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <label ng-if="document.ismresgmcL_OptionalFlg==true" class="custom-file-input file-blue" style="width:100%;margin-bottom:5%">
+                                                                <input id="{{document.ismresgmcL_Id}}" type="file" name="doc{{$index+1}}" accept="image/*, application/pdf,application/msword" data-ng-model="documentList[$index].document_Path" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().document)">
+                                                            </label>
+                                                            <label ng-if="document.ismresgmcL_OptionalFlg==false || document.ismresgmcL_OptionalFlg==null" class="custom-file-input file-blue" style="width:100%;margin-bottom:5%">
+                                                                <input id="{{document.ismresgmcL_Id}}" type="file" name="doc{{$index+1}}" accept="image/*, application/pdf,application/msword" data-ng-model="documentList[$index].document_Path" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().document)">
+                                                            </label>
+                                                            <div class="text-center col-sm-offset-4 error-messages" ng-if="interacted(myForm2.doc{{$index+1}})" ng-messages="myForm2.doc{{$index+1}}.$error">
+                                                                <div ng-message="required">gdfdfgdfg</div>
+                                                            </div>
+                                                            <div class="text-center  col-sm-offset-4 error-messages" ng-if="document.ismresgmcL_OptionalFlg==true && validationfordocument==true" ng-hide="document.document_Path.length>0  ">
+                                                                <span style="color:Red" ng-if="document.ismresgmcL_OptionalFlg==true && validationfordocument==true">Select Document</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div ng-if="document.ISMRESGMCL_Template !=null && document.ISMRESGMCL_Template !='' " ng-hide="document.document_Path.length>0">
+                                                                <span ng-if="document.ISMRESGMCL_Template !=null && document.ISMRESGMCL_Template !='' ">
+                                                                    <a style="color:red;display:inline; font-weight: bold; text-decoration:underline;font-size:small;" data-toggle="modal" data-ng-click="showmodaldetailscheck(document.ISMRESGMCL_Template)">View</a>
+                                                                </span>|
+                                                                <span ng-if="document.ISMRESGMCL_Template !=null && document.ISMRESGMCL_Template !='' ">
+
+                                                                    <a style="color: dodgerblue; text-decoration:underline; font-size:small" href="{{document.ISMRESGMCL_Template}}">
+                                                                        <i class="fa fa-download"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </div>
+                                                            <div ng-if="document.document_Path !=null && document.document_Path !='' ">
+                                                                <span ng-if="document.document_Path !=null && document.document_Path !='' ">
+                                                                    <a style="color:red;display:inline; font-weight: bold; text-decoration:underline;font-size:small;" data-toggle="modal" data-ng-click="showmodaldetailscheck(document.document_Path)">View</a>
+                                                                </span>|
+                                                                <span ng-if="document.document_Path !=null && document.document_Path !='' ">
+
+                                                                    <a style="color: dodgerblue; text-decoration:underline; font-size:small" href="{{document.document_Path}}">
+                                                                        <i class="fa fa-download"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </div>
+
+
+                                                        </td>
+                                                        <td hidden>
+                                                            <input type="hidden" ng-model="document.ismresgcL_Id" />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-3">Relieving Remark:</label>
+                                                        <div class="col-sm-9 input-group text-right">
+                                                            <textarea class="form-control textareaclass" name="disc" rows="5" placeholder="Enter Description" ng-model="obj.ismresG_Remarks" id="usrnn"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="box-tools pull-right" ng-if="savebuttenvalidation1.length>0">
+                                                <md-button type="button" class="md-raised md-primary" ng-click="uploadchecklist('Relieving')">
+                                                    <i class="fa fa-upload" aria-hidden="true"></i>
+                                                    Upload
+                                                </md-button>
+                                                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                    Cancel
+                                                </md-button>
+                                            </div>
+
+
+
+                                            <div class="text-center" ng-hide="savebuttenvalidation1.length>0 || showmsgvalidation==false">
+                                                <input type="hidden" ng-model="" />
+                                                <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="Releavingapplye('Relieving')">
+                                                    <i class="fa fa-tags" aria-hidden="true"></i> Save
+                                                </md-button>
+                                                <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                                </md-button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="text-center col-sm-12" ng-show="showmsgvalidation==false">
+                                        <label style="color:red;font-weight:800;font-size:large">
+                                            Your Can't Apply For Relieving Till Your Resignation is Approved
+                                        </label>
+                                    </div>
+
+                                    <div class="text-center" ng-if="Showapproval==true">
+                                        <label style="color:red;font-weight:800;font-size:large;padding:100px">
+                                            Your Relieving Application Is Under Approval
+                                        </label>
+                                    </div>
+
+                                    <div class="text-center" ng-if="showmsgvalidation1==true">
+                                        <label style="color:red;font-weight:800;font-size:large">
+                                            Your Relieving Application is Approved by Management
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+
+
+                            <!--Relieving Grid-->
+                            <div class="box box-primary" ng-if="getGriddataReleaving.length>0">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Employee Relieving Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="row">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>SL NO.</th>
+                                                    <th>Relieving Date</th>
+                                                    <th>Relieving Reason</th>
+                                                    <th>Relieving Remark</th>
+                                                    <!--<th>Relieving Letter</th>-->
+                                                    <th>Documents</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="user in getGriddataReleaving">
+                                                    <td class="text-center">{{$index+1}}</td>
+                                                    <td class="text-center">{{user.ismresG_ResignationDate | date:'dd/MM/yyyy'}}</td>
+                                                    <td class="text-center">{{user.ismresgmrE_ResignationReasons}}</td>
+                                                    <td class="text-center">{{user.ismresG_Remarks}}</td>
+                                                    <td class="hidden">{{user.ismresG_Id}}</td>
+                                                    <!--<td class="text-center">
+                                                        <span>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#myresignationletter"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                        </span>|
+                                                        <span>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="printData()"><i class="fa fa-print fa-1x" aria-hidden="true"></i></a>
+                                                        </span>
+                                                    </td>-->
+                                                    <td class="text-center">
+                                                        <div class="grid-action-cell">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#mymoduledocviewRelieving" ng-click="viewcomment(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                        </div>
+                                                    </td>
+
+                                                    <!--<td class="text-center">
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Pending'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Approved'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Partially Approved'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                    </td>-->
+
+                                                    <td class="text-center">
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Pending'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                            <a href="javascript:void(0)" data-toggle="modal" style="color:dodgerblue;font-weight:bold" title="View Comments"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Approved'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" style="color:forestgreen;font-weight:bold" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Rejected'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" style="color:orangered;font-weight:bold" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                        <div class="grid-action-cell" ng-if="user.ismresG_MgmtApprRejFlg=='Partially Approved'">
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" ng-click="Approvedperson(user)"><i class="fa fa-eye fa-1x" aria-hidden="true"></i></a>
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Comments" data-target="#approvedrejectedperson" style="color:dodgerblue;font-weight:bold" ng-click="Approvedperson(user)"> {{user.ismresG_MgmtApprRejFlg}}</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </form>
+
+                    </md-content>
+                </md-tab>
+
+            </md-tabs>
+        </md-content>
+
+
+    </div>
+</section>
+
+
+<div id="approvedrejectedperson" class="modal fade" role="dialog" data-backdrop="false" name="formm">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>Approved/Rejected Details</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Approved/Rejected Date</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Approved Last Working Date</th>
+                            <th class="text-center">Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-if="apporvedrejectedperson.length==0">
+                            <td colspan="6">
+                                <span style="color:red;font-size:large;font-weight:bold">Still Not Approved By The Department Head</span>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="user1 in apporvedrejectedperson" ng-if="apporvedrejectedperson.length>0">
+                            <td>{{$index+1}}</td>
+                            <td class="text-center">{{user1.employeename}}</td>
+                            <td class="text-center">{{user1.ismresgaB_Date | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{user1.ismresgaB_AppRejFlg}}</td>
+                            <td class="text-center" ng-if="user1.ismresgaB_AppRejFlg=='Approved'">{{user1.ismresgaB_RelievingDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center" ng-if="user1.ismresgaB_AppRejFlg=='Rejected'">Rejected</td>
+                            <td class="text-center">{{user1.ismresgaB_Remarks}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myresignationletter" class="modal fade" role="dialog" data-backdrop="false" name="formm">
+    <div class="modal-dialog modal-lg" style="width: 60%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="text-center">
+                    <div>
+                        <img style="height:10%;width:100%" src="{{MI_Logo}}" />
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h4 style="text-transform: uppercase;"> RESIGNATION LETTER</h4>
+                </div>
+                <div style="font-size:12px;">
+                    <table class="table table-hover table-responsive" style="width:100%;font-size:12px;">
+                        <tr><td style="text-align:right;">Date : {{currentdate | date:"dd-MM-yyyy"}}</td></tr>
+                        <tr><td style="text-align:left;">From.</td></tr>
+                        <tr><td style="text-align:left;">{{hrmE_EmployeeFirstName}}</td></tr>
+                        <tr><td style="text-align:left;">{{hrmE_PerStreet}}</td></tr>
+                        <tr><td style="text-align:left;">{{hrmE_PerArea}}</td></tr>
+                        <tr><td style="text-align:left;">{{hrmE_PerCity}} {{hrmE_PerPincode}}</td></tr>
+                    </table>
+                    <br />
+                    <table class="table table-hover table-responsive" style="width:100%;font-size:12px;">
+                        <tr><td style="text-align:left;">To.</td></tr>
+                        <tr><td style="text-align:left;">{{employeeManager}}</td></tr>
+                        <tr><td style="text-align:left;">{{companydetails.mI_Name}}</td></tr>
+                        <tr><td style="text-align:left;">{{companydetails.mI_Address1}}</td></tr>
+                        <tr><td style="text-align:left;">{{companydetails.mI_Address2}}</td></tr>
+                        <tr><td style="text-align:left;">{{companydetails.ivrmmcT_Name}} {{companydetails.mI_Pincode}}</td></tr>
+                    </table>
+                    <br />
+                    <div style="font-size:12px">
+                        <p style="text-align:left;">Dear <b>{{employeeManager}}</b>,</p>
+                        <br />
+                        <p style="text-align:justify;">
+                            Please accept this letter as formal notice of my resignation from my position as <b>{{hrmdeS_DesignationName}}</b> at <b>{{companydetails.mI_Name}}</b> with effect from today i.e. <b>{{currentdate | date: 'dd/MM/yyyy'}}</b>. My Joining date was <b>{{hrmE_DOJ | date: 'dd/MM/yyyy'}}</b>. My last day of employment after completion of 3 months’ notice period will be <b>{{tentative_Leaving_Date | date: 'dd/MM/yyyy'}}</b>.
+                        </p>
+                        <br />
+                        <p style="text-align:justify;">
+                            Thank you for giving me the opportunity to work in this position for the past <b>{{duration}}</b> days. I have thoroughly enjoyed working here and appreciate all of the opportunities you have given me. However, I have decided it is time for me to move on to my next challenge.
+                        </p>
+                        <br />
+                        <p style="text-align:justify;">
+                            I would like to do anything I can to help with the transition, including wrapping up my responsibilities and training other team members. If I can be of any other assistance during this time, please let me know.
+                        </p>
+                        <br />
+                        <p>
+                            Thank you again for the opportunity, and I wish you and {{companydetails.mI_Name}} all the best for the future.
+                        </p>
+                        <br />
+                    </div>
+                    <table class="table table-hover table-responsive" style="width:100%;font-size:12px;">
+                        <tr>
+                            <td style="text-align:left;"><b>Yours sincerely,</b></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;"><b>{{hrmE_EmployeeFirstName}}</b></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mymoduledocview" class="modal fade" role="dialog" data-backdrop="false" name="formm">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>Employee Uploaded Checklists</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th class="text-center">File Name</th>
+                            <th class="text-center">Document</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user1 in uploadeddocumets" ng-if="uploadeddocumets.length>0">
+                            <td>{{$index+1}}</td>
+                            <td class="text-center">{{user1.ismresgcL_FileName}}</td>
+                            <td class="text-center">
+                                <span ng-if="user1.ismresgcL_FilePath.length>0">
+                                    <a style="color:red;display:inline; font-weight: bolder; text-decoration:underline;font-size:small;" data-toggle="modal" data-ng-click="showmodaldetailscheck(user1.ismresgcL_FilePath)">View</a>
+
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="grid-action-cell" ng-if="showmsgvalidationdelete==true">
+                                    <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="deletechecklistpopup(user1)"><i class="fa fa-trash fa-1x" aria-hidden="true"></i></a>
+                                </div>
+                                <div class="grid-action-cell" ng-if="showmsgvalidationdelete==false">
+                                    <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="deletechecklist(user1)"><i class="fa fa-trash fa-1x" aria-hidden="true"></i></a>
+                                </div>
+
+                            </td>
+                        </tr>
+                        <tr ng-if="uploadeddocumets.length==0">
+                            <td colspan="4">
+                                <a style="color:red;font-size:large">Still Not Uploaded Any Cheklist Documents</a>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mymoduledocviewRelieving" class="modal fade" role="dialog" data-backdrop="false" name="formm">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>Employee Uploaded Checklists</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th class="text-center">File Name</th>
+                            <th class="text-center">Document</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user1 in uploadeddocumets" ng-if="uploadeddocumets.length>0">
+                            <td>{{$index+1}}</td>
+                            <td class="text-center">{{user1.ismresgcL_FileName}}</td>
+                            <td class="text-center">
+                                <span ng-if="user1.ismresgcL_FilePath.length>0">
+                                    <a style="color:red;display:inline; font-weight: bolder; text-decoration:underline;font-size:small;" data-toggle="modal" data-ng-click="showmodaldetailscheck(user1.ismresgcL_FilePath)">View</a>
+
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span style="color:red" ng-if="user1.ismresgcL_Status=='Rejected'">{{user1.ismresgcL_Status}}</span>
+                                <span style="color:green" ng-if="user1.ismresgcL_Status=='Approved' || user1.ismresgcL_Status=='Partially Approved'">{{user1.ismresgcL_Status}}</span>
+                                <span style="color:black" ng-if="user1.ismresgcL_Status=='Pending'">{{user1.ismresgcL_Status}}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="grid-action-cell" ng-if="user1.ismresgcL_Status=='Pending'">
+                                    <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="deletechecklistpopup(user1)"><i class="fa fa-trash fa-1x" aria-hidden="true"></i></a>
+                                </div>
+                                <!--<div class="grid-action-cell" ng-if="showmsgvalidationdeletereling==false">
+                                    <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="deletechecklist(user1)"><i class="fa fa-trash fa-1x" aria-hidden="true"></i></a>
+                                </div>-->
+
+                            </td>
+                        </tr>
+                        <tr ng-if="uploadeddocumets.length==0">
+                            <td colspan="4">
+                                <a style="color:red;font-size:large">Still Not Uploaded Any Cheklist Documents</a>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-center">
+                    <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                    <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                </div>
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Close
+                </md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfIdzz">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="myModaldocx" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <h4 style="text-align:center">View Document</h4>
+                    </div>
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="noccertificate" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">NOC Certificate</h4>
+            </div>
+            <div class="modal-body">
+                <div class="" id="printnoccertificate">
+                    <div class="text-center">
+                        <div style="font-size: 12px !important;  line-height: 14px !important">
+                            <h5 style="text-transform:uppercase;font-size:20px !important;font-family:'system-ui';margin:4px !important">VAPS TECHNOSOFT Pvt ltd</h5>
+                            <div class="text-center"><h4 style="margin:0px !important;font-size: 16px;">NO DUE CERTIFICATE</h4></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 text-left"><b style="font-weight: 600 !important;"></b></div>
+                        <div class="col-sm-5 text-right"> <b style="font-weight: 600 !important;">Date: </b><label>{{nocapproveddetails[0].ISMCERTREQ_RequestDate |date:'dd/MM/yyyy'}}</label>  </div>
+                        <div class="col-sm-1"></div>
+                    </div>
+                    <br>
+                    <p style="line-height: 18px;    text-align: justify;">
+                        <b style="font-weight: 600 !important;">
+                            Mr/Ms/Mrs <label><b> {{employeename}} </b></label>
+
+                            has submitted his / her resignation on date <label><b>{{ResignationDate|date:'dd/MM/yyyy'}}</b></label>and
+
+                            the same is accepted by the Management.
+                        </b>
+                    </p>
+                    <p style="line-height: 18px;    text-align: justify;">
+                        <b style="font-weight: 600 !important;">
+                            Kindly confirm the dues,advances,office belongings,if any In his / her possession.
+                        </b>
+                    </p>
+                    <br>
+                    <br>
+                    <table class="table-borderd table" border="1">
+                        <thead>
+                            <tr>
+                                <th>S.NO</th>
+                                <th>Approved By</th>
+                                <th>Department</th>
+                                <!--<th>Details of Due</th>-->
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="itm in nocapproveddetails">
+                                <td>{{$index+1}}</td>
+                                <td>{{itm.EmployeeName}}</td>
+
+                                <td>{{itm.HRMD_DepartmentName}}</td>
+                                <!--<td>{{itm.ISMCERTREQAPP_Remarks}}</td>-->
+                                <td>{{itm.ISMRESGAB_Date |date:'dd/MM/yyyy'}}</td>
+                                <td>{{itm.ISMCERTREQAPP_AppRejFlag}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="row text-center">
+                        <div style="font-size: 12px !important;  line-height: 14px !important">
+                            <h5 style="text-transform:uppercase;font-size:20px !important;font-family:'system-ui';margin:4px !important">VAPS TECHNOSOFT Pvt ltd</h5>
+                            <br>
+                            <br>
+                            <div class="text-center"><h4 style="margin:0px !important;font-size: 16px;">ACCOUNTS DEPARTMENT CHECK LIST FOR F AND F DEDUCTION</h4></div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-6 text-left"><b style="font-weight: 600 !important;"></b>Name:<label> {{employeename}}</label></div>
+                    <div class="col-sm-5 text-right"> <b style="font-weight: 600 !important;">Date of Relieving : </b><label>{{HRME_DOL |date:'dd/MM/yyyy'}}</label></div>
+                    <div class="col-sm-1"></div>
+                    <br>
+                    <div style="margin-left:10px !important">
+                        <p>DOJ :<label>{{DateOfJoining |date:'dd/MM/yyyy'}}</label></p>
+                        <p>Department :<label>{{Department}}</label></p>
+                        <p>Designation :<label>{{Designation}}</label></p>
+
+                        <p>Client Name :<label>..............................</label></p>
+                    </div>
+
+                    <br>
+                    <div class="row text-center">
+                        <table class="table-borderd table" border="1">
+                            <thead>
+                                <tr>
+                                    <th>S.NO</th>
+                                    <th>DESCRIPTION</th>
+                                    <th>REMARK</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="obj in checklistapprovedlist">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{obj.ISMRESGMCL_CheckListName}}</td>
+                                    <td>{{obj.ISMRESGCLAPP_Remarks}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <br>
+                    <br>
+                    <div style="margin-left:5px !important">
+                        <div class="row">
+                            <div class="col-sm-6 text-left"><b style="font-weight: 800 !important;">Signature of the Employee </b></div>
+                            <div class="col-sm-5 text-right"> <b style="font-weight: 800 !important;">Signature of the Accounts Manager </b></div>
+                            <div class="col-sm-1"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <md-button type="submit" class="md-raised md-primary" data-ng-click="printnoc(print)">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

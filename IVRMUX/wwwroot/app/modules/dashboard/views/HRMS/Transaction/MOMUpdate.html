@@ -1,0 +1,1036 @@
+﻿<style>
+    .file-blue:before {
+        content: 'Upload MoM';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        border-radius: 5px;
+    }
+
+    .oldd {
+        background-color: coral;
+    }
+
+    .non-editable {
+        pointer-events: none;
+    }
+
+    .neww {
+        background-color: white;
+    }
+    .formatted-cell {
+        white-space: pre-line !important;
+    }
+
+</style>
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> MOM UPDATE PENDING LIST</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="aprovedlist.length > 0">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{aprovedlist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search1" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Name')">Meeting Name</a>
+
+                            </th>
+                            <!--<th>
+                                <a href="" ng-click="sort('MOM_StartTime')">Meeting Time</a>
+                            </th>-->
+                            <th>
+                                <a href="" ng-click="sort('MOM_Date')">Meeting Date</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Venue')">Venue</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Status')">Status</a>
+                            </th>
+                            <th>
+                                Documents
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1=(aprovedlist | filter : search1) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="ssss">
+                            <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td>{{user.MOM_Name}}</td>
+                            <!--<td>{{user.MOM_StartTime}}</td>-->
+                            <td>{{user.MOM_Date |date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.MOM_Venue}}</td>
+                            <td>{{user.MOM_Status}}</td>
+                            <td class="text-center">
+                                <span>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="viewdocument(user);"> <i class="fa fa-eye text-blue"></i></a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a class="text-aqua" href="" ng-click="update(user)" data-placement="bottom" data-toggle="tooltip" title="update">
+                                    <i class="fa fa-arrow-down text-red" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="ssss">
+                </dir-pagination-controls>
+            </div>
+            <div class="box-body" ng-show="aprovedlist.length==0" style="text-align:center;color:red">
+                <b> MOM NOT AVAILABLE FOR UPDATE</b>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="appliedlist.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">MOM UPDATE STATUS</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12 box-content clearfix">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <!--<label><b>AGENDA</b></label>-->
+                            <h5>AGENDA :</h5>
+                            <div id="van">
+                                <pre class="form-control non-editable" ng-bind="MOM_Agenda" contenteditable="false" style="height:150px; overflow-y: scroll; pointer-events: none;"></pre>
+                            </div>
+                            <!--<p id="van" style="height:300px;overflow-y:auto" ng-disabled="true"></p>-->
+                        </div>
+                        <div class="col-sm-6">
+                            <h5>VENUE : <textarea style="color:#444 !important;width: 353px; height: 97px;" ng-disabled="true"> &nbsp;&nbsp;{{MOM_Venue}} </textarea> </h5>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-sm-6">
+                            <h5>Meeting Start Time : <b>{{MOM_StartTime |date :"h:mma"}}</b>  </h5>
+                        </div>  <div class="col-sm-6">
+                            <h5>Meeting End Time : <b>{{MOM_EndTime |date :"h:mma"}} </b> </h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center" ng-if="excel1==false">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#participantsdetails" ng-model="participants" data-backdrop="static">
+                                <h4 ng-click="excelhide()" title="click to view">PARTICIPANTS DETAILS <i class="fa fa-eye text-blue"></i></h4>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#attendencesdetails" ng-model="participantsattende" data-backdrop="static">
+                                <h4 title="click to view">PARTICIPANTS ATTENDENCE DETAILS <i class="fa fa-eye text-blue"></i></h4>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="box box-primary" ng-if="excel==false">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Imported Data From Excel</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                            <div class="col-sm-6 text-center">
+                                <md-button type="button" ng-click="exptoex();" target="_blank" class="md-raised md-primary">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Sample Excel Formate
+                                </md-button>
+                            </div>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body" style="overflow:scroll;">
+                            <div class="">
+                                <div class="col-sm-2 pull-left padding-left-none">
+                                    <label class="custom-file-input file-blue1" style="width:100%;margin:auto;" ng-click="excelhide1()">
+                                        <input type="file" name="impfile" class="btn btn-success" value="Import" ng-model="imp.file" accept=".xlsx" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().vm.gridOptions)" style="padding-top: 1px;padding-bottom: 2px;" fileread="" opts="vm.gridOptions" />
+                                    </label>
+                                </div>
+                                <div class="col-sm-4 pull-right">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-search"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr ng-repeat="item in vm.gridOptions.data  | limitTo:1">
+                                            <th>
+                                                <a href="" ng-click="order('sno')">SLNO</a>
+                                            </th>
+
+                                            <th ng-repeat="key in item | keys">
+                                                <a href="" ng-click="order(key)">{{key}}</a>
+
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in vm.gridOptions.data |orderBy:sortKey:reverse| filter:search ">
+                                            <td>{{ $index + 1}}</td>
+                                            <td class="formatted-cell" ng-repeat="key in item | keys " ng-init="value = item[key]" >{{value}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <pagination total-items="totalItems" ng-model="currentPage"
+                                            max-size="5" boundary-links="true"
+                                            items-per-page="numPerPage" class="pagination-sm">
+                                </pagination>
+                            </div>
+                            <hr />
+                            <!--<div class="row">
+                                                            <div class="text-center">
+                                                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="savedata(vm.gridOptions.data)">
+                                                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="savedata(vm.gridOptions.data)">
+                                                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                                                        Save
+                                                                    </md-button>
+                                                                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                                        Cancel
+                                                                    </md-button>
+                            </div>
+                                                        </div>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 box-content clearfix" style="margin-top: 25px !important">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-4">Meeting Date : <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker data-ng-model="MOM_Date" name="start_date" md-placeholder="Enter date" md-min-date="entredate" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.start_date)" ng-messages="myForm.start_date.$error">
+                                            <div ng-message="required">Select Meeting Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group margin-top-15">
+                                    <table class="table table-hover table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>SL NO</th>
+                                                <th>Upload File</th>
+                                                <th>File Name</th>
+                                                <th>View</th>
+                                                <th>Action </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="other in documentListOtherDetails track by $index">
+                                                <td>{{$index+1}}</td>
+                                                <td>
+                                                    <div class="col-sm-12 UploadEmpDoc1">
+                                                        <!--<strong style="color:red;">*</strong>-->
+                                                        <div class="form-group text-center">
+                                                            <label class="custom-file-input file-bluenew" style="width:100%;margin:auto;">
+                                                                <input type="file" name="doc" accept="image/*, application/pdf" data-ng-model="documentListOtherDetails[$index].FilePath" onchange="angular.element(this).scope().selectFileforUploadzdOtherDetail(this, angular.element(this).scope().other)">
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" ng-model="other.FileName" disabled />
+                                                </td>
+                                                <td>
+                                                    <a ng-if="other.FilePath  !=null && other.FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(other.FilePath)"> view</a>
+                                                </td>
+                                                <td>
+                                                    <span class="input-group-addon" ng-hide="documentListOtherDetails.length >1030">
+                                                        <a href="" ng-show="$last" ng-click="addNewDocumentOtherDetail()" style="color:#000;">
+                                                            <i class="fa fa-plus"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span class="input-group-addon" id="remove" ng-hide="documentListOtherDetails.length ==1">
+                                                        <a href="" ng-click="removeNewDocumentOtherDetail($index,other)" style="color:#000;">
+                                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5" style="padding-top:7%;">From Time :<strong style="color:red;">*</strong></label>
+                                        <div class="col-sm-7">
+                                            <div uib-timepicker name="fromtime" ng-model="MOM_StartTime" ng-change="validateTomintime(MOM_StartTime)" hour-step="hstep" minute-step="mstep" ng-disabled="timedis" show-meridian="true" required></div>
+                                            <div class="error-messages" ng-if="interacted(myForm.fromtime)" ng-messages="myForm.fromtime.$error">
+                                                <div ng-message="required">Select  From Time</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5" style="padding-top:7%;">To Time : <strong style="color:red;">*</strong></label>
+                                        <div class="col-sm-7">
+                                            <div uib-timepicker name="totime" ng-model="MOM_EndTime" ng-change="validatemax(MOM_EndTime)" hour-step="hstep" minute-step="mstep" ng-disabled="timedis" show-meridian="true" required></div>
+                                            <div class="error-messages" ng-if="interacted(myForm.totime)" ng-messages="myForm.totime.$error">
+                                                <div ng-message="required">Select To Time</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-sm-6">
+                                <label class="control-label col-sm-2">Final Flag:</label>
+                                <div class="col-sm-2">
+                                    <label class="lablehalfday">
+                                        <input type="checkbox" name="updateflag" data-ng-model="MOM_Flag">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <label class="control-label col-sm-5" style="padding-top:7%;">MINUTES DETAILS : <strong style="color:red;">*</strong></label>
+                                <textarea name="mindetails" ng-model="MOM_Minutes" style="color:#444 !important; width: 1115px; height: 230px;" rows="4" cols="50" required></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.mindetails)" ng-messages="myForm.mindetails.$error">
+                                    <div ng-message="required">Write details of MOM</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <input type="hidden" ng-model="MOM_Id" value="{{MOM_Id}}" />
+                            <input type="hidden" ng-model="MOMMNT_Id" value="{{MOMMNT_Id}}" />
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData()" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="griddata.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title"> MOM UPDATE LIST</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{griddata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Name')">Meeting Name</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Agenda')">Agenda</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Date')">Meeting Date</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_StartTime')">Meeting Time</a>
+
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('moM_Minutes')">Minutes</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Venue')">Venue</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('Participants')">Participants Details</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('MOM_Status')">Status</a>
+                            </th>
+                            <th>
+                                Documents
+                            </th>
+                            <th>Action </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue=(griddata | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.moM_Name}}</td>
+                            <td>
+                                <span>
+                                    <a class="text-primary" data-placement="bottom" data-toggle="modal" data-target="#agendadetails" data- title="VIEW Details" ng-click="agendadetails(user)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>{{user.moM_Date |date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.moM_StartTime}} TO {{user.moM_EndTime}}</td>
+                            <td>
+                                <span>
+                                    <a class="text-primary" data-placement="bottom" data-toggle="modal" data-target="#minutesdetails" data- title="VIEW Details" ng-click="minutesdetails(user)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>{{user.moM_Venue}}</td>
+                            <td>
+                                <span>
+                                    <a class="text-primary" data-placement="bottom" data-toggle="modal" data- title="VIEW Details" ng-click="ViewDetails(user)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td>{{user.moM_Status}}</td>
+                            <td class="text-center">
+                                <span>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="viewdocument(user)"> <i class="fa fa-eye text-blue"></i></a>
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-if="user.moM_Flag=='Pending'">
+                                    <a class="text-aqua" href="" ng-click="Edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="box box-primary" ng-show="empdata.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title"> EMPLOYEE LIST</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records : {{empdata.length}}</b>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search2" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th>
+                                <a href="">EMPLOYEE NAME</a>
+
+                            </th>
+                            <th>
+                                <a href="">EMPLOYEE CODE</a>
+                            </th>
+                            <th>
+                                <a href="">DEPARTMENT</a>
+                            </th>
+                            <th>
+                                <a href="">DESIGNATION</a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="employee in empdata">-->
+                        <tr dir-paginate="employee in filterValue=(empdata | filter : search2) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                            <td>{{$index + 1}}</td>
+                            <td>{{employee.FullName}} </td>
+                            <td>{{employee.HRME_EmployeeCode}}</td>
+                            <td>{{employee.HRMD_DepartmentName}}</td>
+                            <td>{{employee.HRMDES_DesignationName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+
+
+    </form>
+</section>
+
+
+<div class="modal fade" id="participantsdetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">PARTICIPANTS COUNT : {{updateDetails.length}}</h5>
+            </div>
+            <div class="modal-body" ng-form="myForm12">
+                <table class="table  table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Task/Group <strong style="color:orangered;">*</strong></th>
+                            <th>Participants</th>
+                            <th>Designation</th>
+                            <th> Contact No</th>
+                            <th> Email</th>
+                            <th> ActionPlans</th>
+                            <th> TargetDate</th>
+                            <!--<th>Attendence</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="emp in  updateDetails" ng-form="myForm12">-->
+                        <tr dir-paginate="emp in filterValue1=(updateDetails | filter : search1) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage11" current-page="currentPage11" pagination-id="kkkk">
+                            <td>{{emp.MOMPRT_EXTINTFlag}}</td>
+                            <td>
+                                <input type="text" class="form-control" ng-model="emp.MOMMNT_Names" placeholder="Enter Group*" name="adsss" rows="3" style="resize:none" required />
+                                <div class="error-messages" ng-if="interacted12(myForm12.adsss)" ng-messages="myForm12.adsss.$error">
+                                    <div ng-message="required">Enter Group Name</div>
+                                </div>
+                            </td>
+                            <td>{{emp.MOMPRT_ParticipantsName}}</td>
+                            <td>{{emp.MOMPRT_Designation}}</td>
+                            <td>{{emp.MOMPRT_MobileNo}}</td>
+                            <td>{{emp.MOMPRT_Email}}</td>
+
+
+                            <td>
+                                <textarea class="form-control" ng-model="emp.MOMMNT_ActionPlans" placeholder="Enter ActionPlans" name="ActionPlans" rows="3" style="white-space: pre-line;"></textarea>
+
+                            </td>
+                            <td>
+                                <div class="col-sm-4">
+                                    <md-datepicker ng-model="emp.MOMMNT_TargetDate" name="TargetDate" md-placeholder="Enter date"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted12(myForm12.TargetDate)" ng-messages="myForm12.TargetDate.$error">
+                                        <div ng-message="required">Enter TargetDate</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <!--<td>
+                                <span class="grid-action-cell">
+                                    <a ng-if="emp.momprT_ActiveFlag === true" href="javascript:void(0)" style="color:green;" ng-click="deactive(emp)"> <md-tooltip md-direction="down">Activate Now</md-tooltip> <i class="fa fa-toggle-on text-green" aria-hidden="true"></i></a>
+                                    <span>
+                                        <a ng-if="emp.momprT_ActiveFlag === false" href="javascript:void(0)" style="color:red;" ng-click="deactive(emp)">  <md-tooltip md-direction="down">Deactivate Now</md-tooltip> <i class="fa fa-toggle-off text-red" aria-hidden="true"></i></a>
+                                    </span>
+                                </span>
+                            </td>-->
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="kkkk">
+                </dir-pagination-controls>
+            </div>
+            <div>
+                <h3 class="modal-title"> ADD NEW PARTICIPANTS DETAILS</h3>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <table class="table  table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Employee Type</th>
+                                    <th>Task</th>
+                                    <th>Participants  </th>
+                                    <th> ActionPlans</th>
+                                    <th> Deadlines</th>
+                                    <th>Designation</th>
+                                    <th>Contact No</th>
+                                    <th>Email</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="obj in employeenameschange " ng-form="myForm21">
+
+                                    <td>
+                                        <div class="radio text-center well teststyle" ng-init="obj.radiomodal1 ='Internal'">
+                                            <label>
+                                                <input name="optradio1{{$index+1}}" type="radio" value="Internal" ng-model="obj.radiomodal1" ng-change="onChangeradio1(obj.radiomodal1)" required>
+                                                <span class="lbl padding-8">Internal Dept</span>
+                                            </label>
+                                            <label>
+                                                <input name="optradio1{{$index+1}}" type="radio" value="External" ng-model="obj.radiomodal1" ng-change="onChangeradio1(obj.radiomodal1)" required>
+                                                <span class="lbl padding-8">External Dept</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" ng-model="obj.MOMMNT_Names" placeholder="Enter Task*" name="Task" rows="3" style="resize:none" required />
+                                        <div class="error-messages" ng-if="interacted21(myForm21.Task)" ng-messages="myForm21.Task.$error">
+                                            <div ng-message="required">Enter Task</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div ng-if="obj.radiomodal1=='Internal'">
+                                            <ui-select id="sell11" name="staf11" ng-model="$parent.obj.hrmE_Id" theme="bootstrap" ng-change="visitorlist(obj)" ng-keyup="searchfilter($select);"
+                                                       title="Select emp" ng-required="obj.MOMPRT_EXTINTFlag=='Internal'">
+                                                <ui-select-match ng-trim="false" placeholder="Search employee in the list">
+                                                    {{$select.selected.hrmE_EmployeeFirstName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option1 in emplist | filter: $select.search " value="{{option1.HRME_Id}}" ng-selected="{{option1.Selected == true}}">
+                                                    <div ng-bind-html="(option1.hrmE_EmployeeFirstName) | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+                                        <div ng-if="obj.radiomodal1=='External'">
+                                            <input type="text" class="form-control" name="plac" ng-model="obj.MOMPRT_ParticipantsName" placeholder="Enter Employee Name" ng-disabled="obj.radiomodal1=='Internal'" ng-required="obj.radiomodal1=='External'">
+                                        </div>
+                                    </td>
+
+
+                                    <td>
+                                        <textarea class="form-control" ng-model="obj.MOMMNT_ActionPlans" placeholder="Enter ActionPlans" name="addsss" rows="3" style="resize:none;white-space:pre-line;"></textarea>
+                                    </td>
+                                    <td>
+                                        <div class="col-sm-4">
+                                            <md-datepicker ng-model="obj.MOMMNT_TargetDate" name="TargetDate" md-placeholder="Enter date"> </md-datepicker>
+                                            <div class="error-messages" ng-if="interacted21(myForm21.TargetDate)" ng-messages="myForm21.TargetDate.$error">
+                                                <div ng-message="required">Select TargetDate</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="plac" ng-model="obj.MOMPRT_Designation" placeholder="Enter DesignationName" id="sel7">
+                                    </td>
+                                    <td>
+                                        <input class="form-control" name="mb2" id="catgr1y" type="text" ng-model="obj.MOMPRT_MobileNo" placeholder="Enter MobileNo" maxlength="10" minlength="10"
+                                               allow-pattern="\d" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" ng-paste="$event.preventDefault()">
+                                    </td>
+                                    <td>
+                                        <input type="email" class="form-control" name="emal" ng-model="obj.MOMPRT_Email" placeholder="Enter EmailId" pattern="[^ @]*@[^ @]*">
+                                    </td>
+                                    <td>
+                                        <span class="input-group-addon" ng-hide="employeenameschange.length > 1000">
+                                            <a href="" ng-show="$last" ng-click="addNewDetail()" style="color:#000;">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="input-group-addon" id="remove" ng-hide="employeenameschange.length ==1">
+                                            <a href="" ng-click="removeNewDetail($index,obj)" style="color:#000;">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" data-dismiss="modal">
+                    <i class="fa fa-plus" aria-hidden="true"></i>Add & Close
+                </md-button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="agendadetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">Agenda</h5>
+            </div>
+            <div class="modal-body">
+
+
+                <div id="ada">
+                    <pre class="form-control non-editable" ng-bind="MOM_Agenda" contenteditable="false" style="height:150px; overflow-y: scroll;"></pre>
+                </div>
+
+                <!--<div class="row">
+                    <div class="col-sm-12">
+                        <textarea name="mindetails" ng-model="moM_Agenda" style="color:#444 !important; width: 1115px; height: 230px;" rows="5" cols="50" ng-disabled="true"></textarea>
+                    </div>
+                </div>-->
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">VIEW UPLOADED FILE</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>FILE NAME</th>
+                                <th>VIEW</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documents in uploaddocfiles">
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-left">{{documents.momfL_FileName}}</td>
+                                <td class="text-center">
+                                    <span ng-if="documents.momfL_FilePath !=null && documents.momfL_FilePath !=''">
+                                        <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                           style="color:red;display:inline; font-weight: bolder;"
+                                           ng-click="previewimg_new(documents.momfL_FilePath,documents.momfL_FileName)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" style="width:40px" /> view
+                                        </a>
+                                        <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                           style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                           ng-click="previewimg_new(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                           ng-click="previewimg_new(documents.momfL_FilePath,documents.momfL_FileName)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                           style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" style="width:40px" />
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="minutesdetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">MINUTES DETAILS</h5>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <textarea name="mindetails" ng-model="MOM_Minutes" style="color:#444 !important; width: 1115px; height: 230px;" rows="5" cols="50" ng-disabled="true"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- grid participats details -->
+<div class="modal fade" id="participants" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">PARTICIPANTS COUNT : {{getParticipentsdetails.length}}</h5>
+            </div>
+            <div class="modal-body">
+                <table class="table  table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Task/Group</th>
+                            <th>Participants</th>
+                            <th> ActionPlans</th>
+                            <th> TargetDate</th>
+                            <th> EMAIL</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in employeeid">
+                        <tr>
+                            <td rowspan="{{user.plannerdetails.length+1}}">{{$index+1}} </td>
+                            <td rowspan="{{user.plannerdetails.length+1}}">{{user.MOMMNT_Names}} </td>
+                        </tr>
+                        <tr ng-repeat="meet in user.plannerdetails">
+                            <td>{{meet.MOMPRT_ParticipantsName}}</td>
+                            <td><span style="white-space:pre-line;">{{meet.MOMMNT_ActionPlans}} </span></td>
+                            <td>
+                                <span ng-if="meet.MOMMNT_TargetDate !== '1970-01-01 00:00:00.000' && meet.MOMMNT_TargetDate !== null">{{ meet.MOMMNT_TargetDate | date: 'dd-MM-yyyy' }}</span>
+                                <span ng-if="meet.MOMMNT_TargetDate === '1970-01-01 00:00:00.000' || meet.MOMMNT_TargetDate === null"> - </span>
+                            </td>
+                            <td>{{meet.MOMPRT_Email}}</td>
+                        </tr>
+                        <!--<tr>
+                            <td rowspan="{{user.plannerdetails.length+1}}">{{$index+1}} </td>
+                            <td rowspan="{{user.plannerdetails.length+1}}">{{user.MOMMNT_Names}} </td>
+                        </tr>
+                        <tr ng-repeat="meet in user.plannerdetails">
+                            <td>{{user.MOMPRT_ParticipantsName}}</td>
+                            <td><span style="white-space:pre-line;">{{user.MOMMNT_ActionPlans}} </span></td>
+                            <td>
+                                <span ng-if="user.MOMMNT_TargetDate !== '1970-01-01 00:00:00.000' && user.MOMMNT_TargetDate !== null">{{ user.MOMMNT_TargetDate | date: 'dd-MM-yyyy' }}</span>
+                                <span ng-if="user.MOMMNT_TargetDate === '1970-01-01 00:00:00.000' || user.MOMMNT_TargetDate === null"> - </span>
+                            </td>
+                            <td>{{user.MOMPRT_Designation}}</td>
+                            <td>{{user.MOMPRT_MobileNo}}</td>
+                            <td>{{user.MOMPRT_Email}}</td>
+                        </tr>-->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{momfL_FileName}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=====================video play===============-->
+<div id="myvideoPreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:60%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Videos </h4>
+            </div>
+            <div class="modal-body">
+                <div ng-repeat="vd in view_videos">
+                    <div class="row">
+
+                        <div class="col-sm-6 col-sm-offset-2 vdoleft1">
+                            <video width="420" height="240" controls="controls">
+                                <source ng-src="{{vd.ihw_video | trustUrl}}" type="video/mp4">
+                                Your browser does not support HTML5 video.
+                            </video>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=====================audio play===============-->
+<div id="myaudioPreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:60%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Audio/Mp3 </h4>
+            </div>
+            <div class="modal-body">
+
+                <div ng-repeat="vd in view_videos">
+                    <div class="row">
+
+                        <div class="col-sm-6 col-sm-offset-2 vdoleft1">
+                            <audio width="420" height="240" controls="controls">
+                                <source ng-src="{{vd.ihw_video | trustUrl}}" type="audio/mp3">
+                                Your browser does not support HTML5 Audio.
+                            </audio>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade" id="attendencesdetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">PARTICIPANTS COUNT : {{updateDetails.length}}</h5>
+            </div>
+            <div class="modal-body" ng-form="myForm12">
+                <table class="table  table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Participants</th>
+                            <th>Attendence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="emp in  updateDetails" ng-form="myForm12">-->
+                        <tr dir-paginate="emp in filterValue1=(updateDetails | filter : search1) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage11" current-page="currentPage11" pagination-id="11111">
+                            <td>{{emp.MOMPRT_ParticipantsName}}</td>
+                            <td>
+                                <span class="grid-action-cell">
+                                    <a ng-if="emp.MOMPRT_ActiveFlag === true" href="javascript:void(0)" style="color:green;" ng-click="deactive(emp)"> <md-tooltip md-direction="down">Activate Now</md-tooltip> <i class="fa fa-toggle-on text-green" aria-hidden="true"></i></a>
+                                    <span>
+                                        <a ng-if="emp.MOMPRT_ActiveFlag === false" href="javascript:void(0)" style="color:red;" ng-click="deactive(emp)">  <md-tooltip md-direction="down">Deactivate Now</md-tooltip> <i class="fa fa-toggle-off text-red" aria-hidden="true"></i></a>
+                                    </span>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="11111">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+</div>
+

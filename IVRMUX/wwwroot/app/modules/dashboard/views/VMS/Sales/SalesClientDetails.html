@@ -1,0 +1,257 @@
+﻿<style>
+    .colef {
+        margin-left: 16%;
+    }
+</style>
+<section class="content" data-ng-init="getAllDetail()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Client Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-7 col-sm-offset-3 colef">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Client Name : </label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="clientSelect" ng-model="$parent.ISMSLE_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Client"
+                                           ng-required="false">
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Client">
+                                        {{$select.selected.ismslE_LeadName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in ClientDataOnload | filter: $select.search" value="{{catgry.ismslE_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.ismslE_LeadName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <!--<div class="error-messages" ng-if="myForm.cltpjt.$touched && myForm.cltpjt.$invalid">
+                                    <div ng-message="required">Select Client</div>
+                                </div>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Product Name : </label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="productSelect" ng-model="$parent.ISMSMPR_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Product"
+                                           ng-required="false">
+                                    <ui-select-match ng-trim="true" placeholder="Select or Search Product">
+                                        {{$select.selected.ismsmpR_ProductName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="pr in ProductListOnload | filter: $select.search" value="{{pr.ismsmpR_Id}}"
+                                                       ng-selected="{{pr.Selected == true}}">
+                                        <div ng-bind-html="pr.ismsmpR_ProductName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <!--<div class="error-messages" ng-if="myForm.cltpjt2.$touched && myForm.cltpjt2.$invalid">
+                                    <div ng-message="required">Select Product</div>
+                                </div>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Purchase Status : </label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="statusSelect" ng-model="$parent.ISMSMST_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Status"
+                                           ng-required="false">
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Status">
+                                        {{$select.selected.ismsmsT_StatusName}}
+                                    </ui-select-match>
+
+                                    <ui-select-choices repeat="st in StatusListOnload | filter: $select.search" value="{{st.ismsmsT_Id}}"
+                                                       ng-selected="{{st.Selected == true}}">
+                                        <div ng-bind-html="st.ismsmsT_StatusName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+
+                                    <!--<div class="error-messages" ng-if="myForm.cltpjt3.$touched && myForm.cltpjt3.$invalid">
+        <div ng-message="required">Select Status</div>
+    </div>-->
+</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <div class="error-messages" ng-if="myForm.$submitted && (!myForm.clientSelect.$modelValue &&!myForm.productSelect.$modelValue &&!myForm.statusSelect.$modelValue)">
+                                    <div>At least one field must be selected (Client, Product, or Status).</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="Id" value="{{ISMCLTPRBOM_Id}}" />
+
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="Report()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#tableexcell')" target="_blank" ng-show="ClientReport.length > 0 ">
+                        Export to Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-warn" ng-click="printData();" ng-show="ClientReport.length > 0 ">
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+
+
+    <div class="box box-primary" ng-show="ClientReport.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Client Details List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{ClientReport.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th>Client Name</th>
+                            <th>Client Contact Number</th>
+                            <th>Client Email</th>
+                            <th>Product Name</th>
+                            <th>Client Status</th>
+                            <th>Client Address</th>
+                            <th>Student Strength</th>
+                            <th>Staff Strength</th>
+                            <th>No of Institutions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="bm in alldata = (ClientReport | filter : searchValue) | orderBy:sortKey:sortReverse  | itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}
+                            <td class="text-center">{{bm.ISMSLE_LeadName}}</td>
+                            <td class="text-center">{{bm.ISMSLE_ContactNo}}</td>
+                            <td class="text-center">{{bm.ISMSLE_EmailId}}</td>
+                            <td class="text-center">{{bm.ProductName}}</td>
+                            <td class="text-center">{{bm.StatusName}}</td>
+                            <td class="text-center">{{bm.ISMSLE_LeadAddress1}}</td>
+                            <td class="text-center">{{bm.ISMSLE_StudentStrength}}</td>
+                            <td class="text-center">{{bm.ISMSLE_StaffStrength}}</td>
+                            <td class="text-center">{{bm.ISMSLE_NoOfInstitutions}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="false">
+        <div class="box-header with-border">
+            <h3 class="box-title">Client Details List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{ClientReport.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tableexcell">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th>Client Name</th>
+                            <th>Client Contact Number</th>
+                            <th>Client Email</th>
+                            <th>Product Name</th>
+                            <th>Client Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="bm in ClientReport">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center">{{bm.ISMSLE_LeadName}}</td>
+                            <td class="text-center">{{bm.ISMSLE_ContactNo}}</td>
+                            <td class="text-center">{{bm.ISMSLE_EmailId}}</td>
+                            <td class="text-center">{{bm.ProductName}}</td>
+                            <td class="text-center">{{bm.StatusName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+

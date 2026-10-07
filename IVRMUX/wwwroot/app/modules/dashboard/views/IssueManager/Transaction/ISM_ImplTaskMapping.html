@@ -1,0 +1,411 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e85a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+        .box-label:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }
+
+    .file-bluedd:before {
+        content: 'Download Template';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .multiselect {
+        width: 100%;
+        height: 8em;
+        /*border: solid 1px #5cb7ff;*/
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .md-icon-button + .md-datepicker-input-container {
+        margin-left: -10px;
+        width: 53%;
+    }
+
+    .data-box, .droupdown-box {
+        box-shadow: 0px 10px 10px rgba(0,0,0,0.1);
+    }
+    .dropdown-menu {
+        max-height: 300px;
+        min-width: 200px;
+        /* overflow-y: auto; */
+    }
+
+    /*.callout, .droupdown-box {
+        font-size: 15px;
+        font-family: FontAwesome;
+        font-weight: 600;
+        color: white;
+        transition: all ease-in-out 300ms;
+        background-color: rgb(122, 187, 123);
+        border-left: 7px solid;
+        padding: 5px;
+    }
+
+        .callout:hover, .droupdown-box:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }*/
+
+    .md-datepicker-calendar-pane {
+        z-index: 9999;
+    }
+</style>
+
+
+<!--<style>
+    .multiselect {
+        height: 300px;
+        width: 24.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        margin-left: 35.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>-->
+<link href="/css/MultselectCheckbx.css" rel="stylesheet" />
+
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Complaints/Task List </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="col-sm-7">
+
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <label class="control-label">Implementation Planner :<span style="color:red;">*</span></label>
+                        </div>
+                        <div class="col-sm-8">
+                            <select class="form-control" name="priority22" ng-model="ISMMIMPPL_Id" required>
+                                <option value="">--Select Planner--</option>
+                                <option ng-repeat="option in implplannerlist" ng-selected="{{option.Selected == true}}" value="{{option.ismmimppL_Id}}">
+                                    {{option.ismmimppL_PlannerName}}
+                                </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted1(myForm.priority22)" ng-messages="myForm.priority22.$error">
+                                <div ng-message="required">Please Select Planner</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Employee/Department :<span style="color:Red">*</span></label>
+                        <div class="col-sm-8">
+                            <ui-select id="sel1" name="dept" ng-model="$parent.HRME_Id" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onEmployeechange(obj)" title="Employee/Department">
+                                <ui-select-match ng-trim="false" placeholder="Select or search Employee/Department in the list...">{{$select.selected.employeeName}} : {{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                <ui-select-choices repeat="option in get_employeelist | filter: $select.search " value="{{option.HRME_Id}}" ng-selected="{{option.Selected == true}}">
+                                    <div ng-bind-html="option.employeeName +' : '+  option.HRMD_DepartmentName | highlight: $select.search"></div>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-6 col-sm-offset-5">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="searchtasks()" id="save-btn">
+                            <i class="fa fa-search-minus" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="get_comptasklist.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Planner List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-3 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="search1" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="overflow:scroll">
+                            <table class="table table-hover table-responsive table-bordered text-center" style="width:1700px">
+                                <thead>
+                                    <tr>
+                                        <th>
+
+                                            SLNO
+                                        </th>
+                                        <th>
+                                            <label>
+                                                <input type="checkbox" value="" ng-click="toggleAll()" ng-model="all">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort1('ISMIMPPL_ActivityName')">Planner Activity</a>
+                                        </th>
+
+                                        <th>
+                                            Remarks
+                                        </th>
+                                        <th>
+                                            Client
+                                        </th>
+
+                                        <th>
+                                            Project
+                                        </th>
+                                        <th>
+                                            Module
+                                        </th>
+                                       
+                                        <th>
+                                            Category
+                                        </th>
+
+                                        <th>
+                                            Priority
+                                        </th>
+                                        <th>
+                                            Type
+                                        </th>
+                                        <th>
+                                            Effort Type
+                                        </th>
+                                        <th>
+                                            Effort
+                                        </th>
+                                        <th>
+                                            From Date
+                                        </th>
+                                        <th>
+                                            To Date
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort1('ISMIMPPL_Periodicity')">Periodicity</a>
+                                        </th>
+                                        <th>
+                                            Task Day
+                                        </th>
+
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in get_comptasklist |orderBy:sortKey1:reverse1| filter:search1" ng-class-odd="'odd'">
+                                        <!--| filter:paginate-->
+                                        <td>{{ $index + 1}}</td>
+                                        <td class="text-center">
+                                            <label>
+                                                <input type="checkbox" name="adcheckt_{{user.ISMIMPPL_Id}}" ng-model="user.checkedvalue" ng-change="optionToggled(user)">
+
+                                                <span class="lbl padding-8"></span>
+
+                                            </label>
+
+                                        </td>
+                                        <td>{{user.ISMIMPPL_ActivityName}}</td>
+                                        <td>{{user.ISMIMPPL_Remarks}}</td>
+
+
+                                        <td>
+                                            <select class="form-control" id="sel1" name="PUL_{{user.ISMIMPPL_Id}}" ng-model="user.ISMMCLT_Id" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue">
+                                                <!--ng-required="user.checkedvalue"-->
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="option in clientlist" value="{{option.ismmclT_Id}}" ng-selected="{{option.ismmclT_Id == user.ISMMCLT_Id}}">
+                                                    {{option.ismmclT_ClientName}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted1(myForm['PUL_'+user.ISMIMPPL_Id])" ng-messages="myForm['PUL_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Select  PickUp Location</div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+
+                                            <select class="form-control" id="sel1" name="route_{{user.ISMIMPPL_Id}}" ng-model="user.ISMMPR_Id" ng-required="user.checkedvalue" ng-disabled="!user.checkedvalue" ng-change="get_loca_sches_p(user);">
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="option in projectlist" value="{{option.ismmpR_Id}}" ng-selected="{{option.ismmpR_Id == user.ISMMPR_Id}}">
+                                                    {{option.ismmpR_ProjectName}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted1(myForm['route_'+user.ISMIMPPL_Id])" ng-messages="myForm['route_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Select Project</div>
+                                            </div>
+                                        </td>
+                                        <td>
+
+                                            <select class="form-control" id="sel1" name="route_{{user.ISMIMPPL_Id}}" ng-model="user.IVRMM_Id"  ng-disabled="!user.checkedvalue" ng-change="get_loca_sches_p(user);">
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="option in modulelist" value="{{option.ivrmM_Id}}" ng-selected="{{option.ivrmM_Id == user.IVRMM_Id}}">
+                                                    {{option.ivrmM_ModuleName}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted1(myForm['route_'+user.ISMIMPPL_Id])" ng-messages="myForm['route_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Select Project</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" id="sel1" name="DSC_{{user.ISMIMPPL_Id}}" ng-model="user.ISMMTCAT_Id" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue">
+
+                                                <option value="">--Select--</option>
+                                                <option ng-repeat="option in categorylist" value="{{option.ismmtcaT_Id}}" ng-selected="{{option.ismmtcaT_Id == user.Drop_Session}}">
+                                                    {{option.ismmtcaT_TaskCategoryName}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted1(myForm['DSC_'+user.ISMIMPPL_Id])" ng-messages="myForm['DSC_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Select Category</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" id="sel1" name="PUSC_{{user.ISMIMPPL_Id}}" ng-model="user.HRMPR_Id" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue">
+                                                <option value="">--Select Priority--</option>
+                                                <option ng-repeat="option in get_priority" ng-selected="{{option.Selected == true}}" value="{{option.hrmpR_Id}}">
+                                                    {{option.hrmP_Name}}
+                                                </option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted1(myForm['PUSC_'+user.ISMIMPPL_Id])" ng-messages="myForm['PUSC_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Select Priority</div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+
+                                            <select class="form-control" id="sel1" name="droproute_{{user.ISMIMPPL_Id}}" ng-model="user.ismtcR_BugOREnhancementFlg" ng-required="user.checkedvalue" ng-disabled="!user.checkedvalue" ng-change="get_loca_sches_d(user);">
+                                                <option value="">--Select Type--</option>
+                                                <option value="E">Enhancement</option>
+                                                <option value="B">Bugs & Complaints</option>
+                                                <option value="O">Other's</option>
+
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted1(myForm['droproute_'+user.ISMIMPPL_Id])" ng-messages="myForm['droproute_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Select Planner Type</div>
+                                            </div>
+                                        </td>
+                                        <td>{{user.ISMIMPPL_TimeRequiredFlg}}</td>
+                                        <td class="text-left">
+                                            <input type="number" class="form-control active" name="effort11_{{user.ISMIMPPL_Id}}" min="0" placeholder="Effort" ng-model="user.ISMIMPPL_TimeRequired" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue" pattern="[0-9]">
+
+                                            <div class="error-messages" ng-if="interacted1(myForm['effort11_'+user.ISMIMPPL_Id])" ng-messages="myForm['effort11_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Required</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-left">
+                                            <md-datepicker name="t1_Start_Date_{{$index}}" onkeypress="return false" md-min-date="user.taskDate" ng-model="user.ismtcrastO_StartDate" md-placeholder="Start date" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted1(myForm['t1_Start_Date_'+$index])"
+                                                 ng-messages="myForm['t1_Start_Date_'+$index].$error">
+                                                <div ng-message="required">Select Start Date</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-left">
+                                            <md-datepicker onkeypress="return false" name="t1_End_Date_{{$index}}" ng-model="user.ismtcrastO_EndDate" md-placeholder="End date" md-min-date="user.ismtcrastO_StartDate" ng-required="user.checkedvalue" ng-disabled="!user.checkedvalue"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted1(myForm['t1_End_Date_'+$index])"
+                                                 ng-messages="myForm['t1_End_Date_'+$index].$error">
+                                                <div ng-message="required">Select End Date </div>
+                                            </div>
+                                        </td>
+                                        <td>{{user.ISMIMPPL_Periodicity}}</td>
+                                        <td class="text-left">
+                                            <span ng-if="user.ISMIMPPL_Periodicity=='Weekly' || user.ISMIMPPL_Periodicity=='Monthly'  || user.ISMIMPPL_Periodicity=='Once in Fortnight'">
+                                                <input type="text" class="form-control active" name="effort222_{{user.ISMIMPPL_Id}}" min="0" 
+                                                   placeholder="Enter Day" ng-model="user.ISMTAPL_Day" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue && (user.ISMIMPPL_Periodicity=='Weekly' || user.ISMIMPPL_Periodicity=='Monthly'  || user.ISMIMPPL_Periodicity=='Once in Fortnight')"  ng-bind="changedd(user)">
+                                            </span>
+                                            <span ng-if="user.ISMIMPPL_Periodicity=='Yearly Once'">
+
+                                                <md-datepicker name="t1_Start_Date_11{{$index}}" onkeypress="return false" md-min-date="user.taskDate" md-max-date="user.ismtcrastO_EndDate" ng-model="user.ISMTAPL_OFFDate" md-placeholder="date" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue && user.ISMIMPPL_Periodicity=='Yearly Once'"></md-datepicker>
+
+
+                                            </span>
+
+                                            <div class="error-messages" ng-if="interacted1(myForm['effort222_'+user.ISMIMPPL_Id])" ng-messages="myForm['effort222_'+user.ISMIMPPL_Id].$error">
+                                                <div ng-message="required">Required</div>
+                                            </div>
+
+                                            <div class="error-messages" ng-if="interacted1(myForm['t1_Start_Date_11'+$index])"
+                                                 ng-messages="myForm['t1_Start_Date_11'+$index].$error">
+                                                <div ng-message="required">Select  Date</div>
+                                            </div>
+                                        </td>
+
+                                        <td hidden="hidden">{{user.ISMIMPPL_Id}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+                    <div hidden="hidden">{{returntxt}}</div>
+                    <hr />
+                    <div class="well text-center">
+                        <md-button type="button" class="md-raised md-primary" data-ng-click="savePlanner()" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+      
+    </form>
+</section>
+
+
+

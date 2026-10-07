@@ -1,0 +1,162 @@
+﻿<style>
+    .multiselect {
+        width: 22em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 4%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .aaa {
+        margin-top: 28px;
+        margin-right: 10px;
+        padding-right: 1px;
+        text-align: center;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Month Wise Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row ">
+                    <div class="col-sm-12 text-center">
+                        <div class="well">
+                            <div style="text-align:center;" data-ng-init="feedbacktype='training'">
+                                <input value="training" ng-model="feedbacktype" type="radio" name="feedbacktype">
+                                <span class="lbl padding-8">
+                                    Training Report
+                                </span>
+                                <input value="feedback" ng-model="feedbacktype" type="radio" name="feedbacktype">
+                                <span class="lbl padding-8">
+                                    Feedback Report
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12" style="margin-top:15px">
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label class="control-label col-sm-3">Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" data-ng-model="hreS_Year" name="hreS_Year" required>
+                                    <option value="">Select</option>
+                                    <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.hrmlY_LeaveYear}}" ng-selected="{{leaveyear.Selected===true}}">
+                                        {{leaveyear.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                    <div ng-message="required">Select  Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group col-sm-6">
+                            <label class="control-label col-sm-3">Month:<span style="color:Red">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="mnth" id="sel12" data-ng-model="month" ng-change="monthdays(month)" ng-required="all1=='0'">
+                                    <option value="">--Select--</option>
+                                    <option value="01">JANUARY</option>
+                                    <option value="02">FEBRUARY</option>
+                                    <option value="03">MARCH</option>
+                                    <option value="04">APRIL</option>
+                                    <option value="05">MAY</option>
+                                    <option value="06">JUNE</option>
+                                    <option value="07">JULY</option>
+                                    <option value="08">AUGUST</option>
+                                    <option value="09">SEPTEMBER</option>
+                                    <option value="10">OCTOBER</option>
+                                    <option value="11">NOVEMBER</option>
+                                    <option value="12">DECEMBER</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.mnth)" ng-messages="myForm.mnth.$error">
+                                    <div ng-message="required">Select Month Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="Id" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="checkenable" ng-click="trainingreport()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-if="feedbackdls.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Month Wise Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="row clearfix">
+                        <div class="col-sm-4 text-left">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table  table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+                                <th>Training Name</th>
+                                <th>Training Start Date</th>
+                                <th>Training End Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1 = (feedbackdls  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage)" current-page="currentPage" >
+                                <td>{{$index+1}}</td>
+                                <td>{{user.HRTCR_PrgogramName}}</td>
+                                <td>{{user.HRTCR_StartDate|date: 'dd/MM/yyyy'}}</td>
+                                <td>{{user.HRTCR_EndDate|date: 'dd/MM/yyyy'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        </form>
+</section>

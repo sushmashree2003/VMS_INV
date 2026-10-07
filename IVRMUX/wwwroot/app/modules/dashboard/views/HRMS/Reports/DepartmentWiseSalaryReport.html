@@ -1,0 +1,259 @@
+﻿<style>
+    #wrapper {
+        white-space: nowrap;
+        overflow-x: visible;
+        overflow-y: hidden;
+        width: 76em;
+    }
+
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+    .multiselect {
+        width: 21.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    img {
+        cursor: -webkit-zoom-in;
+        cursor: -moz-zoom-in;
+    }
+
+    input[type=file] {
+        color: #000;
+    }
+</style>
+
+<section class="content" data-ng-init="onLoadGetData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Department Wise Salary Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <form class="form-horizontal" role="form" name="myForm" data-ng-submit="Getreport()" novalidate>
+                    <div class="col-sm-12 well">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12">
+                                        <label class="control-label">
+                                            Institutions:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </label>
+                                        <input name="option[]" value="All" type="checkbox" ng-model="Allmi_id" ng-true-value="true" ng-false-value="false" ng-change="all_check(Allmi_id)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </div>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="mi in get_mi_list | filter : searchValue" value="{{mi.mI_ID}}">
+                                            <input name="mi1" ng-model="mi.selected" type="checkbox" ng-click="mi_click();" ng-required="isOptionsRequired()" value="{{mi.selected.mI_ID}}" ng-change="get_depts(mi)" >
+                                            <span class="lbl padding-8" value="{{mi.selected.mI_ID}}">
+                                                {{mi.mI_Name}}
+                                            </span>
+                                        </label>
+                                        <span class="error-messages" ng-if="interacted(myForm.mi1)" ng-messages="myForm.mi1.$error">
+                                            <span ng-message="required">Select Institution</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-4 padding-left-right-none" ng-if="departmentdropdown.length>0">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12">
+                                        <label class="control-label">
+                                            Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </label>
+                                        <input name="option[]" value="All" type="checkbox" ng-model="dprtmetall" ng-true-value="true" ng-false-value="false" ng-change="alldepartment(dprtmetall)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </div>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="department in departmentdropdown  | filter : searchValue1" value="{{department.hrmD_Id}}">
+                                            <input type="checkbox" name="selclass" ng-model="department.selected1" value="department.hrmD_Id" ng-required="isOptionsRequired1()" ng-true-value="true" ng-false-value="false" >
+                                            <span class="lbl padding-8" value="{{department.selected1.hrmD_Id}}">
+                                                {{department.hrmD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                        <span class="error-messages" ng-if="interacted(myForm.selclass)" ng-messages="myForm.selclass.$error">
+                                            <span ng-message="required">Select Department</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none" style="margin-top:5%">
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <label class="col-sm-4 radio-inline">
+                                        <span class="lbl padding-3">
+                                            Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class=" col-sm-8 radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="hrmlY_LeaveYear" name="year" required>
+                                                <option value="">Select</option>
+                                                <option ng-repeat="yar in yearlist" value="{{yar.hrmlY_LeaveYear}}" ng-selected="{{yar.Selected===true}}">
+                                                    {{yar.hrmlY_LeaveYear}}
+                                                </option>
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                                <span ng-message="required">Select Year</span>
+                                            </span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <label class="col-sm-4 radio-inline">
+                                        <span class="lbl padding-3">
+                                            Month :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class=" col-sm-8 radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="ivrM_Month_Name" name="month" required>
+                                                <option value="">Select</option>
+                                                <option ng-repeat="mnt in monthlist" value="{{mnt.ivrM_Month_Name}}" ng-selected="{{mnt.Selected===true}}">
+                                                    {{mnt.ivrM_Month_Name}}
+                                                </option>
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.month)" ng-messages="myForm.month.$error">
+                                                <span ng-message="required">Select Month</span>
+                                            </span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearall()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Clear
+                        </md-button>
+                    </div>
+                </form>
+
+
+            </div>
+
+
+        </div>
+        <div class="box box-primary" ng-if="getReportvalue.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Department Wise Salary Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-12 well">
+                    <div class="text-center">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <div class="form-group">
+                                <table class="table table-hover table-responsive table-bordered" border="1">
+                                    <thead class="text-center">
+                                        <tr><th colspan="3">Department Wise Monthly Salary</th></tr>
+                                        <tr>
+                                            <th class="text-center">Month</th>
+                                            <th class="text-center">Department</th>
+                                            <th class="text-center">Salary</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="rpt in getReportvalue">
+
+                                            <!--<td rowspan="{{getReportvalue.length}}">{{ivrM_Month_Name}}</td>-->
+                                            <td>{{rpt.HRES_Month}}</td>
+                                            <td>{{rpt.HRMD_DepartmentName}}</td>
+                                            <td>{{rpt.Salary}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><b> Total Amount</b></td>
+                                            <td><b>{{TotalAmt}}</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="box box-danger">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">DEPARTMENT WISE SALARY BAR GRAPH</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body" style="background-color:#3d4347">
+                            <div id="columnchart" style="height: 350px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">DEPARTMENT WISE SALARY PIE GRAPH</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div id="linechart" style="height: 350px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="box box-danger">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">DEPARTMENT WISE SALARY LINE GRAPH</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div id="linechartmulti" style="height: 350px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+
+</section>
+
+
+
+

@@ -1,0 +1,159 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata(); selfassign='Dept'">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">USER EMPLOYEE MAPPING REPORT </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!--<label>
+                <input name="clsoption" value="all" ng-model="usercheckE" type="checkbox" ng-click="all_checkE(usercheckE)">
+                <span class="lbl padding-8">
+                    All
+                </span>
+            </label>-->
+            <div class="box-body">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="sel2" class="control-label col-sm-2"> Employee's:<span style="color:red;">*</span></label>
+                        <div class="multiselect col-sm-10" style="width: 33.1em  !important;">
+                            <input class="form-control" ng-model="searchvalueE" type="text" placeholder="search here..." />
+                            <label>
+                                <input name="clsoption" value="all" ng-model="usercheckE" type="checkbox" ng-click="all_checkE(usercheckE)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </label>
+                            <label ng-repeat="option in get_employeelist | filter:searchvalueE" value="{{Hrme_id}}">
+                                <input type="checkbox" ng-model="option.selected" ng-click="togchkbxE()" ng-required="isOptionsRequired()" name="emp" />
+                                <span class="lbl padding-8">{{option.HRME_EmployeeLastName}} </span>
+                            </label>
+                        </div>
+                        <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                            <div ng-message="required">Select Any One Employee</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <!--<label class="control-label col-sm-4">Scenario :</label>-->
+                    <!--<div class="col-sm-8" style="font-weight: 700;" ng-init="selfassign='Dept'">-->
+                        <div class="col-sm-8" style="font-weight: 700;">
+                            <div class="well text-left">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Dept" name="stask" ng-change="ondatachange(user)" ng-model="selfassign">
+                                    <span class="lbl padding-8"> Department Wise </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Emp" name="stask" ng-change="ondatachange(user)" ng-model="selfassign">
+                                    <span class="lbl padding-8"> Employee Wise </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="box-footer">
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="Report(user)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-show="ids.length > 0" ng-click="exportToExcel('#employee')" target="_blank">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-show="ids.length > 0" ng-click="printData()" id="print-btn">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+
+
+    </form>
+
+
+    <div class="box box-primary" ng-show="ids.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Mapped List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="ids.length > 0">
+
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{ids.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <div id="employee">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th><b>SL.No.</b></th>
+                            <th><b>Head </b></th>
+                            <th><b>Mapped Employee</b> </th>
+                            <th><b>Level Order</b> </th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody ng-repeat="user in ids">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.datadetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.datadetails.length+1}}">{{user.HeadName}}</td>
+                        </tr>
+                        <tr ng-repeat="data in user.datadetails | filter : search">
+                            <td class="text-center">{{data.HRME_EmployeeLastName}}</td>
+                            <td class="text-center">{{data.ISMUSEMM_Order}}</td>
+                        </tr>
+                        <tr></tr>
+                    </tbody>
+                </table>
+           </div>
+
+        <!--<dir-pagination-controls max-size="5"
+                                 direction-links="true"
+                                 boundary-links="true">
+        </dir-pagination-controls>-->-->
+
+            </div>
+        </div>
+</section>
+
+
+

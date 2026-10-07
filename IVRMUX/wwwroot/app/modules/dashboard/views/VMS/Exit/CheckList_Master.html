@@ -1,0 +1,496 @@
+﻿<style>
+
+    .form-group {
+        margin-right: 0px;
+        margin-left: 0px;
+    }
+
+    .file-blue:before {
+        content: 'Upload Document';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #f5f5f5;
+        text-shadow: 1px 1px rgb(0 0 0 / 50%);
+        width: 120px;
+    }
+    .placeholder-text {
+        color: #888 !important; /* grey color */
+    }
+
+    select.form-control {
+        color: #000; /* black */
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" ng-init="loaddata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Check List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Checklist Title :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" placeholder="Enter Checklist Title" type="text" ng-model="ISMRESGMCL_CheckListName" name="ChecklistTitle" required>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.ChecklistTitle)" ng-messages="myForm.ChecklistTitle.$error">
+                                <div ng-message="required">Enter Checklist Title</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Checklist Type :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control"
+                                        name="ChecklistTyp"
+                                        ng-model="ChecklistType"
+                                        required
+                                        ng-class="{'placeholder-text': !ChecklistType}">
+                                    <option value="" disabled hidden>--Select Checklist Type--</option>
+                                    <option value="Resignation">Resignation</option>
+                                    <option value="Relieving">Relieving</option>
+                                    <option value="NOC">NOC</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.ChecklistTyp)" ng-messages="myForm.ChecklistTyp.$error">
+                                <div ng-message="required">Select Checklist Type</div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Remark:</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control textareaclass" name="disc" rows="3" ng-model="ISMRESGMCL_Remarks" id="usrnn"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Compulsory Flag:</label>
+                            <div class="col-sm-8">
+
+                                <label class="lablehalfday">
+                                    <input type="checkbox" name="adcheckthalfday" ng-model="ISMRESGMCL_OptionalFlg" class="ng-pristine ng-untouched ng-valid" aria-checked="false" aria-invalid="false">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company  :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <!--<select class="form-control" name="Company" ng-model="mI_Id" ng-change="oncmpchange(mI_Id)" required>
+                                    <option value="" label="--Select Company--"> </option>
+                                    <option ng-repeat="cmp in company_list_dd" value="{{cmp.mI_Id}}" ng-selected="{{cmp.mI_Id == mI_Id}}">
+                                        {{cmp.mI_Name}}
+                                    </option>
+                                </select>-->
+
+                                <ui-select id="sel1" name="company" ng-model="$parent.objs.mI_Id" ng-change="oncmpchange(objs)" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select or search company Name in the list...">{{$select.selected.mI_Name}}</ui-select-match>
+                                    <ui-select-choices repeat="option in company_list_dd | filter: $select.search " value="{{option.mI_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.mI_Name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.company)" ng-messages="myForm.company.$error">
+                                <div ng-message="required">Select Company</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Department :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <!--<select class="form-control" name="Department" ng-model="hrmD_Id" required>
+                                    <option value="" label="--Select Department--"> </option>
+                                    <option ng-repeat="dep in get_department_lisd_dd" value="{{dep.hrmD_Id}}" ng-selected="{{dep.hrmD_Id == hrmD_Id}}">
+                                        {{dep.hrmD_DepartmentName}}
+                                    </option>
+                                </select>-->
+                                <ui-select id="sel1" name="Department" ng-change="get_designation(objs)" ng-model="$parent.objs.hrmD_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select or search DepartmentName Name in the list...">{{$select.selected.hrmD_DepartmentName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in get_department_lisd_dd | filter: $select.search " value="{{option.hrmD_Id}}" ng-selected="{{option.Selected==true}}">
+                                        <div ng-bind-html="option.hrmD_DepartmentName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.Department)" ng-messages="myForm.Department.$error">
+                                <div ng-message="required">Select Department</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Designation :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">                               
+                                <ui-select id="sel1" name="Designation" ng-model="$parent.objs.hrmdeS_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select or search Designation Name in the list...">{{$select.selected.hrmdeS_DesignationName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in designation_list_dd | filter: $select.search " value="{{option.hrmdeS_Id}}" ng-selected="{{option.Selected==true}}">
+                                        <div ng-bind-html="option.hrmdeS_DesignationName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.Designation)" ng-messages="myForm.Designation.$error">
+                                <div ng-message="required">Select Designation</div>
+                            </div>
+                        </div>
+                        <div class="from-group" ng-hide="true">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Template Name</th>
+                                        <th>Template</th>
+                                        <th>View </th>
+                                        <th>Remove </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input class="form-control" placeholder="Enter Template Name" type="text" ng-model="ISMRESGMCL_TemplateFileName">
+                                        </td>
+                                        <td>
+                                            <div class="col-sm-4">
+                                                <label class="custom-file-input file-blue control-label" style="width:100%">
+                                                    <input type="file" data-ng-model="photo" accept="image/*, application/pdf,application/msword, application/vnd.ms-excel" name="docfile" onchange="angular.element(this).scope().uploadFile(this, angular.element(this).scope().document)" />
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.docfile)" ng-messages="myForm.docfile.$error">
+                                                <div ng-message="required">Upload File</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span ng-if="file_detail !=null && file_detail !=''">
+                                                <a ng-if="extention=='jpg' || extention=='JPG' || extention=='jpeg' || extention=='png'" style="color:red;display:inline; font-weight: bolder; text-decoration:underline;font-size:small;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetails(file_detail)">View</a>
+                                                <a ng-if="extention=='pdf'" style="color:red;display:inline; font-weight: bolder; text-decoration:underline;font-size:small;" data-toggle="modal" data-target="#showpdf" data-ng-click="showmodaldetails(file_detail)">View</a>
+                                                <a ng-if="extention=='doc'|| extention=='docx'|| extention === 'xlsx' || extention === 'xls'" style="color:red;display:inline; font-weight: bolder; text-decoration:underline;font-size:small;" href="{{document_Pathnew}}" data-target="_blank">
+                                                    View
+                                                </a>
+                                            </span>
+
+                                        </td>
+                                        <td>
+                                            <span ng-if="file_detail !=null && file_detail !=''">
+                                                <a href="javascript:void(0)" data-toggle="modal" title="View Comments" ng-click="remove_file()"><i class="fa fa-trash fa-1x" aria-hidden="true"></i></a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-sm-12" style="padding-top:30px;" name="myForm">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Approval Chicklist settings  </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="row col-sm-12">
+                                <!-- removed <div style="overflow:auto"> -->
+                                <div class="clearfix">
+                                    <table class="table table-responsive table-bordered clearfix">
+                                        <thead>
+                                            <tr>
+                                                <th width="50">SL NO</th>
+                                                <th><a href="" ng-click="sort('mI_Name')">Approver Company  </a></th>
+                                                <th><a href="" ng-click="sort('hrmD_DepartmentName')">Approver Department  </a></th>
+                                                <th><a href="" ng-click="sort('hrmdeS_DesignationName')">Approver Designation </a></th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr ng-repeat="objs in transrows" ng-form="dataform1">
+                                                <td style="width:5%;">{{$index+1}}</td>
+                                                <td style="width:30%;">
+                                                    <ui-select id="sel1" name="item1" ng-model="$parent.objs.mI_Id" ng-change="get_department(objs)" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item">
+                                                        <ui-select-match ng-trim="false" placeholder="Select or search company Name in the list...">{{$select.selected.mI_Name}}</ui-select-match>
+                                                        <ui-select-choices repeat="option in company_list_dd | filter: $select.search " value="{{option.mI_Id}}" ng-selected="{{option.mI_Id == objs.mI_Id}}">
+                                                            <div ng-bind-html="option.mI_Name | highlight: $select.search"></div>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                    <!--<div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.item1)" ng-messages="myForm.item1.$error">
+                            <div ng-message="required">Select Company</div>
+                        </div>-->
+                                                </td>
+                                                <td style="width:30%;">
+                                                    <ui-select id="sel1" name="item2" ng-model="$parent.objs.hrmD_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item" required>
+                                                        <ui-select-match ng-trim="false" placeholder="Select or search DepartmentName Name in the list...">{{$select.selected.hrmD_DepartmentName}}</ui-select-match>
+                                                        <ui-select-choices repeat="option in get_department_lisd_ddd | filter: $select.search " value="{{option.hrmD_Id}}" ng-selected="{{option.hrmD_Id == objs.hrmD_Id}}">
+                                                            <div ng-bind-html="option.hrmD_DepartmentName | highlight: $select.search"></div>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                </td>
+                                                <td style="width:30%;">
+                                                    <ui-select id="sel1" name="item3" ng-model="$parent.objs.hrmdeS_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item" required>
+                                                        <ui-select-match ng-trim="false" placeholder="Select or search Designation Name in the list...">{{$select.selected.hrmdeS_DesignationName}}</ui-select-match>
+                                                        <ui-select-choices repeat="option in designation_list_ddd | filter: $select.search " value="{{option.hrmdeS_Id}}" ng-selected="{{option.hrmdeS_Id == objs.hrmdeS_Id}}">
+                                                            <div ng-bind-html="option.hrmdeS_DesignationName | highlight: $select.search"></div>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                </td>
+
+                                                <td>
+                                                    <span class="" ng-show="!get_editstock">
+                                                        <span class="" ng-hide="stockrows.length > 4">
+                                                            <a href="" ng-show="$last" ng-click="addstockrows()">
+                                                                <i class="fa fa-plus"></i>
+                                                            </a>
+                                                        </span>
+                                                        <span class="" id="remove" ng-hide="transrows.length ==1">
+                                                            <a href="" ng-click="removestockrows($index,objs)">
+                                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                                            </a>
+                                                        </span>
+                                                    </span>
+                                                </td>
+
+                                                <td hidden="hidden">{{objs.ismresgmclapauT_Id}}</td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <div class="text-center">
+                    <input type="hidden" ng-model="id" value="{{ismresgmcL_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="savedata()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    Master Check List
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label" ng-if="searchValue!=''">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th>Designation</th>
+                            <th>Title</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>CheckList Type</th>
+                            <th>Compulsory Flag</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                            <th>Approval</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-center" ng-if="check_list.length==0">
+                            <td colspan="10">
+                                <span style="color:red;font-weight:700">No Check List Entered</span>
+                            </td>
+                        </tr>
+                        <!-- Removed ng-if="check_list.Length>0" -->
+                        <tr dir-paginate="tr in filterValue1 = (check_list | filter : searchValue) |orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center">{{tr.MI_Name}}</td>
+                            <td class="text-center">{{tr.ISMRESGMCL_CheckListName}}</td>
+                            <td class="text-center">{{tr.HRMD_DepartmentName}}</td>
+                            <td class="text-center">{{tr.HRMDES_DesignationName}}</td>
+                            <td class="text-left">{{tr.ISMRESGMCL_Flg}}</td>
+                            <td class="text-center">
+                                <!--{{tr.ISMRESGMCL_OptionalFlg}}-->
+                                <span ng-if="tr.ISMRESGMCL_OptionalFlg==true">
+                                    <i class="fa fa-check  text-green"></i>
+                                </span>
+                                <_O
+                                <span ng-if="tr.ISMRESGMCL_OptionalFlg==false">
+                                    <i class="fa fa-times  text-red"></i>
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                <span ng-if="tr.ISMRESGMCL_ActiveFlag === true">
+                                    <a href="" ng-click="deactive(tr)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        Deactivate
+                                    </a>
+                                </span>
+                                <span ng-if="tr.ISMRESGMCL_ActiveFlag === false">
+                                    <a href="" ng-click="deactive(tr)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        Activate
+                                    </a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a class="text-aqua" href="" ng-click="edit(tr)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <span ng-click="ViewApproverDepartDesign(tr)">
+                                    <i class="fa fa-eye text-black" title="View Files"></i>
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="page">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </form>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                            <!--ng-init="zoomWidth = 100;imgStyle = {width:'100px'}" ng-style="imgStyle"
+                            ng-mouse-wheel-up="zoomWidth = zoomWidth + 20; imgStyle.width = zoomWidth +'px'; "
+                            ng-mouse-wheel-down="zoomWidth = zoomWidth - 20;imgStyle.width = zoomWidth  +'px'; " />-->
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-center">
+                        <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                        <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                    </div>
+                    <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <!--<embed id="idpdf" ng-src="{{content}}" onload="refreshDialer();" style="width: 100%;" height="1000" />
+                <div class="modal-body" oncontextmenu="return false"></div>-->
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="modalviewfiles" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class=" col-sm-0 pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeimg()">Close</button>
+                    </div>
+
+                </div>
+                <div class="modal-body">
+                    <div class="row" ng-show="get_details_Approver_list.length > 0">
+                        <div class="col-sm-12">
+                            <div style="overflow:auto">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10%">Sl.No</th>
+                                            <th>Company</th>
+                                            <th>Department</th>
+                                            <th>DesignationName</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr ng-repeat="Approver in get_details_Approver_list">
+                                            <td class="text-center">{{$index+1}}</td>
+                                            <td>{{Approver.MI_Name}}</td>
+                                            <td>{{Approver.HRMD_DepartmentName}}</td>
+                                            <td>{{Approver.HRMDES_DesignationName}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

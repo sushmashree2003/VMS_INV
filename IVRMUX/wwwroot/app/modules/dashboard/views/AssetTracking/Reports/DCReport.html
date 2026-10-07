@@ -1,0 +1,734 @@
+﻿
+<section class="content twocoloumn">
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Assets Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-5">
+                        <div class="col-sm-8">
+                            <!--ng-hide="staffcheck=='Staff'"-->
+                            <label for="sel2" class="control-label col-sm-4 inst">Company: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div class="multiselect col-sm-8 mul">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Item here...">
+                                    <label>
+                                        <input name="alitem" value="1" ng-model="allmi" type="checkbox" ng-click="all_miid(allmi)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-model="MI_Id" ng-repeat="mi in get_mi_list | filter : searchValue">
+                                        <input name="mi" ng-model="mi.miid" type="checkbox" ng-click="mi_click();" ng-required="isRequiredmi()">
+                                        <span class="lbl padding-8">
+                                            {{mi.MI_Name}}
+                                        </span>
+                                    </label>
+
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.mi)" ng-messages="myForm.mi.$error">
+                                    <div ng-message="required"> Select  checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-7">
+                        <div class="form-group">
+                            <div class="col-sm-8">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                    <span class="lbl padding-4">Between Dates </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-12" ng-show="bw_dates">
+                                <div class="col-sm-5">
+
+                                    <md-datepicker ng-model="startdate" name="sdate" ng-paste="$event.preventDefault()" onkeydown="return false" md-max-date="plMaxdate" md-placeholder="From Date" ng-required="bw_dates" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <md-datepicker ng-model="enddate" name="ddate" ng-paste="$event.preventDefault()" onkeydown="return false" md-max-date="plMaxdate" md-placeholder="To Date" md-min-date="startdate" ng-required="bw_dates" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <br />
+                        <br />
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='OUT'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="OUT" name="PRno" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> ALL </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="ISSUE" name="PRno" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> ISSUE</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="RECEIVED" name="PRno" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> RECEIVED</span>
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="getreport()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-list-alt" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                    <md-button ng-show="get_AssetsReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <!--<md-button ng-show="get_AssetsReport.length>0 && selectionflag=='Location'" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printARL')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>-->
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box box-primary" ng-show="tempdc.length>0 && (optionflag=='OUT'|| optionflag=='ISSUE'|| optionflag=='RECEIVED')">
+        <div class="box-header with-border">
+            <h3 class="box-title">CHECK-OUT ASSETS DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" style="overflow:scroll">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{tempdc.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue1!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue1" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" style="width:1300px">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+
+                        <th>
+                            Print
+                        </th>
+
+                        <th><a href="" ng-click="sortBy('INVACO_No')">DC No. </a></th>
+                        <th><a href="" ng-click="sortBy('invmS_StoreName')">Store </a></th>
+                        <th><a href="" ng-click="sortBy('invmI_ItemName')">Item </a></th>
+                        <!--<th><a href="" ng-click="sortBy('invstO_SalesRate')">Sale Rate </a></th>-->
+                        <!--<th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Location</a> </th>-->
+                        <th><a href="" ng-click="sortBy('invacO_CheckoutDate')">Date </a></th>
+                        <th><a href="" ng-click="sortBy('invacO_CheckOutQty')">Quantity </a></th>
+                        <th><a href="" ng-click="sortBy('invacO_ReceivedBy')">Received By</a> </th>
+                        <th><a href="" ng-click="sortBy('invacO_CheckOutRemarks')">Remarks</a> </th>
+                        <!--<th>Action</th>-->
+                    </tr>
+                </thead>
+                <tbody dir-paginate="user in filterValue2 = (tempdc | filter : searchValue1)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'">
+
+                    <tr>
+                        <td rowspan="{{user.LIST.length+1}}">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                        <td class="text-center" rowspan="{{user.LIST.length+1}}">
+
+                            <a href="javascript:void(0)" ng-click="reschedule(user);"> <i class="fa fa-print" aria-hidden="true"></i></a>
+                            <!--data-toggle="modal" data-target="#popup111" data-backdrop="static"-->
+
+                        </td>
+                        <td rowspan="{{user.LIST.length+1}}"> {{user.INVACO_No}}</td>
+
+
+                    </tr>
+                    <tr ng-repeat="user1 in user.LIST ">
+
+
+
+                        <td>{{user1.INVMS_StoreName}}</td>
+                        <td>{{user1.INVMI_ItemName}}</td>
+                        <!--<td>{{user1.INVSTO_SalesRate}}</td>-->
+                        <!--<td>{{user1.INVMLO_LocationRoomName}}</td>-->
+                        <td>{{user1.INVACO_CheckoutDate | date:'dd/MM/yyyy'}}</td>
+                        <td>{{user1.INVACO_CheckOutQty}}</td>
+                        <td>{{user1.INVACO_ReceivedBy}}</td>
+                        <td>{{user1.INVACO_CheckOutRemarks}}</td>
+
+                        <!--<td class="text-center">
+                            <a class="text-aqua" href="" ng-click="edit(user,user.invstO_SalesRate)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+
+    <div ng-hide="true">
+        <div id="printARL">
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                <thead>
+                    <tr>
+                        <th colspan="10" style="text-align:center">
+                            DELIVERY CHALLAN REPORT
+                        </th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No.
+                        </th>
+
+                        <th>DC No. </th>
+                        <th>Store </th>
+                        <th>Item</th>
+                        <!--<th>Sale Rate </th>-->
+                        <!--<th>Location </th>-->
+                        <th>Date </th>
+                        <th>Quantity </th>
+                        <th>Received By </th>
+                        <th>Remarks </th>
+
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in  tempdc">
+                    <tr>
+                        <td rowspan="{{user.LIST.length+1}}">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+
+                        <td rowspan="{{user.LIST.length+1}}"> {{user.INVACO_No}}</td>
+
+
+                    </tr>
+                    <tr ng-repeat="user1 in user.LIST ">
+
+
+
+                        <td>{{user1.INVMS_StoreName}}</td>
+                        <td>{{user1.INVMI_ItemName}}</td>
+                        <!--<td>{{user1.INVSTO_SalesRate}}</td>-->
+                        <!--<td>{{user1.INVMLO_LocationRoomName}}</td>-->
+                        <td>{{user1.INVACO_CheckoutDate | date:'dd/MM/yyyy'}}</td>
+                        <td>{{user1.INVACO_CheckOutQty}}</td>
+                        <td>{{user1.INVACO_ReceivedBy}}</td>
+                        <td>{{user1.INVACO_CheckOutRemarks}}</td>
+
+
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+    <div ng-hide="true">
+        <div id="printARL1">
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                <thead>
+                    <tr>
+                        <th colspan="10" style="text-align:center">
+                            DELIVERY CHALLAN REPORT
+                        </th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No.
+                        </th>
+
+                        <th>
+                            DC No.
+                        </th>
+                        <th>From Location </th>
+                        <th>To Store </th>
+                        <th>Item </th>
+                        <th>Rate </th>
+                        <th>Date </th>
+                        <th>Quantity </th>
+                        <th>Received By </th>
+                        <th>Remarks </th>
+
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in  tempdc">
+                    <tr>
+                        <td rowspan="{{user.LIST.length+1}}"> {{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+
+                        <td rowspan="{{user.LIST.length+1}}"> {{user.INVACI_No}}</td>
+                    </tr>
+                    <tr ng-repeat="user1 in user.LIST ">
+
+                        <td>{{user1.INVMLO_LocationRoomName}}</td>
+                        <td>{{user1.INVMS_StoreName}}</td>
+                        <td>{{user1.INVMI_ItemName}}</td>
+                        <td>{{user1.INVSTO_SalesRate}}</td>
+                        <td>{{user1.INVACI_CheckInDate |date:'dd/MM/yyyy'}}</td>
+                        <td>{{user1.INVACI_CheckInQty}}</td>
+                        <td>{{user1.INVACI_ReceivedBy}}</td>
+                        <td>{{user1.INVACI_CheckInRemarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="tempdc.length>0 && optionflag=='IN'">
+        <div class="box-header with-border">
+            <h3 class="box-title">CHECK-IN DC DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{tempdc.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue1!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue2" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+
+                        <th>
+                            Print
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">DC No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">From Location</a> </th>
+                        <th><a href="" ng-click="sortBy('invmS_StoreName')">To Store </a></th>
+                        <th><a href="" ng-click="sortBy('invmI_ItemName')">Item </a></th>
+                        <th><a href="" ng-click="sortBy('invstO_SalesRate')">Rate </a></th>
+                        <th><a href="" ng-click="sortBy('invacI_CheckInDate')">Date </a></th>
+                        <th><a href="" ng-click="sortBy('invacI_CheckInQty')">Quantity </a></th>
+                        <th><a href="" ng-click="sortBy('invacI_ReceivedBy')">Received By</a> </th>
+                        <th><a href="" ng-click="sortBy('invacI_CheckInRemarks')">Remarks</a> </th>
+
+                    </tr>
+                </thead>
+                <tbody dir-paginate="user in filterValue2 = (tempdc | filter : searchValue1)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'">
+                    <tr>
+                        <td rowspan="{{user.LIST.length+1}}"> {{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+
+                        <td class="text-center" rowspan="{{user.LIST.length+1}}">
+
+                            <a href="javascript:void(0)" ng-click="reschedule1(user);"> <i class="fa fa-print" aria-hidden="true"></i></a>
+                            <!--data-toggle="modal" data-target="#popup111" data-backdrop="static"-->
+
+                        </td>
+                        <td rowspan="{{user.LIST.length+1}}"> {{user.INVACI_No}}</td>
+                    </tr>
+                    <tr ng-repeat="user1 in user.LIST ">
+
+                        <td>{{user1.INVMLO_LocationRoomName}}</td>
+                        <td>{{user1.INVMS_StoreName}}</td>
+                        <td>{{user1.INVMI_ItemName}}</td>
+                        <td>{{user1.INVSTO_SalesRate}}</td>
+                        <td>{{user1.INVACI_CheckInDate |date:'dd/MM/yyyy'}}</td>
+                        <td>{{user1.INVACI_CheckInQty}}</td>
+                        <td>{{user1.INVACI_ReceivedBy}}</td>
+                        <td>{{user1.INVACI_CheckInRemarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+
+
+
+</section>
+
+<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">DELIVERY CHALLAN DETAILS</h4>
+                <md-button type="button" class="md-raised" data-ng-click="printDataout()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="box-content clearfix">
+                <div class="row">
+                    <div class="col-sm-12" style="text-align:center">
+                        <h5>DELIVERY CHALLAN</h5>
+                    </div>
+
+                    <div class="col-sm-12" style="text-align:center;margin-top:-35px">
+                        <img src="{{imagename}}" style="border:none;height:120px;width:600px;text-align:center" />
+                    </div>
+                </div>
+                <div class="row">
+                    <br />
+                    <div class="col-sm-12">
+                        <table class="table table-responsive table-bordered" width="100%">
+                            <tr>
+                                <td style="width:35%;text-align:left">TO</td>
+                                <td style="width:65%;text-align:left">DELIVERY CHALLAN NO:&nbsp;&nbsp;&nbsp;{{decno}}&nbsp;</td>
+                            </tr>
+
+                            <tr>
+                                <td style="width:45%;text-align:left;height:250px" rowspan="7">
+                                    <!--<span> {{invaO_Tolocation}} </span>-->
+                                    <p id="invaO_Tolocation"></p>
+
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left !important">
+                                    <span>DATE:&nbsp;&nbsp;&nbsp;{{dcdate |date:'dd/MM/yyyy'}} </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left !important">
+                                    <span>Time:&nbsp;&nbsp;&nbsp;{{Time}} </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:65%;text-align:left">ISSUED TO :&nbsp;&nbsp;&nbsp;{{Issued}}</td>
+                            </tr>
+                            <tr>
+                                <td style="width:65%;text-align:left">MODE OF TRANSPORT: &nbsp;&nbsp;&nbsp;{{Mode}}  </td>
+                            </tr>
+                            <tr ng-if="Mode=='By Vehicale'">
+                                <td style="width:65%;text-align:left">Vehicle No.: &nbsp;&nbsp;&nbsp;{{Vehicalno}}  </td>
+                            </tr>
+                            <tr>
+                                <td style="width:65%;text-align:left">Req Through :&nbsp;&nbsp;&nbsp;{{temptorecbyname}}</td>
+                            </tr>
+
+                            <tr>
+                                <td style="width:50%;text-align:left">
+
+                                    <!--GST No :&nbsp;&nbsp;&nbsp; {{migst}}-->
+                                    VAT TIN: &nbsp;29950803765  <br />
+
+                                    GST No :&nbsp; 29AACCV7691K1Z J
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-responsive table-bordered" width="100%" style="min-height:230px !important">
+                            <tr>
+                                <td style="width:65px"><b>SL. NO.</b></td>
+                                <td><b>DESCRIPTION</b></td>
+                                <td><b>QTY.</b> </td>
+                            </tr>
+                            <tr ng-repeat="it in printstudents">
+                                <td>{{$index+1}}</td>
+                                <td><span style="float:left">{{it.INVMI_ItemName}}({{it.INVACO_CheckOutRemarks}})</span></td>
+                                <td class="text-center"><span style="float:right">{{it.INVACO_CheckOutQty}}&nbsp; {{it.INVACO_QuantityRemark}}</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><b style="float:right"> TOTAL</b></td>
+                                <td><span style="float:right">{{ttl}}</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-left">
+                                    <p>
+                                        <b> NOTE: </b><span>
+                                            <strong>{{Note}} </strong>
+                                        </span>
+                                    </p>
+
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <!--<div class="col-sm-12">
+                    <p>
+                        <b> NOTE: </b><span>
+                            <strong>{{Note}} </strong>
+                        </span>
+                    </p>
+
+                </div>-->
+                <div>
+
+                    <div class="col-sm-12">
+                        <h5 style="text-align:right"> For &nbsp; {{miname}} </h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <br />
+                        <br />
+                        <br />
+                        <h5>Receiver's signature </h5>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <br />
+                        <br />
+                        <br />
+                        &nbsp;
+                    </div>
+                    <div class="col-sm-4" style="text-align:right">
+                        <br />
+                        <br />
+                        <br />
+                        <h5> Authorised Signatory </h5>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="popup1113" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">DELIVERY CHALLAN DETAILS</h4>
+                <md-button type="button" class="md-raised" data-ng-click="printDatain()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div class="row">
+                                <div class="col-sm-12" style="text-align:center">
+                                    <h5>DELIVERY CHALLAN</h5>
+                                </div>
+
+                                <div class="col-sm-12" style="text-align:center;margin-top:-35px">
+                                    <img src="{{imagename}}" style="border:none;height:120px;width:600px;text-align:center" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <br />
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:35%;text-align:left">TO</td>
+                                            <td style="width:65%;text-align:left">DELIVERY CHALLAN NO:&nbsp;&nbsp;&nbsp;{{decno}}&nbsp;</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:45%;text-align:left;height:250px" rowspan="7">
+                                                <!--<span> {{invaO_Tolocation}} </span>-->
+                                                <p id="invaO_Tolocation"></p>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align:left !important">
+                                                <span>DATE:&nbsp;&nbsp;&nbsp;{{dcdate |date:'dd/MM/yyyy'}} </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align:left !important">
+                                                <span>Time:&nbsp;&nbsp;&nbsp;{{Time}} </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:65%;text-align:left">ISSUED TO :&nbsp;&nbsp;&nbsp;{{Issued}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:65%;text-align:left">MODE OF TRANSPORT: &nbsp;&nbsp;&nbsp;{{Mode}}  </td>
+                                        </tr>
+                                        <tr ng-if="Mode=='By Vehicale'">
+                                            <td style="width:65%;text-align:left">Vehicle No.: &nbsp;&nbsp;&nbsp;{{Vehicalno}}  </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:65%;text-align:left">Req Through :&nbsp;&nbsp;&nbsp;{{temptorecbyname}}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:50%;text-align:left">
+
+                                                <!--GST No :&nbsp;&nbsp;&nbsp; {{migst}}-->
+                                                VAT TIN: &nbsp;29950803765  <br />
+
+                                                GST No :&nbsp; 29AACCV7691K1Z J
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="table table-responsive table-bordered" width="100%" style="min-height:230px !important">
+                                        <tr>
+                                            <td style="width:65px"><b>SL. NO.</b></td>
+                                            <td><b>DESCRIPTION</b></td>
+                                            <td><b>QTY.</b> </td>
+                                        </tr>
+                                        <tr ng-repeat="it in printstudents">
+                                            <td>{{$index+1}}</td>
+                                            <td><span style="float:left">{{it.INVMI_ItemName}}({{it.INVACO_CheckOutRemarks}})</span></td>
+                                            <td class="text-center"><span style="float:right">{{it.INVACO_CheckOutQty}}&nbsp; {{it.INVACO_QuantityRemark}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><b style="float:right"> TOTAL</b></td>
+                                            <td><span style="float:right">{{ttl}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-left">
+                                                <p>
+                                                    <b> NOTE: </b><span>
+                                                        <strong>{{Note}} </strong>
+                                                    </span>
+                                                </p>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <!--<div class="col-sm-12">
+                                <p>
+                                    <b> NOTE: </b><span>
+                                        <strong>{{Note}} </strong>
+                                    </span>
+                                </p>
+
+                            </div>-->
+                            <div>
+
+                                <div class="col-sm-12">
+                                    <h5 style="text-align:right"> For &nbsp; {{miname}} </h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Receiver's signature </h5>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Authorised Signatory </h5>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

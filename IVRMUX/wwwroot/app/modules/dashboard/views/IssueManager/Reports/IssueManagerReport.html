@@ -1,0 +1,499 @@
+﻿
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+<style>
+    .padding {
+        padding-bottom: 28px;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">IssueManager Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <div class="well">
+                        <div ng-init="optionflag='MAKERCHECKER'" class="text-center">
+                            <label class="radio-inline">
+                                <input type="radio" value="MAKERCHECKER" ng-model="optionflag" ng-change="onradiochange()" />
+                                <span class="lbl padding-8">Maker Checker</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="CHECKLIST" ng-model="optionflag" ng-change="onradiochange()" />
+                                <span class="lbl padding-8">Checklist Report</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="PLANER" ng-model="optionflag" ng-change="onradiochange()" />
+                                <span class="lbl padding-8">Planer Approval </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="LEAVE" ng-model="optionflag" ng-change="onradiochange()" />
+                                <span class="lbl padding-8">Leave Autotransfer </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="col-sm-12 col-md-12 col-md-offset-2" ng-if="optionflag=='CHECKLIST'">                    
+                    <!--<div class="form-group">
+            <label class="control-label col-sm-2">Floor : <span style="color:red;">*</span></label>
+            <div class="multiselect col-sm-4">
+                <input class="form-control" data-ng-model="searchcomapny" type="text" placeholder="Search here..." />
+                <label>
+                    <input name="clsoption" value="all" data-ng-model="obj.hrmF_FloorName" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkCCCC()">
+                    <span class="lbl padding-8">
+                        All
+                    </span>
+                </label>
+                <label ng-repeat="floor in floorList | filter:searchcomapny" value="{{floor.hrmF_Id}}">
+                    <input type="checkbox" data-ng-model="floor.selected" ng-click="togchkbxCCCC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequiredtwo()" name="floorname" />
+                    <span class="lbl padding-8">{{floor.hrmF_FloorName}}</span>
+                </label>
+            </div>
+            <div class="col-sm-offset-4 error-messages" ng-if="interacted(myForm.floorname)" ng-messages="myForm.floorname.$error">
+                <div ng-message="required">Please Select Any One floorname</div>
+            </div>
+        </div>-->
+                    <br />
+                    <div class="row">
+                        <label class="control-label col-sm-2">Floor :<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="sel2" name="floorname" data-ng-model="obj.hrmF_FloorName" required>
+                                <option value="">--Select--</option>
+                                <option ng-repeat="floor in floorList" value="{{floor.hrmF_FloorName}}" ng-selected="{{floor.Selected == true}}">
+                                    {{floor.hrmF_FloorName}}
+                                </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted1(myForm.floorname)" ng-messages="myForm.floorname.$error">
+                                <div ng-message="required">Select Floor</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-md-offset-2" ng-if="optionflag=='MAKERCHECKER' || optionflag=='PLANER' || optionflag=='LEAVE' || optionflag=='CHECKLIST'  " style="padding-left:0px;">
+                    <div class="row padding">
+                        <br />
+                        <label class="control-label col-sm-2">From Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="obj.startdate" name="startdate" md-placeholder="Enter date" required></md-datepicker>
+                            <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                <div ng-message="required">Select From Date</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row padding">
+                        <label class="control-label col-sm-2">To Date:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <md-datepicker ng-model="obj.enddate" name="endatediff" md-min-date="startdate" md-placeholder="Enter Date" required></md-datepicker>
+                            <div class="error-messages" ng-if="interacted(myForm.endatediff)" ng-messages="myForm.endatediff.$error">
+                                <div ng-message="required">To Date</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <br />
+            <div class="text-center padding">
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="GetReport()" id="save-btn">
+                    <i class="fa fa-search-minus" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clear()" ng-disabled="form.$invalid">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+                <md-button ng-if="get_Report.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button ng-show="get_Report.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printExcel')">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export To Excel
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_Report.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">IssueManager Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" ng-if="optionflag=='MAKERCHECKER'">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Date
+                            </th>
+                            <th>
+                                Employee code
+                            </th>
+                            <th>
+                                Employee name
+                            </th>
+                            <th>
+                                Approved name
+                            </th>
+                            <th>Approval name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.ISMDRPT_Date |date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.HRME_EmployeeCode}}</td>
+                            <td>{{user.DREmpName}}</td>
+                            <td>
+                                {{user.ApprovedEmpName}}
+                            </td>
+                            <td>{{user.ApprovalEmpName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-12" ng-if="optionflag=='CHECKLIST'">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Flor Name
+                            </th>
+                            <th>
+                                Approved Name
+                            </th>
+                            <th>
+                                Date
+                            </th>
+                            <th>
+                                Count
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.HRMF_FloorName}}</td>
+                            <td>{{user.ApprovedEmpName}}</td>
+                            <td>
+                                {{user.ISMCLT_Date |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{user.Rcount}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-12" ng-if="optionflag=='PLANER'">
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Employee Name
+                            </th>
+                            <th>
+                                Start Date
+                            </th>
+                            <th>End Date</th>
+                            <th>Approved Name</th>
+                            <th>Approved Date</th>
+                            <th>Approved Time</th>
+                            <th>Planer Name</th>
+                            <th>Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody dir-paginate="user in filterValue1 = (employeeid| filter : searchValue) |orderBy:propertyName:reverse|filter:searchValue |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                            <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.PlnnedEmpName}}</b></td>
+                        </tr>
+                        <tr dir-paginate="planner in filterValue1 = (user.plannerdetails| filter : searchValue) |orderBy:propertyName:reverse|filter:searchValue |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td>
+                                {{planner.ISMTPL_StartDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{planner.ISMTPL_EndDate |date:'dd/MM/yyyy'}}
+                            </td>
+
+                            <td>
+                                {{planner.ApprovedEmpName}}
+                            </td>
+                            <td>
+                                {{planner.ApprovedDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{planner.ApprovedTime |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{planner.ISMTPL_PlannerName}}
+                            </td>
+                            <td>
+                                {{planner.ISMTPLAP_Remarks}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--<table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Employee Name
+                            </th>
+                            <th>
+                                Start Date
+                            </th>
+                            <th>End Date</th>
+                            <th>Approved Name</th>
+                            <th>Approved Date</th>
+                            <th>Approved Time</th>
+                            <th>Planer Name</th>
+                            <th>Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>
+                                {{user.PlnnedEmpName}}
+                            </td>
+                            <td>
+                                {{user.ISMTPL_StartDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{user.ISMTPL_EndDate |date:'dd/MM/yyyy'}}
+                            </td>
+
+                            <td>
+                                {{user.ApprovedEmpName}}
+                            </td>
+                            <td>
+                                {{user.ApprovedDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{user.ApprovedTime |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td>
+                                {{user.ISMTPL_PlannerName}}
+                            </td>
+                            <td>
+                                {{user.ISMTPLAP_Remarks}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>-->
+            </div>
+            <div class="col-sm-12" ng-if="optionflag=='LEAVE'">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Employee Name
+                            </th>
+                            <th>
+                                AppliedDate
+                            </th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Auto Transfer Date</th>
+                            <th>Leave Reson</th>
+                            <th>Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.LeaveEmpName}}{</td>
+                            <td>{{user.AppliedDate |date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.HRELAP_FromDate |date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.HRELAP_ToDate |date:'dd/MM/yyy'}}</td>
+                            <td>{{user.AutoTransferDate}}</td>
+                            <td>{{user.HRELAP_LeaveReason}}</td>
+                            <td>{{user.HRELAPA_Remarks}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br />
+            <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="xyz">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+<div id="printExcel" style="display:none">
+    <table class="table table-hover table-responsive table-bordered text-center" ng-if="optionflag=='MAKERCHECKER'">
+        <thead>
+            <tr>
+                <th>
+                    SL.No
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Employee code
+                </th>
+                <th>
+                    Employee name
+                </th>
+                <th>
+                    Approved name
+                </th>
+                <th>Approval name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in get_Report">
+                <td>{{$index+1}}</td>
+                <td>{{user.ISMDRPT_Date |date:'dd/MM/yyyy'}}</td>
+                <td>{{user.HRME_EmployeeCode}}</td>
+                <td>{{user.DREmpName}}</td>
+                <td>
+                    {{user.ApprovedEmpName}}
+                </td>
+                <td>{{user.ApprovalEmpName}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-hover table-responsive table-bordered text-center" ng-if="optionflag=='PLANER'">
+        <thead>
+            <tr>
+                <th>
+                    SL.No
+                </th>
+                <th>
+                    Employee Name
+                </th>
+                <th>
+                    Start Date
+                </th>
+                <th>End Date</th>
+                <th>Approved Name</th>
+                <th>Approved Date</th>
+                <th>Approved Time</th>
+                <th>Planer Name</th>
+                <th>Remark</th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="user in employeeid">
+            <tr>
+                <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{$index+1}}</td>
+                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}"><b>{{user.PlnnedEmpName}}</b></td>
+            </tr>
+            <tr ng-repeat="planner in plannerdetails">
+                <td>
+                    {{planner.ISMTPL_StartDate |date:'dd/MM/yyyy'}}
+                </td>
+                <td>
+                    {{planner.ISMTPL_EndDate |date:'dd/MM/yyyy'}}
+                </td>
+
+                <td>
+                    {{planner.ApprovedEmpName}}
+                </td>
+                <td>
+                    {{planner.ApprovedDate |date:'dd/MM/yyyy'}}
+                </td>
+                <td>
+                    {{planner.ApprovedTime |date:'dd/MM/yyyy'}}
+                </td>
+                <td>
+                    {{planner.ISMTPL_PlannerName}}
+                </td>
+                <td>
+                    {{planner.ISMTPLAP_Remarks}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-hover table-responsive table-bordered text-center" ng-if="optionflag=='LEAVE'">
+        <thead>
+            <tr>
+                <th>
+                    SL.No
+                </th>
+                <th>
+                    Employee Name
+                </th>
+                <th>
+                    AppliedDate
+                </th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Auto Transfer Date</th>
+                <th>Leave Reson</th>
+                <th>Remark</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in get_Report">
+                <td>{{$index+1}}</td>
+                <td>{{user.LeaveEmpName}}{</td>
+                <td>{{user.AppliedDate |date:'dd/MM/yyyy'}}</td>
+                <td>{{user.HRELAP_FromDate |date:'dd/MM/yyyy'}}</td>
+                <td>{{user.HRELAP_ToDate |date:'dd/MM/yyy'}}</td>
+                <td>{{user.AutoTransferDate |date:'dd/MM/yyy'}}</td>
+                <td>{{user.HRELAP_LeaveReason}}</td>
+                <td>{{user.HRELAPA_Remarks}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

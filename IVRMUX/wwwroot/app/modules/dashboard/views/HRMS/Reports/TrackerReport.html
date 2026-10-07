@@ -1,0 +1,344 @@
+﻿<style>
+    div.scrollTable {
+        overflow: auto;
+        /*white-space: nowrap;*/
+    }
+
+    div.scrollTable a {
+        display: inline-block;
+        color: white;
+        text-align: center;
+        padding: 14px;
+        text-decoration: none;
+    }
+
+    div.scrollTable a:hover {
+        background-color: #777;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" ng-submit="findstatistics()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Institution Tracker Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <div class="well" data-ng-init="institution ='17'">
+                            <input type="radio" name="institute" value="17" data-ng-model="institution" /><span class="lbl padding-8">VTS</span>
+                            <input type="radio" name="institute" value="16" data-ng-model="institution" /><span class="lbl padding-8">VKS</span>
+                            <input type="radio" name="institute" value="22" data-ng-model="institution" /><span class="lbl padding-8">MARGA</span>
+                            <input type="radio" name="institute" value="24" data-ng-model="institution" /><span class="lbl padding-8">GLOBAL</span>
+                            <input type="radio" name="institute" value="20" data-ng-model="institution" /><span class="lbl padding-8">UNNATHI</span>
+                            <input type="radio" name="institute" value="21" data-ng-model="institution" /><span class="lbl padding-8">SMART</span>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <div class="well" data-ng-init="module ='HRMS'">
+                            <input type="radio" name="modulename" value="HRMS" data-ng-model="module" /><span class="lbl padding-8">HRMS</span>
+                            <input type="radio" name="modulename" value="FRONTOFFICE" data-ng-model="module" /><span class="lbl padding-8">FRONTOFFICE</span>
+                            <input type="radio" name="modulename" value="LEAVE" data-ng-model="module" /><span class="lbl padding-8">LEAVE</span>
+                            <input type="radio" name="modulename" value="VISITER" data-ng-model="module" /><span class="lbl padding-8">VISITER</span>
+                            <input type="radio" name="modulename" value="RECRUITMENT" data-ng-model="module" /><span class="lbl padding-8">RECRUITMENT</span>
+                            <input type="radio" name="modulename" value="TRAINING" data-ng-model="module" /><span class="lbl padding-8">TRAINING</span>
+                            <input type="radio" name="modulename" value="EXIT" data-ng-model="module" /><span class="lbl padding-8">EXIT</span>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            Find
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="EmployeeDis">
+            <div class="box-header with-border">
+                <h3 class="box-title">Statistics of {{module}} Module</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5> Current Total Active Employees - {{totalactiveemployee }}</h5>
+                    </div>
+                    <div class="col-sm-6">
+                        <h5> Current Total Left Employees - {{totalleftemployee}}</h5>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly Active Employees of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Year</th>
+                                    <th>Employee Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in ActEmpsYearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.year}}</td>
+                                    <td class="text-left">{{emp.ActEmpcount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly Active Employees of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlyactiveemployeegrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly Left Employees of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Year</th>
+                                    <th>Employee Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in LeftEmpsYearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.year}}</td>
+                                    <td class="text-left">{{emp.LeftEmpcount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly Left Employees of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlyleftemployeegrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly Loan/Advance Active Employees of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Year</th>
+                                    <th>Employee Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in LoanAdvEmpsYearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.year}}</td>
+                                    <td class="text-left">{{emp.LAEmpcount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly Loan/Advance Active Employees of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlyloanadvanceemployeegrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly Payment Mode of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Year</th>
+                                    <th>Bank Mode Count</th>
+                                    <th>Cash Mode Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in modeofPaymentyearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.HRES_Year}}</td>
+                                    <td class="text-left">{{emp.BankCount}}</td>
+                                    <td class="text-left">{{emp.CashCount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly Payment Mode of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlymodeofpaymentgrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly PF/ESI Count of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Year</th>
+                                    <th>EPF Count</th>
+                                    <th>ESI Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in PFESIEmpsYearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.HRES_Year}}</td>
+                                    <td class="text-left">{{emp.EPFCount}}</td>
+                                    <td class="text-left">{{emp.ESICount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly PF/ESI Count of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlypfesiemployeegrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly Cumulative Salary Count of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Department</th>
+                                    <th>Year</th>
+                                    <th>Earning</th>
+                                    <th>Deduction</th>
+                                    <th>Net</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in CumulativeSalaryYearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.DeptName}}</td>
+                                    <td class="text-left">{{emp.HRES_Year}}</td>
+                                    <td class="text-left">{{emp.Earning}}</td>
+                                    <td class="text-left">{{emp.Deduction}}</td>
+                                    <td class="text-left">{{emp.Netamount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly Cumulative Salary Count of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlycumulativesalarygrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly Mobile/Email add Count of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Year</th>
+                                    <th>Mobile Reg. Count</th>
+                                    <th>Email Reg. Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in EmpsMobEmailYearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.year}}</td>
+                                    <td class="text-left">{{emp.MobileEmpcount}}</td>
+                                    <td class="text-left">{{emp.EmailCount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly Mobile/Email add Count of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlymobileemialgrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Yearly Employee Salary Count of {{companyname}}</h5>
+                        <table class="table-bordered text-left margin-bottom-10" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Year</th>
+                                    <th>Employee Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="emp in salEmpsyearly">
+                                    <td class="text-left">{{$index +1}}</td>
+                                    <td class="text-left">{{emp.HRES_Year}}</td>
+                                    <td class="text-left">{{emp.Empcounts}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h5 class="box-title">Monthly Employee Salary Count of {{companyname}}</h5>
+                        <div class="col-sm-12">
+                            <div ui-grid="monthlyemployeesalarygrid" ui-grid-grouping ui-grid-exporter ui-grid-auto-resize class="grid" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

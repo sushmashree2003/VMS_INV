@@ -1,0 +1,975 @@
+﻿<style>
+    .multiselect {
+        width: 19.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 1.6%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content">
+    <div data-ng-init="onpageload()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TOUR PLAN  REPORT </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-3 padding-left-2px">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 8px;width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueDeptd" type="text" placeholder="Search Department here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                        <label>
+                                            <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Department</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                            <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 padding-left-none">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueDesgd" type="text" placeholder="Search Designation here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                        <label>
+                                            <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdesg(designationselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Designation</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                            <input name="desg" ng-model="user.selected" type="checkbox" ng-disabled="roleflag==true" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 padding-left-none">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                        <label>
+                                            <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                            <span class="lbl padding-8">
+                                                <b>  All Employees</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                            <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Tour Name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <ui-select id="sel1" name="stdnamere" ng-model="$parent.IER_ID" theme="bootstrap" title=" Select Name" required>
+                                        <ui-select-match ng-trim="false" style="outline: 0;font-weight: 100 !important;" placeholder="Select/Search Tour Name">{{$select.selected.IER_PlanName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in tasklist | filter: $select.search" value="{{name.IER_ID}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.IER_PlanName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stdnamere)" ng-messages="myForm.stdnamere.$error">
+                                        <div ng-message="required">Please Select Any One Tour Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br />
+                <!--------Inserting Items-------->
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="getReport()">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button type="button" ng-if="ApprovalSubmission.length > 0" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--ng-if="rdopunch=='TADAAdavance'"-->
+    <div class="box box-primary" ng-show="ApprovalSubmission.length > 0">
+
+        <div class="box-body">
+            <div class="col-sm-12 box-content clearfix">
+                <h4 class="text-center" ng-show="ApprovalSubmission.length > 0" ng-hide="true">FINAL SUBMISSION  LIST </h4>
+                <hr />
+                <div class="row" ng-repeat="tour in TourPlanDetails">
+                    <div class="col-sm-5">
+                        <h5>COMPANY NAME: <span style="color:#444 !important">&nbsp;{{tour.MI_Name |uppercase}} </span> </h5>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5>APPLIED DATE: <span style="color:#444 !important">&nbsp;{{tour.VTADAAA_AppliedDate |date:'dd-MM-yyyy'}}</span> </h5>
+                    </div>
+                    <div class="col-sm-3">
+                        <h5>STAFF NAME: <span style="color:#444 !important">&nbsp;{{tour.HRME_EmployeeFirstName |uppercase}} </span> </h5>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div>
+                            <h5 ng-show="getArrayDc.length > 0">DC List </h5>
+                            <hr />
+                            <table class="table table-bordered table-condensed" ng-show="getArrayDc.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl No
+                                        </th>
+                                        <th>
+                                            Dc No
+                                        </th>
+                                        <th>
+                                            Item Name
+                                        </th>
+                                        <th>
+                                            Recived By
+                                        </th>
+                                        <th>
+                                            Check Out Date
+                                        </th>
+                                        <th>
+                                            Check OutQty
+                                        </th>
+                                        <th>
+                                            To Location
+                                        </th>
+
+                                        <th>
+                                            Remarks
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="dc in  getArrayDc">
+                                        <td>
+                                            {{$inex+1}}
+                                        </td>
+                                        <td>
+                                            {{dc.INVACO_No}}
+                                        </td>
+                                        <td>
+                                            {{dc.INVMI_ItemName}}
+
+                                        </td>
+                                        <td>
+                                            {{dc.INVACO_ReceivedBy}}
+
+                                        </td>
+                                        <td>
+                                            {{dc.INVACO_CheckoutDate |date:'dd-MM-yyyy'}}
+
+                                        </td>
+                                        <td>
+                                            {{dc.INVACO_CheckOutQty}}
+
+                                        </td>
+                                        <td>
+                                            {{dc.INVACO_Tolocation}}
+
+                                        </td>
+                                        <td>
+                                            {{dc.INVACO_CheckOutRemarks}}
+                                        </td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="col-sm-12" ng-show="ViewDetails.length > 0">
+                                <div class="box-header with-border">
+                                    <h6 class="box-title"> Adavance Details </h6>
+                                </div>
+                                <div ng-repeat="level in Getsancationed_List">
+                                    <div class="row">
+                                        <div class="text-center">
+                                            <h5>{{level.VTADAAA_SanctioningLevel}} level Approved By - {{level.ApprovedBy}}</h5>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12" ng-show="flagone==true">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Applied Date</th>
+
+                                                        <th>Expenditure Head</th>
+
+                                                        <th>Applied Amount</th>
+
+                                                        <th>Approved Amount</th>
+                                                        <th>Approved Date</th>
+                                                        <th>Approval Remark</th>
+                                                        <td> ExpenditureHead Status</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                        <td class="text-center">{{$index+1}}</td>
+                                                        <td>{{leveldetails.VTADAAA_AppliedDate |date:'dd/MM/yyyy'}}</td>
+
+                                                        <td style="text-align:left">{{leveldetails.VTADAAAD_ExpenditureHead}}</td>
+
+                                                        <td class="text-left">{{leveldetails.HeadWiseAppliedAmount}}</td>
+                                                        <td class="text-left">{{leveldetails.HeadWiseSactionedAmount}}</td>
+                                                        <td>{{leveldetails.VTADAAAA_Date |date:'dd/MM/yyyy'}}</td>
+                                                        <td>{{leveldetails.VTADAAAAH_Remarks}}</td>
+                                                        <td class="text-left">{{leveldetails.VTADAAAAH_StatusFlg}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-12" ng-show="flagtwo==true">
+                                            <table class="table table-bordered table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sl No.</th>
+                                                        <th> Total AppliedAmount</th>
+                                                        <th>Applied Date</th>
+                                                        <th>Head Wise Sanction Amount</th>
+                                                        <th>Approved Date</th>
+                                                        <th>Remark</th>
+                                                        <th>Staus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                        <td class="text-center">{{$index+1}}</td>
+                                                        <td>
+                                                            {{leveldetails.AdvancedAppliedAmount}}
+                                                        </td>
+                                                        <td>{{leveldetails.VTADAAA_AppliedDate |date:'dd/MM/yyyy'}}</td>
+                                                        <td>
+                                                            {{leveldetails.VTADAAAA_SactionedAmount}}
+                                                        </td>
+
+                                                        <td>{{leveldetails.VTADAAAA_Date |date:'dd/MM/yyyy'}}</td>
+                                                        <td>
+                                                            {{leveldetails.VTADAAAA_Remarks }}
+                                                        </td>
+                                                        <td>
+                                                            {{leveldetails.VTADAAAA_StatusFlg}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                            <h5 ng-show="employeeidNew.length > 0">Lead Status List</h5>
+                            <hr />
+                            <table class="table table-bordered table-condensed" ng-show="employeeidNew.length > 0">
+                                <thead>
+                                    <tr>
+
+                                        <th>
+                                            Category Name
+                                        </th>
+                                        <th>
+                                            Lead name
+                                        </th>
+
+
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            Source Name
+                                        </th>
+
+                                        <th>
+                                            Cost
+                                        </th>
+                                        <th>
+                                            Lead Created By
+                                        </th>
+                                        <th>
+                                            Demo Given By
+                                        </th>
+                                        <th>
+                                            Lead Status
+                                        </th>
+                                        <th>
+                                            Lead Comment
+                                        </th>
+                                        <th>
+                                            Demo Reponse
+                                        </th>
+                                        <th>
+                                            Praposal
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="user in employeeidNew">
+                                    <tr>
+
+                                        <td class="text-left" rowspan="{{user.Datacategorynew.length+1}}"><b>{{user.IMRC_CategoryName}}</b></td>
+                                    </tr>
+                                    <tr ng-repeat="emplist in user.Datacategorynew">
+
+
+                                        <td>
+                                            {{emplist.ISMSLE_LeadName}}
+                                        </td>
+
+                                        <td>
+                                            {{emplist.ISMSMPR_ProductName}}
+                                        </td>
+                                        <td>
+                                            {{emplist.ISMSMSO_SourceName}}
+                                        </td>
+
+                                        <td>
+                                            {{emplist.TotalCost}}
+                                        </td>
+                                        <td>
+                                            {{emplist.HRME_EmployeeFirstName}}
+                                        </td>
+                                        <td>
+                                            {{emplist.Demo_EmployeeFirstName}}
+                                        </td>
+                                        <td>
+                                            {{emplist.LeadStatus}}
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" data-target="#myModal_Lead" ng-click="LeadsData(emplist)">
+                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                            </a>
+
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views123" data-target="#myModalgetclasslist_1" ng-click="view(emplist,vi)">
+
+                                                |Demo Response
+
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span ng-if="emplist.ISMSLET_HtmlPdf!=null && emplist.ISMSLET_HtmlPdf !=''">
+                                                <a href="{{emplist.ISMSLET_HtmlPdf}}" class="text-primary" target="_blank" title="Views">
+                                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+
+                            <h5 ng-show="materaldocuuploadNew.length > 0">File List </h5>
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+
+                                        <th>View</th>
+                                        <th>Amount</th>
+                                        <th>Remark</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="materal in materaldocuuploadNew">
+                                        <td class="text-center">
+                                            {{$index+1}}
+                                        </td>
+
+                                        <td>
+                                            <span ng-show="materal.ILRT_FilePath!=null && materal.ILRT_FilePath!=''">
+                                                <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.ILRT_FilePath  !=null && materal.ILRT_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.ILRT_FilePath)">
+                                                    view
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{materal.ILRT_Cost}}
+
+                                        </td>
+                                        <td>
+                                            {{materal.ILRT_Filedesc}}
+
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!-----Inside ----->
+                            <h5 ng-show="concalLopdata.length > 0">
+                                Concal  List
+                            </h5>
+                            <table class="table table-bordered table-condensed" ng-if="concalLopdata.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl No
+                                        </th>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <!--<th>
+                                            Percentage
+                                        </th>-->
+                                        <th>
+                                            Total Days
+                                        </th>
+                                        <th>
+                                            Concal Days
+                                        </th>
+                                        <th>
+                                            Eligibale Applied Amount
+                                        </th>
+
+                                        <th>
+                                            Total Sanction Amount
+                                        </th>
+                                        <th>
+                                            Total Eligibale amount
+                                        </th>
+                                        <th>
+                                            Con call Deducted Amount
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in concalLopdata">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{user.IMRC_CategoryName}}
+                                        </td>
+                                        <!--<td>
+                                            {{user.IERPC_Percentage}}
+                                        </td>-->
+                                        <td>
+                                            {{user.TotalDays}}
+                                        </td>
+                                        <td>
+                                            {{user.concalDays}}
+                                        </td>
+                                        <td>
+                                            {{user.Amount}}
+                                        </td>
+                                        <td>
+                                            {{user.TotalSactionedAmount}}
+                                        </td>
+                                        <td>
+                                            {{user.TotalEligbleAmount}}
+                                        </td>
+                                        <td>
+                                            {{user.TotalSactionedAmount-user.TotalEligbleAmount}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <h5 ng-show="FinalSumbmission.length > 0">Lead  Executed List </h5>
+                                        <hr />
+                                        <table class="table table-bordered table-condensed" ng-show="FinalSumbmission.length > 0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sl No</th>
+                                                    <th>
+                                                        Category Name
+                                                    </th>
+                                                    <th>
+                                                        Percentage
+                                                    </th>
+                                                    <th>
+                                                        Lead Count
+                                                    </th>
+                                                    <th>
+                                                        Execution Lead count
+                                                    </th>
+                                                    <th>
+                                                        Applied Amount
+                                                    </th>
+                                                    <th>
+                                                        Total Sanction Amount
+                                                    </th>
+                                                    <th>
+                                                        Total Eligibale amount
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="lead in  FinalSumbmission">
+                                                    <td>
+                                                        {{$index+1}}
+                                                    </td>
+                                                    <td>
+                                                        {{lead.IMRC_CategoryName}}
+                                                    </td>
+                                                    <td>
+                                                        <span style="color:red !important">
+                                                            {{lead.IERPC_Percentage}} %
+                                                        </span>
+
+                                                    </td>
+                                                    <td>
+                                                        {{lead.LeadCount}}
+                                                    </td>
+                                                    <td>
+                                                        {{lead.ExecutionLeadCount}}
+                                                    </td>
+                                                    <td>
+                                                        {{lead.VTADAAA_TotalAppliedAmount}}
+                                                    </td>
+                                                    <td>
+                                                        {{lead.VTADAAA_TotalSactionedAmount}}
+                                                    </td>
+                                                    <td>
+                                                        {{lead.VTADAAA_TotalEligbleAmount}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="5">
+                                                        Total
+                                                    </td>
+                                                    <td>
+                                                        <strong>  {{ TotalAppliedAmount}} </strong>
+                                                    </td>
+                                                    <td>
+                                                        <strong>{{ TotalSactionedAmount}}  </strong>
+                                                    </td>
+                                                    <td>
+                                                        <strong>  {{ TotalEligbleAmount}} </strong>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="form-group" ng-if="GpsLocationTada.length >0">
+
+                                        <label class="control-label col-sm-12">
+
+                                        </label>
+                                        <div class="box-content col-sm-12 margin-top-10" style="max-height: 250px;  overflow:auto;padding:0px !important">
+                                            <div class="col-sm-10" ng-repeat="response in GpsLocationTada" style="border-bottom: 0.5px solid #dcd6d6;padding-bottom: 10px;">
+                                                <label class="control-label  text-body" style="font-size:14px;">
+                                                    {{GpsLocationTada.length-$index}}) Travel Details :{{response.ISMSLE_LeadName}} -  {{response.VMSGPSTADA_DateTime | date:"dd-MM-yyyy '-' h:mma"}}
+                                                </label>
+                                                <span ng-if="response.VMSGPSTADA_Remarks!=null && response.VMSGPSTADA_Remarks!=''">
+                                                    <br /> <label class="control-label text-left" style="margin-left: 3%">
+                                                        <span class="control-label text-body" style="font-size:14px;">Response</span> : <b>{{response.VMSGPSTADA_Remarks}}</b>
+                                                    </label>
+                                                </span> <br />
+                                                <span ng-if="response.VMSGPSTADA_Address!=null && response.VMSGPSTADA_Address!=''">
+                                                    <br /> <label class="control-label text-left" style="margin-left: 3%">
+                                                        <span class="control-label text-body" style="font-size:14px;">Address</span> : <b>{{response.VMSGPSTADA_Address}}</b>
+                                                    </label>
+                                                </span> <br />
+                                                <span ng-if="response.VMSGPSTADA_LATLONGValue!=null && response.VMSGPSTADA_LATLONGValue!=''">
+                                                    <br /> <label class="control-label text-left" style="margin-left: 3%">
+                                                        <span class="control-label text-body" style="font-size:14px;">LatLong Value</span> : <b>{{response.VMSGPSTADA_LATLONGValue}}</b>
+                                                    </label>
+                                                </span> <br />
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div id="donutchart" style="background: center no-repeat url('../content/shared/styles/world-map.png');height: 360px; width: 100%;"></div>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="form-horizontal">
+
+                                    <div class="col-sm-12">
+                                        <div class="row" ng-repeat="final in ApprovalSubmission" ng-show="ApprovalSubmission.length > 0">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Route Plan Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.TotalAmt" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Eligible Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.EligibleAmt" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="final.CreditWalletAmount > 0">
+                                                    <label class="control-label col-sm-4">Balance Debit Amount :</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.CreditWalletAmount" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Bill Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="ILRT_BillCost" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-sm-6">
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Route Plan Advance Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.SactionedAmt" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="VTADAA_BalanceHRMS > 0">
+                                                    <label class="control-label col-sm-4">Total Salary Deducted Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="VTADAA_BalanceHRMS" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="VTADAA_BalanceConcal > 0">
+                                                    <label class="control-label col-sm-4">Con call  Deducted Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="VTADAA_BalanceConcal" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="VTADAA_TotalAppliedAmount > 0">
+                                                    <label class="control-label col-sm-4">Total Applied Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="VTADAA_TotalAppliedAmount" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal_Lead" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+
+                <center><h4 class="modal-title custom">Lead Comments</h4></center>
+
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl No
+                                        </th>
+                                        <th>
+                                            Lead Comments
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="lead in  LeadComments">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{lead.ISMSLECOM_Comments}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--======PRINT EXCEL REPORT======-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h5 class="modal-title" style="color:#fff !important;">IMAGE </h5>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h5 class="modal-title" style="color:#fff !important;">IMAGE </h5>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====================Previewtada view========-->
+<div id="myimagePreviewtada" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width:80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-sm-8 text-left">
+                    <h4 class="text-white"> TADA Route Document Apply </h4>
+                </div>
+                <div class="cols-sm-4 text-right">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close<i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="tadapreviewX" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="myModalgetclasslist_1" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="model-header custom-header">
+                <center><h4 class="modal-title custom">Sales Lead Demo</h4></center>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 "><b>Lead Title:</b></label>
+                                <div class="col-sm-8 text-left">
+                                    {{ismslE_LeadName_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 "><b>Lead Contact No :</b></label>
+                                <div class="col-sm-8 text-left">
+                                    {{ISMSLE_ContactNo_s}}
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 "><b>Contact Person:</b></label>
+                                <div class="col-sm-8 text-left">
+                                    {{ISMSLEDM_ContactPerson_s}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 "><b>Address:</b></label>
+                                <div class="col-sm-8 text-left">
+                                    {{ISMSLEDM_DemoAddress_s}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3 "><b>Remarks:</b></label>
+                                <div class="col-sm-8 text-left">
+                                    {{ISMSLEDM_Remarks_s}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h4 ng-show="product_dd_s.length > 0">Product Details</h4>
+                <table class="table table-bordered" ng-show="product_dd_s.length > 0">
+                    <thead>
+                        <tr>
+                            <th>SLNo</th>
+                            <th>Product Name</th>
+                            <th>Discussion Points</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+                        <tr ng-repeat="crd in product_dd_s">
+                            <td>{{ $index + 1 }}</td>
+                            <td class="text-center">{{crd.ismsmpR_ProductName}}</td>
+                            <td class="text-center">{{crd.ismsledmpR_DiscussionPoints}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="modal-content">
+
+            <div class="modal-body">
+
+
+                <h4 ng-show="demo_response_details.length > 0">Response Details</h4>
+                <table class="table table-bordered" ng-show="demo_response_details.length > 0">
+                    <thead>
+                        <tr>
+                            <th>SLNo</th>
+                            <th>Product Name</th>
+                            <th>Discussion Points</th>
+                            <th>StatusName</th>
+                            <th>Remarks</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+                        <tr ng-repeat="crd in demo_response_details">
+
+
+
+                            <td>{{ $index + 1 }}</td>
+                            <td class="text-center">{{crd.ismsmpR_ProductName}}</td>
+                            <td class="text-center">{{crd.ismsledmpR_DiscussionPoints}}</td>
+                            <td class="text-center">{{crd.ismsmsT_StatusName}}</td>
+                            <td class="text-center">{{crd.ismsledmpR_Remarks}}</td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>

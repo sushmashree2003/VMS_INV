@@ -1,0 +1,457 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        /*border: 1px solid #3e85a0;*/
+        padding: 12px;
+        /*min-height: 371px;*/
+        /*border-radius: 5px;*/
+    }
+
+    .file-bluedd:before {
+        content: 'Download Template';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .file-bluenew:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e85a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+    .multiselect {
+        width: 24.1em;
+        height: 9em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: -0.3%;
+        margin-bottom: 2%;
+        padding: 3%;
+    }
+
+    .box-label:hover {
+        box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+        transform: translate(0px, -5px) scale(1.0);
+    }
+
+    .Rejected {
+        color: #fff;
+        background-color: #dc3545 !important;
+    }
+
+    .Approved {
+        color: white;
+        background-color: #28a745 !important;
+    }
+    .Pending {
+        color: white;
+        background-color: #17a2b8 !important;
+    }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+<section class="content">
+    <div data-ng-init="loaddata()">
+        <form class="form-horizontal" role="form" name="myForm2" novalidate>
+            <div class="well " ng-init="flag='Assigned'">
+                <md-tabs md-dynamic-height md-border-bottom md-selected="myTabIndex" flex layout="column" md-stretch-tabs="always">
+                    <md-tab label="Scope Of Deployment Features Update" id="tab1" ng-click="initializeFlag('Assigned')">
+                        <md-content class="md-padding " style="min-height:150px">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="control-label col-sm-4">Hosting Name:<span style="color:red;font-weight:600">*</span></label>
+                                        <div class="col-sm-8">
+                                            <ui-select id="sel2" name="Hosting" ng-model="$parent.obj.ivrmcH_Id" ng-true-value="1" theme="bootstrap" title="Select Hosting" required ng-change="OnChangehost()">
+                                                <ui-select-match placeholder="Select or Search Hosting Name">
+                                                    {{$select.selected.ivrmcH_HostName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option in get_client | propsFilter: {ivrmcH_HostName: $select.search}"
+                                                                   value="{{option.ivrmcH_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.ivrmcH_HostName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(myForm2.Hosting)" ng-messages="myForm2.Hosting.$error">
+                                                <span ng-message="required">Please Select Host  <i class="fa fa-warning"></i> !</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="control-label col-sm-4">Version Name:<span style="color:red;font-weight:600">*</span></label>
+                                        <div class="col-sm-8">
+                                            <ui-select id="sel2" name="Hosting" ng-model="$parent.obj.ivrmvT_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Version" required>
+                                                <ui-select-match placeholder="Select or Search Version Name">
+                                                    {{$select.selected.ivrmvT_VersionName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option in version_list | propsFilter: {ivrmvT_VersionName: $select.search}"
+                                                                   value="{{option.ivrmvT_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.ivrmvT_VersionName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(myForm2.version)" ng-messages="myForm2.version.$error">
+                                                <span ng-message="required">Please Select version  <i class="fa fa-warning"></i> !</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </md-content>
+                    </md-tab>
+                    <md-tab id="tab2" label="Scope Of Deployment Feature Remarks Update" ng-click="initializeFlag('Created')">
+                        <md-content class="md-padding" style="min-height:150px">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <label class="control-label col-sm-4">Hosting Name:<span style="color:red;font-weight:600">*</span></label>
+                                        <div class="col-sm-8">
+                                            <ui-select id="sel2" name="Hosting" ng-model="$parent.obj.ivrmcH_Id" ng-true-value="1" theme="bootstrap" title="Select Hosting" required ng-change="OnChangehost()">
+                                                <ui-select-match placeholder="Select or Search Hosting Name">
+                                                    {{$select.selected.ivrmcH_HostName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option in get_client | propsFilter: {ivrmcH_HostName: $select.search}"
+                                                                   value="{{option.ivrmcH_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.ivrmcH_HostName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(myForm2.Hosting)" ng-messages="myForm2.Hosting.$error">
+                                                <span ng-message="required">Please Select Host  <i class="fa fa-warning"></i> !</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="control-label col-sm-4">Version Name:<span style="color:red;font-weight:600">*</span></label>
+                                        <div class="col-sm-8">
+                                            <ui-select id="sel2" name="version" ng-model="$parent.obj.ivrmvT_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Version" required>
+                                                <ui-select-match placeholder="Select or Search Version Name">
+                                                    {{$select.selected.ivrmvT_VersionName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option in version_list | propsFilter: {ivrmvT_VersionName: $select.search}"
+                                                                   value="{{option.ivrmvT_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.ivrmvT_VersionName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(myForm2.version)" ng-messages="myForm2.version.$error">
+                                                <span ng-message="required">Please Select version  <i class="fa fa-warning"></i> !</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </md-content>
+                    </md-tab>
+                </md-tabs>
+                <hr>
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="gettasks_forupdate()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <!--<md-button type="button" ng-click="exptoex();" target="_blank" class="md-raised md-primary" ng-disabled="!grid_view">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-disabled="!grid_view" id="print-btn" aria-disabled="false" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>-->
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="box box-primary" ng-if="tasks_list.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Update The Scope Of Deployment</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <style>
+                tr.closedrow {
+                    background-color: #c3c3c3;
+                    color: black;
+                    cursor: not-allowed;
+                }
+
+
+                    tr.closedrow input,
+                    tr.closedrow select,
+                    tr.closedrow button {
+                        pointer-events: none;
+                        opacity: 0.5;
+                        background-color: #e0e0e0;
+                        cursor: not-allowed;
+                    }
+                .badge-warning {
+                    color: #1f2d3d;
+                    background-color: #ffc107 !important;
+                }
+            </style>
+            <div>
+                
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge badge-danger">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-8 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue1" type="text" placeholder="Search Task Status...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                :root {
+                    --upload-bg: linear-gradient(-180deg, #ffdc73, #febf01);
+                    --upload-border: #03c5ff;
+                    --upload-text-color: #333;
+                    --upload-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    --upload-radius: 8px;
+                    --upload-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .file-upload-test-case {
+                    position: relative;
+                    display: inline-block;
+                    width: 120px;
+                    height: 20px;
+                    font-family: var(--upload-font);
+                }
+
+                    .file-upload-test-case input[type="file"] {
+                        display: none;
+                    }
+
+                    .file-upload-test-case::before {
+                        content: ' Upload Test Case';
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: var(--upload-bg);
+                        border: 2px solid var(--upload-border);
+                        color: var(--upload-text-color);
+                        font-weight: 600;
+                        font-size: 14px;
+                        text-align: center;
+                        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+                        cursor: pointer;
+                        height: 100%;
+                        border-radius: var(--upload-radius);
+                        box-shadow: var(--upload-shadow);
+                        transition: all 0.3s ease-in-out;
+                        background-image: url('upload-icon.png'); /* Replace with your icon */
+                        background-repeat: no-repeat;
+                        background-size: 20px 20px;
+                        background-position: 15px center;
+                    }
+
+                    .file-upload-test-case:hover::before {
+                        filter: brightness(1.05);
+                        transform: scale(1.02);
+                    }
+
+                    .file-upload-test-case:active::before {
+                        transform: scale(0.98);
+                    }
+            </style>
+            <form name="myForm" novalidate>
+                <div class="text-center" ng-if="flag=='Created'">
+                    <p class="badge badge-warning">
+                        Note: You cannot close the tasks until the "Scope of Development Remarks" has been updated by the developer assigned to the respective task.
+                    </p>
+                </div>
+                <div style="overflow-x:auto !important;" class="col-sm-12">
+
+                    <table class="table table-bordered table-responsive">
+                        <thead>
+                            <tr>
+                                <th>
+                                    &nbsp;
+                                </th>
+                                <th>Sl.No</th>
+                                <th>Task ID</th>
+                                <th>Status</th>
+                                <th>Task Description</th>
+                                <th>Created By </th>
+                                <th>Assigned To </th>
+                                <th>Task Status</th>
+                                <th> Feature</th>
+                                <th>Feature Remarks</th>
+                                <th ng-if="flag=='Created'"> Test Case</th>
+                                <th ng-if="flag=='Created'">Completed <br /> Flag</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="task in tasks_list | filter : searchValue1" class={{task.class}}>
+                                <td>
+                                    <label class="control-label" ng-if="task.IVRMVFD_Status!='Close'">
+                                        <input type="checkbox" name="dfsd1" ng-model="task.check" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-16"></span>
+                                    </label>
+                                </td>
+                                <td>{{$index+1}}</td>
+                                <td>{{task.ISMTCR_TaskNo}}</td>
+                                <td>
+                                    <label class="badge {{task.flag}}">
+                                        {{task.flag}}
+                                    </label>
+                                </td>
+                                <td>{{task.ISMTCR_Desc}}</td>
+                                <td>{{task.Created_EmployeeName}}</td>
+                                <td>{{task.AssignedTo_EmployeeName}}</td>
+                                <td>{{task.ISMTCR_Status}}</td>
+                                <td>
+                                    <textarea ng-model="task.IVRMVFD_Features"
+                                              name="feature_{{$index}}"
+                                              ng-required="task.check && task.IVRMVFD_Features==''&& task.edit_feature"
+                                              ng-disabled="task.edit_feature "></textarea>
+
+                                    <div class="error-messages"
+                                         ng-if="interacted1(myForm['feature_'+$index])"
+                                         ng-messages="myForm['feature_'+$index].$error">
+                                        <div ng-message="required">Enter The Feature <i class="fa fa-warning"></i></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <textarea ng-model="task.IVRMVFD_Remarks"
+                                              name="remarks_{{$index}}"
+                                              ng-required="task.check && task.IVRMVFD_Remarks=='' && task.edit_remark "
+                                              ng-disabled="task.edit_remark || task.IVRMVFD_Status=='Close'"></textarea>
+
+                                    <div class="error-messages"
+                                         ng-if="interacted1(myForm['remarks_'+$index])"
+                                         ng-messages="myForm['remarks_'+$index].$error">
+                                        <div ng-message="required">Enter The Remarks <i class="fa fa-warning"></i></div>
+                                    </div>
+                                </td>
+                                <td ng-if="flag=='Created'">
+                                    <label class="file-upload-test-case" ng-if="task.IVRMVFD_Status!='Close'">
+                                        <input name="test_{{$index}}" ng-disabled=" !task.edit_feature" type="file"
+                                               onchange="angular.element(this).scope().selectFileForUpload(this,angular.element(this).scope().task)"
+                                               ng-required="task.check && task.IVRMVFD_Test_Case==0" />
+
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted1(myForm['test_'+$index])"
+                                         ng-messages="myForm['test_'+$index].$error">
+                                        <div ng-message="required">Upload The Test Case File <i class="fa fa-warning"></i> </div>
+                                    </div> <br />
+                                    <a class="text-red" href="" ng-click="view_test_case_file(task.IVRMVFD_Test_Case,task.IVRMVFD_Test_Case_File_Name)" ng-if="task.IVRMVFD_Test_Case && task.IVRMVFD_Test_Case!=0">
+                                        View <i class="fa fa-eye text-black" title="View Checklist"></i>
+                                    </a>
+                                </td>
+                                <td ng-if="flag=='Created'">
+                                    <div class="col-sm-12">
+                                        <label class="control-label" ng-if="task.IVRMVFD_Status!='Close' && task.IVRMVFD_Features.length>1">
+                                            <input type="checkbox" name="closeflag1" ng-disabled="!task.check || task.IVRMVFD_Status=='Close'" ng-model="task.closeflag" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-16"></span>
+                                        </label>
+                                    </div>
+                                    <label ng-if="task.IVRMVFD_Status=='Close'" class="text-green"><b>Closed</b></label>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="save_features()" id="save-btn">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Save
+                </md-button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-sm-9 col-lg-9 col-9 pull-left">
+                            <h4 style="text-align:center">{{Documentname}}</h4>
+                        </div>
+                        <div class="col-sm-2 col-lg-2 col-2 pull-right">
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                                <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="pdfviewdd">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="myModaldocx" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-2 pull-left">
+                        <h4 style="text-align:center">{{Documentname}}</h4>
+                    </div>
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fa fa-window-close" aria-hidden="true"> Close</i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

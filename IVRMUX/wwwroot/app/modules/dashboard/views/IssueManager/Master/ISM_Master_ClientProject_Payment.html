@@ -1,0 +1,471 @@
+<style>
+    .multiselect {
+        width: 100%;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        padding: 0;
+    }
+
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 5px;
+        border-bottom: 0px solid #e5e5e5;
+        border-bottom-color: #f4f4f4;
+        background: #205081;
+        color: #fff;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Client Project Payment</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Client:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="client" ng-model="$parent.ISMMCLT_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,ts.optradio);" title="Select Client"
+                                               ng-change="onchangeProject(ISMMCLT_Id)" required ng-disabled="editflag==true">
+                                        <ui-select-match ng-trim="false" placeholder="Select Or Search Client">
+                                            {{$select.selected.ismmclT_ClientName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="catgry in clientlist | filter: $select.search" value="{{catgry.ismmclT_Id}}"
+                                                           ng-selected="{{catgry.Selected == true}}">
+                                            <div ng-bind-html="catgry.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                        <div ng-message="required">Select Client Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Project:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="project" name="project" ng-model="ISMMPR_Id" ng-disabled="editflag==true" required>
+                                        <option value="">--Select Project--</option>
+                                        <option ng-repeat="pro in projectlist" value="{{pro.ismmpR_Id}}" ng-selected="{{pro.ismmpR_Id == ISMMPR_Id}}">
+                                            {{pro.ismmpR_ProjectName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.project)" ng-messages="myForm.project.$error">
+                                        <div ng-message="required">Select Project Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="year" ng-model="ISMCLTPRP_Year" ng-disabled="editflag==true" required>
+                                        <option value="">--Select Year--</option>
+                                        <option ng-repeat="acdyear in yearlist" value="{{acdyear.asmaY_Id}}" ng-selected="{{acdyear.Selected == true}}">
+                                            {{acdyear.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                        <div ng-message="required">Select Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Installment Name :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="FTI_Id" name="installment" ng-disabled="editflag==true" required>
+                                        <option value="">Select Installment Name </option>
+                                        <option ng-repeat="option in getinstallment" value="{{option.ftI_Id}}" ng-selected="{{option.ftI_Id == FTI_Id}}">
+                                            {{option.ftI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.installment)" ng-messages="myForm.installment.$error">
+                                        <div ng-message="required">Select Installment Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Installment Amount :<span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="iamount" id="iamount" type="text" ng-model="ISMCLTPRP_InstallmentAmt" required
+                                           allow-pattern="\d" ng-paste="$event.preventDefault()">
+                                    <div class="error-messages" ng-if="interacted(myForm.iamount)" ng-messages="myForm.iamount.$error">
+                                        <div ng-message="required">Enter Installment Amount</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Payment Date<strong style="color:red;">*</strong></label>
+                                </div>
+                                <div class="col-sm-8 input-group">
+                                    <md-datepicker name="payment_date" onkeydown="return false" data-ng-model="ISMCLTPRP_PaymentDate" placeholder="Enter date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.payment_date)" ng-messages="myForm.payment_date.$error">
+                                        <div ng-message="required">Select Payment Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <input type="hidden" ng-model="ismcltprP_Id " value="{{ismcltprP_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Master Client Project Payment List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{alldata.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here..." />
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="" ng-click="sort('ismmclT_ClientName')">Client Name </a></th>
+                        <th><a href="" ng-click="sort('ismmpR_ProjectName')">Project Name </a></th>
+                        <th><a href="" ng-click="sort('asmaY_Year')">Year</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_InstallmentName')">Installment Name</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_PaymentDate')">Payment Due Date</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_InstallmentAmt')">Installment Amount</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_ReceivedAmt')">Received Amount</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_InstallmentAmt')">Balance Amount</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_PaymentDate')">Update Payment</a></th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1=(alldata |filter:filterValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                        current-page="currentPage" pagination-id="page1">
+                        <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td style="text-align:left ;width: 20%;">{{user.ismmclT_ClientName}}</td>
+                        <td style="text-align:left">{{user.ismmpR_ProjectName}}</td>
+                        <td style="text-align:left">{{user.asmaY_Year}}</td>
+                        <td style="text-align:left">{{user.ismcltprP_InstallmentName}}</td>
+                        <td style="text-align:left">{{user.ismcltprP_PaymentDate|date:'dd/MM/yyyy'}}</td>
+                        <td style="text-align:left">{{user.ismcltprP_InstallmentAmt}}</td>
+                        <td style="text-align:left">{{user.ismcltprP_ReceivedAmt}}</td>
+                        <td style="text-align:left">{{user.ismcltprP_BalanceAmt}}</td>
+                        <td style="text-align:center;width: 1%;">
+                            <a href="javascript:void(0)" ng-click="viewdetails(user)" data-placement="bottom" data-toggle="tooltip"
+                               title="View Data" data-target="#myModalreadmitview">
+                                <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                        <td style="text-align:center">
+                            <span ng-if="user.paymentstatusflag!='Full Payment'">
+                                <a href="javascript:void(0)" ng-click="Editdata(user)" data-placement="bottom" data-toggle="tooltip"
+                                   title="Edit Client Data">
+                                    <i class="fa fa-pencil-square-o" style="color: black;" aria-hidden="true"></i>
+                                </a>
+                                |
+                                <span ng-if="user.ismcltprP_ActiveFlag === true">
+                                    <a href="" ng-click="clientDecative(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                    </a>
+                                </span>
+
+                                <span ng-if="user.ismcltprP_ActiveFlag === false">
+                                    <a href="" ng-click="clientDecative(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                    </a>
+                                </span>
+                            </span>
+                            <span ng-if="user.paymentstatusflag=='Full Payment'">
+                                <label style="color :green; font-size:medium;font-weight:bold">Full Payment</label>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+<div id="myModalreadmitview" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <md-button type="button" class="md-raised md-warn pull-right" ng-click="clearpayment()">
+                    <i class="fa fa-times" aria-hidden="true"></i>Close
+                </md-button>
+                <!--<h4 class="modal-title text-white">Payment Update Details</h4>-->
+                <h4 class="modal-title text-white">Payment Status : {{paymentstatusflagnew}}</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+                    <div class="well">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label class="control-label text-bold"> Client Name : {{clientname}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label text-bold"> Due Date : {{duedate | date :'dd/MM/yyyy'}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label class="control-label text-bold"> Project Name : {{projectname}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label text-bold"> Year : {{yearname}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label class="control-label text-bold"> Installment Name : {{installmentname}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label text-bold col-sm-5"> Installment Amount : </label>
+                                        <div class="col-sm-7">
+                                            <input class="form-control" name="iamountd" id="iamountd" type="text" ng-model="installmentamount" required
+                                                   allow-pattern="\d">
+                                            <div class="error-messages" ng-if="interacted1(myForm1.iamountd)" ng-messages="myForm1.iamountd.$error">
+                                                <div ng-message="required">Enter Installment Amount</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="well">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No</th>
+                                            <th>Received Amount</th>
+                                            <th>Received Date</th>
+                                            <th>Payment Mode</th>
+                                            <th>Reference No.</th>
+                                            <th>TDS Amount</th>
+                                            <th>Cheque Date</th>
+                                            <th>Remarks</th>
+                                            <th>Bank</th>
+
+                                           
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in totalgrid">
+                                            <td>{{$index+1}}</td>
+                                            <td>
+                                                <input type="text" class="form-control" id="reamt{{$index}}" name="amount{{$index}}" allow-pattern="[0-9]"
+                                                       ng-model="user.ismcppD_ReceivedAmount" required />
+                                                <div class="error-messages" ng-if="interacted1(myForm1['amount'+$index])"
+                                                     ng-messages="myForm1['amount'+$index].$error">
+                                                    <div ng-message="required">Select Received Amount</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <md-datepicker id="payment_dateid{{$index}}" name="payment_date{{$index}}" onkeypress="return false"
+                                                               ng-model="user.ismcppD_ReceivedDate" md-max-date="maxdate"
+                                                               placeholder="Enter date" required></md-datepicker>
+                                                <div class="error-messages" ng-if="interacted1(myForm1['payment_date'+$index])"
+                                                     ng-messages="myForm1['payment_date'+$index].$error">
+                                                    <div ng-message="required">Enter Received Date</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" id="pymtmoded{{$index}}" name="pymtmode{{$index}}" ng-model="user.ivrmmoD_Id"
+                                                        required ng-change="onchangepaymentmode(user)">
+                                                    <option value="">--Select Payment Mode--</option>
+                                                    <option ng-repeat="pro in paymentmodedetails" value="{{pro.ivrmmoD_Id}}" ng-selected="{{pro.ivrmmoD_Id == user.ivrmmoD_Id}}">
+                                                        {{pro.ivrmmoD_ModeOfPayment}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1['pymtmode'+$index])"
+                                                     ng-messages="myForm1['pymtmode'+$index].$error">
+                                                    <div ng-message="required">Select Payment Mode</div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <input type="text" class="form-control" id="refno{{$index}}" name="refeno{{$index}}"
+                                                       ng-model="user.ismcppD_PaymentRefNo" required />
+                                                <div class="error-messages" ng-if="interacted1(myForm1['refeno'+$index])"
+                                                     ng-messages="myForm1['refeno'+$index].$error">
+                                                    <div ng-message="required">Enter Reference No.</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" id="refno{{$index}}" name="tdsamt{{$index}}"
+                                                       ng-model="user.ismcppD_TDSAmount" required />
+                                                <div class="error-messages" ng-if="interacted1(myForm1['tdsamt'+$index])"
+                                                     ng-messages="myForm1['tdsamt'+$index].$error">
+                                                    <div ng-message="required">Enter</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <md-datepicker id="paymentche_dateid{{$index}}" name="paymentcheq_date{{$index}}" onkeypress="return false"
+                                                               data-ng-model="user.ismcppD_ChequeDate" md-max-date="maxdate"
+                                                               placeholder="Enter date" ng-required="user.flag==1"></md-datepicker>
+                                                <div class="error-messages" ng-if="interacted1(myForm1['paymentcheq_date'+$index])"
+                                                     ng-messages="myForm1['paymentcheq_date'+$index].$error">
+                                                    <div ng-message="required">Enter Cheque Date</div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <textarea class="form-control textareaclass" id="remk{{$index}}" name="remarks{{$index}}"
+                                                          ng-model="user.ismcppD_Remarks" rows="3"></textarea>
+                                                <div class="error-messages" ng-if="interacted1(myForm1['remarks'+$index])"
+                                                     ng-messages="myForm1['remarks'+$index].$error">
+                                                    <div ng-message="required">Enter Remarks</div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <select class="form-control" id="pymtmodedbank{{$index}}" name="pymtmodedbank{{$index}}" ng-model="user.HRMBD_Id"
+                                                        ng-required="user.flag==1" ng-change="bankchange(user)">
+                                                    <option value="">--Select Bank Name--</option>
+                                                    <option ng-repeat="pro in master_bankdetails" value="{{pro.hrmbD_Id}}" ng-selected="{{pro.hrmbD_Id == user.hrmbD_Id}}">
+                                                        {{pro.hrmbD_BankName}} -- {{pro.hrmbD_BankAccountNo}}
+                                                    </option>
+                                                </select>
+                                                <!--<div class="error-messages" ng-if="interacted1(myForm1['pymtmodedbank'+$index])"
+             ng-messages="myForm1['pymtmodedbank'+$index].$error">
+            <div ng-message="required">Select Bank Name</div>
+        </div>-->
+                                            </td>
+
+
+
+                                            <td>
+                                                <span class="" ng-hide="totalgrid.length > 99">
+                                                    <a href="" ng-show="$last" ng-click="addNewsiblingguard()">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="" id="remove" ng-hide="totalgrid.length ==1">
+                                                    <a href="" ng-click="removeNewsiblingguard($index)">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                                <input type="hidden" ng-model="user.ismcppD_Id" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="c()"
+                                   id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clearpayment()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Close
+                        </md-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

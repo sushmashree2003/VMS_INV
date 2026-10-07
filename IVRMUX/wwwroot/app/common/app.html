@@ -1,0 +1,1983 @@
+﻿<link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700i" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" media="all">
+<link href="../css/print/PortalInteraction/interaction.css" rel="stylesheet" />
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<style>
+    .zoom:hover {
+        -ms-transform: scale(1.5); /* IE 9 */
+        -webkit-transform: scale(1.5); /* Safari 3-8 */
+        transform: scale(1.5);
+        transform: translateX(180px);
+        /*background: PaleTurquoise;
+        transition: all 1.5s linear;*/
+        background: salmon;
+        transition: all 1.5s ease;
+    }
+
+    .skin-purple .treeview-menu > li.active > a,
+    .skin-purple .treeview-menu > li > a:hover {
+        /*border-width: 2px;*/
+        border-top: 0.1px solid #b5b2b2 !important;
+        border-bottom: 0.1px solid #b5b2b2 !important;
+        /*font-weight: 800;
+        color: white;*/
+    }
+
+    .sidebar-mini.sidebar-collapse .main-sidebar {
+        width: 61px !important;
+    }
+
+    .overlaymsg :hover {
+        background-color: #c4ced8;
+        transform: translate(0px, -5px) scale(1.0);
+    }
+
+    .boxlayout {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        border-radius: 5px;
+    }
+
+    .feedback_1 {
+        margin-bottom: 19px;
+        margin-right: -7px;
+    }
+
+    .asdf {
+        margin-left: 403px;
+    }
+
+    .fff {
+        margin-left: -119px;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+
+    .box-content_search {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .text-head {
+        font-family: FontAwesome;
+        font-weight: 800;
+        overflow-x: hidden;
+        overflow-y: auto;
+        font-size: 14px;
+        color: #0d4073;
+    }
+
+    .text-body {
+        font-family: FontAwesome;
+        font-weight: 600;
+        overflow-x: hidden;
+        overflow-y: auto;
+        font-size: 15px;
+        color: #0d4073;
+    }
+
+    .tagsu {
+        display: inline;
+        position: relative;
+    }
+
+        .tagsu:hover:after {
+            background: #333;
+            background: rgba(0, 0, 0, .8);
+            border-radius: 5px;
+            bottom: -150px;
+            color: #fff;
+            content: attr(gloss);
+            left: -80%;
+            padding: 5px 15px;
+            position: absolute;
+            z-index: 98;
+            width: 500px;
+        }
+
+        .tagsu:hover:before {
+            border: solid;
+            border-color: #333 transparent;
+            border-width: 0 6px 6px 6px;
+            bottom: -4px;
+            content: "";
+            left: -80%;
+            position: absolute;
+            z-index: 99;
+        }
+
+    .tagss:hover:after {
+        background: #333;
+        background: rgba(0, 0, 0, .8);
+        border-radius: 5px;
+        bottom: -50px !important;
+        color: #fff;
+        content: attr(gloss);
+        left: -10%;
+        padding: 5px 15px;
+        position: absolute;
+        z-index: 98;
+        width: 200px !important;
+    }
+</style>
+<script>
+    $(function () {
+        var token = null;
+        var config = {
+            //apiKey: "AIzaSyAXsUYaGjukBqdQbE_sk8nbL0gqsNP39h0",
+            //authDomain: "webpushnotification-62f3b.firebaseapp.com",
+            //projectId: "webpushnotification-62f3b",
+            //storageBucket: "webpushnotification-62f3b.appspot.com",
+            //messagingSenderId: "25529584780",
+            //appId: "1:25529584780:web:880f0d42b0a626678b7fa9",
+            //measurementId: "G-BSC0HG5YG1"
+            apiKey: "AIzaSyC7RLFr8bkITn06hSWoDaDoLt5AZp_kHb8",
+            authDomain: "vapsstofware.firebaseapp.com",
+            projectId: "vapsstofware",
+            storageBucket: "vapsstofware.appspot.com",
+            messagingSenderId: "63236243897",
+            appId: "1:63236243897:web:200456b0df7c928670b668",
+            measurementId: "G-TWY1L7JMVW"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(config);
+        }
+
+        const messaging = firebase.messaging();
+
+        messaging.requestPermission()
+            .then(function () {
+                console.log("granted");
+                if (isTokenSentToServer()) {
+                    console.log("already granted");
+                } else {
+                    getRegtoken();
+                }
+            });
+        function getRegtoken() {
+            messaging.getToken().then((currentToken) => {
+                if (currentToken) {
+                    console.log(currentToken);
+                    setTokenSentToServer(true);
+                    saveToken(currentToken)
+                    //   updateUIForPushEnabled(currentToken);
+                } else {
+                    console.log('No Instance ID token available. Request permission to generate one.');
+                    setTokenSentToServer(false);
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+                setTokenSentToServer(false);
+            });
+        }
+        function setTokenSentToServer(sent) {
+            window.localStorage.setItem('sentToServer', sent ? 1 : 0);
+        }
+        function saveToken(sent) {
+            urlvariable = "text";
+            var data = sent;
+            const params = {
+                department: "",
+                pushtocken: sent
+            }
+            URL = "http://localhost:57606/api/ISM_Notification/pushnotificationdetails";  //Your URL
+
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+            xmlhttp.withCredentials = true;
+            xmlhttp.open("POST", URL, false);
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+            xmlhttp.send(JSON.stringify(params));
+            console.log(JSON.stringify(params));
+        }
+        function callbackFunction(xmlhttp) {
+            //alert(xmlhttp.responseXML);
+        }
+        function isTokenSentToServer() {
+            return window.localStorage.getItem('sentToServer') === '1';
+        }
+        messaging.onMessage(function (payload) {
+            console.log('Message received. ', payload);
+
+            notificationTitle = payload.notification.title;
+            notificationbody = payload.notification.body;
+            notificationicone = payload.notification.icon;
+            notificationURL = payload.notification.click_action;
+            var notification = new Notification(notificationTitle, {
+                icon: notificationicone,
+                body: notificationbody,
+            });
+            notification.onclick = function () {
+                var newWindow = window.open(notificationURL);
+                newWindow.document.createElement('script');
+                script.src = 'js/myScript.js';
+                newWindow.document.head.appendChild(script);
+            };
+        });
+    });
+</script>
+<div class="wrapper" data-ng-init="GetRoleTypes()" ng-controller="appCtrl">
+    <header class="main-header">
+        <!-- Logo -->
+        <a href="" class="logo">
+            <!-- mini logo for sidebar mini 50x50 pixels -->
+            <span class="logo-mini"><img src="images/VMSLogo-1.png" class="img-responsive" style="display:inline; max-width: 103%;" /></span>
+            <!-- logo for regular state and mobile devices -->
+            <span class="logo-lg" style="font-size:small">
+                <img src="images/I-Vidyala.png" class="img-responsive" style="display:inline; max-width: 85%;" />
+                <!--<span><b>VAPS MANAGEMENT SOFTWARE</b></span>-->
+            </span>
+        </a>
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top">
+            <!-- Sidebar toggle button-->
+            <!--Added on 30/10/2017-->
+
+            <a class="">
+                <!--<i class="fa fa-search text-white"></i>-->
+                <input type="text" id="search-field" style="margin-top: 10px !important;height: 35px;width: 200px;" ng-model="TaskNo" placeholder="Search Task No." />
+                <i class="fa fa-search text-white" style="font-size: x-large;padding-left: 10px;" ng-disabled="TaskNo==null || TaskNo==''" ng-click="SearchTaskNo()"></i>
+            </a>
+
+            <a href="" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                <span class="sr-only">Toggle navigation</span>
+                <!--<label style="color:white;">{{institutionname}}</label>-->
+                <!--<img src="images/HHS.png" class="img-responsive" style="display:inline; max-width: 85%;" />-->
+            </a>
+            <div class="search hidden">
+                <i class="fa fa-search text-white" aria-hidden="true"></i>
+            </div>
+            <md-input-container class="hidden" flex-gt-sm>
+                <label>Search here....</label>
+                <input ng-model="app.search" style="">
+            </md-input-container>
+            <ul class="nav navbar-nav visible-lg visible-md">
+
+                <li class="">
+                    <a class="font-monotype" href="" target="_blank"> {{institutionname}}</a>
+                </li>
+            </ul>
+
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+                    <li ui-sref="app.QRcodescan">
+                        <i class="fa fa-qrcode" style="font-size:35px;color:white;margin-top:10px;margin-right:35px;" ng-click=""></i>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav">
+                    <!--new -->
+                    <li class="hidden">
+                        <a href="">
+                            <md-tooltip md-direction="down">
+                                New File
+                            </md-tooltip>
+                            <i class="fa fa-file" aria-hidden="true"></i>
+                        </a>
+                    </li>
+
+
+                    <!--edit -->
+                    <li class="hidden">
+                        <a href="">
+                            <md-tooltip md-direction="down">
+                                Edit
+                            </md-tooltip>
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        </a>
+                    </li>
+
+                    <li style="margin-bottom: -10px;">
+                        <a href="" style="font-size: large;">
+                            <span class="tagsu" gloss="Two-factor authentication (2FA), sometimes referred to as two-step verification or dual-factor authentication, is a security process in which users provide two different authentication factors to verify themselves. 2FA is implemented to better protect both a user's credentials and the resources the user can access.">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <label ng-if="!userauth" class="checkbox-inline tagsu tagss" gloss="Activate OTP Based Login" data-ng-click="authDecative(true)" style="margin-left: 5px;" role="button" tabindex="0">
+                                <div class="toggle btn btn-default off" data-toggle="toggle" style="width: 60px; height: 25px;min-height: 0px;">
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" data-toggle="toggle" data-onstyle="success" data-width="60" class="ng-pristine ng-untouched ng-valid" aria-checked="true" aria-invalid="false">
+                                    <div class="toggle-group">
+                                        <label class="btn btn-success toggle-on" style="padding: 0px 5px;font-size: medium !important;font-weight: bold !important;"><b>On</b></label><label class="btn btn-default active toggle-off" style="padding: 0px 5px;font-size: medium !important;font-weight: bold !important;">Off</label><span class="toggle-handle btn btn-default"></span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label ng-if="userauth" class="checkbox-inline tagsu tagss" gloss="Deactive OTP Based Login" data-ng-click="authDecative(false)" style="margin-left: 5px;" role="button" tabindex="0">
+                                <div class="toggle btn btn-success" data-toggle="toggle" style="width: 60px; height: 25px;min-height: 0px;"><input type="checkbox" ng-true-value="true" ng-false-value="false" data-toggle="toggle" data-onstyle="success" data-width="60" class="ng-pristine ng-untouched ng-valid" aria-checked="true" aria-invalid="false"><div class="toggle-group"><label class="btn btn-success toggle-on" style="padding: 0px 5px;font-size: medium !important;font-weight: bold !important;">On</label><label class="btn btn-default active toggle-off" style="padding: 0px 5px;font-size: medium !important;font-weight: bold !important;"><b>Off</b></label><span class="toggle-handle btn btn-default"></span></div></div>
+                            </label>
+                        </a>
+                    </li>
+
+                    <li ng-if="rName!='Online Exam Candidate'">
+                        <a ng-if="uName.toLowerCase() != 'CANDIDATE' && uName.toLowerCase() != 'candidatevks' && uName.toLowerCase() != 'candidatevts' && uName.toLowerCase() != 'candidateunnathi' && uName.toLowerCase() != 'candidatesmart' && uName.toLowerCase() != 'candidatemarga' && uName.toLowerCase() != 'candidatepacific' && uName.toLowerCase() != 'candidateglobal'" data-toggle="modal" data-backdrop="static" ng-click="notifyclick()">
+                            <i class="fa fa-bell">
+                                {{notifycount}}
+                            </i>
+                        </a>
+                    </li>
+                    <!--<li ng-if="rName!='Online Exam Candidate'">
+                        <a ng-if="uName.toLowerCase() != 'CANDIDATE' && uName.toLowerCase() != 'candidatevks' && uName.toLowerCase() != 'candidatevts' && uName.toLowerCase() != 'candidateunnathi' && uName.toLowerCase() != 'candidatesmart' && uName.toLowerCase() != 'candidatemarga' && uName.toLowerCase() != 'candidatepacific' && uName.toLowerCase() != 'candidateglobal' && rName.toLowerCase() != 'clientuser'" data-toggle="modal" data-backdrop="static" ng-click="feedbackclick()">
+                            <i class="fa fa-comments">
+                                {{totalfeed}}
+                            </i>
+                        </a>
+                    </li>-->
+                    <li ng-if="rName!='Online Exam Candidate'">
+                        <!--<div class="row">
+                            <div class="col-sm-4">
+                                <div class="dropdown">
+                                    <i class="fa fa-bolt dropbtnt" data-ng-click="onintercationclick()">Interaction</i>
+                                </div>
+                            </div>
+                        </div>-->
+                        <!-- ======================-->
+                        <a ng-if="uName.toLowerCase() != 'CANDIDATE' && uName.toLowerCase() != 'candidatevks' && uName.toLowerCase() != 'candidatevts' && uName.toLowerCase() != 'candidateunnathi' && uName.toLowerCase() != 'candidatesmart' && uName.toLowerCase() != 'candidatemarga' && uName.toLowerCase() != 'candidatepacific' && uName.toLowerCase() != 'candidateglobal' && rName.toLowerCase() != 'clientuser'" data-toggle="modal" data-backdrop="static" ng-click="onintercationclick()">
+                            <i class="fa fa-users">
+                                <b> Interaction</b>
+                            </i>
+                        </a>
+                        <!--<a ng-click="intercationclick()">
+                            <md-tooltip md-direction="down" style="font-size:16px">
+                                <b> Interaction </b>
+                            </md-tooltip>
+                            <i class="fa fa-comments" style="font-size:16px"> &nbsp;<b>Interaction</b></i>
+                        </a>-->
+                    </li>
+                    <li ng-if="rName!='Super Admin' && rName!='SUPER ADMIN' && rName!='super admin' && rName!='SADMIN' && rName!='Sadmin' && rName!='sadmin' && uName.toLowerCase() != 'CANDIDATE' && uName.toLowerCase() != 'candidatevks' && uName.toLowerCase() != 'candidatevts' && uName.toLowerCase() != 'candidateunnathi' && uName.toLowerCase() != 'candidatesmart' && uName.toLowerCase() != 'candidatemarga' && uName.toLowerCase() != 'candidatepacific' && uName.toLowerCase() != 'candidateglobal' && rName!='Online Exam Candidate'">
+                        <a ui-sref="app.changepswd">
+                            <md-tooltip md-direction="down">
+                                Password
+                            </md-tooltip>
+                            <i class="fa fa-key">&nbsp;<b>Password</b></i>
+                        </a>
+                    </li>
+                    <li class="dropdown user user-menu" ng-if="rName!='Online Exam Candidate'">
+                        <!--ng-if="rName!='Online Exam Candidate'"-->
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-gears">
+                                <b>Log-Out</b>
+                            </i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="user-header">
+                                <img src="{{imgname}}" class="img-circle" alt="User Image">
+                                <h4><b style="color:white;font-size:13px">{{rName}}</b></h4>
+                                <p class="text-center" style="font-size:13px">
+                                    <b style="color:white">USER:- {{uName}}</b>
+                                    <!--<span ng-if="userlength==0">
+                                        <b style="color:white">USER:- {{uName}}</b>
+                                    </span>
+                                    <span ng-if="userlength>0">
+                                        <b style="color:white">USER:- {{uName}}</b>
+                                    </span>-->
+                                    <!--<span ng-if="userlength>0">
+                                        <b style="color:white">NAME:- {{ufullName}}</b>
+                                    </span>-->
+                                </p>
+                            </li>
+
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div class="text-center">
+                                    <button type="button" ng-if="midata.length > 1 && rName!='Online Exam Candidate'" data-toggle="modal" data-backdrop="static" data-ng-click="vm.institute();"
+                                            class="btn btn-primary btn-flat">
+                                        Institution
+                                    </button>    <!--data-target="#institution"-->
+                                    <button type="button" data-ng-click="vm.logout();" class="btn btn-danger btn-flat">Log Out</button>
+                                </div>
+                            </li>
+                        </ul>
+                        <!--<ul class="dropdown-menu">
+                            <li class="user-header">
+                                <img src="dist/img/avatar2.png" class="img-circle" alt="User Image">
+                                <p class="text-center">
+                                    ADMIN
+                                    <br />
+                                    Software Engineer
+                                    <small>Playing in Web - since 2014</small>
+                                </p>
+                            </li>
+                            <li class="user-footer">
+                                <div class="text-center">
+                                    <a data-ng-click="vm.logout();" class="btn btn-primary btn-flat">About Me</a>
+                                    <a ui-sref="lock" class="btn btn-success btn-flat">Lockscreen</a>
+                                    <a class="btn btn-danger btn-flat" data-ng-click="vm.logout();">Log Out</a>
+                                </div>
+                            </li>
+                        </ul>-->
+                    </li>
+                    <!-- Control Sidebar Toggle Button -->
+                </ul>
+            </div>
+        </nav>
+    </header>    <!-- Left side column. contains the logo and sidebar -->
+    <!-- Left side column. contains the logo and sidebar -->
+    <aside class="main-sidebar" style="overflow-y:scroll;height:525px;" id="style-4">
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+            <!-- Sidebar user panel -->
+            <!--<div class="user-panel">
+                <div class="pull-left image">
+                    <img src="dist/img/avatar2.png" class="img-circle" alt="User Image">
+                </div>
+                <div class="pull-left info">
+                    <p>ADMIN</p>
+                    <a href=""><i class="fa fa-circle text-success" style="color: #1ad61d;"></i> Online</a>
+                </div>
+            </div>-->
+            <div class="user-panel">
+                <div class="pull-left image">
+                    <img src="{{imgname}}" class="img-circle" style="height: 46px" alt="User Image">
+                </div>
+                <div class="pull-left info">
+                    <p style="text-transform:uppercase;font-size:12px"><b>{{uName}}</b> </p>
+                    <a ui-sref="test" style="font-size:12px"><i class="fa fa-circle text-success"></i> Online</a>
+                    <!--<b>
+                    <span ng-if="ufullName!=null">
+                        <span style="font-size:11px" ng-if="userlength>17">
+                            {{ufullName}}
+                        </span>
+
+                        <span style="font-size:16px" ng-if="userlength<=17">
+                            {{ufullName}}
+                        </span>
+                    </span>
+                    <span ng-if="ufullName==null">
+                        {{uName}}
+                    </span>-->
+
+                </div>
+            </div>
+            <!-- search form -->
+            <!-- /.search form -->
+            <!-- sidebar menu: : style can be found in sidebar.less -->
+            <ul class="sidebar-menu" ng-if="rName!='Online Exam Candidate'">
+                <!--<li class="header">MAIN NAVIGATION</li>-->
+                <li class="active">
+                    <!--<a ui-sref="app.homepage" ng-click="setModuleName('Dashboard')">-->
+                    <a ng-click="fetchhomepage()">
+                        <md-button class="md-fab md-mini color10" style="padding-right: 8px;">
+                            <i class="fa fa-home"></i>
+                        </md-button>
+                        <!--<i class="fa fa-dashboard color1"></i>-->
+                        <span>Home</span>
+                        <!--<span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>-->
+                    </a>
+                </li>
+                <!--<li>
+                    <a ui-sref="app.homepage" ng-click="setpagetitle('Home')">
+                        <i class="fa fa-home text-danger"></i><span>HOME</span>
+                    </a>
+                </li>-->
+                <li class="treeview" ng-repeat="module in moduleListonly" ng-if="module.parentId == 0">
+                    <!-- Loop First level-->
+                    <a href="" class="" style="font-size:16px;font-family: monospace;" ng-click="setModuleName(module.ivrmM_ModuleName,module.moduleId);">
+                        <md-button class="md-fab md-mini {{module.ivrmmmI_Color}}">
+                            <i class="fa fa-{{module.ivrmmmI_Icon}}"></i>
+                            <!--<i class="material-icons">{{module.ivrmmmI_Icon}}</i>-->
+                        </md-button>
+                        <span>{{module.ivrmM_ModuleName}}</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="treeview link-1" ng-repeat="moduleCategory in moduleListsubmenu" ng-if="module.moduleId == moduleCategory.moduleId && module.menuId == moduleCategory.parentId && moduleCategory.parentId != 0">
+                            <a href="" style="font-size:14px;font-family: serif;" ng-click="setSubMenuName(moduleCategory.ivrmM_ModuleName,moduleCategory.menuId,moduleCategory.moduleId);">
+                                <i class="fa fa-cube link-1" style="color:#a3baca"></i>
+                                <span>&nbsp;</span>
+                                <span>{{moduleCategory.ivrmM_ModuleName}}</span>
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li ng-repeat="subModuleCategory in moduleListsubmenu" ng-if="moduleCategory.menuId == subModuleCategory.parentId && moduleCategory.menuId == subModuleCategory.parentId">
+                                    <a href="" ng-click="setpagetitle(subModuleCategory.ivrmM_ModuleName);">
+                                        <i class="fa fa-file-text text-danger"></i>
+                                        <span>&nbsp;</span>
+                                        <span>{{subModuleCategory.ivrmM_ModuleName}}</span>
+                                        <i class="fa fa-angle-left pull-right"></i>
+                                    </a>
+                                    <ul class="treeview-menu">
+                                        <li ng-repeat="pages in pageList" ng-if="inArray(subModuleCategory.moduleId,pageList) && subModuleCategory.moduleId == pages.moduleId && subModuleCategory.menuId == pages.menuId">
+
+                                            <a ui-sref="{{pages.ivrmP_PageURL}}({pageId:{{pages.pageId}}})">
+                                                <i class="fa fa-file-text text-danger"></i><span>&nbsp;</span> {{pages.ivrmmP_PageName}}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li ng-repeat="pages in pageList" style="font-size:12px;" ng-if="moduleCategory.moduleId == pages.moduleId && moduleCategory.menuId == pages.menuId">
+                                    <a ui-sref="{{pages.ivrmP_PageURL}}({pageId:{{pages.pageId}}})" ng-click="setpagetitle(pages.ivrmmP_PageName);">
+                                        <i class="fa fa-hand-o-right" aria-hidden="true" style="color: #a3baca;"></i>
+                                        <span>&nbsp;</span>
+                                        {{pages.ivrmmP_PageName}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <!--<li>
+                    <a ui-sref="app.changepswd">
+                        <md-button class="md-fab md-mini color11">
+                            <i class="fa fa-key"></i>
+                        </md-button>
+                        <span>Change Password</span>
+                    </a>
+                </li>-->
+                <li>
+                    <a data-ng-click="vm.logout();">
+                        <md-button class="md-fab md-mini">
+                            <i class="fa fa-sign-out"></i>
+                        </md-button>
+                        <span>Logout</span>
+                    </a>
+                </li>
+                <!--<li class="header" style="border:0px;">LABELS</li>-->
+                <!--<li>
+                    <a data-ng-click="">
+                        <md-button class="md-fab md-mini color3">
+                            <i class="fa fa-question"></i>
+                        </md-button>
+                        <span>Help</span>
+
+                    </a>
+                </li>-->
+            </ul>
+        </section>
+        <!-- /.sidebar -->
+    </aside>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>
+                <strong>
+                    {{ModuleName}}
+                </strong>
+            </h1>
+            <ol class="breadcrumb">
+                <li class="active">{{SubMenuName}}<span ng-if="pageTitle!=''&& pageTitle!=null&& pageTitle!='Home'">&nbsp;>&nbsp;</span>{{pageTitle}}</li>
+            </ol>
+        </section>
+        <ui-view></ui-view>
+    </div>
+    <footer class="main-footer clearfix">
+        <div class="row">
+            <div class="col-sm-4">
+                <strong> &copy; <a class="text-blue" href="https://www.vapstech.com/" target="_blank">VAPS</a> 2017 .</strong> All rights reserved.
+            </div>
+            <div class="col-sm-4 text-center">
+                &nbsp;&nbsp;| &nbsp;&nbsp;
+                <a href="" class="text-black text-bold">
+                    VAPS E - CAMPUS -
+                </a>
+                <a href="">
+                    <md-tooltip md-direction="top">
+                        SMS
+                    </md-tooltip>
+                    <i class="fa fa-mobile text-blue text-bold" aria-hidden="true"></i>
+                </a>&nbsp;&nbsp;
+                <a href="">
+                    <md-tooltip md-direction="top">
+                        EMAIL
+                    </md-tooltip>
+                    <i class="fa fa-envelope-o text-danger text-bold" aria-hidden="true"></i>
+                </a>&nbsp;&nbsp;
+                <a href="">
+                    <md-tooltip md-direction="top">
+                        E-Banking
+                    </md-tooltip>
+                    <i class="fa fa-laptop text-green text-bold" aria-hidden="true"></i>
+                </a> &nbsp;&nbsp;|&nbsp;&nbsp;
+            </div>
+            <div class="col-sm-4 pull-right hidden-xs text-right">
+                <a href="">
+                    <md-tooltip md-direction="top">
+                        Facebook
+                    </md-tooltip>
+                    <i class="fa fa-facebook-square text-blue" aria-hidden="true"></i>
+                </a>
+                <a href="">
+                    <md-tooltip md-direction="top">
+                        Twitter
+                    </md-tooltip>
+                    <i class="fa fa-twitter-square text-danger " aria-hidden="true"></i>
+                </a>
+                <a href="">
+                    <md-tooltip md-direction="top">
+                        Google
+                    </md-tooltip>
+                    <i class="fa fa-google-plus-square text-info " aria-hidden="true"></i>
+                </a>
+                <a href="">
+                    <md-tooltip md-direction="top">
+                        Linkedin
+                    </md-tooltip>
+                    <i class="fa fa-linkedin-square text-green " aria-hidden="true"></i>
+                </a>
+                <!--&nbsp;&nbsp;|&nbsp;&nbsp;
+                <b>Created With</b>
+                <a href="">
+                    <md-tooltip md-direction="top">
+                      Subhash
+                    </md-tooltip>
+                    <i class="fa fa-heart text-red" aria-hidden="true"></i>
+                </a>-->
+
+            </div>
+        </div>
+    </footer>
+
+    <!-- ******************************************************************* MODEL ISM Interaction ******************************************************************** -->
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormInteraction" method="post" novalidate>
+        <div id="myModalInteraction" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" style="width:80%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="pull-right">
+                            <button type="button" class="close" data-dismiss="modal" ng-click="closemessage()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="pull-left">
+                            <button type="button" class="btn btn-bg" style="color: #fff;background: #205081; font-size: 20px;" ng-click="oninboxtab()">
+                                <!--<span class="fa-layers fa-fw">
+                                    <i class="fa fa-envelope">
+                                        <span class="fa-layers-counter" style="background:Tomato">{{inboxtotal}}</span>
+                                    </i>
+                                </span>-->
+                                <span class="fa-stack">
+                                    <span class="fa fa-circle-o fa-stack-2x"></span>
+                                    <strong class="fa-stack-1x">
+                                        {{inboxtotal}}
+                                    </strong>
+                                </span>
+                                Inbox
+                            </button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-bg" style="color: #fff;background: #205081; font-size: 20px;" ng-click="onnewmessagetab()"> <i class="fa fa-plus ml-1"></i>&nbsp;&nbsp; New Message</button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <!--************************************* INBOX *********************************** -->
+                        <div class="col-sm-12">
+                            <div class="box-body" ng-if="inboxTab">
+                                <div class="col-sm-4">
+                                    <div class="overlaymsg" ng-repeat="msg in get_inboxMessages">
+                                        <div ng-click="onmessageclick(msg)" class="boxlayout">
+                                            <div class="col-sm-0 pull-left">
+                                                <span ng-if="msg.ISMINTR_GroupOrIndFlg=='G'">
+                                                    <i class="fa fa-users ml-1" style="color:cornflowerblue;"></i>
+                                                </span>
+                                                <span ng-if="msg.ISMINTR_GroupOrIndFlg=='I'">
+                                                    <i class="fa fa-user ml-1" style="color:mediumseagreen;"></i>
+                                                </span>
+                                            </div>
+                                            {{msg.ISMINTR_Subject}}
+                                            <div class="pull-right"><i class="fa fa-arrow-right" aria-hidden="true"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--************* Inbox Message Details ************ -->
+                                <div class="col-sm-8">
+                                    <div ng-if="get_messageDetail.length>0">
+                                        <div class="panel-group accordion">
+                                            <div class="panel panel-default">
+                                                <div class="boxlayout" data-toggle="collapse" data-parent=".accordion" data-target=".{{msg_id}}">
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <div class="col-sm-1 padding-left-none">
+                                                                <span ng-if="msg_type=='G'">
+                                                                    <i class="fa fa-users ml-1" style="color:cornflowerblue;"></i>
+                                                                </span>
+                                                                <span ng-if="msg_type=='I'">
+                                                                    <i class="fa fa-user ml-1" style="color:mediumseagreen;"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-sm-6 padding-left-none">
+                                                                <span class="panel-title" style="font-weight: 700;">
+                                                                    <a>{{Sender}}</a>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-sm-5 pull-right">
+                                                                <div class="col-sm-1 padding-left-none">
+                                                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                                                </div>
+                                                                {{msg_DateTime |date:'dd-MM-yyyy EEEE hh:mm a'}}
+                                                                <span ng-if="messageflg=='S'">
+                                                                    <i class="fa fa-paper-plane ml-1"></i>
+                                                                </span>
+                                                                <span ng-if="messageflg=='R'">
+                                                                    <i class="fa fa-envelope ml-1"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <div class="col-sm-1 padding-left-none">
+                                                                <label style="font-weight: 700;font-size:14px;">To: </label>
+                                                            </div>
+                                                            <div class="col-sm-10 padding-left-none">
+                                                                <label style="font-size:12px;">{{toname}}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-collapse collapse in {{msg_id}}">
+                                                    <div class="panel-body">
+                                                        <div class="col-sm-12">
+                                                            <div class="col-sm-12">
+                                                                <h5 class="pull-left" style="white-space: pre-line;">{{msg_subject}}</h5>
+                                                                <div class="pull-right">
+                                                                    <i class="fa fa-reply " aria-hidden="true" ng-click="replyclick(msgroup)"><a>Reply</a>  </i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <div style="white-space: pre-line;">{{msg_message}}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--***************************************** Reply Message *************************************** -->
+                                        <div class="box-body" ng-if="showreply">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <label class="boxlayout" style="width:100%;">
+                                                        <span class="col-sm-10">
+                                                            <span ng-if="msg_type=='G'">
+                                                                <span class="panel-title" style="font-weight: 700; color:#205081;">Reply To: </span>
+                                                                <b> {{Senderuser}}</b> <br /> <span class="col-sm-10 col-sm-offset-1" style="font-size:12px;"> {{replytoname}} </span>
+                                                            </span>
+                                                            <span ng-if="msg_type=='I'">
+                                                                <span class="panel-title" style="font-weight: 700; color:#205081;">Reply To: </span>
+                                                                <b> {{replytoname}}</b> <br />
+                                                            </span>
+                                                        </span>
+                                                        <span class="col-sm-2">
+                                                            <span class="pull-right">
+                                                                <button type="button" class="btn" ng-click="closereply()" data-dismiss="modal"><i class="fa fa-times text-black" aria-hidden="true"></i></button>
+                                                            </span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <textarea class="form-control" name="reply" rows="10" id="comment" style="font-size:14px; white-space: pre-line;" ng-model="obj.ismintrD_Interaction" placeholder="Type your Reply here ....."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <input type="hidden" ng-model="obj.ismintrD_Id" value="{{ismintrD_Id}}" />
+                                                <md-button type="button" ng-click="saveReply(msg_id)" class="md-raised md-primary">
+                                                    <i class="fa fa-paper-plane " aria-hidden="true"></i> Reply
+                                                </md-button>
+                                            </div>
+                                        </div>
+                                        <!-- *********************Reply List********************************* -->
+                                        <div class="panel-group accordion1">
+                                            <div class="panel panel-default" ng-repeat="rply in get_replyMessages">
+                                                <div class="boxlayout" style="padding: 5px;background: aliceblue;" data-toggle="collapse" data-parent=".accordion1"
+                                                     data-target=".{{rply.ISMINTRD_Id}}">
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <div class="col-sm-6 padding-left-none">
+                                                                <span class="panel-title" style="font-weight: 700;">
+                                                                    <a>{{rply.Sender}}</a>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-sm-5 pull-right">
+                                                                <div class="col-sm-1 padding-left-none">
+                                                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                                                </div>
+                                                                {{rply.ISMINTRD_DateTime |date:'dd-MM-yyyy EEEE hh:mm a'}}
+                                                                <span ng-if="rply.messageflg=='S'">
+                                                                    <i class="fa fa-paper-plane ml-1"></i>
+                                                                </span>
+                                                                <span ng-if="rply.messageflg=='R'">
+                                                                    <i class="fa fa-envelope ml-1"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-collapse collapse {{rply.ISMINTRD_Id}}">
+                                                    <div class="panel-body">
+                                                        <div class="col-sm-12">
+                                                            <div style="white-space: pre-line;">{{rply.ISMINTRD_Interaction}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--************* Reply Details ************ -->
+                        </div>
+                        <!--********************************** New Message ************************************* -->
+                        <div class="col-sm-10 col-sm-offset-1" ng-if="newmessageTab">
+                            <div class="box-header with-border" ng-init="obj.groupOrIndFlg=='I'">
+                                <h3 class="box-title col-sm-4">New Message</h3>
+                                <h2 class="box-title">{{isminT_DateTime | date:'MM/dd/yyyy  h:mma'}}</h2>
+                                <label class="radio-inline col-sm-3">
+                                    <input type="radio" value="I" name="individual" ng-model="obj.groupOrIndFlg" ng-change="getdetail()">
+                                    <span class="lbl padding-8">Individual</span>
+                                </label>
+                                <label class="radio-inline col-sm-4">
+                                    <input type="radio" value="G" name="group" ng-model="obj.groupOrIndFlg" ng-change="getdetail()">
+                                    <span class="lbl padding-8">Group</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <div ng-if="obj.groupOrIndFlg=='I'">
+                                    <h5 class="control-label col-sm-1 col-sm-offset-1">To:<span style="color:Red">*</span></h5>
+                                    <div class="col-sm-9 margin-top-5">
+                                        <ui-select id="sel1" name="employee" ng-model="$parent.obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Employee" ng-required="obj.groupOrIndFlg=='I'">
+                                            <ui-select-match ng-trim="false" placeholder="Select or Search ...">{{$select.selected.employeeName}} : {{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                            <ui-select-choices repeat="option in get_toEmplist | filter: $select.search " value="{{option.id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.employeeName +':'+ option.HRMD_DepartmentName | highlight: $select.search">
+                                                </div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                    </div>
+                                    <div class="error-messages" ng-if="interactedINT(myFormInteraction.employee)" ng-messages="myFormInteraction.employee.$error">
+                                        <div ng-message="required" class="col-sm-8">Select Employee</div>
+                                    </div>
+                                </div>
+                                <div ng-if="obj.groupOrIndFlg=='G'">
+                                    <div class="multiselect col-sm-8" style="width: 58.1em;">
+                                        <span ng-if="get_toEmplist.length>0">
+                                            <input class="form-control" ng-model="obj.searchValueTO" type="text" placeholder="search Employee here...">
+                                        </span>
+                                        <div>
+                                            <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                            <h5 class="lbl padding-8">
+                                                To All
+                                            </h5>
+                                        </div>
+                                        <label class="col-sm-6" ng-repeat="user in get_toEmplist | filter : obj.searchValueTO">
+                                            <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequiredINT()">
+                                            <span class="lbl padding-8">
+                                                <b> {{user.employeeName}}</b> : {{user.HRMD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interactedINT(myFormInteraction.emp)" ng-messages="myFormInteraction.emp.$error">
+                                        <div ng-message="required" class="col-sm-8">Select Atleast one Employee</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="form-group">
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <input type="text" name="subject" class="form-control active" style="font-size:15px; height:40px; white-space: pre-line;" placeholder="Add a Subject" data-ng-model="obj.ismintR_Subject" ng-required="newmessageTab">
+                                        <div class="error-messages" ng-if="interactedINT(myFormInteraction.subject)" ng-messages="myFormInteraction.subject.$error">
+                                            <div ng-message="required">Enter Subject</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <textarea class="form-control" name="message" rows="10" id="comment" style="font-size:14px; white-space: pre-line;" ng-model="obj.ismintR_Interaction" placeholder="Type your Message here...." ng-required="newmessageTab"></textarea>
+                                        <div class="error-messages" ng-if="interactedINT(myFormInteraction.message)" ng-messages="myFormInteraction.message.$error">
+                                            <div ng-message="required">Enter Message</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <input type="hidden" ng-model="obj.ismintR_Id" value="{{ismintR_Id}}" />
+                                <md-button type="button" ng-click="savedata()" class="md-raised md-primary">
+                                    <i class="fa fa-paper-plane " aria-hidden="true"></i> Send
+                                </md-button>
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!--******************************************Notification start******************-->
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormInteraction" method="post" novalidate>
+        <div id="myModalNotify" class="modal fade" role="dialog" data-backdrop="" data-keyboard="false">
+            <div class="modal-dialog" style="width:90%;overflow:auto;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="pull-right">
+                            <button type="button" class="close" data-dismiss="modal" ng-click="closemessage()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="pull-left">
+                            <!--<span class="fa-stack">
+                                <span class="fa fa-circle-o fa-stack-2x"></span>
+                                <strong class="fa-stack-1x">
+                                    {{feedcount}}
+                                </strong>
+                            </span>-->
+                            NOTIFICATION DETAILS
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <!--************************************* INBOX *********************************** -->
+
+                        <div class="col-sm-12">
+                            <div dir-paginate="feed in notificationlist  | itemsPerPage:itemsPerPage22" current-page="currentPage22" ng-class-odd="'odd'" pagination-id="scsdsfsd">
+                                <div class="row" style="border-style: ridge;border-radius:20px">
+                                    <div ng-click="clicknotification(feed)">
+                                        <div class="col-sm-6">
+                                            <b>Notification Sent By:&nbsp;{{feed.createdby}}</b>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <b>Date / Time:&nbsp;{{feed.CreatedDate |date:'dd/MM/yyyy'}} -- {{feed.CreatedTime}}</b>
+                                        </div>
+                                        <div class="col-sm-12 pull-left" ng-show="feed.ISMNO_ReadFlg==true">
+                                            <p ng-bind-html="feed.ISMNO_Notification"></p>
+
+                                        </div>
+                                        <div class="col-sm-12 pull-left" ng-show="feed.ISMNO_ReadFlg==false" style="color:darkblue">
+                                            <p ng-bind-html="feed.ISMNO_Notification"></p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true" pagination-id="scsdsfsd">
+                        </dir-pagination-controls>
+
+                        <!--************* Reply Details ************ -->
+                        <!--********************************** New Message ************************************* -->
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--******************************************Notification End******************-->
+    <!--******************************************Feedback start******************-->
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormInteraction" method="post" novalidate>
+        <div id="myModalfeedback" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" style="width:90%;overflow:auto;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="pull-right">
+                            <button type="button" class="close" data-dismiss="modal" ng-click="closemessage()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="pull-left">
+                            <span class="fa-stack">
+                                <span class="fa fa-circle-o fa-stack-2x"></span>
+                                <strong class="fa-stack-1x">
+                                    {{feedcount}}
+                                </strong>
+                            </span>
+                            FEEDBACK DETAILS
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <!--************************************* INBOX *********************************** -->
+                        <div class="row">
+                            <div class="box-body" ng-if="inboxTab">
+                                <div class="col-sm-3">
+                                    <div class="overlaymsg" ng-repeat="feed in get_feedbacklist">
+                                        <div ng-click="feedbackdetailsclick(feed)" class="boxlayout" ng-show="feed.totalcount>0">
+                                            <div class="col-sm-0 pull-left">
+                                                <span>
+                                                    <i class="fa fa-user ml-1" style="color:mediumseagreen;"></i>
+                                                </span>
+                                            </div>
+                                            <span class="fa-stack">
+                                                <span class="fa fa-circle-o fa-stack-2x"></span>
+                                                <strong class="fa-stack-1x">
+                                                    {{feed.totalcount}}
+                                                </strong>
+                                            </span>
+
+                                            <b>{{feed.employee_name}}</b>
+                                            <div class="pull-right"><i class="fa fa-arrow-right" aria-hidden="true"></i></div>
+                                        </div>
+
+
+                                        <div ng-click="feedbackdetailsclick(feed)" class="boxlayout" ng-show="feed.totalcount==0">
+                                            <div class="col-sm-0 pull-left">
+                                                <span>
+                                                    <i class="fa fa-user ml-1" style="color:mediumseagreen;"></i>
+                                                </span>
+                                            </div>
+                                            <span class="fa-stack">
+                                                <span class="fa fa-circle-o fa-stack-2x"></span>
+                                                <strong class="fa-stack-1x">
+                                                    {{feed.totalcount}}
+                                                </strong>
+                                            </span>
+
+                                            {{feed.employee_name}}
+                                            <div class="pull-right"><i class="fa fa-arrow-right" aria-hidden="true"></i></div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <!--************* Inbox Message Details ************ -->
+                                <div class="col-sm-9">
+                                    <div ng-if="get_feedbackdetails.length>0">
+                                        <div class="panel-group accordion feedback_1">
+                                            <div class="panel panel-default" style="overflow:scroll;overflow-x:auto;width:100%; height:400px;">
+                                                <div class="boxlayout" data-toggle="collapse" data-parent=".accordion" data-target=".{{msg_id}}">
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <div class="col-sm-4 padding-left-none">
+                                                                <span class="panel-title" style="font-weight: 700;">
+                                                                    <a>{{sender_empname}}</a>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-sm-4 padding-center-none">
+                                                                <span class="panel-title" style="font-weight: 700;">
+                                                                    <a> Department: {{hrmD_DepartmentName}}</a>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-sm-4" style="text-align:right">
+                                                                <span class="panel-title" style="font-weight: 700;">
+                                                                    <a>  Total: {{get_feedbackdetails.length}}</a>
+                                                                </span>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <table class="table  table-responsive table-bordered" id="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center"><b>SL.No.</b></th>
+                                                            <th class="text-center"><b>Task No.</b></th>
+                                                            <th class="text-center"><b>Task Title</b> </th>
+                                                            <th class="text-center"><b>DR Date</b> </th>
+                                                            <th class="text-center"><b>Feedback</b> </th>
+                                                            <th class="text-center"><b>Feedback Date</b> </th>
+                                                            <th class="text-center"><b>Send Feedback</b> </th>
+                                                            <!--<th class="text-center"><b>Reply</b> </th>-->
+                                                            <th class="text-center"><b>All Transaction</b> </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody style="font-size: 12.5px;">
+                                                        <tr ng-repeat="plnr in get_feedbackdetails">
+                                                            <td class="text-center">
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback != true">
+                                                                    {{$index+1}}
+                                                                </span>
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback == true">
+                                                                    <b style="font-size:15px">{{$index+1}}</b>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-left">
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback != true">
+                                                                    {{plnr.ISMTCR_TaskNo}}
+                                                                </span>
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback == true">
+                                                                    <b style="font-size:15px">{{plnr.ISMTCR_TaskNo}}</b>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-left">
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback != true">
+                                                                    {{plnr.ISMTCR_Title}}
+                                                                </span>
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback == true">
+                                                                    <b style="font-size:15px">{{plnr.ISMTCR_Title}}</b>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback != true">
+                                                                    {{plnr.ISMDRPT_Date  | date :'dd/MM/yyyy'}}
+                                                                </span>
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback == true">
+                                                                    <b style="font-size:15px">{{plnr.ISMDRPT_Date  | date :'dd/MM/yyyy'}}</b>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-left">
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback != true">
+                                                                    {{plnr.ISMDRF_FeedBack}}
+                                                                </span>
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback == true">
+                                                                    <b style="font-size:15px">{{plnr.ISMDRF_FeedBack}}</b>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback != true">
+                                                                    {{plnr.CreatedDate | date :'dd/MM/yyyy'}}
+                                                                </span>
+                                                                <span ng-show="plnr.ISMDRF_OpenFeedback == true">
+                                                                    <b style="font-size:15px">{{plnr.CreatedDate | date :'dd/MM/yyyy'}}</b>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <textarea rows="2" class="textareaclass" ng-model="plnr.feedbact"></textarea>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom"
+                                                                   data-toggle="modal" title="Planner" data-ng-model="planner" data-target="#myModalViewfeedback"
+                                                                   data-ng-click="getViewfeedback(plnr)">
+                                                                    fa
+                                                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View All</i>
+                                                                </a>
+                                                            </td>
+
+                                                            <!--<td class="text-center">{{$index+1}}</td>
+                                                            <td style="text-align:left">{{plnr.ISMTCR_TaskNo}}</td>
+                                                            <td style="text-align:left">{{plnr.ISMTCR_Title}}</td>
+                                                            <td class="text-center">{{plnr.ISMDRPT_Date  | date :'dd/MM/yyyy'}}</td>
+                                                            <td style="text-align:left">{{plnr.ISMDRF_FeedBack}}</td>
+                                                            <td class="text-center">{{plnr.CreatedDate | date :'dd/MM/yyyy'}}</td>
+                                                            <td>
+                                                                <textarea rows="2" class="textareaclass" ng-model="plnr.feedbact"></textarea>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom"
+                                                                data-toggle="modal" title="Planner" data-ng-model="planner" data-target="#myModalViewfeedback"
+                                                                data-ng-click="getViewfeedback(plnr)">
+                                                                <i class="fa fa-eye fa-1x" aria-hidden="true">View All</i>
+                                                                </a>
+                                                            </td>-->
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="text-center fff">
+                                                <md-button type="button" ng-click="Sendfeedback(plnr)" class="md-raised md-primary asdf">
+                                                    <i class="fa fa-paper-plane " aria-hidden="true"></i> Reply
+                                                </md-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--************* Reply Details ************ -->
+                        </div>
+                        <!--********************************** New Message ************************************* -->
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div id="myModalViewfeedback" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width:90%;" overflow:auto;">
+            <div class="modal-content" style="overflow:auto;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white col-sm-10">Feedback Details</h4>
+                    <h4 class="modal-title text-white">{{planDate | date:'dd/MM/yyyy'}} </h4>
+                </div>
+                <div class="box-body">
+                    <div style="overflow-x:auto;width:100%; height:300px;">
+                        <table class="table table-responsive table-bordered clearfix">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <!--<th><a href="" ng-click="sort('invtsL_SalesQty')">Employee Name</a></th>-->
+                                    <th><a href="" ng-click="sort('invtsL_SalesQty')">Feedback</a></th>
+                                    <th>Send/Receive</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="fd in get_feedback">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <!--<td class="text-center">{{fd.employee_name}}</td>-->
+                                    <td class="text-center">{{fd.ISMDRFS_FeedBack}}</td>
+                                    <td>
+                                        <span ng-if="fd.ISMDRFS_Status === '1'">
+                                            <a class="text-aqua" href="" data-placement="bottom" data-toggle="tooltip" title="Send">
+                                                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                        <span ng-if="fd.ISMDRFS_Status === '2'">
+                                            <a class="text-aqua" href="" data-placement="bottom" data-toggle="tooltip" title="Receive">
+                                                <i class="fa fa-envelope" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+
+    <!--*************************** completed**************-->
+    <div id="myModalAbsent" class="modal" role="dialog" ng-show="grid_view" data-backdrop="static">
+        <div class="modal-dialog" style="width:80%;">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Employee Absent List</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body" style="overflow:scroll">
+                    <div id="table">
+                        <div style="overflow-x:auto;width:100%; height:300px;">
+                            <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;text-align:center;width:100%" id="table1">
+                                <thead>
+                                    <tr><th colspan=5>Today's Absent Report : {{todate_date | date:'dd-MM-yyyy'}}</th></tr>
+                                    <tr>
+                                        <th>SLNO</th>
+                                        <th ng-click="sort('ecode')">Employee Code</th>
+                                        <th ng-click="sort('ename')">Employee Name</th>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in temp_list|orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                                        <td>{{ $index+1}}</td>
+                                        <td>{{ user.ecode}}</td>
+                                        <td nowrap>{{user.ename}}</td>
+                                        <td nowrap>{{user.HRMD_DepartmentName}}</td>
+                                        <td nowrap>{{user.HRMDES_DesignationName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Employee Planner Not Creation List</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body" style="overflow:scroll">
+                    <div id="table">
+                        <div style="overflow-x:auto;width:100%; height:300px;">
+                            <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;text-align:center;width:100%" id="table1">
+                                <thead>
+                                    <tr><th colspan=5>Planner Not Created for {{prestartdate | date:'dd-MM-yyyy'}} to {{lastdate | date:'dd-MM-yyyy'}}</th></tr>
+                                    <tr>
+                                        <th>SLNO</th>
+                                        <th ng-click="sort('HRME_EmployeeCode')">Employee Code</th>
+                                        <th ng-click="sort('employeename')">Employee Name</th>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="plnr in no_planner_creation|orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                                        <td>{{ $index+1}}</td>
+                                        <td>{{ plnr.HRME_EmployeeCode}}</td>
+                                        <td nowrap>{{plnr.employeename}}</td>
+                                        <td nowrap>{{plnr.HRMD_DepartmentName}}</td>
+                                        <td nowrap>{{plnr.HRMDES_DesignationName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <md-button type="button" ng-click="savedata3()" class="md-raised md-primary">
+                        <i class="fa fa-arrow-right " aria-hidden="true"></i> Ok
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<div id="viewremarksstatus" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="model-header custom-header">
+                <center><h4 class="modal-title custom">Leave Approved Details</h4></center>
+            </div>-->
+    <div id="myModalTaskList1" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" style="width:90%;">
+            <div class="modal-content">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Task List</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-primary" ng-click="OnClickSearch()">Close <i class="fa fa-times text-black" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </span><sapn>
+                                        </sapn>
+                                        <input class="form-control" ng-model="searchValueallsearch" type="text" placeholder="search all...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div style="overflow-x:auto">
+                                <table class="table table-responsive table-bordered clearfix">
+                                    <thead>
+                                        <tr>
+                                            <th width="5%">SL NO</th>
+                                            <th>Company</th>
+                                            <th><a href="" ng-click="sort('ISMTCR_Id')"> Issue/Task List</a></th>
+                                            <th width="8%"><a href="" ng-click="sort('ISMTCR_CreationDate')">Date</a></th>
+                                            <th><a href="" ng-click="sort('ISMMCLT_ClientName')">Client/Office</a></th>
+                                            <th width="10%"><a href="" ng-click="sort('createdby')">Created By</a></th>
+                                            <th width="10%"><a href="" ng-click="sort('createdby')">Module Name</a></th>
+                                            <th width="10%"><a href="" ng-click="sort('assignedby')">Assigned By</a></th>
+                                            <th><a href="" ng-click="sort('ismtcrastO_Id')">Assigned To</a></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="objs in get_globalsearchtask | filter : searchValueallsearch | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'" pagination-id="pagecount1">
+                                            <td class="text-center">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                            <td class="text-left">{{objs.MI_Name}}</td>
+                                            <td class="text-left">
+                                                <span>
+                                                    <a class="text-body col-sm-12 text-left" ng-model="objs.ISMTCR_Id" data-ng-click="viewresponse1(objs)" style="overflow-x: unset !important;overflow-y: unset !important;">
+                                                        {{objs.ISMTCR_Title}}
+                                                    </a>
+                                                    <label class="control-label col-sm-12 text-left" style="padding-left:0 !important">
+                                                        <span class="col-sm-12 text-left">
+                                                            {{objs.ISMTCR_TaskNo}} -
+                                                            <label class="control-label">{{objs.ISMTCR_BugOREnhancementFlg}}</label>
+                                                            <span ng-if="objs.HRMP_Name!=null && objs.HRMP_Name!=''">
+                                                                <label style="color:red;"><b>-{{objs.HRMP_Name}}</b></label><span ng-if="objs.priorityswitch>0">
+                                                                    -<i class="fa fa-exchange" aria-hidden="true" style="padding: 0 !important;font-size: medium;color:blue">{{objs.priorityswitch}}</i>
+                                                                </span>
+                                                            </span>
+                                                            <span ng-if="objs.ISMTCR_Status=='Open' || objs.ISMTCR_Status=='ReOpen'">
+                                                                - <span style="font-weight:500 !important;font-size: larger;color: red;">{{objs.ISMTCR_Status}}</span>
+                                                            </span>
+                                                            <span ng-if="objs.ISMTCR_Status!='Open' && objs.ISMTCR_Status!='ReOpen'">
+                                                                - <span style="font-weight:500 !important;font-size: larger;color: blue;">{{objs.ISMTCR_Status}}</span>
+                                                            </span>
+                                                            <span ng-if="notassign==false && objs.taskdate!=' To ' && objs.taskdate!='To' && objs.taskdate!=null">
+                                                                <br /> <b>Date: {{objs.taskdate}}</b>
+                                                            </span>
+
+                                                            <span ng-if="objs.ISMMTCAT_TaskCategoryName!='' && objs.ISMMTCAT_TaskCategoryName!=null" style="font-weight:500 !important;font-size: larger;color: blue;">
+                                                                <br /><span style="color:black">Category:</span> {{objs.ISMMTCAT_TaskCategoryName}}
+                                                                <i ng-show="objs.attachement>0" style="font-size: 14px;color: dodgerblue;" class="fa fa-file-image-o pull-right" aria-hidden="true">({{objs.attachement}})</i>
+                                                            </span>
+                                                            <span ng-if="objs.ISMTAPL_Periodicity!='' && objs.ISMTAPL_Periodicity!=null" style="font-weight:500 !important;font-size: larger;color: blue;">
+                                                                <br /><span style="color:black">Periodicity:</span> {{objs.ISMTAPL_Periodicity}}
+                                                            </span>
+                                                            <span ng-if="objs.deparname!=null && objs.deparname!=''">
+                                                                <br /><label>Depart.:<b>{{objs.deparname}}</b></label>
+                                                            </span>
+                                                            <span ng-if="objs.yrplan!=null && objs.yrplan!=''">
+                                                                <br /><label style="color:rgb(216 115 90)"><b>{{objs.yrplan}}</b></label>
+                                                            </span>
+                                                        </span>
+                                                    </label>
+                                                </span>
+                                            </td>
+                                            <td class="text-left">
+                                                <label class="control-label"><b>{{objs.ISMTCR_CreationDate}}</b></label>
+                                            </td>
+                                            <td class="text-left">
+                                                <span>
+                                                    <span ng-if="objs.ISMMCLT_ClientName!=null">{{objs.ISMMCLT_ClientName}}</span>
+                                                    <span ng-if="objs.ISMMCLT_ClientName==null"><label style="color:green;">NA</label></span>
+                                                </span>
+                                            </td>
+
+                                            <td class="text-left">
+                                                <label class="control-label">{{objs.createdby}}</label>
+                                            </td>
+                                            <td class="text-left">
+                                                <label class="control-label">
+                                                    <span ng-if="objs.IVRMM_ModuleName!=''">{{objs.IVRMM_ModuleName}}</span>
+                                                    <span ng-if="objs.IVRMM_ModuleName==''"><label style="color:green;">NA</label></span>
+                                                </label>
+                                            </td>
+                                            <td class="text-left">
+                                                <label class="control-label">{{objs.assignedby}}</label>
+                                            </td>
+                                            <td class="text-left" style="width: 10%;">
+                                                <span class="text-left" ng-if="!objs.addtoplannerflag">
+                                                    <span ng-if="objs.empleft" style="color:red">{{objs.assignedto}}<br />(Left)</span>
+                                                    <span ng-if="!objs.empleft">{{objs.assignedto}}</span>
+                                                </span>
+                                                <span class="text-left" ng-if="objs.addtoplannerflag"><b style="color:red">{{objs.assignedto}}</b></span>
+                                            </td>
+                                            <td class="text-left" hidden="hidden">{{objs.ismtcrastO_Id}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <dir-pagination-controls max-size="5" pagination-id="pagecount1"
+                                                         direction-links="true"
+                                                         boundary-links="true">
+                                </dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer custom-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================MODEL Response=================================== -->
+    <div>
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myFormModelmulti" method="post" novalidate>
+            <div id="myModalResponse1" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" style="width: 85%;">
+                    <div class="modal-content" style="padding: 0px 10px;">
+                        <div class="modal-header" style="padding:8px">
+                            <div class="col-sm-12">
+                                <div class="col-sm-10">
+                                    <h4 class="modal-title text-white" style="text-align:center;font-size: large;">	TASK- {{taskno}} </h4>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="pull-right">
+                                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                                            <i class="fas fa-times-circle">Close</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body" style="padding:0px 10px">
+                            <div class="col-sm-12">
+                                <div style="padding-left:0.5%">
+                                    <div class="col-sm-9">
+                                        <span class="text-head  text-left" style="font-size:20px;" ng-model="ISMTCR_Id">{{tasktitle}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr style="padding-right:50%" />
+                            <div class="col-sm-12">
+                                <div class="col-sm-6" style="padding-left:3%">
+                                    <div class="form-group">
+                                        <label class="control-label  text-body text-left" style="font-size:15px;">
+                                            {{tasktype}} &nbsp;&nbsp;
+                                            <span ng-if="priorityswitch!='' && priorityswitch!=null">
+                                                - <lable style="color:deeppink;">{{prioritypreswitch}}</lable>
+                                                <i class="fa fa-exchange" aria-hidden="true" style="font-size: medium;color: blue;"></i>
+                                                <label>
+                                                    <b style="color:red;">- {{tsakpriority}}</b>  - <b>{{Rep_module}}</b>
+                                                </label>
+                                                <br />
+                                                Switch -<i class="fa fa-exchange" aria-hidden="true" style="font-size: medium;color: blue;"> ({{priorityswitch}})</i>
+                                            </span>
+                                            <span ng-if="priorityswitch==null || priorityswitch==''">
+                                                <label>
+                                                    <b style="color:red;">- {{tsakpriority}}</b>  - <b>{{Rep_module}}</b>
+                                                </label>
+                                            </span>
+                                        </label><br />
+                                        <label class="control-label  text-body text-left" style="font-size:15px;">Client: {{taskclient}} </label><br />
+                                        <label class="control-label text-body">
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                Status :
+                                            </label>
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                {{taskstatus}}
+                                            </label>
+                                        </label><br />
+                                        <label class="control-label  text-body">
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                Date :
+                                            </label>
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                {{taskdate | date:"dd-MM-yyyy '-' h:mma"}}
+                                            </label>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label  text-body">
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                Created By :
+                                            </label>
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                {{created_by}}
+                                            </label>
+                                        </label><br />
+                                        <label class="control-label  text-body">
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                Assigned To :
+                                            </label>
+                                            <label class="control-label text-body" style="font-size:15px;" ng-if="Rep_assignedto!='' && Rep_assignedto!=null">
+                                                <span ng-if="leftflag" style="color:red">{{Rep_assignedto}} (Left)</span>
+                                                <span ng-if="!leftflag">{{Rep_assignedto}}</span>
+                                            </label>
+                                            <label ng-if="Rep_assignedto=='' || Rep_assignedto==null" class="control-label text-body" style="font-size:15px;">
+                                                <span style="color:red">Not-Assigned</span>
+                                            </label>
+                                        </label><br />
+                                        <label class="control-label text-body" ng-if="!taskeditable && (startdate!=null && startdate!='')">
+                                            <label class="control-label text-body" style="font-size:15px;">
+                                                {{startdate | date:'dd-MM-yyyy'}} - {{enddate | date:'dd-MM-yyyy'}} <span ng-if="effort>0">- Effort - {{effhrstemp}}:{{effmintemp}} Hr</span>
+                                            </label>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <textarea class="form-control" style="border-radius:10px" name="response1" type="text" placeholder="Task Description .... " ng-disabled="true" ng-model="taskdescription" rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" ng-if="taskAttatchment.length>0" style="padding-left:5%">
+                                <hr />
+                                <div class="form-group">
+                                    <span>
+                                        <label class="control-label text-body" style="font-size:16px;">
+                                            Attachments : <b>
+                                                <span ng-repeat="objtfr in taskAttatchment track by $index">
+                                                    <span ng-if="objtfr.ISMTCRAT_Attatchment!=null && objtfr.ISMTCRAT_Attatchment!=''">
+                                                        {{$index+1}})
+                                                        <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                            <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr,$index,1);"> View  </i> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                        </span>
+                                                        <span ng-if="objtfr.filetype=='pdf'">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" full-frame="" " data-ng-click="downloadpdf(objtfr,$index,1)"> Pdf <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i> </a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                        </span>
+                                                        <span ng-if="objtfr.filetype=='doc' || objtfr.filetype=='docx' || objtfr.filetype=='ppt' || objtfr.filetype=='pptx'">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,$index,1)" full-frame=""> Docx/ppt <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                        </span>
+                                                        <span ng-if="objtfr.filetype=='xlsx' || objtfr.filetype=='xls' || objtfr.filetype=='xlx'">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,$index,1)" full-frame=""> Excel <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                        </span>
+                                                        <span ng-if="objtfr.filetype=='wmv' || objtfr.filetype=='mp4'">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewvideo(objtfr,$index,1)" full-frame=""> Video <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                        </span>
+                                                        <span ng-if="objtfr.filetype=='mp3'">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewaudio(objtfr,$index,1)" full-frame=""> Audio <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRAT_Attatchment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                        </span>
+                                                        <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png' && objtfr.filetype!='pdf' && objtfr.filetype!='doc' && objtfr.filetype!='docx' && objtfr.filetype!='ppt' && objtfr.filetype!='pptx' && objtfr.filetype!='xlsx' && objtfr.filetype!='xls' && objtfr.filetype!='xlx' && objtfr.filetype!='wmv' && objtfr.filetype!='mp4' && objtfr.filetype!='mp3'">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRAT_Attatchment}}" full-frame=""> Download </a> - <i class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </b>
+                                        </label>
+                                    </span>
+                                </div>
+                                <hr />
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group" style="padding-left: 1%;">
+                                    <div class="box-content col-sm-12" style="max-height: 280px;overflow:auto;border: 1px solid #5cb7ff;border-radius: 5px;width: 99%;">
+                                        <div class="" ng-repeat="response in get_taskresponse" style="border-bottom: 0.5px solid #dcd6d6;padding-bottom: 5px;">
+                                            <label class="control-label  text-body" style="font-size:14px;">
+                                                {{get_taskresponse.length-$index}}) Response By : {{response.responseby}} - {{response.ISMTCRRES_ResponseDate | date:"dd-MM-yyyy '-' h:mma"}} <span ng-if="response.pagename!=null && response.pagename!=''">
+                                                    <span style="color:red">(</span> {{response.pagename}} <span style="color:red">)</span>
+                                                </span><span ng-if="response.ISMTCRRES_Status!=null && response.ISMTCRRES_Status!=''">
+                                                    <span class="control-label text-body" style="font-size:14px;color:black">- Status: <b>{{response.ISMTCRRES_Status}}</b></span>
+                                                </span>
+                                            </label>
+                                            <span ng-if="respattachement">
+                                                <br /><label class="control-label text-body" style="font-size:14px;margin-left: 1.5%;">
+                                                    Attachments : <b>
+                                                        <span ng-repeat="objtfr in get_responseattachments track by $index">
+                                                            <span ng-if="objtfr.ISMTCRRES_Response==response.ISMTCRRES_Response && objtfr.ISMTCRRES_ResponseAttachment!=null && objtfr.ISMTCRRES_ResponseAttachment!=''">
+                                                                <!--{{objtfr.slno}})-->
+                                                                <span ng-if="objtfr.filetype=='jpg' || objtfr.filetype=='png'">
+                                                                    <i class="fa fa-eye" style="color:#0094ff;" title="Preview" ng-click="previewimg(objtfr,objtfr.slno-1,2);"> View  </i> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                                </span>
+                                                                <span ng-if="objtfr.filetype=='pdf'">
+                                                                    <a style="color:red;display:inline; font-weight: bolder;" full-frame="" " data-ng-click="downloadpdf(objtfr,objtfr.slno-1,2)"> Pdf <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i> </a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                                </span>
+                                                                <span ng-if="objtfr.filetype=='doc' || objtfr.filetype=='docx' || objtfr.filetype=='ppt' || objtfr.filetype=='pptx'">
+                                                                    <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,objtfr.slno-1,2)" full-frame=""> Docx/ppt <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                                </span>
+                                                                <span ng-if="objtfr.filetype=='xlsx' || objtfr.filetype=='xls' || objtfr.filetype=='xlx'">
+
+                                                                    <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewdox(objtfr,objtfr.slno-1,2)" full-frame=""> Excel <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                                </span>
+                                                                <span ng-if="objtfr.filetype=='wmv' || objtfr.filetype=='mp4'">
+                                                                    <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewvideo(objtfr,objtfr.slno-1,2)" full-frame=""> Video <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                                </span>
+                                                                <span ng-if="objtfr.filetype=='mp3'">
+                                                                    <a style="color:red;display:inline; font-weight: bolder;" data-ng-click="viewaudio(objtfr,objtfr.slno-1,2)" full-frame=""> Audio <i class="fa fa-eye" style="color:#0094ff;" title="Preview"> </i></a> - <a href="{{ objtfr.ISMTCRRES_ResponseAttachment}}"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                                                                </span>
+                                                                <span ng-if="objtfr.filetype!='jpg' && objtfr.filetype!='png' && objtfr.filetype!='pdf' && objtfr.filetype!='doc' && objtfr.filetype!='docx' && objtfr.filetype!='ppt' && objtfr.filetype!='pptx' && objtfr.filetype!='xlsx' && objtfr.filetype!='xls' && objtfr.filetype!='xlx' && objtfr.filetype!='wmv' && objtfr.filetype!='mp4' && objtfr.filetype!='mp3'">
+                                                                    <a style="color:red;display:inline; font-weight: bolder;" href="{{objtfr.ISMTCRRES_ResponseAttachment}}" full-frame=""> Download </a> - <i class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                    </b>
+                                                </label>
+                                            </span>
+                                            <br />
+                                            <label ng-if="response.ISMTCRRES_Response.length<=50" class="control-label text-left" style="margin-left: 1.5%;"><span class="control-label text-body" style="font-size:14px;">Response</span> :<span style="font-weight: 600;font-family: 'Kendo UI';">{{response.ISMTCRRES_Response}}</span></label>
+
+                                            <span ng-if="response.ISMTCRRES_Response.length>50" class="control-label text-body" style="font-size:14px;margin-left: 1.5%">Response  : </span><br />
+                                            <p ng-if="response.ISMTCRRES_Response.length>50" ng-repeat="rmks in response.student_rmrks track by $index" class="row text-left" style="margin-left: 1.5%;font-weight: 600;font-family: 'Kendo UI';">
+                                                {{rmks}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="save_ack" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close text-white" data-dismiss="modal"><i class="fa fa-times"></i></button>
+                <h3 class="modal-title text-white">Acknowledgement Status</h3>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" name="myForm1">
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Remark:<span style="color:Red">*</span></label>
+                                <div class="col-sm-7">
+                                    <textarea class="form-control active" value="" id="sel233" name="desc12" ng-model="ISM_AS_Remarks" type="text" required></textarea>
+                                    <div class="error-messages" ng-if="interacted(myForm1.desc12)" ng-messages="myForm1.desc12.$error">
+                                        <div ng-message="required">Please Enter Remark</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" ng-click="save_click();" data-toggle="modal" data-backdrop="false"
+                        class="btn btn-primary btn-flat" data-dismiss="modal">
+                    Submit
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--========== INTERACTION END ==================-->
+<!--Istitution Selection-->
+<div class="modal" id="institution" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close text-white" data-dismiss="modal"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title text-white">Institution Select</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" name="myForm">
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Institution Select:<span style="color:Red">*</span></label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" id="sel1" name="cat" ng-model="mI_Id">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="acd in MIdata" value="{{acd.mI_Id}}" ng-selected="{{acd.Selected==true}}">
+                                            {{acd.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                        <div ng-message="required">Please Select Category</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" data-ng-click="vm.InstituteChange(mI_Id);" data-toggle="modal" data-backdrop="false"
+                        class="btn btn-primary btn-flat" data-dismiss="modal">
+                    Submit
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--==================== Image Preview Model ===========================-->
+<div id="myModalPreviewimgg" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <img id="preview1" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdfg" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="pdfIdzz1">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="myModaldocxg" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <iframe width="1150" height="1000" ng-src="{{detailFrame}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=====================video play===============-->
+<div id="myvideoPreviewg" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <div ng-repeat="vd in view_videos">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-2 vdoleft1">
+                                    <video width="800" height="400" controls="controls">
+                                        <source ng-src="{{vd.ihw_video}}" type="video/mp4">
+                                        Your browser does not support HTML5 video.
+                                    </video>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=====================audio play===============-->
+<div id="myaudioPreviewg" class="modal fade" role="dialog" style="z-index:9999;overflow:auto !important" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" style="width: 85%; overflow:auto;">
+        <div class="modal-content">
+            <div class="modal-footer" style="padding: 0px 10px;">
+                <div class="row">
+                    <div class="col-sm-10 pull-right">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-dismiss="modal">
+                            <i class="fas fa-times-circle"> Close</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box" style="overflow:auto;">
+                    <div class="box-body">
+                        <div ng-repeat="vd in view_videos">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-4 vdoleft1">
+                                    <audio width="800" height="100" controls="controls">
+                                        <source ng-src="{{vd.ihw_video}}" type="audio/mp3">
+                                        Your browser does not support HTML5 Audio.
+                                    </audio>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!----==================Silver Jubilee added by Adarsh MS===============-->
+<div id="Silverjubileesuggestion" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <style>
+        /* Silver Jubile Rating Grid */
+        .silverjubrating {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+            width: 80%;
+            margin: 10px auto;
+        }
+
+            .silverjubrating input {
+                display: none;
+            }
+
+            .silverjubrating label {
+                display: block;
+                width: 100%;
+                height: 30px;
+                background-color: #a8d9f1;
+                text-align: center;
+                line-height: 30px;
+                font-size: 14px;
+                color: black;
+                cursor: pointer;
+                border-radius: 5px;
+                transition: background-color 0.3s ease, transform 0.2s;
+            }
+
+                .silverjubrating label:hover {
+                    background-color: #ddd;
+                    transform: scale(1.1);
+                }
+
+            /* Highlight the selected number */
+            .silverjubrating input:checked + label {
+                background-color: #0080FF;
+                color: black;
+            }
+
+            /* Hover effect on non-selected labels */
+            .silverjubrating label:hover {
+                background-color: #ddd;
+            }
+    </style>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-white">Silver Jubilee Suggestion</h5>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm_suggestion" method="post" novalidate>
+                    <div class="text-center">
+                        <p style="color:blue; font-size:14px;font-weight: bold;">
+                            As we celebrate the VAPS Silver Jubilee, we’d love to hear your suggestions! Share your ideas with VAPS !
+                        </p>
+                        <img src="https://dcampusstrg.blob.core.windows.net/files/17/NAACDocumentsUpload/7759144d-8e83-47bc-b9c5-b76d7d90f088.jpg" style="width:150px;object-fit:contain;" />
+                    </div>
+                    <h5 class="text-center">Share Your Experience With VAPS</h5>
+                    <div class="silverjubrating">
+                        <!-- Rating Grid (1-10) -->
+                        <input type="radio" id="rating-1" name="rating" value="1" required ng-model="rating">
+                        <label for="rating-1">1</label>
+                        <input type="radio" id="rating-2" name="rating" value="2" required ng-model="rating">
+                        <label for="rating-2">2</label>
+                        <input type="radio" id="rating-3" name="rating" value="3" required ng-model="rating">
+                        <label for="rating-3">3</label>
+                        <input type="radio" id="rating-4" name="rating" value="4" required ng-model="rating">
+                        <label for="rating-4">4</label>
+                        <input type="radio" id="rating-5" name="rating" value="5" required ng-model="rating">
+                        <label for="rating-5">5</label>
+                        <input type="radio" id="rating-6" name="rating" value="6" required ng-model="rating">
+                        <label for="rating-6">6</label>
+                        <input type="radio" id="rating-7" name="rating" value="7" required ng-model="rating">
+                        <label for="rating-7">7</label>
+                        <input type="radio" id="rating-8" name="rating" value="8" required ng-model="rating">
+                        <label for="rating-8">8</label>
+                        <input type="radio" id="rating-9" name="rating" value="9" required ng-model="rating">
+                        <label for="rating-9">9</label>
+                        <input type="radio" id="rating-10" name="rating" value="10" required ng-model="rating">
+                        <label for="rating-10">10</label>
+                    </div>
+                    <div class="error-messages text-center" ng-if="interacted_silverjubileesuggestion(myForm_suggestion.rating)" ng-messages="myForm_suggestion.rating.$error">
+                        <div ng-message="required">Select Rating  <i class="fa fa-warning"></i> !</div>
+                    </div>
+                    <hr />
+                    <!-------------------------------------------------->
+                    <h5 class="text-center">Creative Suggestions for the Silver Jubilee Celebrations</h5>
+                    <label class="radio-inline ">
+                        <textarea style="width: 826px; height: 120px;"
+                                  placeholder="Silver Jubilee Suggestion..."
+                                  class="form-control"
+                                  ng-model="silver.silverjubileesuggestion"
+                                  name="silverjubileesuggestion"
+                                  ng-change="checkForbiddenWords()"
+                                  ng-required="!errorMessage"></textarea>
+                        
+                    </label>
+                    <p class="text-center" ng-show="errorMessage" style="color: red;"><b>{{silver.silverjubileesuggestion}} Is Not a suggestion </b></p>
+                   
+                    <div class="error-messages text-center" ng-if="interacted_silverjubileesuggestion(myForm_suggestion.silverjubileesuggestion)" ng-messages="myForm_suggestion.silverjubileesuggestion.$error">
+                        <div ng-message="required ">Enter The Silver jubilee Suggestion<i class="fa fa-warning"></i> !</div>
+                    </div>
+                    <div class="text-center">
+                        <p><span class="text-red">Note:</span> Please provide suggestions for the upcoming Silver Jubilee events and company welfare. <br /> Responses such as "Good," "Super," "Nothing," and "NA" will not be considered as suggestions.</p>
+                    </div>
+                    <!---------------------------------------------------------->
+                    <div class="box-footer text-center">
+                        <md-button type="submit" class="md-raised md-warn md-button md-ink-ripple" id="save-btn" ng-click="closesilverjubilee()">
+                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                            Remind Me Later
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="silverjubliee_suggestion_save()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

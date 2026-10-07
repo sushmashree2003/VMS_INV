@@ -1,0 +1,235 @@
+﻿<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">INCENTIVE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" id="sss"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well text-center" ng-init="typeflag='Employee'">
+                            <input type="radio" value="Employee" name="employee" ng-model="typeflag" ng-change="typerdochange(typeflag)">
+                            <span class="lbl padding-8">Employee Wise</span>
+                            <input type="radio" value="Lead" name="lead" ng-model="typeflag" ng-change="typerdochange(typeflag)">
+                            <span class="lbl padding-8">Lead Wise</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" required></md-datepicker>
+                                <div class="error-messages" style="text-align: center;" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                    <div ng-message="required">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" md-min-date="startdate" required></md-datepicker>
+                                <div class="error-messages" style="text-align: center;" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                    <div ng-message="required">Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="showreport();">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-show="get_employeereport.length > 0 || get_leadreport.length > 0" ng-click="exportToExcel()" target="_blank">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-show="get_employeereport.length > 0 || get_leadreport.length > 0" ng-click="printData()" id="print-btn">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="Grid_view && (get_employeereport.length > 0 || get_leadreport.length > 0)">
+        <div class="box-header with-border">
+            <h3 class="box-title">INCENTIVE REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <div id="employee">
+                <table class="table table-hover table-responsive table-bordered" ng-show="employee">
+                    <thead>
+                        <tr>
+                            <th>SL.NO</th>
+                            <th>NAME</th>
+                            <th>DEPARTMENT NAME</th>
+                            <th>INCENTIVE SHARE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_employeereport | filter:searchValue ">
+                            <td>{{$index+1}}</td>
+                            <td>{{user.Name}}</td>
+                            <td>{{user.Department}}</td>
+                            <td>{{user.IncentiveShare}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="lead">
+                <table class="table table-hover table-responsive table-bordered" ng-show="lead">
+                    <thead>
+                        <tr>
+                            <th>SL.NO</th>
+                            <th>LEAD NAME</th>
+                            <th>STUDENT STRENGTH</th>
+                            <th>AMOUNT APPROVED</th>
+                            <th>INCENTIVE PERCENTAGE</th>
+                            <th>OVERALL INCENTIVE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="users in get_leadreport | filter:searchValue ">
+                            <td>{{$index+1}}</td>
+                            <td>{{users.LeadName}}</td>
+                            <td>{{users.ISMSLE_StudentStrength}}</td>
+                            <td>{{users.AmountApproved}}</td>
+                            <td>{{users.percentage}}</td>
+                            <td class="text-center">
+                                <span>
+                                    <label class="control-label col-sm-10" ng-click="mainmodelclick(users.ISMSLE_id)" data-target="#myModalG" ng-model="users.ISMSLE_id">{{users.OverallIncentive}}</label>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!--Employee Report Print-->
+    <div ng-show="table_flag" id="printSectionIdEmployee">
+        <div class="row margin-top-20">
+            <div class="col-sm-12">
+                <table class="table table-hover table-responsive table-bordered" id="tableemployee">
+                    <thead>
+                        <tr>
+                            <th><b>SL.NO</b></th>
+                            <th><b>NAME</b></th>
+                            <th><b>DEPARTMENT NAME</b></th>
+                            <th><b>INCENTIVE SHARE</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_employeereport">
+                            <td>{{$index+1}}</td>
+                            <td>{{user.Name}}</td>
+                            <td>{{user.Department}}</td>
+                            <td>{{user.IncentiveShare}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!--Lead Report Print-->
+    <div ng-show="table_flag" id="printSectionIdLead">
+        <div class="row margin-top-20">
+            <div class="col-sm-12">
+                <table class="table table-hover table-responsive table-bordered" id="tablelead">
+                    <thead>
+                        <tr>
+                            <th>SL.NO</th>
+                            <th>LEAD NAME</th>
+                            <th>STUDENT STRENGTH</th>
+                            <th>AMOUNT APPROVED</th>
+                            <th>INCENTIVE PERCENTAGE</th>
+                            <th>OVERALL INCENTIVE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="users in get_leadreport">
+                            <td>{{$index+1}}</td>
+                            <td>{{users.LeadName}}</td>
+                            <td>{{users.ISMSLE_StudentStrength}}</td>
+                            <td>{{users.AmountApproved}}</td>
+                            <td>{{users.percentage}}</td>
+                            <td>{{users.OverallIncentive}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!--MAIN MODELCLICK-->
+    <div id="myModalG" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg" style="width: 90%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="print-border">
+                        <div class="modal-header text-right">
+                            <!--<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printDatanew();">Print</button>-->
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closedata();">Close</button>
+                            <!--<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="exportven();">Export to Excel</button>-->
+                        </div>                       
+                        <div class="box-body">
+                            <div class="text-center">
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>SL.NO</th>
+                                            <th>NAME</th>
+                                            <th>DEPARTMENT</th>
+                                            <th>DEPARTMENT SHARE</th>
+                                            <th>INCENTIVE SHARE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="useri in getleaddetails">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{useri.Name}}</td>
+                                            <td>{{useri.Department}}</td>
+                                            <td>{{useri.Deptshare}}</td>
+                                            <td>{{useri.IncentiveShare}}</td>
+                                        </tr>                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+

@@ -1,0 +1,2198 @@
+﻿
+<style>
+    .img-zoom-in-out .modal {
+        text-align: center;
+    }
+
+        .img-zoom-in-out .modal .modal-dialog {
+            display: inline-block;
+            width: auto;
+        }
+
+            .img-zoom-in-out .modal .modal-dialog .img-responsive {
+                max-height: calc(100vh - 225px);
+            }
+</style>
+
+<section class="content admission" ng-init="BindData()">
+    <div class="box box-primary" ng-app="MyModule">
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT ADMISSION FORM </h3>
+            <div class="box-tools pull-right">
+                <label>
+                    <input type="checkbox" data-ng-model="readmit" data-ng-click="readmitreload()" data-toggle="modal" data-target="#myModalreadmit">Re-Admit
+                    <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                </label>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+
+            </div>
+        </div>
+        <div class="box-body">
+            <md-content>
+                <md-tabs md-dynamic-height md-border-bottom md-selected="myTabIndex">
+                    <md-tab label="Student">
+                        <form class="form-horizontal" role="form" name="myForm1" novalidate>
+                            <md-content class="md-padding">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Student Name:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="fname" ng-model="obj.amsT_FirstName" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" placeholder="First Name" maxlength="20" required>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.fname)" ng-messages="myForm1.fname.$error">
+                                                    <div ng-message="required">Enter Name</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4"></label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" id="usr" name="middlenam" type="text" ng-model="obj.amsT_MiddleName" allow-pattern="(\s|[a-zA-Z])" placeholder="Middle Name" maxlength="20">
+                                                <!--<div class="error-messages" ng-if="interacted1(myForm1.middlenam)" ng-messages="myForm1.middlenam.$error">
+                                                    <div ng-message="required">Enter Middle Name</div>
+                                                </div>-->
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" maxlength="20" name="lname" id="usr" type="text" ng-model="obj.amsT_LastName" allow-pattern="(\s|[a-zA-Z])" placeholder="Last Name">
+                                                <!--<div class="error-messages" ng-if="interacted1(myForm1.lname)" ng-messages="myForm1.lname.$error">
+                                                    <div ng-message="required">Enter Last Name</div>
+                                                </div>-->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="stuayear" data-ng-model="obj.asmaY_Id" required>
+                                                    <!--ng-disabled="true"-->
+                                                    <option ng-repeat="acedmicYear in allAcademicYear" value="{{acedmicYear.asmaY_Id}}" ng-selected="{{acedmicYear.Selected == true}}">
+                                                        {{acedmicYear.asmaY_Year}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stuayear)" ng-messages="myForm1.stuayear.$error">
+                                                    <div ng-message="required">Select Academic Year</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-if="reg_ == true">
+                                            <label class="control-label col-sm-4">RegNo:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="reg_ == true">*</strong></label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" name="sturegno" ng-model="obj.amsT_RegistrationNo" ng-required="reg_ == true" id="reservation" type="text" ng-blur="checkregnoduplicate()">
+                                                <div class="error-messages" ng-if="interacted1(myForm1.sturegno)" ng-messages="myForm1.sturegno.$error">
+                                                    <div ng-message="required">Enter RegNo</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-if="Adm_ == true">
+                                            <label class="control-label col-sm-4">Admission No:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="Adm_==true">*</strong></label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" name="stuaddno" ng-model="obj.amsT_AdmNo" id="reservation" ng-required="Adm_==true" type="text" ng-blur="checkadmnoduplicate()">
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stuaddno)" ng-messages="myForm1.stuaddno.$error">
+                                                    <div ng-message="required">Enter Admission No</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="stuclass" data-ng-model="obj.asmcL_Id" required ng-change="onclasschange(obj.asmcL_Id,obj.asmaY_Id,'0');">
+                                                    <!--ng-disabled="EditId > 0"-->
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="class in allClass" value="{{class.asmcL_Id}}" ng-selected="{{class.Selected == true}}">
+                                                        {{class.asmcL_ClassName}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stuclass)" ng-messages="myForm1.stuclass.$error">
+                                                    <div ng-message="required">Select the class</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Date of Admission:<strong style="color:red;">*</strong></label>
+
+                                            <!--<md-datepicker name="sch_date" ng-model="amsT_Date" onkeydown="return false"  md-min-date="minDatef" md-max-date="maxDatef" required></md-datepicker>-->
+                                            <md-datepicker name="sch_date" ng-model="amsT_Date" onkeydown="return false" required></md-datepicker>
+                                            <div class="error-messages col-sm-offset-5" ng-if="interacted1(myForm1.sch_date)" ng-messages="myForm1.sch_date.$error">
+                                                <div ng-message="required">Select Date</div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Date Of Birth:<strong style="color:red;">*</strong></label>
+
+
+                                            <md-datepicker name="dob" ng-model="obj.amsT_DOB" onkeydown="return false" ng-change="calcage(obj.amsT_DOB);" md-max-date="maxDate1" md-min-date="minDate1" ng-disabled="DOB" md-placeholder="Select date" required></md-datepicker>
+
+                                            <div class="error-messages col-sm-offset-5" ng-if="interacted1(myForm1.dob)" ng-messages="myForm1.dob.$error">
+                                                <div ng-message="required">Select Date</div>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">DOB in Words:</label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" id="reservation" name="studob" ng-model="obj.amsT_DOB_Words" ng-disabled="true" type="text" maxlength="250" allow-pattern="(\s|[a-zA-Z])">
+                                                <!--<div class="error-messages" ng-if="interacted1(myForm1.studob)" ng-messages="myForm1.studob.$error">
+                                                    <div ng-message="required">Enter DOB in Words</div>
+
+                                                </div>-->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Caste Category:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="stucstcat" data-ng-model="obj.imcC_Id" ng-change="getcaste(obj.imcC_Id)">
+                                                    <!--required-->
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="casteCategory in allcasteCategory" value="{{casteCategory.imcC_Id}}" ng-selected="{{casteCategory.Selected == true}}">
+                                                        {{casteCategory.imcC_CategoryName}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stucstcat)" ng-messages="myForm1.stucstcat.$error">
+                                                    <div ng-message="required">Select Caste Category </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Caste:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <!--<select class="form-control" name="stucst" id="sel1" data-ng-model="obj.iC_Id" ng-disabled="castedisble==true" required>
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="caste in allCaste" value="{{caste.imC_Id}}" ng-selected="{{caste.imC_Id == newcaste}}">
+                                                        {{caste.imC_CasteName}}
+                                                    </option>
+                                                </select>-->
+
+
+                                                <ui-select ng-model="obj.iC_Id" name="stucst" required>
+                                                    <ui-select-match placeholder="Select Caste">
+                                                        <span ng-bind="$select.selected.imC_CasteName"></span>
+                                                    </ui-select-match>
+                                                    <ui-select-choices repeat="item in (allCaste | filter: $select.search) track by item.imC_Id">
+                                                        <span ng-bind="item.imC_CasteName"></span>
+                                                    </ui-select-choices>
+                                                </ui-select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stucst)" ng-messages="myForm1.stucst.$error">
+                                                    <div ng-message="required">Select Caste </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Sub Caste:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="sub" name="subcaste" type="text" ng-model="obj.amsT_SubCasteIMC_Id" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="20">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Bank IFSC Code:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" name="stubifsc" type="text" ng-model="obj.amsT_StuBankIFSC_Code" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="11" ng-minlength="11">
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stubifsc)" ng-messages="myForm1.stubifsc.$error">
+                                                    <!--<div ng-message="required">Enter Bank IFSC Code </div>-->
+                                                    <div ng-message="minlength">Enter minimum 11 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Student Birth Place:</label>
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" name="stubplace" id="usr" type="text" ng-model="obj.amsT_BirthPlace"
+                                                          allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)" maxlength="1000"></textarea>
+                                                <!--<div class="error-messages" ng-if="interacted1(myForm1.stubplace)" ng-messages="myForm1.stubplace.$error">
+                                                    <div ng-message="required">Enter Sudent Birth Place </div>
+                                                </div>-->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Birth Certificate No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" ng-model="obj.amsT_BirthCertNO" id="usr" type="text" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="20">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Caste Certificate No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" ng-model="obj.amsT_StuCasteCertiNo" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="20">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Govt.Admno:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="govtadno" name="govtadmno" type="text" ng-model="obj.amsT_GovtAdmno" maxlength="50" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Student PAN Card No:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="PANCardNo" id="usr" type="text" ng-model="obj.amsT_StudentPANNo" maxlength="10" ng-minlength="10" allow-pattern="([a-zA-Z0-9])" ng-pattern="/[a-zA-Z]{5}\d{4}[a-zA-Z]{1}/i" ng-paste="$event.preventDefault()">
+                                                <div class="error-messages" ng-if="interacted1(myForm1.PANCardNo)" ng-messages="myForm1.PANCardNo.$error">
+                                                    <div ng-message="pattern">Enter valid PANCard No!</div>
+                                                    <div ng-message="minlength">Enter Minimum 10 characters</div>
+                                                    <div ng-message="maxlength">Field cannot take more than 10 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-6">Current Class-Section:</label>
+                                                    <div class="col-sm-6" style="">
+                                                        <label class="control-label col-sm-6">{{lblclasssection}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-6">Age:<strong style="color:red;">*</strong></label>
+                                                    <div class="col-sm-6" style="">
+                                                        <input class="form-control active" name="stuage" id="reservation" ng-model="obj.pasR_Age" allow-pattern="\d" maxlength="2" disabled type="text" required>
+                                                        <div class="error-messages" ng-if="interacted1(myForm1.stuage)" ng-messages="myForm1.stuage.$error">
+                                                            <div ng-message="required">Enter Age</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-6">Gender:<strong style="color:red;">*</strong></label>
+                                                    <div class="col-sm-6">
+                                                        <select class="form-control" name="stugen" data-ng-model="amsT_Sex" id="sel1" required>
+                                                            <option value="">--Select--</option>
+                                                            <option value="Male">Male</option>
+                                                            <option value="Female">Female</option>
+                                                            <option value="Other">Other</option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted1(myForm1.stugen)" ng-messages="myForm1.stugen.$error">
+                                                            <div ng-message="required">Select Gender</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-6">Mother Tongue:</label>
+                                                    <div class="col-sm-6" style="">
+                                                        <input class="form-control active" name="stumtoungue" id="reservation" ng-model="obj.amsT_MotherTongue"
+                                                               allow-pattern="(\s|[a-zA-Z])" maxlength="15" type="text">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-6">Language Spoken:</label>
+                                                    <div class="col-sm-6" style="">
+                                                        <input class="form-control active" name="stulangspoken" id="reservation" ng-model="obj.amsT_LanguageSpoken "
+                                                               allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)" maxlength="100">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-6">Religion:<strong style="color:red;">*</strong></label>
+                                                    <div class="col-sm-6">
+                                                        <select class="form-control" name="sturel" id="sel1" ng-model="obj.ivrmmR_Id" required>
+                                                            <option value="">--Select--</option>
+                                                            <option ng-repeat="Religion in allReligion" value="{{Religion.ivrmmR_Id}}" ng-selected="{{Religion.Selected == true}}">
+                                                                {{Religion.ivrmmR_Name}}
+                                                            </option>
+                                                        </select>
+                                                        <div class="error-messages" ng-if="interacted1(myForm1.sturel)" ng-messages="myForm1.sturel.$error">
+                                                            <div ng-message="required">Select Religion</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 student-photoadm" style="padding-bottom: 5px;" ng-show="profile_photo==1">
+                                                <div class="form-group text-center">
+                                                    <div style="width:70%;height:120px;border:1px solid #5cb7ff;margin:auto;">
+                                                        <img style="width:100%;height:120px;" id="blah">
+                                                    </div>
+                                                    <label class="custom-file-input file-blue" style="width:70%;margin:auto;">
+                                                        <input type="file" name="stufile" accept="image/*" data-ng-model="obj.image" onchange="angular.element(this).scope().uploadStudentProfilePic(this)" ng-required="profile_photo==1">
+                                                    </label>
+                                                    <div class="error-messages" ng-if="interacted1(myForm1.stufile)" ng-messages="myForm1.stufile.$error">
+                                                        <div ng-message="required">Upload Student Photo</div>
+                                                    </div>                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Nationality:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="stunat" id="sel1" ng-model="obj.IVRMMC_Id" required>
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="Nationality in allcountry" value="{{Nationality.ivrmmC_Id}}" ng-selected="{{Nationality.Selected == true}}">
+                                                        {{Nationality.ivrmmC_Nationality}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stunat)" ng-messages="myForm1.stunat.$error">
+                                                    <div ng-message="required">Select Nationality</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="form-group" data-ng-repeat="mobilestd in mobilesstd  track by $index | filter:nameText" ng-form="myForm1">
+                                            <label class="control-label col-sm-4">
+                                                Mobile Number(SMS):<strong style="color:red;">*</strong>
+                                            </label>
+                                            <div class="col-sm-8 input-group" style="">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-tablet"></i>
+                                                </div>
+                                                <input name="stumobno" type="text" id="reservation" class="form-control" 
+                                                       ng-blur="addtopdays(mobilesstd[$index],$index)" data-ng-model="mobilesstd[$index].amsT_MobileNo" 
+                                                       maxlength="10" ng-minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d">
+
+                                                <span ng-show="$last" ng-disabled="!myForm1" class="input-group-addon" ng-hide="mobilesstd.length > 4">
+                                                    <a href="" ng-click="addNewMobile1std(curval1std)" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="mobilesstd.length ==1">
+                                                    <a href="" ng-click="removeNewMobile1std($index,mobilesstd[$index].curval1std)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="error-messages text-center" ng-if="interacted1(myForm1.stumobno)" ng-messages="myForm1.stumobno.$error">
+                                                <div ng-message="pattern">Enter Valid Mobile Number</div>
+                                                <div ng-message="required">Enter Mobile Number</div>
+                                                <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="show">both are same</div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" data-ng-repeat="emailstd in emailsstd track by $index" ng-form="myForm1">
+                                            <label class="control-label col-sm-4">
+                                                Email-ID:<strong style="color:red;">*</strong>
+                                            </label>
+                                            <div class="col-sm-8 input-group" style="">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-envelope-o"></i>
+                                                </div>
+                                                <input name="stuemailid" type="email" id="reservation" class="form-control" data-ng-model="emailsstd[$index].amsT_emailId"
+                                                       ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._]+@[A-Za-z0-9]+\.[A-Za-z.]{2,5}$/">
+                                                <span ng-show="$last" class="input-group-addon" ng-hide="emailsstd.length > 4">
+                                                    <a href="" ng-show="showAddEmail1std(emailstd)" ng-click="addNewEmail1std()" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="emailsstd.length ==1">
+                                                    <a href="" ng-click="removeNewEmail1std($index)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="error-messages text-center" ng-if="interacted1(myForm1.stuemailid)" ng-messages="myForm1.stuemailid.$error">
+                                                <div ng-message="pattern">Enter Valid email-id</div>
+                                                <div ng-message="required">Enter Email -Id</div>
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Aadhaar No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="stuadhno" id="usr" type="text" ng-model="obj.amsT_AadharNo" 
+                                                       maxlength="12" allow-pattern="\d">
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stuadhno)" ng-messages="myForm1.stuadhno.$error">
+                                                    <div ng-message="required">Enter Aadhaar No</div>
+                                                    <div ng-message="minlength">Enter Minimum 12 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Blood Group:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="stubloodgrp" ng-model="obj.amsT_BloodGroup" id="sel1">
+                                                    <option value="">--Select--</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A-">A-</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B-">B-</option>
+                                                    <option value="AB+">AB+</option>
+                                                    <option value="AB-">AB-</option>
+                                                    <option value="O+">O+</option>
+                                                    <option value="O-">O-</option>
+                                                    <option value="A1+ve">A1+ve</option>
+                                                    <option value="A1-ve">A1-ve</option>
+                                                    <option value="B1+ve">B1+ve</option>
+                                                    <option value="B1-ve">B1-ve</option>
+                                                    <option value="A2+ve">A2+ve</option>
+                                                    <option value="A2-ve">A2-ve</option>
+                                                    <option value="A1B+ve">A1B+ve</option>
+                                                    <option value="A2B+ve">A2B+ve</option>
+                                                    <option value="A1B2">A1B2</option>
+                                                    <option value="A1B-ve">A1B-ve</option>
+                                                    <option value="A2B-ve">A2B-ve</option>
+                                                    <option value="Not Available">Not Available</option>
+
+                                                </select>
+                                                <!--<div class="error-messages" ng-if="interacted1(myForm1.stubloodgrp)" ng-messages="myForm1.stubloodgrp.$error">
+                                                    <div ng-message="required">Select Blood Group</div>
+                                                </div>-->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Student Category:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="stucatt" data-ng-model="obj.stucategory" ng-disabled="true" required>
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="categ in adm_m_stud_cat" value="{{categ.asmcC_Id}}" ng-selected="{{categ.Selected == true}}">
+                                                        {{categ.className}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.stucatt)" ng-messages="myForm1.stucatt.$error">
+                                                    <div ng-message="required">Required Student Category</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+
+                                            <label class="control-label col-sm-4">Student Bank Account No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" ng-model="obj.amsT_StuBankAccNo" allow-pattern="\d" maxlength="20">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4"><input type="checkbox" ng-model="obj.amsT_BPLCardFlag" value="1"><span class="lbl padding-8">Govt.Number(EMIS No./BPL Card No /STS No).</span><strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_BPLCardFlag == 1">*</strong> </label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" name="bplcard" type="text" ng-model="obj.amsT_BPLCardNo" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="50" ng-disabled="obj.amsT_BPLCardFlag != 1" ng-required="obj.amsT_BPLCardFlag == 1">
+                                                <div class="error-messages" ng-if="interacted1(myForm1.bplcard)" ng-messages="myForm1.bplcard.$error">
+                                                    <div ng-message="required">Enter Govt.Number.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Fee Concession Type:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="feecons" data-ng-model="obj.feeconcession" required>
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="concession in concessionList" value="{{concession.fmcC_Id}}" ng-selected="{{concession.Selected == true}}">
+                                                        {{concession.fmcC_ConcessionName}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted1(myForm1.feecons)" ng-messages="myForm1.feecons.$error">
+                                                    <div ng-message="required">Required Fee Concession Type</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Student TPIN:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="sub" name="tpin" type="text" ng-model="obj.amsT_Tpin" allow-pattern="(\s|[0-9])" maxlength="15" ng-disabled="true">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Student GPS Tracing Id:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="sub" name="tpin" type="text" ng-model="obj.amsT_GPSTrackingId" maxlength="50">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="checkbox-inline">
+                                                <label>
+                                                    <input type="checkbox" data-ng-model="obj.amsT_ECSFlag" ng-change="ecsdetailscheck(obj.amsT_ECSFlag)" value="1" data-toggle="modal"
+                                                           data-target="#myModalecs">
+                                                    <span class="lbl padding-8">ECS</span><span style="color:lightgreen;font-size:20px;"></span>
+                                                </label>
+                                                <!--<label><input type="checkbox" data-ng-model="obj.amsT_ECSFlag" value="1"></label>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="text-center">
+                                    <md-button type="button" class="md-raised md-primary" ng-click="savefirsttab()" ng-disabled="applastdatedisable">
+                                        Save And Proceed <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                    </md-button>
+                                    <!--<md-button type="button" class="md-raised md-primary" ng-click="validateStuDet(obj)" ng-disabled="applastdatedisable">
+                                        Next <i class="fa fa-chevron-circle-right ng-scope" aria-hidden="true"></i>
+                                    </md-button>-->
+                                    <md-button type="button" class="md-raised md-warn" ng-click="clear_first_tab()">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                                    </md-button>
+                                </div>
+
+                            </md-content>
+                        </form>
+                    </md-tab>
+                    <md-tab label="Address" id="add" ng-disabled="address">
+                        <!---->
+                        <form class="form-horizontal" role="form" name="myForm2" novalidate>
+                            <md-content class="md-padding">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <md-subheader class="md-primary">Permanent Address:</md-subheader>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Permanent Address:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="stuperadd" id="usr" type="text" ng-model="obj.amsT_PerStreet" placeholder="Enter Address" allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)" required>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.stuperadd)" ng-messages="myForm2.stuperadd.$error">
+                                                    <div ng-message="required">Enter Permanent Address</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4"></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" ng-model="obj.amsT_PerArea" type="text" placeholder="Area"
+                                                       allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)" maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Country:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="addcoun" ng-model="obj.IVRMMC_Id5" ng-change="onSelectGetState(obj.IVRMMC_Id5)" required>
+                                                    <option value="">Select Country</option>
+                                                    <option ng-repeat="Country1 in allcountry" value="{{Country1.ivrmmC_Id}}" ng-selected="{{Country1.Selected == true}}">
+                                                        {{Country1.ivrmmC_CountryName}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addcoun)" ng-messages="myForm2.addcoun.$error">
+                                                    <div ng-message="required">Select Country</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">State:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="addstate" ng-model="obj.amsT_PerState" required>
+                                                    <option value="" ng-show="statelabel==true">Select State</option>
+                                                    <option ng-repeat="State1 in allState" value="{{State1.ivrmmS_Id}}" ng-selected="State1.ivrmmS_Id==obj.amsT_PerState">{{State1.ivrmmS_Name}}</option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addstate)" ng-messages="myForm2.addstate.$error">
+                                                    <div ng-message="required">Select State</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">City:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" name="addcity" ng-model="obj.amsT_PerCity" type="text" placeholder="City" maxlength="25" allow-pattern="(\s|[a-zA-Z])" required>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addcity)" ng-messages="myForm2.addcity.$error">
+                                                    <div ng-message="required">Enter City</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Pincode</label><!--<strong style="color:red;">*</strong>-->
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" name="addpin" ng-model="obj.amsT_PerPincode" type="text" placeholder="Pincode" maxlength="6" ng-minlength="6" allow-pattern="\d">
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addpin)" ng-messages="myForm2.addpin.$error">
+                                                    <div ng-message="required">Enter Pincode</div>
+                                                    <div ng-message="minlength">Enter minimum 6 digits</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <md-subheader class="md-primary">Communication Address:</md-subheader>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Contact Address:<strong style="color:red;display:inline; font-weight: bolder; margin-left:10px;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="addcontact" id="usr" type="text" placeholder="Enter Address" ng-model="obj.amsT_ConStreet" allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)" required>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addcontact)" ng-messages="myForm2.addcontact.$error">
+                                                    <div ng-message="required">Enter Communication Address</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4"></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" placeholder="Area" ng-model="obj.amsT_ConArea"
+                                                       allow-pattern="(\s|[a-zA-Z]|-|,|:|.|#|@|&)">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Country:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="addconcounrty" ng-model="obj.amsT_ConCountry" ng-change="onSelectGetState1(obj.amsT_ConCountry)" required>
+                                                    <option value="">Select Country</option>
+                                                    <option ng-repeat="Country2 in allcountry" value="{{Country2.ivrmmC_Id}}" ng-selected="{{Country2.Selected == true}}">
+                                                        {{Country2.ivrmmC_CountryName}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addconcounrty)" ng-messages="myForm2.addconcounrty.$error">
+                                                    <div ng-message="required">Select Country</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">State:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="addconstate" ng-model="obj.amsT_ConState" required>
+                                                    <option value="" ng-show="statelabel2==true">Select State</option>
+                                                    <option ng-repeat="State2 in allState1" value="{{State2.ivrmmS_Id}}"
+                                                            ng-selected="State2.ivrmmS_Id==obj.amsT_ConState">
+                                                        {{State2.ivrmmS_Name}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addconstate)" ng-messages="myForm2.addconstate.$error">
+                                                    <div ng-message="required">Select State</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">City:<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="addconcity" id="usr" ng-model="obj.amsT_ConCity" type="text" placeholder="City" ng-module="obj.amsT_ConCity" maxlength="25" allow-pattern="(\s|[a-zA-Z])" required>
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addconcity)" ng-messages="myForm2.addconcity.$error">
+                                                    <div ng-message="required">Enter City</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Pincode</label><!--<strong style="color:red;">*</strong>-->
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="addconpincode" id="usr" type="text" placeholder="Pincode" ng-model="obj.amsT_ConPincode" maxlength="6" ng-minlength="6" allow-pattern="\d">
+                                                <div class="error-messages" ng-if="interacted2(myForm2.addconpincode)" ng-messages="myForm2.addconpincode.$error">
+                                                    <div ng-message="required">Enter Pincode</div>
+                                                    <div ng-message="required">Enter Minimum 6 digits</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label class="control-label col-sm-pull-4 right" style="margin-left:52%;"><input type="checkbox" ng-model="obj.chkbox_address" ng-true-value="1" ng-false-value="0" ng-click="address_copy();"><span class="lbl padding-8">Same As Permanent Address</span></label>
+                                <hr />
+                                <div class="text-center">
+                                    <md-button type="button" class="md-raised md-primary" ng-click="previous(obj)">
+                                        <i class="fa fa-chevron-circle-left ng-scope" aria-hidden="true"></i> Previous
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-primary" ng-click="savesecondtab()">
+                                        Save And Proceed <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                    </md-button>
+                                    <!--<md-button type="button" class="md-raised md-primary" ng-click="validateadd(obj)">
+                                        Next <i class="fa fa-chevron-circle-right ng-scope" aria-hidden="true"></i>
+                                    </md-button>-->
+                                    <md-button type="button" class="md-raised md-warn" ng-click="clear_second_tab();">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                                    </md-button>
+                                </div>
+                            </md-content>
+                        </form>
+                    </md-tab>
+                    <md-tab label="Parents" ng-disabled="Parents">
+                        <!---->
+                        <form class="form-horizontal" role="form" name="myForm3" novalidate>
+                            <md-content class="md-padding">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <md-subheader>
+                                            Father's Details<label class="checkbox-inline" style="color:#fff;">
+                                                <input type="checkbox" ng-model="obj.amsT_FatherAliveFlag" value="1">
+                                                <span class="lbl padding-8">Alive</span>
+                                            </label>
+                                        </md-subheader>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Father's Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_FatherAliveFlag == 1">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" name="parsfname" type="text" ng-model="obj.amsT_FatherName" allow-pattern="(\s|[a-zA-Z])" ng-required="obj.amsT_FatherAliveFlag == 1">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsfname)" ng-messages="myForm3.parsfname.$error">
+                                                    <div ng-message="required">Enter Father's Name</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Sur Name:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_FatherSurname">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Aadhaar No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="parsaadharno" id="usr" type="text" ng-model="obj.amsT_FatherAadharNo" allow-pattern="(\s|[0-9])" maxlength="12">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsaadharno)" ng-messages="myForm3.parsaadharno.$error">
+                                                    <div ng-message="minlength">Enter minimum 12 digits</div>
+                                                    <div ng-message="required">Enter Father's Aadhaar No</div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Qualification:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_FatherEducation">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Office Address:</label>
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" rows="2" id="comment" ng-model="obj.amsT_FatherOfficeAdd" allow-pattern="(\s|[a-zA-Z0-9.]|,|-)"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Occupation:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" name="parsoccup" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_FatherOccupation">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsoccup)" ng-messages="myForm3.parsoccup.$error">
+                                                    <div ng-message="required">Enter Occupation</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Designation:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_FatherDesignation">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Bank Account No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[0-9])" ng-model="obj.amsT_FatherBankAccNo" maxlength="18">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Bank IFSC Code:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" name="parifsccode" ng-model="obj.amsT_FatherBankIFSC_Code" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="11">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parifsccode)" ng-messages="myForm3.parifsccode.$error">
+                                                    <div ng-message="minlength">Enter  minimum length 11 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Caste Certificate No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z0-9])" ng-model="obj.amsT_FatherCasteCertiNo" maxlength="20">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Nationality:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_FatherAliveFlag == 1">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="sel1" name="parsnat" ng-model="obj.IVRMMC_Id3" ng-required="obj.amsT_FatherAliveFlag == 1">
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="Nationality1 in allcountry" value="{{Nationality1.ivrmmC_Id}}" ng-selected="{{Nationality1.Selected == true}}">
+                                                        {{Nationality1.ivrmmC_Nationality}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsnat)" ng-messages="myForm3.parsnat.$error">
+                                                    <div ng-message="required">Select Nationality</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Father Religion:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="sturefather" id="selfather" ng-model="obj.amsT_FatherReligion">
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="Religionfather in allReligionfather" value="{{Religionfather.ivrmmR_Id}}" ng-selected="{{Religionfather.Selected == true}}">
+                                                        {{Religionfather.ivrmmR_Name}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Father Caste:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="stucstfather" id="selcasfather" data-ng-model="obj.amsT_FatherCaste" ng-disabled="castedisble==true">
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="castefather in allCastefather" value="{{castefather.imC_Id}}" ng-selected="{{castefather.Selected == true}}">
+                                                        {{castefather.imC_CasteName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Father Sub Caste:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="subfather" name="subcastefather" type="text" ng-model="obj.amsT_FatherSubCaste" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="20">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Income:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="parents_monthly_income==1 && obj.amsT_FatherAliveFlag == 1">*</strong></label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" id="usr" name="parsincome" type="text" placeholder="Monthly Income" allow-pattern="([0-9])" ng-model="obj.amsT_FatherMonIncome" ng-required="parents_monthly_income==1 && obj.amsT_FatherAliveFlag == 1" ng-disabled="parents_monthly_income==0">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsincome)" ng-messages="myForm3.parsincome.$error">
+                                                    <div ng-message="required">Enter Monthly Income</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" name="parsanninc" id="usr" type="text" placeholder="Annual Income" allow-pattern="([0-9])" ng-model="obj.amsT_FatherAnnIncome" ng-required="parents_annual_income == 1 && obj.amsT_FatherAliveFlag == 1" ng-disabled="parents_annual_income==0">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsanninc)" ng-messages="myForm3.parsanninc.$error">
+                                                    <div ng-message="required">Enter Annual Income</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Father PAN Card No:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="stdfatherpancard" id="stdfathpancard" type="text" ng-model="obj.amsT_FatherPANNo" maxlength="10" ng-minlength="10" allow-pattern="([a-zA-Z0-9])" ng-pattern="/[a-zA-Z]{5}\d{4}[a-zA-Z]{1}/i">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.stdfatherpancard)" ng-messages="myForm3.stdfatherpancard.$error">
+                                                    <div ng-message="pattern">Enter valid PANCard No!</div>
+                                                    <div ng-message="minlength">Enter Minimum 10 characters</div>
+                                                    <div ng-message="maxlength">Field cannot take more than 10 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" data-ng-repeat="mobile in mobiles  track by $index | filter:nameText" ng-form="myForm3">
+                                            <label class="control-label col-sm-4">
+                                                Mobile Number:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_FatherAliveFlag == 1 &&  default_sms_email=='F'">*</strong>
+                                            </label>
+                                            <div class="col-sm-8 input-group" style="">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-tablet"></i>
+                                                </div>
+                                                <input name="parsmobno" type="text" id="reservation" class="form-control" data-ng-model="mobiles[$index].amsT_FatherMobleNo" maxlength="10" ng-minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d">
+
+                                                <span ng-show="$last" ng-disabled="!myForm3" class="input-group-addon" ng-hide="mobiles.length > 4">
+                                                    <a href="" ng-click="addNewMobile(curval1)" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="mobiles.length ==1">
+                                                    <a href="" ng-click="removeNewMobile($index,selmobs[$index].curval1)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="error-messages text-center" ng-if="interacted(myForm3.parsmobno)" ng-messages="myForm3.parsmobno.$error">
+                                                <div ng-message="pattern">Enter Valid Mobile Number</div>
+                                                <div ng-message="required">Enter Mobile Number</div>
+                                                <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="show">both are same</div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" data-ng-repeat="email in emails track by $index" ng-form="myForm3">
+                                            <label class="control-label col-sm-4">
+                                                Email-ID:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_FatherAliveFlag == 1 &&  default_sms_email=='F'">*</strong>
+                                            </label>
+                                            <div class="col-sm-8 input-group" style="">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-envelope-o"></i>
+                                                </div>
+                                                <input name="parsemail" type="email" id="reservation" class="form-control" data-ng-model="emails[$index].amsT_FatheremailId" ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}$/">
+
+                                                <span ng-show="$last" class="input-group-addon" ng-hide="emails.length > 4">
+                                                    <a href="" ng-show="showAddEmail(email)" ng-click="addNewEmail()" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="emails.length ==1">
+                                                    <a href="" ng-click="removeNewEmail($index)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="error-messages text-center" ng-if="interacted(myForm3.parsemail)" ng-messages="myForm3.parsemail.$error">
+                                                <div ng-message="pattern">Enter Valid email-id</div>
+                                                <div ng-message="required">Enter Email -Id</div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <md-subheader>
+                                            Mother's Details<label class="checkbox-inline" style="color:#fff;">
+                                                <input type="checkbox" ng-model="obj.amsT_MotherAliveFlag" value="1">
+                                                <span class="lbl padding-8">Alive</span>
+                                            </label>
+                                        </md-subheader>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother's Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_MotherAliveFlag == 1">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="parsmotname" id="usr" type="text" ng-model="obj.amsT_MotherName" allow-pattern="(\s|[a-zA-Z])" ng-required="obj.amsT_MotherAliveFlag == 1">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsmotname)" ng-messages="myForm3.parsmotname.$error">
+                                                    <div ng-message="required">Enter Mother's Name</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Sur Name:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_MotherSurname">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Aadhaar No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" name="parsmotaadno" type="text" ng-model="obj.amsT_MotherAadharNo" maxlength="12" allow-pattern="(\s|[0-9])">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsmotaadno)" ng-messages="myForm3.parsmotaadno.$error">
+                                                    <div ng-message="minlength">Enter Aadhaar No minimum length 12 characters </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Qualification:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_MotherEducation">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Office Address:</label>
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" rows="2" id="comment" ng-model="obj.amsT_MotherOfficeAdd" allow-pattern="(\s|[a-zA-Z0-9.]|,|-)"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Occupation:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="parsmotoccup" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_MotherOccupation">
+                                                <!--<div class="error-messages" ng-if="interacted3(myForm3.parsmotoccup)" ng-messages="myForm3.parsmotoccup.$error">
+                                                    <div ng-message="required">Enter Occupation</div>
+                                                </div>-->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Designation:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z])" ng-model="obj.amsT_MotherDesignation">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Bank Account No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[0-9])" ng-model="obj.amsT_MotherBankAccNo" maxlength="18">
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Bank IFSC Code:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="parsmotifscco" id="usr" type="text" ng-model="obj.amsT_MotherBankIFSC_Code" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="11" ng-minlength="11">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsmotifscco)" ng-messages="myForm3.parsmotifscco.$error">
+                                                    <div ng-message="minlength">Enter Bank IFSC Code minimum length 11 characters </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Caste Certificate No.:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="usr" type="text" allow-pattern="(\s|[a-zA-Z0-9])" ng-model="obj.amsT_MotherCasteCertiNo" maxlength="20">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Nationality:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_MotherAliveFlag == 1">*</strong></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="parsmotnat" id="sel1" ng-model="obj.IVRMMC_Id4" ng-required="obj.amsT_MotherAliveFlag == 1">
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="Nationality2 in allcountry" value="{{Nationality2.ivrmmC_Id}}" ng-selected="{{Nationality2.Selected == true}}">
+                                                        {{Nationality2.ivrmmC_Nationality}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted3(myForm3.parsmotnat)" ng-messages="myForm3.parsmotnat.$error">
+                                                    <div ng-message="required">Select Nationality</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother Religion:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="sturemother" id="sel1" ng-model="obj.amsT_MotherReligion">
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="Religionmother in allReligionmother" value="{{Religionmother.ivrmmR_Id}}" ng-selected="{{Religionmother.Selected == true}}">
+                                                        {{Religionmother.ivrmmR_Name}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother Caste:</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="stucstmother" id="selcasmother" data-ng-model="obj.amsT_MotherCaste" ng-disabled="castedisble==true">
+                                                    <option value="">--Select--</option>
+                                                    <option ng-repeat="castemother in allCastemother" value="{{castemother.imC_Id}}" ng-selected="{{castemother.Selected == true}}">
+                                                        {{castemother.imC_CasteName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother Sub Caste:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" id="submother" name="subcastemother" type="text" ng-model="obj.amsT_MotherSubCaste" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="20">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Income:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="parents_monthly_income==1 && obj.amsT_MotherAliveFlag == 1">*</strong></label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" id="usr" type="text" placeholder="Monthly Income" name="mmi" allow-pattern="([0-9])" ng-model="obj.amsT_MotherMonIncome" ng-required="parents_monthly_income==1 && obj.amsT_MotherAliveFlag == 1" ng-disabled="parents_monthly_income==0">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.mmi)" ng-messages="myForm3.mmi.$error">
+                                                    <div ng-message="required">Enter Monthly Income</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" id="usr" type="text" placeholder="Annual Income" allow-pattern="([0-9])" name="mai" ng-model="obj.amsT_MotherAnnIncome" ng-required="parents_annual_income == 1 && obj.amsT_MotherAliveFlag == 1" ng-disabled="parents_annual_income==0">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.mai)" ng-messages="myForm3.mai.$error">
+                                                    <div ng-message="required">Enter Annual Income</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother PAN Card No:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" name="stdmotherpancard" id="stdmothpancard" type="text" ng-model="obj.amsT_MotherPANNo" maxlength="10" ng-minlength="10" allow-pattern="([a-zA-Z0-9])" ng-pattern="/[a-zA-Z]{5}\d{4}[a-zA-Z]{1}/i">
+                                                <div class="error-messages" ng-if="interacted3(myForm3.stdmotherpancard)" ng-messages="myForm3.stdmotherpancard.$error">
+                                                    <div ng-message="pattern">Enter valid PANCard No!</div>
+                                                    <div ng-message="minlength">Enter Minimum 10 characters</div>
+                                                    <div ng-message="maxlength">Field cannot take more than 10 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" data-ng-repeat="mobile1 in mobiles1  track by $index | filter:nameText" ng-form="myForm3">
+                                            <label class="control-label col-sm-4">
+                                                Mobile Number:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_MotherAliveFlag == 1 && default_sms_email=='M'">*</strong>
+                                            </label>
+                                            <div class="col-sm-8 input-group" style="">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-tablet"></i>
+                                                </div>
+                                                <input name="parsmotmobno" type="text" id="reservation" class="form-control" data-ng-model="mobiles1[$index].amsT_MotherMobileNo" maxlength="10" ng-minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d">
+
+                                                <span ng-show="$last" ng-disabled="!myForm3" class="input-group-addon" ng-hide="mobiles1.length > 4">
+                                                    <a href="" ng-click="addNewMobile1(curval11)" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="mobiles1.length ==1">
+                                                    <a href="" ng-click="removeNewMobile1($index,selmobs1[$index].curval11)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="error-messages text-center" ng-if="interacted(myForm3.parsmotmobno)" ng-messages="myForm3.parsmotmobno.$error">
+                                                <div ng-message="pattern">Enter Valid Mobile Nmber</div>
+                                                <div ng-message="required">Enter Mobile Number</div>
+                                                <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="show">both are same</div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" data-ng-repeat="email1 in emails1 track by $index" ng-form="myForm3">
+                                            <label class="control-label col-sm-4">
+                                                Email-ID:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="obj.amsT_MotherAliveFlag == 1 && default_sms_email=='M'">*</strong>
+                                            </label>
+                                            <div class="col-sm-8 input-group" style="">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-envelope-o"></i>
+                                                </div>
+                                                <input name="parsmotemail" type="email" id="reservation" class="form-control" data-ng-model="emails1[$index].amsT_MotherEmailId" ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}$/">
+
+                                                <span ng-show="$last" class="input-group-addon" ng-hide="emails1.length > 4">
+                                                    <a href="" ng-show="showAddEmail1(email1)" ng-click="addNewEmail1()" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="emails1.length ==1">
+                                                    <a href="" ng-click="removeNewEmail1($index)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="error-messages text-center" ng-if="interacted(myForm3.parsmotemail)" ng-messages="myForm3.parsmotemail.$error">
+                                                <div ng-message="pattern">Enter Valid email-id</div>
+                                                <div ng-message="required">Enter Email -Id</div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <hr />
+                                <div class="text-center">
+                                    <md-button type="button" class="md-raised md-primary" ng-click="Parents_previous(obj)">
+                                        <i class="fa fa-chevron-circle-left ng-scope" aria-hidden="true"></i> Previous
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-primary" ng-click="savethirdtab()">
+                                        Save And Proceed <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                    </md-button>
+                                    <!--<md-button type="button" class="md-raised md-primary" ng-click="validateParDetails(obj)">
+                                        Next <i class="fa fa-chevron-circle-right ng-scope" aria-hidden="true"></i>
+                                    </md-button>-->
+                                    <md-button type="button" class="md-raised md-warn" ng-click="clear_third_tab()">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                                    </md-button>
+                                </div>
+                            </md-content>
+                        </form>
+                    </md-tab>
+                    <md-tab label="Others" ng-disabled="Others">
+                        <!---->
+                        <form class="form-horizontal" role="form" name="myForm4" novalidate>
+                            <md-content class="md-padding">
+                                <!-- /.box-header -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="">
+                                            <label class="control-label">Activities:</label>
+                                            <div class="multiselect col-sm-4">
+                                                <label ng-repeat="Activity in allActivity" value="{{Activity.amA_Id}}">
+                                                    <input type="checkbox" ng-model="Activity.Selected">
+                                                    <span class="lbl padding-8">
+                                                        {{Activity.amA_Activity}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="">
+                                            <label class="control-label">Reference Details</label>
+                                            <div class="multiselect col-sm-4">
+                                                <label ng-repeat="Refrence in allRefrence">
+                                                    <input type="checkbox" value="{{Refrence.pamR_Id}}" ng-model="Refrence.Selected">
+                                                    <span class="lbl padding-8">
+                                                        {{Refrence.pamR_ReferenceName}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="">
+                                            <label class="control-label">Source Details</label>
+                                            <div class="multiselect col-sm-4">
+                                                <label ng-repeat="Sources in allSources" value="{{Sources.pamS_Id}}">
+                                                    <input type="checkbox" value="{{Sources.pamS_Id}}" ng-model="Sources.Selected">
+                                                    <span class="lbl padding-8">
+                                                        {{Sources.pamS_SourceName}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6 col-sm-offset-3">
+                                        <div class="form-group">
+                                            <label class="control-label"> Achievements:</label>
+                                            <div class="">
+                                                <textarea class="form-control" name="othach" rows="3" ng-model="obj.amsteC_Extracurricular" id="comment" allow-pattern="(\s|[a-zA-Z]|,|-)" maxlength="100"></textarea>
+                                                <div class="error-messages" ng-if="interacted4(myForm4.othach)" ng-messages="myForm4.othach.$error">
+                                                    <div ng-message="required">Enter Achievements</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box">
+                                    <h4 class="box-title">Bond Details</h4>
+                                    <table class="table table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a href="" ng-click="order('SLNO')">SL. NO.</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="order('Bond')">Bond Name</a>
+                                                </th>
+                                                <th><a href="" ng-click="order('Number')">Bond Number</a> </th>
+                                                <!--<th>Action</th>-->
+                                                <!--<th hidden="hidden"></th>-->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="bond in govtBondList">
+
+                                                <td>{{ $index + 1 }}</td>
+
+                                                <td style="text-align:left">
+
+                                                    <input type="checkbox" name="adcheckt" ng-model="bond.Selected" value="{{bond.imgB_Id}}">
+                                                    <span class="lbl padding-8">{{bond.imgB_Name}}</span>
+
+
+                                                </td>
+                                                <td>
+                                                    <input class="form-control" type="text" name="bondnum{{$index}}" id="bondNo" ng-disabled="!bond.Selected" ng-model="bond.amstB_BandNo" allow-pattern="\d" ng-required="bond.Selected" maxlength="8">
+                                                    <div class="error-messages" ng-if="interacted4(myForm4['bondnum'+$index])" ng-messages="myForm4['bondnum'+$index].$error">
+                                                        <div ng-message="required">Enter Bond Number</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!--  <tr ng-repeat="bondDet in bondList | orderBy:predicate:default | filter:paginate| filter:search" ng-class-odd="'odd'">
+                                                <td class="text-center">{{ $index + 1 }}</td>
+                                                <td><input class="form-control" id="id{{bondDet.amstB_BondName}}" data-ng-model="bondDet.amstB_BondName" value="{{ bondDet.amstB_BondName}}" type="text" allow-pattern="(\s|[a-zA-Z0-9.]|,|-)" maxlength="20" ></td>
+                                                <td><input class="form-control" id="id{{bondDet.amstB_BandNo}}" data-ng-model="bondDet.amstB_BandNo" value="{{ bondDet.amstB_BandNo}}" type="text" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="30" ></td>
+                                                <td>
+
+                                                    <span class="" ng-hide="bondList.length > 4">
+                                                        <a href="" ng-show="$last" ng-click="addNewsiblingbond()">
+                                                            <i class="fa fa-plus"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span class="" id="remove" ng-hide="bondList.length ==1">
+                                                        <a href="" ng-click="removeNewsiblingbond($index,bondDet)">
+                                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+
+                                                </td>
+                                                <td hidden="hidden">{{bondDet.amstB_Id}}</td>
+                                            </tr>-->
+                                        </tbody>
+                                        
+                                    </table>
+                                </div>
+                                <div style="width:1080px;overflow:scroll;">
+                                    <div class="box">
+                                        <h4 class="box-title">Previous School Details</h4>
+                                        <div style="width:100%;overflow:auto;">
+                                            <table class="table table-responsive table-bordered clearfix" style="width:2000px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <a href="" ng-click="order('sno')">SL. NO.</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="order('amstpS_PrvSchoolName')">School Name</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="order('amstpS_PreSchoolType')">School Type</a>
+                                                        </th>
+                                                        <th><a href="" ng-click="order('amstpS_PreviousClass')">Class</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_PreviousPer')">Percentage</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_PreviousGrade')">Grade</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_LeftYear')">Passed Year</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_PreviousMarks')">Total Marks</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_PreSchoolBoard')">Board</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_PreSchoolCountry')">Country</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_PreSchoolState')">State</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_Address')">Address</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_LeftReason')">Left Reason</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_MediumOfInst')">Medium</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_ConcOrScholarshipFlg')">Concession/Scholarship Type</a> </th>
+                                                        <th><a href="" ng-click="order('amstpS_ConcOrScholarshipDate')">Concession/Scholarship Date</a> </th>
+                                                        <th width="">Action</th>
+                                                        <th hidden="hidden"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr ng-repeat="prevSchool in prevSchoolDetails | orderBy:predicate:default | filter:paginate| filter:search" ng-class-odd="'odd'">
+                                                        <td class="text-center">{{ $index + 1 }}</td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_PrvSchoolName}}" data-ng-model="prevSchool.amstpS_PrvSchoolName" value="{{ prevSchool.amstpS_PrvSchoolName}}" type="text" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()" ng-blur="prevSchoolNameEntered($index)">
+
+                                                            <span class="error-messages">{{errorMessage2}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <!--<input class="form-control" id="id{{prevSchool.amstpS_PreSchoolType}}" name="prevtype{{$index}}" data-ng-model="prevSchool.amstpS_PreSchoolType" value="{{ prevSchool.amstpS_PreSchoolType}}" type="text" allow-pattern="(\s|[a-zA-Z]|,|-)" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null" >-->
+
+                                                            <select class="form-control" id="id{{prevSchool.amstpS_PreSchoolType}}" name="prevtype{{$index}}" data-ng-model="prevSchool.amstpS_PreSchoolType" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                                <option value="">--Select--</option>
+                                                                <option ng-repeat="Schooltype in Schooltypelist" value="{{Schooltype.ivrmmtyP_Type}}" ng-selected="Schooltype.ivrmmtyP_Type==prevSchool.amstpS_PreSchoolType">{{Schooltype.ivrmmtyP_Type}}
+                                                            </select>
+
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevtype'+$index])" ng-messages="myForm4['prevtype'+$index].$error">
+                                                                <div ng-message="required">Select School Type </div>
+
+
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <!--<input class="form-control" id="id{{prevSchool.amstpS_PreviousClass}}" name="prevclass{{$index}}" data-ng-model="prevSchool.amstpS_PreviousClass" value="{{ prevSchool.amstpS_PreviousClass}}" type="text" allow-pattern="(\s|[a-zA-Z]|-|,)" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null" >-->
+
+                                                            <select class="form-control" id="id{{prevSchool.amstpS_PreviousClass}}" name="prevclass{{$index}}" data-ng-model="prevSchool.amstpS_PreviousClass" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                                on
+                                                                <option value="">--Select--io</option>
+                                                                in
+                                                                <option ng-repeat="cls in prevSchlCls" value="{{cls.asmcL_ClassName}}" ng-selected="cls.asmcL_ClassName==prevSchool.amstpS_PreviousClass">{{cls.asmcL_ClassName}}
+                                                            </select>
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevclass'+$index])" ng-messages="myForm4['prevclass'+$index].$error">
+                                                                <div ng-message="required">Select Class </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_PreviousPer}}" name="prevper{{$index}}" data-ng-model="prevSchool.amstpS_PreviousPer" value="{{ prevSchool.amstpS_PreviousPer}}" type="text" allow-pattern="([0-9]|%)" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevper'+$index])" ng-messages="myForm4['prevper'+$index].$error">
+                                                                <div ng-message="required">Enter Percentage</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_PreviousGrade}}" name="prevgrade{{$index}}" data-ng-model="prevSchool.amstpS_PreviousGrade" value="{{ prevSchool.amstpS_PreviousGrade}}" type="text" allow-pattern="(\s|[a-zA-Z0-9])" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevgrade'+$index])" ng-messages="myForm4['prevgrade'+$index].$error">
+                                                                <div ng-message="required">Enter Grade </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <!--<input class="form-control" id="id{{prevSchool.amstpS_LeftYear}}" name="prevleftyr{{$index}}" data-ng-model="prevSchool.amstpS_LeftYear" value="{{ prevSchool.amstpS_LeftYear}}" type="text" maxlength="4" allow-pattern="\d" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null" >-->
+                                                            <select class="form-control" id="id{{prevSchool.amstpS_LeftYear}}" name="prevleftyr{{$index}}" data-ng-model="prevSchool.amstpS_LeftYear" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                                -<
+                                                                <option value="">--Select--<</option>
+                                                                <option ng-repeat="yr in prevYr" value="{{yr.asmaY_Year}}">{{yr.asmaY_Year}}</option>
+                                                            </select>
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevleftyr'+$index])" ng-messages="myForm4['prevleftyr'+$index].$error">
+                                                                <div ng-message="required">Select Passed Year </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_PreviousMarks}}" name="prevmarks{{$index}}" data-ng-model="prevSchool.amstpS_PreviousMarks" value="{{ prevSchool.AMSTPS_PreviousMarks}}" type="text" allow-pattern="\d" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevmarks'+$index])" ng-messages="myForm4['prevmarks'+$index].$error">
+                                                                <div ng-message="required">Enter Total Marks </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control" id="{{prevSchool.amstpS_PreSchoolBoard}}" name="prevboard{{$index}}" data-ng-model="prevSchool.amstpS_PreSchoolBoard" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                                <option value="">--Select--</option>
+                                                                <option ng-repeat="board in boardList" value="{{board.ivrmmB_Name}}" ng-selected="board.ivrmmB_Name==prevSchool.amstpS_PreSchoolBoard">
+                                                                    {{board.ivrmmB_Name}}
+                                                            </select>
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevboard'+$index])" ng-messages="myForm4['prevboard'+$index].$error">
+                                                                <div ng-message="required">
+                                                                    Select Board
+                                                                </div>
+                                                            </div>
+                                                            <!--</td>-->
+                                                            <!--<td><input class="form-control" id="id{{prevSchool.amstpS_PreSchoolBoard}}" data-ng-model="prevSchool.amstpS_PreSchoolBoard" value="{{ prevSchool.amstpS_PreSchoolBoard}}" type="text" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()"></td>-->
+
+
+                                                        <td>
+                                                            <!--<input class="form-control" id="id{{prevSchool.amstpS_PreSchoolCountry}}" name="prevcountry{{$index}}" data-ng-model="prevSchool.amstpS_PreSchoolCountry" value="{{ prevSchool.amstpS_PreSchoolCountry}}" type="text" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null" >-->
+
+                                                            <select class="form-control" id="id{{prevSchool.amstpS_PreSchoolCountry}}" name="prevcountry{{$index}}" data-ng-model="prevSchool.amstpS_PreSchoolCountry" ng-change="onselectprevCountry(prevSchool.amstpS_PreSchoolCountry)" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                                <option value="">--Select--</option>
+                                                                <option ng-repeat="con in prevCountry" value="{{con.ivrmmC_CountryName}}" ng-selected="con.ivrmmC_CountryName==prevSchool.amstpS_PreSchoolCountry">
+                                                                    {{con.ivrmmC_CountryName}}
+                                                            </select>
+
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevcountry'+$index])" ng-messages="myForm4['prevcountry'+$index].$error">
+                                                                <div ng-message="required">
+                                                                    Select
+                                                                    <div ng-message="required">Select Country </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+
+                                                            <!--<input class="form-control" id="id{{prevSchool.amstpS_PreSchoolState}}" name="prevstate{{$index}}" data-ng-model="prevSchool.amstpS_PreSchoolState" value="{{ prevSchool.amstpS_PreSchoolState}}" type="text" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null" >-->
+                                                            <select class="form-control" id="id{{prevSchool.amstpS_PreSchoolState}}" name="prevstate{{$index}}" data-ng-model="prevSchool.amstpS_PreSchoolState" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                                <option value="">--Select--</option>
+                                                                <option ng-repeat="ste in prevState" value="{{ste.ivrmmS_Name}}" ng-selected="ste.ivrmmS_Name==prevSchool.amstpS_PreSchoolState">
+                                                                    {{ste.ivrmmS_Name}}
+                                                            </select>
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevstate'+$index])" ng-messages="myForm4['prevstate'+$index].$error">
+                                                                <div ng-message="required">Select State</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_Address}}" name="prevadd{{$index}}" data-ng-model="prevSchool.amstpS_Address" value="{{ prevSchool.amstpS_Address}}" type="text" allow-pattern="(\s|[a-zA-Z0-9.]|,|-|#)" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevadd'+$index])" ng-messages="myForm4['prevadd'+$index].$error">
+                                                                <div ng-message="required">Enter Address </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_LeftReason}}" name="prevleft{{$index}}" data-ng-model="prevSchool.amstpS_LeftReason" value="{{ prevSchool.amstpS_LeftReason}}" type="text" allow-pattern="(\s|[a-zA-Z]|,|-)" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevleft'+$index])" ng-messages="myForm4['prevleft'+$index].$error">
+                                                                <div ng-message="required">Enter Left Reason </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_MediumOfInst}}" name="prevmedium{{$index}}" data-ng-model="prevSchool.amstpS_MediumOfInst" value="{{ prevSchool.amstpS_MediumOfInst}}" type="text" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()" ng-disabled="prevSchool.amstpS_PrvSchoolName=='' ||prevSchool.amstpS_PrvSchoolName==null">
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevmedium'+$index])" ng-messages="myForm4['prevmedium'+$index].$error">
+                                                                <div ng-message="required">Enter Medium</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control" id="id{{prevSchool.amstpS_ConcOrScholarshipFlg}}" name="prevconflag{{$index}}"
+                                                                   data-ng-model="prevSchool.amstpS_ConcOrScholarshipFlg"
+                                                                   value="{{ prevSchool.amstpS_ConcOrScholarshipFlg}}"
+                                                                   type="text" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()"
+                                                                   ng-disabled="prevSchool.amstpS_PrvSchoolName=='' || prevSchool.amstpS_PrvSchoolName==null">
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevconflag'+$index])"
+                                                                 ng-messages="myForm4['prevconflag'+$index].$error">
+                                                                <div ng-message="required">Enter Concession / Scholarship Type</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <md-datepicker name="prevcondate{{$index}}" data-ng-model="prevSchool.amstpS_ConcOrScholarshipDate" 
+                                                                           onkeydown="return false" id="id{{prevSchool.amstpS_ConcOrScholarshipDate}}"  
+                                                                           ng-disabled="prevSchool.amstpS_PrvSchoolName=='' || prevSchool.amstpS_PrvSchoolName==null">
+                                                            </md-datepicker>
+                                                            <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['prevcondate'+$index])"
+                                                                 ng-messages="myForm4['prevcondate'+$index].$error">
+                                                                <div ng-message="required">Enter Concession / Scholarship Date</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="" ng-hide="prevSchoolDetails.length > 4">
+                                                                <a href="" ng-show="$last" ng-click="addNewsiblingprevsch()">
+                                                                    <i class="fa fa-plus"></i>
+                                                                </a>
+                                                            </span>
+                                                            <span class="" id="remove" ng-hide="prevSchoolDetails.length ==1">
+                                                                <a href="" ng-click="removeNewsiblingprevsch($index,prevSchool)">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </a>
+                                                            </span>
+                                                        </td>
+                                                        <td hidden="hidden">{{bondDet.amstB_Id}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="width:1080px;overflow:scroll;">
+                                    <div class="box">
+                                        <h5 class="box-title">GUARDIAN DETAILS</h5>
+                                        <table class="table table-responsive table-bordered clearfix" style="width:2000px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>SL.NO.</th>
+                                                    <th><a href="" ng-click="order('amstG_GuardianName')">Guardian Name</a></th>
+                                                    <th><a href="" ng-click="order('amstG_GuardianAddress')">Guardian Address</a></th>
+                                                    <th><a href="" ng-click="order('amstG_emailid')">Guardian Email</a> </th>
+                                                    <th><a href="" ng-click="order('amstG_GuardianPhoneNo')">Guardian Phone</a> </th>
+                                                    <th>Guardian Photo</th>
+                                                    <th>Guardian Sign</th>
+                                                    <th>Guardian Finger Print</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="studentGuardianDet in studentGuardianDetails| orderBy:predicate:default | filter:paginate| filter:search" ng-class-odd="'odd'">
+                                                    <td class="text-center">{{ $index + 1 }}</td>
+                                                    <td>
+                                                        <input class="form-control" id="id{{studentGuardianDet.amstG_GuardianName}}" data-ng-model="studentGuardianDet.amstG_GuardianName" type="text" allow-pattern="(\s|[a-zA-Z])" ng-paste="$event.preventDefault()" ng-blur="guardianNameEntered(studentGuardianDetails,$index)">
+                                                        <span class="error-messages"> {{errorMessage}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control" id="id{{studentGuardianDet.amstG_GuardianAddress}}" name="gurdadd{{$index}}" data-ng-model="studentGuardianDet.amstG_GuardianAddress" type="text" allow-pattern="(\s|[a-zA-Z0-9.]|-|,|#)" ng-paste="$event.preventDefault()" ng-disabled="studentGuardianDet.amstG_GuardianName=='' || studentGuardianDet.amstG_GuardianName==null" ng-required="studentGuardianDet.amstG_GuardianName!='' && studentGuardianDet.amstG_GuardianName!=null">
+                                                        <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['gurdadd'+$index])" ng-messages="myForm4['gurdadd'+$index].$error">
+                                                            <div ng-message="required">Enter Guardian Address</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control" id="id{{studentGuardianDet.amstG_emailid}}" data-ng-model="studentGuardianDet.amstG_emailid" type="email" name="email_id{{$index}}" ng-pattern="/^[A-Za-z0-9]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-paste="$event.preventDefault()" ng-disabled="studentGuardianDet.amstG_GuardianName=='' || studentGuardianDet.amstG_GuardianName==null" ng-required="studentGuardianDet.amstG_GuardianName!='' && studentGuardianDet.amstG_GuardianName!=null">
+                                                        <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['email_id'+$index])" ng-messages="myForm4['email_id'+$index].$error">
+                                                            <div ng-message="pattern">Enter Valid Email-id</div>
+                                                            <div ng-message="required">Enter Email-id</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control" id="id{{studentGuardianDet.amstG_GuardianPhoneNo}}" data-ng-model="studentGuardianDet.amstG_GuardianPhoneNo" name="guamobile_number{{$index}}" type="text" maxlength="10" allow-pattern="\d" ng-minlength="10" ng-paste="$event.preventDefault()" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" ng-disabled="studentGuardianDet.amstG_GuardianName=='' || studentGuardianDet.amstG_GuardianName==null" ng-required="studentGuardianDet.amstG_GuardianName!='' && studentGuardianDet.amstG_GuardianName!=null">
+                                                        <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['guamobile_number'+$index])" ng-messages="myForm4['guamobile_number'+$index].$error">
+                                                            <div ng-message="pattern">Enter valid Mobile NO</div>
+                                                            <div ng-message="required">Enter Mobile NO</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control" id="id{{studentGuardianDet.amstG_GuardianPhoto}}" data-ng-model="studentGuardianDet.amstG_GuardianPhoto" accept="image/*" type="file" onchange="angular.element(this).scope().uploadGuardianPhoto(this, angular.element(this).scope().studentGuardianDet)" ng-show="studentGuardianDet.amstG_GuardianName!='' && studentGuardianDet.amstG_GuardianName!=null">
+                                                        <span ng-if="studentGuardianDet.amstG_GuardianPhoto !=null && studentGuardianDet.amstG_GuardianPhoto !=''">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showGuardianPhoto(studentGuardianDet)"> view</a>
+                                                        </span>
+                                                    </td>
+
+                                                    <td>
+                                                        <input class="form-control" id="id{{studentGuardianDet.amstG_GuardianSign}}" data-ng-model="studentGuardianDet.amstG_GuardianSign" accept="image/*" type="file" onchange="angular.element(this).scope().uploadGuardianSign(this, angular.element(this).scope().studentGuardianDet)" ng-show="studentGuardianDet.amstG_GuardianName!='' && studentGuardianDet.amstG_GuardianName!=null">
+                                                        <span ng-if="studentGuardianDet.amstG_GuardianSign !=null && studentGuardianDet.amstG_GuardianSign !='' ">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showGuardianSign(studentGuardianDet)"> view</a>
+                                                        </span>
+                                                    </td>
+
+                                                    <td>
+                                                        <input class="form-control" id="id{{studentGuardianDet.amstG_Fingerprint}}" data-ng-model="studentGuardianDet.amstG_Fingerprint" accept="image/*" type="file" onchange="angular.element(this).scope().uploadGuardianFingerprint(this, angular.element(this).scope().studentGuardianDet)" ng-show="studentGuardianDet.amstG_GuardianName!='' && studentGuardianDet.amstG_GuardianName!=null">
+                                                        <span ng-if="studentGuardianDet.amstG_Fingerprint != null && studentGuardianDet.amstG_Fingerprint != '' ">
+                                                            <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showGuardianFingerprint(studentGuardianDet)"> view</a>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="" ng-hide="studentGuardianDetails.length > 4">
+                                                            <a href="" ng-show="$last" ng-click="addNewsiblingguard()">
+                                                                <i class="fa fa-plus"></i>
+                                                            </a>
+                                                        </span>
+                                                        <span class="" id="remove" ng-hide="studentGuardianDetails.length ==1">
+                                                            <a href="" ng-click="removeNewsiblingguard($index)">
+                                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="box">
+                                    <h4 class="box-title">Siblings Details</h4>
+                                    <table class="table table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    SL. NO.
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="order('amstS_SiblingsName')">Name</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="order('asmcL_ClassName')">Class</a>
+                                                </th>
+                                                <th><a href="" ng-click="order('amstS_SiblingsRelation')">Relation</a> </th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="sibling in studentSiblingDetails">
+                                                <td class="text-center">{{ $index + 1 }}</td>
+                                                <td>
+                                                    <input class="form-control" id="usr" name="hsname" type="text" data-ng-model="sibling.amstS_SiblingsName" ng-paste="$event.preventDefault()" maxlength="40"
+                                                           allow-pattern="(\s|[a-zA-Z])" ng-blur="siblingNameEntered($index)" />
+                                                    <span class="error-messages">{{errorMessage1}}</span>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" id="sel1" name="stuclass{{$index}}" data-ng-model="sibling.amcL_Id" ng-disabled="sibling.amstS_SiblingsName=='' || sibling.amstS_SiblingsName==null" ng-required="sibling.amstS_SiblingsName!='' && sibling.amstS_SiblingsName!=null">
+                                                        <option value="">--Select--</option>
+                                                        <option ng-repeat="sibclass in siblingClass" value="{{sibclass.asmcL_Id}}" ng-selected="{{sibclass.asmcL_Id == sibling.amcL_Id}}">
+                                                            {{sibclass.asmcL_ClassName}}
+                                                        </option>
+                                                    </select>
+                                                    <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['stuclass'+$index])" ng-messages="myForm4['stuclass'+$index].$error">
+                                                        <div ng-message="required">Select Class </div>
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <input class="form-control" id="usr" name="rel{{$index}}" type="text" maxlength="20" allow-pattern="(\s|[a-zA-Z]|,|-)" data-ng-model="sibling.amstS_SiblingsRelation" ng-paste="$event.preventDefault()" ng-disabled="sibling.amstS_SiblingsName=='' || sibling.amstS_SiblingsName==null" ng-required="sibling.amstS_SiblingsName!='' && sibling.amstS_SiblingsName!=null">
+                                                    <div class="error-messages col-sm-offset-5" ng-if="interacted4(myForm4['rel'+$index])" ng-messages="myForm4['rel'+$index].$error">
+                                                        <div ng-message="required">Enter Relation </div>
+                                                    </div>
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <span class="" ng-hide="studentSiblingDetails.length > 4">
+                                                        <a href="" ng-show="$last" ng-click="addNewsibling()">
+                                                            <i class="fa fa-plus"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span class="" id="remove" ng-hide="studentSiblingDetails.length ==1">
+                                                        <a href="" ng-click="removeNewsibling($index)">
+                                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">No Of Brothers :</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="noofbro" ng-model="obj.amsT_Noofbrothers" id="usr" type="text"
+                                                           allow-pattern="[0-9]" maxlength="2">
+                                                    <div class="error-messages" ng-if="interacted4(myForm4.noofbro)" ng-messages="myForm4.noofbro.$error">
+                                                        <div ng-message="required">Enter No Of Brothers</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">No Of Sisters :</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="noofsis" ng-model="obj.amsT_Noofsisters" id="usr" type="text"
+                                                           allow-pattern="[0-9]" maxlength="2">
+                                                    <div class="error-messages" ng-if="interacted4(myForm4.noofsis)" ng-messages="myForm4.noofsis.$error">
+                                                        <div ng-message="required">Enter No Of Sisters</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">No Of Elder Sisters :</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="noofeldsis" ng-model="obj.amsT_NoOfElderSisters" id="usr" type="text"
+                                                           allow-pattern="[0-9]" maxlength="2">
+                                                    <div class="error-messages" ng-if="interacted4(myForm4.noofeldsis)" ng-messages="myForm4.noofeldsis.$error">
+                                                        <div ng-message="required">Enter No Of Elder Sisters</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">No Of Younger Sisters :</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="noofyngsis" ng-model="obj.amsT_NoOfYoungerSisters" id="usr" type="text"
+                                                           allow-pattern="[0-9]" maxlength="2">
+                                                    <div class="error-messages" ng-if="interacted4(myForm4.noofyngbro)" ng-messages="myForm4.noofyngbro.$error">
+                                                        <div ng-message="required">Enter No Of Younger Sisters</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">No Of Elder Brothers :</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="noofeldbro" ng-model="obj.amsT_NoOfElderBrothers" id="usr" type="text"
+                                                           allow-pattern="[0-9]" maxlength="2">
+                                                    <div class="error-messages" ng-if="interacted4(myForm4.noofeldbro)" ng-messages="myForm4.noofeldbro.$error">
+                                                        <div ng-message="required">Enter No Of Elder Brothers</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">No Of Younger Brothers :</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-control" name="noofyngbro" ng-model="obj.amsT_NoOfYoungerBrothers" id="usr" type="text"
+                                                           allow-pattern="[0-9]" maxlength="2">
+                                                    <div class="error-messages" ng-if="interacted4(myForm4.noofyngbro)" ng-messages="myForm4.noofyngbro.$error">
+                                                        <div ng-message="required">Enter No Of Younger Brothers</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr />
+                                <div class="text-center">
+                                    <md-button type="button" class="md-raised md-primary" ng-click="validateOtherPrevious(obj)">
+                                        <i class="fa fa-chevron-circle-left ng-scope" aria-hidden="true"></i> Previous
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-primary" ng-click="savefourthtab()">
+                                        Save And Proceed <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                    </md-button>
+                                    <!--<md-button type="button" class="md-raised md-primary" ng-click="validateOtherdetails(obj)">
+                                        Next <i class="fa fa-chevron-circle-right ng-scope" aria-hidden="true"></i>
+                                    </md-button>-->
+                                    <md-button type="button" class="md-raised md-warn" ng-click="clear_fourth_tab(allActivity);">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                                    </md-button>
+                                </div>
+                            </md-content>
+                        </form>
+                    </md-tab>
+                    <md-tab label="Document Upload" ng-disabled="DocumentUpload">
+                        <!---->
+                        <form class="form-horizontal" role="form" name="myForm5" enctype="multipart/form-data" novalidate>
+                            <md-content class="md-padding">
+                                <md-subheader>Document Upload Details [Only JPEG Files (0-2MB)]</md-subheader>
+                                <table class="table table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                SL. NO.
+                                            </th>
+                                            <th class="text-center">
+                                                Document Name
+                                            </th>
+                                            <th class="text-center" colspan="2">Action </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="document in documentList track by $index" ng-form="dataForm">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{document.amsmD_DocumentName}}<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="document.amsmD_FLAG===true">*</strong></td>
+
+                                            <td class="documents">
+                                                <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                                    <input id="{{document.amsmD_Id}}" type="file" name="doc" accept="image/*" data-ng-model="documentList[$index].document_Path" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().document)" ng-required="document.amsmD_FLAG===true">
+                                                </label>
+                                                <div class="error-messages" ng-if="interacted(dataForm.doc)" ng-messages="dataForm.doc.$error">
+                                                    <div ng-message="required">Please upload this file</div>
+                                                </div>
+                                            </td>
+
+                                            <td ng-if="document.document_Path !=null && document.document_Path !='' ">
+                                                <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetails(document)"> view</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <br />
+                                <div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <md-subheader>Required Details</md-subheader>
+                                        <div class="checkbox-inline">
+                                            <label><input type="checkbox" data-ng-model="obj.amsT_HostelReqdFlag" value="1"><span class="lbl padding-8">Hostel Required</span></label>
+                                        </div>
+                                        <div class="checkbox-inline">
+                                            <label><input type="checkbox" data-ng-model="obj.amsT_TransportReqdFlag" value="1"><span class="lbl padding-8">Transport Required</span></label>
+                                        </div>
+                                        <div class="checkbox-inline">
+                                            <label><input type="checkbox" data-ng-model="obj.amsT_GymReqdFlag" value="1"><span class="lbl padding-8">Gym Required</span></label>
+                                        </div>
+                                        <!--<div class="checkbox-inline">
+                                            <label><input type="checkbox" data-ng-model="obj.amsT_ECSFlag" value="1"><span class="lbl padding-8">ECS</span></label>
+                                        </div>-->
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <md-subheader>Photo Upload[Only JPEG Files (0-2MB)]</md-subheader>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-6">Father's Photo:</label>
+                                            <div class="col-sm-6 father-photo">
+                                                <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                                    <input type="file" name="phfile1" ng-model="fatherphoto" accept="image/*" onchange="angular.element(this).scope().uploadFatherPhoto(this)">
+                                                </label>
+                                                <span ng-if="fatherphoto !=null && fatherphoto !=''">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showfatherPhoto(fatherphoto)"> view</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-6">Father's Signature</label>
+                                            <div class="col-sm-6 fathersign-photo">
+                                                <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                                    <input type="file" name="phfile2" ng-model="fatherSign" onchange="angular.element(this).scope().uploadFatherSignature(this)">
+                                                </label>
+                                                <span ng-if="fatherSign !=null && fatherSign !='' ">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showfathersign(fatherSign)"> view</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-6">Father's Fingerprint:</label>
+                                            <div class="col-sm-6 fatherfringer-photo">
+                                                <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                                    <input type="file" name="phfile3" ng-model="fatherFingerprint" onchange="angular.element(this).scope().uploadFatherFingerprints(this)">
+                                                </label>
+                                                <span ng-if="fatherFingerprint !=null && fatherFingerprint !='' ">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showfatherfingerprint(fatherFingerprint)"> view</a>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <md-subheader>Photo Upload[Only JPEG Files (0-2MB)]</md-subheader>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-6">Mother's Photo</label>
+                                            <div class="col-sm-6 mother-photo">
+                                                <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                                    <input type="file" name="motherphoto" ng-model="motherphoto" onchange="angular.element(this).scope().uploadMotherphoto(this)">
+                                                </label>
+                                                <span ng-if="motherphoto !=null &&  motherphoto!=''">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmotherprofilepic(motherphoto)"> view</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-6">Mother's Signature:</label>
+                                            <div class="col-sm-6 mothersign-photo">
+                                                <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                                    <input type="file" name="mothersign" ng-model="mothersign" onchange="angular.element(this).scope().uploadMotherSign(this)">
+                                                </label>
+                                                <span ng-if="mothersign !=null && mothersign !=''">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmothersign(mothersign)"> view</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-6">Mother's Fingerprint:</label>
+                                            <div class="col-sm-6 motherfinger-photo">
+                                                <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                                    <input type="file" name="motherfingerprint" ng-model="motherfingerprint" onchange="angular.element(this).scope().uploadMotherFingerprints(this)">
+                                                </label>
+                                                <span ng-if="motherfingerprint !=null  && motherfingerprint !='' ">
+                                                    <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmotherfingerprint(motherfingerprint)"> view</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </md-content>
+                        </form>
+                        <hr />
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-click="previous_document(obj)">
+                                <i class="fa fa-chevron-circle-left ng-scope" aria-hidden="true"></i>
+                                Previous
+                            </md-button>
+                            <!--<md-button type="submit" ng-click="savedata()" class="md-raised md-primary" ng-disabled="disableSaveButton==true">
+                                <i class="fa fa-check-square-o" aria-hidden="true"></i> Submit
+                            </md-button>-->
+                            <md-button type="submit" ng-click="savefinaltab()" class="md-raised md-primary" ng-disabled="disableSaveButton==true">
+                                <i class="fa fa-check-square-o" aria-hidden="true"></i> Submit
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="clear_fifth_tab()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Clear
+                            </md-button>
+
+                        </div>
+                    </md-tab>
+
+
+                </md-tabs>
+            </md-content>
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-warn" data-ng-click="clearAll()">
+                    <i class="fa fa-times" aria-hidden="true"></i> ClearAll
+                </md-button>
+            </div>
+        </div>
+
+    </div>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT'S DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row clearfix">
+                <div class="col-sm-3 padding-right-none">
+                    <div class="form-group">
+                        <label class="control-label col-sm-6">Academic Year:</label>
+                        <div class="col-sm-6  padding-left-right-none">
+                            <select class="form-control" id="sel1223" name="stuayearsearch" data-ng-model="obj.asmaY_Idsearch">
+                                <option value="">All</option>
+                                <option ng-repeat="acedmicYearsearch in allAcademicYearsearch" value="{{acedmicYearsearch.asmaY_Id}}">
+                                    {{acedmicYearsearch.asmaY_Year}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group" ng-if="search!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group searchbox">
+                        <div class="input-group">
+                            <!--<span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>-->
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <button class="btn" type="submit" ng-click="searchByColumn(search,searchColumn, obj.asmaY_Idsearch)"><i class="fa fa-search"></i></button>
+                            </span>
+                            <select class="form-control" id="sel1" ng-model="searchColumn" ng-change="getcolumnId(searchColumn)">
+                                <option value="" ng-selected="true">Student Name</option>
+                                <option value="1">First Name</option>
+                                <option value="2">Middle Name</option>
+                                <option value="3">Last Name</option>
+                                <option value="4">Admission Date</option>
+                                <option value="5">Gender</option>
+                                <option value="6">Reg.No</option>
+                                <option value="7">Adm.No</option>
+                                <option value="8">EmailId</option>
+                                <option value="9">Mobile No.</option>
+                                <option value="10">Class Name</option>
+                                <option value="11">Status</option>
+                                <option value="12">Father Name</option>
+                                <option value="13">Mother Name</option>
+                                <!--<option value="14">Academic Year</option>-->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="overflow:scroll;" class="clearfix" id="style-4">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+
+                        <tr>
+                            <th>
+                                SL. No
+
+                            </th>
+                            <th ng-click="sort('amsT_FirstName')">
+                                FIRST NAME
+
+                            </th>
+                            <th ng-click="sort('amsT_MiddleName')">
+                                MIDDLE NAME
+
+                            </th>
+                            <th ng-click="sort('amsT_LastName')">
+                                LAST NAME
+
+                            </th>
+                            <th ng-click="sort('class')">
+                                CLASS
+
+                            </th>
+                            <th ng-click="sort('amsT_Date')">
+                                ADMISSION DATE
+
+                            </th>
+                            <th ng-click="sort('amsT_Sex')">
+                                GENDER
+
+                            </th>
+                            <th ng-click="sort('amsT_RegistrationNo')">
+                                REGISTRATION NO
+
+                            </th>
+                            <th ng-click="sort('amsT_AdmNo')">
+                                ADMISSION NO
+
+                            </th>
+                            <th ng-click="sort('amsT_emailId')">
+                                EMAIL ID
+
+                            </th>
+                            <th ng-click="sort('amsT_MobileNo')">
+                                MOBILE NO
+
+                            </th>
+                            <th ng-click="sort('amsT_SOL')">
+                                STATUS
+                            </th>
+                            <th>Download</th>
+                            <th>Action</th>
+                            <th hidden="hidden"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="Student in filterValue1=(adm_m_student |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <!--<tr ng-repeat="Student in adm_m_student | orderBy:'amsT_Id' | filter:search" >-->
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{ Student.amsT_FirstName }}</td>
+                            <td>{{ Student.amsT_MiddleName }}</td>
+                            <td>{{ Student.amsT_LastName }}</td>
+                            <td>{{ Student.class }}</td>
+                            <td>{{ Student.amsT_Date | date:"dd-MM-yyyy"}}</td>
+                            <td>{{ Student.amsT_Sex }}</td>
+                            <td>{{ Student.amsT_RegistrationNo }}</td>
+                            <td>{{ Student.amsT_AdmNo }}</td>
+                            <td>{{ Student.amsT_emailId }}</td>
+                            <td>{{ Student.stdmobilenumber }}</td>
+                            <td>{{ Student.amsT_SOL }}</td>
+                            <td class="text-center">
+                                <span ng-if="Student.amsT_Photoname!=null">
+                                    <i class="fa fa-cloud-download" aria-hidden="true" ng-click="downloaddirectimage(Student.amsT_Photoname,Student.amsT_AdmNo,'Student Photo')" 
+                                     title="Student Photo"  style="margin-left: 15px;font-size:small;color:#007ad1;">&nbsp;Download
+                                    </i>
+                                </span>                             
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" ng-click="Editdata(Student,allRefrence,allSources,allActivity)" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square-o text-primary" aria-hidden="true"></i></a>
+                                <a href="javascript:void(0)" ng-click="Deletedata(Student)" data-toggle="tooltip" title="Delete"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a>
+                            </td>
+                            <td hidden="hidden">{{Student.amsT_Id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+    <!--//modal-->
+    <div class="img-zoom-in-out">
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                    <div class="modal-footer">
+                        <div class="text-center">
+                            <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                            <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+
+                        </div>
+
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--//modal-->
+    <!--//modal-->
+    <div id="myModalreadmit" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-ng-click="removeall()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">Re-Admint Details</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="sel124" name="stdyearre" data-ng-model="yearid1" ng-change="getstudentlistre()" required>
+                                    <option value="">--Select Year--</option>
+                                    <option ng-repeat="stdyearre in yearre" value="{{stdyearre.asmaY_Id}}" ng-selected="{{stdyearre.Selected == true}}">
+                                        {{stdyearre.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Student Name:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="sel123" name="stdnamere" data-ng-model="amsT_Id" required>
+                                    <option value="">--Select Student Name--</option>
+                                    <option ng-repeat="name in stdname" value="{{name.amsT_Id}}" ng-selected="{{name.Selected == true}}">
+                                        {{name.amsT_FirstName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.stuayear)" ng-messages="myForm1.stuayear.$error">
+                                    <div ng-message="required">Select Student Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="addtocart()">Populate Data To Admission Form</md-button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="myModalecs" role="dialog">
+        <!---->
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-ng-click="removeall1()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">ECS STudent Details</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" name="myFormecs" novalidate>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6">Acc.No:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <input class="form-control" name="acchno" ng-model="objecs.asecS_AccountNo" id="acchno" type="text" allow-pattern="(\s|[0-9])" placeholder="" maxlength="30" required>
+                                        <div class="error-messages" ng-if="interactedecs(myFormecs.acchno)" ng-messages="myFormecs.acchno.$error">
+                                            <div ng-message="required">Enter Account Number</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6">Account Holder Name:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <input class="form-control" name="acchname" ng-model="objecs.asecS_AccountHolderName" id="acchname" type="text" allow-pattern="(\s|[a-zA-Z])" placeholder="" maxlength="30" required>
+                                        <div class="error-messages" ng-if="interactedecs(myFormecs.acchname)" ng-messages="myFormecs.acchname.$error">
+                                            <div ng-message="required">Enter Account Holder Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6">Bank Name:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <input class="form-control" name="accbname" ng-model="objecs.asecS_BankName" id="accbname" type="text" allow-pattern="(\s|[a-zA-Z])" placeholder="" maxlength="30" required>
+                                        <div class="error-messages" ng-if="interactedecs(myFormecs.accbname)" ng-messages="myFormecs.accbname.$error">
+                                            <div ng-message="required">Enter Bank Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6">Account Type:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <input class="form-control" name="accttype" ng-model="objecs.asecS_AccountType" id="accttype" type="text" allow-pattern="(\s|[A-Za-z0-9])" placeholder="" maxlength="30" required>
+                                        <div class="error-messages" ng-if="interactedecs(myFormecs.accttype)" ng-messages="myFormecs.accttype.$error">
+                                            <div ng-message="required">Enter Account Type</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6">MICR:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <input class="form-control" name="acchmicr" ng-model="objecs.asecS_MICRNo" id="acchmicr" type="text" allow-pattern="(\s|[0-9])" placeholder="" maxlength="30" required>
+                                        <div class="error-messages" ng-if="interactedecs(myFormecs.acchmicr)" ng-messages="myFormecs.acchmicr.$error">
+                                            <div ng-message="required">Enter MICR</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6">Branch Name:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <input class="form-control" name="accbranchname" ng-model="objecs.asecS_Branch" id="accbranchname" type="text" allow-pattern="(\s|[a-zA-Z])" placeholder="" maxlength="30" required>
+                                        <div class="error-messages" ng-if="interactedecs(myFormecs.accbranchname)" ng-messages="myFormecs.accbranchname.$error">
+                                            <div ng-message="required">Enter Branch Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" value="{{objecs.asecS_Id}}">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="addtocartecs(objecs)">
+                        <i class="fa fa-cart-plus" aria-hidden="true"></i> Add & Close
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>

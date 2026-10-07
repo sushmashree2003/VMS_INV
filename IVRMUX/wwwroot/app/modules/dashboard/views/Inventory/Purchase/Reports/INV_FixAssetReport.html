@@ -1,0 +1,537 @@
+﻿<style>
+    .multiselect {
+        width: 22em;
+        height: 11em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: -11.3%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .mul {
+        width: 22.1em;
+        height: 14em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .inst {
+        margin-left: -71px;
+    }
+
+    .taglbl {
+        margin-left: -15px;
+    }
+
+    .taglbl1 {
+        margin-left: -99px;
+    }
+
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+
+    .titlecolor {
+        color: white !important;
+    }
+
+    .k-filter-row th, .k-title, .k-grid-header th.k-header {
+        font-weight: bold !important;
+    }
+
+    .k-grid-header .k-link, .k-grid-header .k-link:link, .k-pager-info, .k-scheduler-agendaview .k-scheduler-datecolumn, .k-scheduler-header {
+        color: black !important;
+    }
+
+    .k-pdf-export .k-grid-excel, .k-pdf-export .k-grid-pdf, .k-pdf-export .k-pager-wrap {
+        display: none;
+        width: 20%;
+        margin: auto;
+    }
+
+    .k-filter-row > th:first-child, .k-grid tbody td:first-child, .k-grid tfoot td:first-child, .k-grid-header th.k-header:first-child {
+        color: black;
+    }
+</style>
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fixed Asset Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row" ng-show="staffcheck=='Staff'">
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+
+                                    <label class="radio-inline">
+                                        <input type="radio" value="AssetId-Wise" name="AssetID" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">AssetId-Wise</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Supplier" name="Supplier" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Supplier</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Group" name="Group" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Group</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9" ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" name="sdate" onkeypress="return false"  md-placeholder="Start Date" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" name="ddate" onkeypress="return false"  md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <!-- ===========================AssetID========================== -->
+                            <div class="form-group" ng-if="optionflag=='AssetId-Wise'">
+
+
+                                <label class="control-label col-sm-4">Select AssetID:<span style="color:Red">*</span></label>
+                                <div class="col-sm-4 ">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_Fixedassetdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Asset ID. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="Assetall" type="checkbox" ng-click="all_checkA(Assetall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVAAT_Id" ng-repeat="Asset in get_Fixedassetdetails | filter : searchValue">
+                                            <input name="AssetId" ng-model="Asset.Assetck" type="checkbox" ng-click="togchkbxA();" ng-required="isOptionsRequiredA()">
+                                            <span class="lbl padding-8">
+                                                {{Asset.INVAAT_AssetId}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.AssetId)" ng-messages="myForm.AssetId.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ======================= Supplier ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Supplier'">
+                                <label class="control-label col-sm-4">Select or Search Supplier No:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_Fixedassetdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Supplier No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="spall" type="checkbox" ng-click="all_checkSP(spall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMS_Id" ng-repeat="sp in get_Fixedassetdetails | filter : searchValue">
+                                            <input name="splr" ng-model="sp.spck" type="checkbox" ng-click="togchkbxSP();" ng-required="isOptionsRequiredSP()">
+                                            <span class="lbl padding-8">
+                                                {{sp.INVMS_SupplierName}}/{{sp.MI_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.splr)" ng-messages="myForm.splr.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row" ng-hide="staffcheck=='Staff'">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4">
+                                <div class="col-sm-9 col-lg-offset-2">
+                                    <label for="sel2" class="control-label col-sm-8 inst">Institutions: <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8 mul">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search Item here...">
+                                            <label>
+                                                <input name="alitem" value="1" ng-model="allmi" type="checkbox" ng-click="all_miid(allmi)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-model="MI_Id" ng-repeat="mi in get_mi_list | filter : searchValue">
+                                                <input name="mi" ng-model="mi.miid" type="checkbox" ng-click="mi_click();" ng-required="isRequiredmi()">
+                                                <span class="lbl padding-8">
+                                                    {{mi.MI_Name}}
+                                                </span>
+                                            </label>
+
+                                        </div>
+                                        <div class="error-messages" ng-if="interacted(myForm.mi)" ng-messages="myForm.mi.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="col-sm-10 col-lg-offset-2">
+                                    <div class="well">
+                                        <div class="text-center" ng-init="optionflag='All'">
+                                            <label class="radio-inline">
+                                                <input type="radio" value="All" name="All1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8"> All </span>
+                                            </label>
+
+                                            <label class="radio-inline">
+                                                <input type="radio" value="AssetId-Wise" name="AssetID1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">AssetId-Wise</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="Supplier" name="Supplier1" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">Supplier</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="Group" name="Groupee" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                                <span class="lbl padding-8">Group</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                           
+                                </div>
+                            <div class="col-sm-6 col-lg-offset-2">
+
+
+
+                                <!-- ===========================AssetID========================== -->
+                                <div class="form-group" ng-if="optionflag=='AssetId-Wise'">
+
+
+                                    <label class="control-label col-sm-4">Select AssetID:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-4 taglbl2">
+                                        <div class="multiselect col-sm-8 taglbl3">
+                                            <span ng-show="get_Fixedassetdetails.length>0">
+                                                <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Asset ID. here...">
+                                            </span>
+                                            <label>
+                                                <input name="classes" value="1" ng-model="Assetall" type="checkbox" ng-click="all_checkA(Assetall)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+
+                                            <label ng-model="INVAAT_Id" ng-repeat="Asset in get_Fixedassetdetails | filter : searchValue">
+                                                <input name="AssetId" ng-model="Asset.Assetck" type="checkbox" ng-click="togchkbxA();" ng-required="isOptionsRequiredA()">
+                                                <span class="lbl padding-8">
+                                                    {{Asset.INVAAT_AssetId}}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.AssetId)" ng-messages="myForm.AssetId.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- ======================= Supplier ============================ -->
+                                <div class="form-group" ng-if="optionflag=='Supplier'">
+                                    <label class="control-label col-sm-4">Select Supplier:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8">
+                                            <span ng-show="get_Fixedassetdetails.length>0">
+                                                <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Supplier No. here...">
+                                            </span>
+                                            <label>
+                                                <input name="classes" value="1" ng-model="spall" type="checkbox" ng-click="all_checkSP(spall)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+
+                                            <label ng-model="INVMS_Id" ng-repeat="sp in get_Fixedassetdetails | filter : searchValue">
+                                                <input name="splr" ng-model="sp.spck" type="checkbox" ng-click="togchkbxSP();" ng-required="isOptionsRequiredSP()">
+                                                <span class="lbl padding-8">
+                                                    {{sp.INVMS_SupplierName}}/{{sp.MI_Name}}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.splr)" ng-messages="myForm.splr.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="optionflag=='Group'">
+                                    <label class="control-label col-sm-4">Select Group:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8">
+                                            <span ng-show="get_Fixedassetdetails.length>0">
+                                                <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Supplier No. here...">
+                                            </span>
+                                            <label>
+                                                <input name="classes" value="1" ng-model="spall" type="checkbox" ng-click="all_checkSP(spall)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+
+                                            <label ng-model="INVMG_Id" ng-repeat="sp in get_Fixedassetdetails | filter : searchValue">
+                                                <input name="splr" ng-model="sp.spck" type="checkbox" ng-click="togchkbxSP();" ng-required="isOptionsRequiredSP()">
+                                                <span class="lbl padding-8">
+                                                    {{sp.INVMG_GroupName}}/{{sp.MI_Name}}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.splr)" ng-messages="myForm.splr.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            </div>
+
+                      
+                        <div class="col-sm-12">
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <div class="col-sm-3">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                            <span class="lbl padding-4">Between Dates </span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-9 bwdate" ng-show="bw_dates">
+                                        <div class="col-sm-5">
+                                            <md-datepicker ng-model="startdate" name="sdate" onkeypress="return false"  md-placeholder="Start Date" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                                <div ng-message="required">Select Start Date</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <md-datepicker ng-model="enddate" name="ddate" onkeypress="return false"  md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                                <div ng-message="required">Select End Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="get_fixedassetreport">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fixed Asset Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div id="grid123">
+
+                </div>
+
+
+            </div>
+            <!-- /.box-header -->
+            <!--<div class="box-body">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <table class="table table-hover table-responsive table-bordered text-center">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                    </th>
+                    <th><a href="" ng-click="sortBy('INV_AssetHead')">Asset Head</a></th>
+                    <th><a href="" ng-click="sortBy('INV_AssetDesc')">Asset description</a> </th>
+                    <th><a href="" ng-click="sortBy('INV_SupplierINVDate')">Supplier Invoice Date </a> </th>
+                    <th><a href="" ng-click="sortBy('INV_SupplierINVNo')">Supplier Invoice No </a> </th>
+                    <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier name </a> </th>
+                    <th><a href="" ng-click="sortBy('INVMGRN_GRNNo')">GRN No</a></th>
+                    <th><a href="" ng-click="sortBy('INVMGRN_PurchaseDate')">GRN Date</a></th>
+                    <th><a href="" ng-click="sortBy('INV_HSNNo')">HSN Code</a> </th>
+                    <th><a href="" ng-click="sortBy('INV_AssetId')">Asset Id</a> </th>
+                    <th><a href="" ng-click="sortBy('INV_LCTAsset')">Location of asset</a> </th>
+                    <th><a href="" ng-click="sortBy('INVTGRN_SalesPrice')">Basic price</a> </th>
+                    <th><a href="" ng-click="sortBy('INV_GST')">GST Price</a> </th>
+                     <th><a href="" ng-click="sortBy('INV_otherChrgs')">Other Charges</a> </th>
+                    <th><a href="" ng-click="sortBy('INVTGRN_Amount')">Total value</a> </th>
+
+
+
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr dir-paginate="user in filterValue1 = (get_fixedassetreport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                    <td>{{user.INV_AssetHead }}</td>
+                    <td>{{user.INV_AssetDesc}}</td>
+                    <td>{{user.INV_SupplierINVDate}}</td>
+                    <td>{{user.INV_SupplierINVNo}}</td>
+                    <td>{{user.INVMS_SupplierName}}</td>
+                    <td>{{user.INVMGRN_GRNNo}}</td>
+                    <td>{{user.INVMGRN_PurchaseDate}}</td>
+                    <td>{{user.INV_HSNNo}}</td>
+                    <td>{{user.INV_AssetId}}</td>
+                    <td>{{user.INV_LCTAsset}}</td>
+                    <td>{{user.INVTGRN_SalesPrice | number :2}}</td>
+                    <td>{{user.INV_GST | number :2}}</td>
+                    <td>{{user.INV_otherChrgs | number :2}}</td>
+                    <td>{{user.INVTGRN_Amount | number :2}}</td>
+
+
+
+
+                </tr>
+
+
+
+
+            </tbody>
+        </table>
+
+        <dir-pagination-controls max-size="10"
+                                 direction-links="true"
+                                 boundary-links="true">
+        </dir-pagination-controls>
+
+    </div>-->
+        </div>
+        <!--<div ng-hide="true">
+            <div id="printpo">
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                </div>
+                <h4 class="text-center">Fixed Asset Report</h4>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('INV_AssetHead')">Asset Head</a></th>
+                            <th><a href="" ng-click="sortBy('INV_AssetDesc')">Asset description</a> </th>
+                            <th><a href="" ng-click="sortBy('INV_SupplierINVDate')">Supplier Invoice Date </a> </th>
+                            <th><a href="" ng-click="sortBy('INV_SupplierINVNo')">Supplier Invoice No </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier name </a> </th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_GRNNo')">GRN No</a></th>
+                            <th><a href="" ng-click="sortBy('INVMGRN_PurchaseDate')">GRN Date</a></th>
+                            <th><a href="" ng-click="sortBy('INV_HSNNo')">HSN Code</a> </th>
+                            <th><a href="" ng-click="sortBy('INV_AssetId')">Asset Id</a> </th>
+                            <th><a href="" ng-click="sortBy('INV_LCTAsset')">Location of asset</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_SalesPrice')">Basic price</a> </th>
+                            <th><a href="" ng-click="sortBy('INV_GST')">GST Price</a> </th>
+                            <th><a href="" ng-click="sortBy('INV_otherChrgs')">Other Charges</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTGRN_Amount')">Total value</a> </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_fixedassetreport">
+                            <td>{{user.INV_AssetHead }}</td>
+                            <td>{{user.INV_AssetDesc}}</td>
+                            <td>{{user.INV_SupplierINVDate}}</td>
+                            <td>{{user.INV_SupplierINVNo}}</td>
+                            <td>{{user.INVMS_SupplierName}}</td>
+                            <td>{{user.INVMGRN_GRNNo}}</td>
+                            <td>{{user.INVMGRN_PurchaseDate}}</td>
+                            <td>{{user.INV_HSNNo}}</td>
+                            <td>{{user.INV_AssetId}}</td>
+                            <td>{{user.INV_LCTAsset}}</td>
+                            <td>{{user.INVTGRN_SalesPrice | number :2}}</td>
+                            <td>{{user.INV_GST | number :2}}</td>
+                            <td>{{user.INV_otherChrgs | number :2}}</td>
+                            <td>{{user.INVTGRN_Amount | number :2}}</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+
+
+            </div>
+
+        </div>-->
+
+    </div>
+</section>

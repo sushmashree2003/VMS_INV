@@ -1,0 +1,341 @@
+<style>
+    .twocoloumn .multiselect {
+        width: 21.3em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 53px !important;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Task Group</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Group Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select ng-show="!etr" class="form-control" name="grp" ng-model="ISMMTGRP_Id" ng-change="onprojectChange();" required>
+                                    <option value="">--Select Group Name--</option>
+                                    <option ng-repeat="option in get_groupname" ng-selected="{{option.Selected == true}}" value="{{option.ISMMTGRP_Id}}">
+                                        {{option.ISMMTGRP_TaskGroupName}}
+                                    </option>
+                                </select>
+                                <input class="col-sm-12" ng-show="etr" ng-disabled="true" type="text" ng-model="ISMMTGRP_TaskGroupName" />
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.grp)" ng-messages="myForm.grp.$error">
+                                <div ng-message="required">Select Group Name</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Department:<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-7">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here...">
+                                <label>
+                                    <input name="stdd" value="1" ng-model="usercheck" type="checkbox" ng-click="all_check()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="pro in dept_list |filter:searchchkbx1">
+                                    <input value="{{pro.hrmD_Id}}" data-ng-model="pro.selectedd2" ng-value="{{pro.selectedd2}}" type="checkbox" name="secoption1" ng-true-value="true" ng-false-value="false" ng-change="togchkbx();" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">{{pro.hrmD_DepartmentName}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.secoption1)" ng-messages="myForm.secoption1.$error">
+                                <div ng-message="required">Select Department</div>
+                            </div>
+
+                        </div>
+                        <div class="text-center">
+                            <md-button type="button" ng-click="show_data()" class="md-raised md-primary ssss">
+                                Show
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+                </div>
+        </form>
+    </div>
+
+
+
+    <div class="box box-primary" ng-show="task_list.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Task List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <label>
+                                <input type="checkbox" value="" ng-click="toggleAll()" ng-model="all">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+
+                        <th><a href="" ng-click="sortBy('invmpI_PINo')">Task Title</a></th>
+                        <th><a href="" ng-click="sortBy('invmpI_PIDate')">Task No</a> </th>
+                        <th><a href="" ng-click="sortBy('invmpI_ReferenceNo')">Department</a> </th>
+                        <th><a href="" ng-click="sortBy('invmpI_ReferenceNo')">Description</a> </th>
+                        <th><a href="" ng-click="sortBy('invmpI_ApproxTotAmount')">Task Order </a> </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="us in filterValue1 = (task_list | filter : searchValue)  | orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="abc">
+
+
+
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" name="adcheckt" ng-model="us.checkedvalue" ng-value="{{us.checkedvalue}}" ng-change="optionToggled(us)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                        <td>{{us.ISMTCR_Title}}</td>
+                        <td>{{us.ISMTCR_TaskNo}}</td>
+                        <td>{{us.HRMD_DepartmentName}}</td>
+                        <td>{{us.ISMTCR_Desc}}</td>
+
+                        <td>
+                            <input ng-disabled="!us.checkedvalue" type="text" ng-model="us.ISMTCR_TGOrder" />
+                        </td>
+
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="abc">
+            </dir-pagination-controls>
+
+            <div class="text-center">
+                <md-button type="button" ng-click="save_data(us)" class="md-raised md-primary ssss">
+                    save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Master Task Group List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid1}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue12.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue1" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+
+                        <th>Group Name</th>
+                      
+                        <th>Task View</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    <tr dir-paginate="ts in filterValue12 = (task_grop_list | filter : searchValue1)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="abcde">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                    
+                        <td class="text-center">{{ts.ismmtgrP_TaskGroupName }}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" class="text-aqua" ng-click="task_view(ts)" data-toggle="modal" data-placement="bottom" data-target="#myModaloptionlist" title="View Option">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
+
+                        <td class="text-center">
+                            <span ng-if="ts.ismmtgrP_ActiveFlag === true">
+                                <a href="" ng-click="deactive(option)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                            <span ng-if="ts.ismmtgrP_ActiveFlag === false">
+                                <a href="" ng-click="deactive(option)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+
+                        </td>
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="edit(ts)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="abcde">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+
+
+
+    <div id="myModaloptionlist" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 95%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom" style="font-size: medium;"> Task List</h4></center>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+
+                            <th>SLNo </th>
+                            <th>Task Name </th>
+                            <th>Task No </th>
+                            <th>Task Description </th>
+                            <th>Task Order </th>
+                            <th>Status </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr ng-repeat="evet in task_view_list">
+
+                            <td>{{ $index + 1 }}</td>
+
+                            <td> {{evet.ismtcR_Title}} </td>
+                            <td> {{evet.ismtcR_TaskNo}} </td>
+                            <td> {{evet.ismtcR_Desc}} </td>
+                            <td> {{evet.ismtcR_TGOrder}} </td>
+                            <td class="text-center">
+                                <span ng-if="evet.ismtcR_ActiveFlg === true">
+                                    <a href=""
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        Deactivate
+                                    </a>
+                                </span>
+                                <span ng-if="evet.ismtcR_ActiveFlg === false">
+                                    <a href=""
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        Activate
+                                    </a>
+                                </span>
+
+                            </td>
+
+                    </tbody>
+                </table>
+                <div class="modal-footer custom-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

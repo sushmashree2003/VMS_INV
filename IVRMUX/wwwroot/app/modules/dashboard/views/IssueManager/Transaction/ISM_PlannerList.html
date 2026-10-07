@@ -1,0 +1,520 @@
+﻿
+
+<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+
+    .md-icon-button + .md-datepicker-input-container {
+        margin-left: -10px;
+        width: 53%;
+    }
+    ._md-datepicker-has-triangle-icon {    
+        margin-right: -45px;
+    }
+</style>
+<link href="./css/ISM/site.css" rel="stylesheet" />
+<link href="./css/ISM/StyleSheet.css" rel="stylesheet" />
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Planner List </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Start Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-7">
+                                <md-datepicker ng-model="ismtpL_StartDate" name="startdate" md-placeholder="Enter Date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                <div ng-message="required">Select Start Date</div>
+                                <div ng-message="valid">The entered value is not Valid!</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">End Date:<span style="color:red;">*</span></label>
+                            <div class="col-sm-7">
+                                <md-datepicker ng-model="ismtpL_EndDate" name="endate" md-placeholder="Enter Date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages col-sm-5 col-sm-offset-5" ng-if="interacted(myForm.endate)" ng-messages="myForm.endate.$error">
+                                <div ng-message="required">Select End Date</div>
+                                <div ng-message="valid">The entered value is not Valid!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Planner Name:<span style="color:red;">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" name="planner" class="form-control active" ng-model="ismtpL_PlannerName" placeholder="Planner" required />
+                        </div>
+                        <div class="error-messages col-sm-6 col-sm-offset-4" ng-if="interacted(myForm.planner)" ng-messages="myForm.planner.$error">
+                            <div ng-message="required"> Enter Planner Name </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Planner Goal:</label>
+                        <div class="col-sm-7">
+                            <textarea class="form-control" name="plannergoal" type="text" placeholder="Planner Goal .... " ng-model="ismtpL_Remarks" rows="3"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="box-body">
+                <div class="box-content">
+                    <div class="clearfix">
+                        <div style="width:100%;overflow:auto;">
+                            <div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            <b> Total Task :</b>
+                                            <label class="badge">
+                                                {{presentCountgrid}}
+                                            </label>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            <b>Total Task Selected : </b>
+                                            <label class="badge">
+                                                {{totalcheck}}
+                                            </label>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            <b>Total Effort : </b>
+                                            <label class="badge">
+                                                {{totaleffort}} Hrs
+                                            </label>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 pull-right">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-search"></i>
+                                            </span>
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table table-responsive table-bordered clearfix" style="min-width: 120%;">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th></th>
+                                        <th width="1%"><a href="" ng-click="sort('invmI_Id')">Issue/Task No.</a></th>
+                                        <th width="22%"><a href="" ng-click="sort('invmI_Id')">Issue/Task</a></th>
+                                        <th><a href="" ng-click="sort('invtsL_SalesPrice')">Assigned Date</a></th>
+                                        <th><a href="" ng-click="sort('invtsL_SalesPrice')">Assigned By</a></th>
+                                        <th><a href="" ng-click="sort('invtsL_SalesQty')">Start Date</a></th>
+                                        <th><a href="" ng-click="sort('invtsL_SalesQty')">End Date</a></th>
+                                        <th width="7%"><a href="" ng-click="sort('invtsL_SalesQty')">Effort</a></th>
+                                        <th width="13%"><a href="" ng-click="sort('invtsL_SalesQty')">Remarks</a></th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="obja in filterValue = (assignedtasklist | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-center">
+                                            <label>
+                                                <input type="checkbox" name="adcheckt" value="{{obja.editck}}" ng-model="obja.checkedvalue" ng-change="onassignCheck(obja)"><span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td class="text-center">
+                                            <label class="control-label text-body text-left" style="font-size:14px;">{{obja.ISMTCR_TaskNo}} </label>
+                                        </td>
+                                        <td class="text-left">
+                                            <a class="text-head col-sm-12 text-left" ng-model="obja.ISMTCR_Id" data-ng-click="viewresponse(objs)">{{obja.ISMTCR_Title}}</a>
+                                            <!--<span class="text-head col-sm-12 text-left" style="font-size:20px;" ng-model="obja.ISMTCR_Id">{{obja.ISMTCR_Title}}</span>-->
+                                            <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">
+                                                <span class="text-left" ng-if="obja.ISMTCR_BugOREnhancementFlg=='B'">Bugs & Complaints</span>
+                                                <span class="text-left" ng-if="obja.ISMTCR_BugOREnhancementFlg=='E'">Enhancement</span>
+                                                &nbsp;&nbsp;
+                                                <span ng-if="(obja.HRMP_Name=='High')|| (obja.HRMP_Name=='HIGH')"><label style="color:red;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                                <span ng-if="(obja.HRMP_Name=='Normal')||(obja.HRMP_Name=='NORMAL')"><label style="color:orange;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                                <span ng-if="(obja.HRMP_Name=='Low')||(obja.HRMP_Name=='LOW')"><label style="color:green;"><b>{{obja.HRMP_Name}}</b></label></span>
+                                                &nbsp;&nbsp;
+                                            </label>
+                                            <span ng-if="obja.ISMMCLT_ClientName!=null">
+                                                <label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Client: {{obja.ISMMCLT_ClientName}} </label>
+                                            </span>
+                                            <!--<label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Created By: {{obja.createdby}} </label>-->
+                                            <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">Created Date: {{obja.ISMTCR_CreationDate | date:'dd-MM-yyyy'}} </label>
+                                        </td>
+                                        <td class="text-left">
+                                            <label class="control-label">{{obja.ISMTCRASTO_AssignedDate | date:'dd-MM-yyyy'}}</label>
+                                        </td>
+
+                                        <td class="text-left">
+                                            <label class="control-label">{{obja.assignedby}}</label>
+                                        </td>
+
+                                        <td class="text-left">
+                                            <md-datepicker name="start_date" ng-model="obja.ISMTCRASTO_StartDate" ng-disabled="!obja.checkedvalue" md-placeholder="Start date" style="margin-left: -10px;"></md-datepicker>
+                                        </td>
+
+                                        <td class="text-left">
+                                            <md-datepicker name="end_date" ng-model="obja.ISMTCRASTO_EndDate" ng-disabled="!obja.checkedvalue" md-placeholder="End date" style="margin-left: -10px;"></md-datepicker>
+                                        </td>
+
+                                        <!--<td class="text-left">
+                                            <input type="number" class="form-control active" name="effort" min="0" ng-blur="counteffort();" ng-disabled="!obja.checkedvalue" max="24" maxlength="2" placeholder="Effort" ng-model="obja.ISMTCRASTO_EffortInHrs">
+                                        </td>-->
+                                        <td class="text-left">
+                                            <select class="form-control" name="effort" ng-disabled="!obja.checkedvalue" ng-change="counteffort();" ng-model="obja.ISMTCRASTO_EffortInHrs">
+                                                <option value="0">0</option>
+                                                <option value="1">1 Hour</option>
+                                                <option value="2">2 Hour</option>
+                                                <option value="3">3 Hour</option>
+                                                <option value="4">4 Hour</option>
+                                                <option value="5">5 Hour</option>
+                                                <option value="6">6 Hour</option>
+                                                <option value="7">7 Hour</option>
+                                                <option value="8">8 Hour</option>
+                                                <option value="9">9 Hour</option>
+                                                <option value="10">10 Hour</option>
+                                                <option value="11">11 Hour</option>
+                                                <option value="12">12 Hour</option>
+
+                                            </select>
+                                        </td>
+                                        <td class="text-left">
+                                            <textarea class="form-control" name="remarks" type="text" ng-disabled="!obja.checkedvalue" placeholder="Remarks...." ng-model="obja.ISMTPLTA_Remarks" rows="3"></textarea>
+                                        </td>
+
+                                        <td class="text-left">
+                                            <a href="" ng-click="removetask(obja)" class="text-red" data-placement="bottom" data-toggle="tooltip" title="Remove Task">
+                                                <i class="fa fa-close fa-1x" aria-hidden="true">Remove</i>
+                                            </a>
+                                        </td>
+
+                                        <td class="text-left" hidden="hidden">{{obja.ismtcrastO_Id}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>                      
+                    </div>
+
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="ismtpL_Id" value="{{ismtpL_Id}}" />
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savePlanner()" id="save-btn">
+                            <i class="fa fa-save" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="addtask()" id="save-btn">
+                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                            Add Task
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- ============================MODEL Add to Planner=================================== -->
+    <div id="myModalAddtoPlanner" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 95%; overflow:auto;">
+            <div class="modal-content" style="overflow:auto;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white col-sm-10">Add to Planner </h4>
+                    <h4 class="modal-title text-white">{{ismtcrastO_AssignedDate | date:'dd/MM/yyyy'}} </h4>
+                </div>
+                <div class="box-body">
+                    <table class="table table-responsive table-bordered clearfix">
+                        <thead>
+                            <tr>
+                                <th>SL NO</th>
+                                <th></th>
+                                <th style="width:22%"><a href="" ng-click="sort('invmI_Id')">Task</a></th>
+                                <th><a href="" ng-click="sort('invmuoM_Id')">Status</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesPrice')">Start Date</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">End Date</a></th>
+                                <th style="width: 7%;"><a href="" ng-click="sort('invtsL_SalesQty')">Effort</a></th>
+                                <th><a href="" ng-click="sort('invtsL_SalesQty')">Remarks</a></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="objplnr in taskplanner track by $index">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center">
+                                    <label>
+                                        <input type="checkbox" name="adcheckt" value="{{objplnr.addck}}" ng-model="objplnr.checkedTask" ng-change="onTaskCheck(objplnr)"><span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td class="text-left">
+                                    <span class="text-head col-sm-12 text-left" style="font-size:20px;" ng-model="objplnr.ISMTCR_Id">{{objplnr.ISMTCR_Title}}</span>
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">{{objplnr.ISMTCR_TaskNo}} </label>
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">
+                                        <span class="text-left" ng-if="objplnr.ISMTCR_BugOREnhancementFlg=='B'">Bugs & Complaints</span>
+                                        <span class="text-left" ng-if="objplnr.ISMTCR_BugOREnhancementFlg=='E'">Enhancement</span>
+                                        &nbsp;&nbsp;
+                                        <span ng-if="(objplnr.HRMP_Name=='High')|| (objplnr.HRMP_Name=='HIGH')"><label style="color:red;"><b>{{objplnr.HRMP_Name}}</b></label></span>
+                                        <span ng-if="(objplnr.HRMP_Name=='Normal')||(objplnr.HRMP_Name=='NORMAL')"><label style="color:orange;"><b>{{objplnr.HRMP_Name}}</b></label></span>
+                                        <span ng-if="(objplnr.HRMP_Name=='Low')||(objplnr.HRMP_Name=='LOW')"><label style="color:green;"><b>{{objplnr.HRMP_Name}}</b></label></span>
+                                        &nbsp;&nbsp;
+                                    </label>
+                                    <span ng-if="objplnr.ISMMCLT_ClientName!=null">
+                                        <label class="control-label col-sm-12 text-body text-left" style="font-size:14px;">Client: {{objplnr.ISMMCLT_ClientName}} </label>
+                                    </span>
+                                    <label class="control-label col-sm-10 text-body text-left" style="font-size:14px;">Date: {{objplnr.ISMTCR_CreationDate | date:'dd-MM-yyyy'}} </label>
+                                </td>
+                                <td class="text-left">
+                                    <select class="form-control" name="status" ng-model="objplnr.ismmistS_Id">
+                                        <option value="">Status</option>
+                                        <option ng-repeat="option in get_Status" ng-selected="{{option.Selected == true}}" value="{{option.ismmistS_Id}}">
+                                            {{option.ismmistS_StatusName}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td class="text-left">
+                                    <md-datepicker name="start_date" ng-model="objplnr.ismtcrastO_StartDate" md-placeholder="Start date"></md-datepicker>
+                                </td>
+                                <td class="text-left">
+                                    <md-datepicker name="end_date" ng-model="objplnr.ismtcrastO_EndDate" md-placeholder="End date"></md-datepicker>
+                                </td>
+                                <td class="text-left">
+                                    <input type="number" class="form-control active" name="effort" min="0" max="24" maxlength="2" placeholder="Effort" ng-model="objplnr.ismtcrastO_EffortInHrs">
+                                </td>
+                                <td class="text-left">
+                                    <textarea class="form-control" name="remarks" type="text" placeholder="Remarks.... " ng-model="objplnr.ismtcrastO_Remarks" rows="3"></textarea>
+                                </td>
+                                <td class="text-left" hidden="hidden">{{objplnr.ismtcrastO_Id}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br />
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-primary" data-ng-click="saveAddTask()" data-dismiss="modal"><i class="fa fa-shopping-cart" aria-hidden="true"></i> ADD</md-button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ============================MODEL Response=================================== -->
+    <div id="myModalResponse" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">	Response </h4>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <div>
+                            <div class="form-group">
+                                <span class="text-head col-sm-10 text-left" style="font-size:22px;" ng-model="ISMTCR_Id">{{tasktitle}}</span>
+                                <label class="control-label col-sm-10 text-body text-left" style="font-size:16px;">{{taskno}} </label>
+                                <label class="control-label col-sm-10 text-body text-left" style="font-size:16px;">
+                                    {{tasktype}} &nbsp;&nbsp;
+
+                                    <span ng-if="(tsakpriority=='High')|| (tsakpriority=='HIGH')"><label style="color:red;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Normal')||(tsakpriority=='NORMAL')"><label style="color:orange;"><b>{{tsakpriority}}</b></label></span>
+                                    <span ng-if="(tsakpriority=='Low')||(tsakpriority=='LOW')"><label style="color:green;"><b>{{tsakpriority}}</b></label></span>
+                                </label>
+                                <label class="control-label col-sm-10">
+                                    Created By :
+                                    <label class="control-label text-body" style="font-size:16px;">
+                                        {{createdby}}
+                                    </label>
+                                </label>
+                                <label class="control-label col-sm-10">
+                                    Date :
+                                    <label class="control-label text-body" style="font-size:16px;">
+                                        {{taskdate | date:'dd-MM-yyyy'}}
+                                    </label>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4 margin-top-20">
+                                    <label class="control-label"><b>Description :</b> </label>
+                                </div>
+                                <div class="col-sm-8 margin-top-20">
+                                    <textarea class="form-control" name="response" type="text" placeholder="Task Description .... " ng-disabled="true" ng-model="taskdescription" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 margin-top-10">Attachments :</label>
+                                <label class="lessonplanner margin-top-10" style="margin:auto;">
+                                    <input class="custom-file-input file-blue" type="file" name="doc"
+                                           accept="image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" data-ng-model="ismtcrreS_ResponseAttachment" multiple
+                                           onchange="angular.element(this).scope().selectFileforUpload(this)" />
+                                </label>
+                                <div class="col-sm-4"></div>
+                                <div class="col-sm-8 margin-top-10">
+                                    <table class="table table-bordered text-left" ng-if="files.length>0">
+                                        <tbody>
+                                            <tr ng-repeat="fl in files">
+                                                <td class="text-left">
+                                                    <b class="control-label" style="color: #3a5999 !important;">
+                                                        {{fl.name}}
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="close margin-bottom-10" style="color:red;float:right" ng-if="files.length>0">
+                                        <b><i class="fa fa-times" aria-hidden="true" ng-click="remove_file()">Clear</i></b>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 margin-top-10">Activity :</label>
+
+                                <div class="box-content col-sm-8 margin-top-10" style="max-height: 250px; width: 66%; overflow:auto;">
+                                    <label class="control-label col-sm-8 margin-top-10 text-body" style="font-size:14px;">
+                                        {{createdby}} : {{taskstatus}}
+                                    </label>
+                                    <label class="control-label col-sm-10 text-left">जब एक अज्ञात मुद्रक ने नमूना लेकर एक नमूना किताब बनाई. यह न केवल पाँच सदियों से जीवित रहा बल्कि इसने इलेक्ट्रॉनिक मीडिया में छलांग लगाने के बाद भी मूलतः</label>
+                                    <label class="control-label col-sm-8 margin-top-10 text-body" style="font-size:14px;">
+                                        {{createdby}} : {{taskstatus}}
+                                    </label>
+                                    <label class="control-label col-sm-10 text-left">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</label>
+                                    <label class="control-label col-sm-8 margin-top-10 text-body" style="font-size:14px;">
+                                        {{createdby}} : {{taskstatus}}
+                                    </label>
+                                    <label class="control-label col-sm-10 text-left">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</label>
+                                    <label class="control-label col-sm-8 margin-top-10 text-body" style="font-size:14px;">
+                                        {{createdby}} : {{taskstatus}}
+                                    </label>
+                                    <label class="control-label col-sm-10 text-left">ل ما عبر إدخال بعض النوادر أو الكلمات العشوائية إلى النص. إن كنت تريد أن تستخدم نص لوريم إيبسوم ما، .</label>
+                                    <label class="control-label col-sm-8 margin-top-10 text-body" style="font-size:14px;">
+                                        {{createdby}} : {{taskstatus}}
+                                    </label>
+                                    <label class="control-label col-sm-10 text-left"> 是印刷及排版领域所常用的虚拟文字。由于曾经一台匿名的打印机刻意打乱了一盒印刷字体从而造出一本字体样品书.</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 margin-top-10">">Response :</</label>
+                                <div class="col-sm-8 margin-top-10">
+                                    <textarea class="form-control" name="response" type="text" placeholder="Task Response .... " ng-model="ismtcrreS_Response" rows="4"></textarea>
+                                </div>
+                            </div>
+
+                            <!--<div class="col-sm-5">
+                                <div class="box-content margin-top-80">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4 margin-top-10">Created By :</label>
+                                        <label class="control-label col-sm-8 margin-top-10 text-body" style="font-size:16px;">
+                                            {{createdby}}
+                                        </label>
+                                    </div>
+                                    <div class="form-group" ng-if="taskclient!=null">
+                                        <label class="control-label col-sm-4 margin-top-10">Client :</label>
+                                        <label class="control-label col-sm-8 margin-top-10 text-body" style="font-size:16px;">
+                                            {{taskclient}}
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12 margin-top-20">
+                                            <span><label for="sel2" class="control-label col-sm-4">Assign to : <span style="color:Red">*</span></label></span>
+                                            <div class="multiselect col-sm-8">
+                                                <span ng-show="get_employeelist.length>0">
+                                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Student here...">
+                                                </span>
+                                                <label>
+                                                    <input name="classes" value="1" ng-model="usercheck" type="checkbox" ng-click="all_check(usercheck)">
+                                                    <span class="lbl padding-8">
+                                                        All
+                                                    </span>
+                                                </label>
+                                                <label ng-model="asmcl" ng-repeat="option in get_employeelist | filter : searchValue">
+                                                    <input name="employee" ng-model="option.empcheck" type="checkbox" ng-click="togchkbx();" ng-required="isOptionsRequired()">
+                                                    <span class="lbl padding-8">
+                                                        {{option.hrmE_EmployeeFirstName}}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                                <div ng-message="required">Please Select Atleast One checkbox</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4 margin-top-20">Status :</label>
+                                        <select class="form-control" name="status" ng-model="objs.ismmistS_Id">
+                                            <option value="">Status</option>
+                                            <option ng-repeat="option in get_Status" ng-selected="{{option.Selected == true}}" value="{{option.ismmistS_Id}}">
+                                                {{option.ismmistS_StatusName}}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group margin-top-20">
+                                        <label class="control-label col-sm-4 margin-top-10">Start Date :</label>
+                                        <md-datepicker name="start_date" ng-model="ismtcrastO_StartDate" md-placeholder="Start date"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.start_date)" ng-messages="myForm.start_date.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-top-10">
+                                        <label class="control-label col-sm-4 margin-top-5">End Date :</label>
+                                        <md-datepicker name="end_date" ng-model="ismtcrastO_EndDate" md-placeholder="End date"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.end_date)" ng-messages="myForm.end_date.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-top-20">
+                                        <label class="control-label col-sm-4">Effort :</label>
+                                        <input type="number" class="form-control active" name="effort" placeholder="Effort" ng-model="effort">
+                                    </div>
+
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+                    <br />
+                </div>
+                <div class="modal-footer">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="addeffort()" data-dismiss="modal"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Add</md-button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</section>

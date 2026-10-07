@@ -1,0 +1,965 @@
+﻿
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Client Project</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div style="font-weight: 700;">
+                            <div class="well text-center" ng-init="ISMMCLT_Host='Shared'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Shared" name="ISMMCLT_Host" ng-model="ISMMCLT_Host">
+                                    <span class="lbl padding-8">Shared  </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Dedicated" name="ISMMCLT_Host" ng-model="ISMMCLT_Host">
+                                    <span class="lbl padding-8">  Dedicated</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">
+                                        Client :<span style="color:red;">*</span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="cname" ng-model="$parent.ISMSLET_Id" theme="bootstrap"
+                                                   ng-keyup="searchfilter($select,ts.optradio);" title="Select Lead Name" ng-change="get_lead_product()" required>
+                                            <ui-select-match ng-trim="false" placeholder="Select Or Search Lead Name">
+                                                {{$select.selected.ISMSLE_LeadName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="catgry in mompendinglist | filter: $select.search" value="{{catgry.ISMSLET_Id}}"
+                                                               ng-selected="{{catgry.Selected == true}}">
+                                                <div ng-bind-html="catgry.ISMSLE_LeadName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                    </div>
+                                    <div class=" col-sm-offset-4 error-messages" ng-if="interacted(myForm.cname)" ng-messages="myForm.cname.$error">
+                                        <div ng-message="required">Select Client Name</div>
+                                    </div>
+                                </div>
+                                <!--ng-change="get_lead_product()" ng-required="edibl==0"-->
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Start Academic Year: <span style="color:red;">*</span></label>
+                                    <div class="col-sm-8">
+
+                                        <input class="form-control" placeholder="Contract_Year_From" type="text" name="Contract_Year_From" data-ng-model="Contract_Year_From" required />
+                                    </div>
+                                    <div class=" col-sm-offset-4 error-messages" ng-if="interacted(myForm.Contract_Year_From)" ng-messages="myForm.Contract_Year_From.$error">
+                                        <div ng-message="required">Enter Academic Year</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Project Duration (in years): </label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Project Duration" type="number" name="ISMMCLTPR_ProjectDuration"
+                                               data-ng-model="ISMMCLTPR_ProjectDuration" ng-change="handleChange()" required/>
+                                        <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_ProjectDuration)" ng-messages="myForm.ISMMCLTPR_ProjectDuration.$error">
+                                            <div ng-message="required">Please Enter Project Duration.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> End Academic Year: <span style="color:red;">*</span></label>
+                                    <div class="col-sm-8">
+
+                                        <input class="form-control" placeholder="Contract_Year_To" type="text" name="Contract_Year_To" data-ng-model="Contract_Year_To" required />
+                                    </div>
+                                    <div class=" col-sm-offset-4 error-messages" ng-if="interacted(myForm.Contract_Year_To)" ng-messages="myForm.Contract_Year_To.$error">
+                                        <div ng-message="required">Enter Academic Year</div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Nodal Officer Name: <span style="color:red;">*</span></label>
+                                    <div class="col-sm-8">
+
+                                        <input class="form-control" ng-disabled="true" placeholder="Enter Nodal Officer Name" type="text" name="ISMMCLTPR_NodalOfficerName" data-ng-model="ISMMCLTPR_NodalOfficerName" required />
+                                    </div>
+                                    <div class=" col-sm-offset-4 error-messages" ng-if="interacted(myForm.ISMMCLTPR_NodalOfficerName)" ng-messages="myForm.ISMMCLTPR_NodalOfficerName.$error">
+                                        <div ng-message="required">Enter Nodal Officer Name</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Nodal Officer Email ID: <span style="color:red;">*</span></label>
+                                    <div class="col-sm-8">
+
+                                        <input class="form-control" ng-disabled="true" ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._]+@[A-Za-z0-9]+\.[A-Za-z.]{2,5}$/" placeholder="Enter Nodal Officer Email" type="text" name="ISMMCLTPR_NodalOfficerEmailId" data-ng-model="ISMMCLTPR_NodalOfficerEmailId" required />
+                                    </div>
+                                    <div class=" col-sm-offset-4 error-messages" ng-if="interacted(myForm.ISMMCLTPR_NodalOfficerEmailId)" ng-messages="myForm.ISMMCLTPR_NodalOfficerEmailId.$error">
+                                        <div ng-message="required">Enter Nodal Officer Email ID</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Product Name :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="Product" ng-disabled="true" placeholder="Enter Product Name" class="form-control" ng-model="ISMSMOUA_ProductName" required /> <!--disabled-->
+                                        <div class="error-messages" ng-if="interacted(myForm.Product)" ng-messages="myForm.Product.$error">
+                                            <div ng-message="required">Enter Name of the Product</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Package Name :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="PackageName" ng-disabled="true" placeholder="Enter Package Name" class="form-control" ng-model="ISMSMOU_PackageName" required />
+                                        <div class="error-messages" ng-if="interacted(myForm.PackageName)" ng-messages="myForm.PackageName.$error">
+                                            <div ng-message="required">Enter Name of the Package</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Total Student: </label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" ng-disabled="true" placeholder="Enter Student Strength"  type="text" name="ISMMCLTPR_TotalStudent" data-ng-model="ISMMCLTPR_TotalStudent" allow-pattern="[0-9]" required />
+                                        <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_TotalStudent)" ng-messages="myForm.ISMMCLTPR_TotalStudent.$error">
+                                            <div ng-message="required">Please Enter Total Student.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--<div class="form-group">
+        <label class="control-label col-sm-4">MOU Start Date:<span style="color:Red">*</span></label>
+        <div class="col-sm-8 input-group">
+            <md-datepicker name="ISMMCLTPR_MOUStartDate" onkeypress="return false"
+                           data-ng-model="ISMMCLTPR_MOUStartDate"
+                           placeholder="Enter date" required
+                           ng-change="DateFunction()"></md-datepicker>
+            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_MOUStartDate)" ng-messages="myForm.ISMMCLTPR_MOUStartDate.$error">
+                <div ng-message="required">Select MOU Start Date</div>
+            </div>
+        </div>
+    </div>-->
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Cost Per Student:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" ng-disabled="true" placeholder="Cost Per Student" type="text" name="ISMMCLTPR_CostPerStudent" data-ng-model="ISMMCLTPR_CostPerStudent" allow-pattern="[0-9.]" required />
+                                        <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_CostPerStudent)" ng-messages="myForm.ISMMCLTPR_CostPerStudent.$error">
+                                            <div ng-message="required">Please Enter Cost Per Student.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Total Cost  Per Year:</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Total Cost  Per Year" type="text" name="ISMMCLTPR_CostPerYearStudent" ng-model="ISMMCLTPR_CostPerYearStudent" allow-pattern="[0-9]"  required />
+                                        <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_CostPerYearStudent)" ng-messages="myForm.ISMMCLTPR_CostPerYearStudent.$error">
+                                            <div ng-message="required">Please Enter Total Cost  Per Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Enhancement Per Yr: </label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enhancement Per Yr" type="text" name="ISMMCLTPR_EnhancementPerYr" data-ng-model="ISMMCLTPR_EnhancementPerYr" allow-pattern="[0-9.]" value="15" />
+                                        <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_EnhancementPerYr)" ng-messages="myForm.ISMMCLTPR_EnhancementPerYr.$error">
+                                            <div ng-message="required">Please Enter Enhancement Per Yr.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">MOU Start  Date:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8 input-group">
+                                        <md-datepicker name="ISMMCLTPR_MOUStartDate" onkeypress="return false"
+                                                       data-ng-model="ISMMCLTPR_MOUStartDate"
+                                                       placeholder="Enter date" required
+                                                       ng-change="DateFunction()"></md-datepicker>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_MOUStartDate)" ng-messages="myForm.ISMMCLTPR_MOUStartDate.$error">
+                                        <div ng-message="required">Select MOU Start Date</div>
+                                    </div>
+                                </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">MOU End Date:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8 input-group">
+                                            <md-datepicker name="ISMMCLTPR_MOUEndDate" onkeypress="return false"
+                                                           data-ng-model="ISMMCLTPR_MOUEndDate"
+                                                           placeholder="Enter date" required></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_MOUEndDate)" ng-messages="myForm.ISMMCLTPR_MOUEndDate.$error">
+                                                <div ng-message="required">Select MOU End Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Work Order No: </label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" type="text" name="ISMMCLTPR_WorkOrder" data-ng-model="ISMMCLTPR_WorkOrder" />
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_WorkOrder)" ng-messages="myForm.ISMMCLTPR_WorkOrder.$error">
+                                                <div ng-message="required">Please Work Order No.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Nodal Officer Contact No:</label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" placeholder="Nodal Officer Contact No" ng-disabled="true" name="ISMMCLTPR_NodalOfficerContactNo" id="catgr1y" type="text" data-ng-model="ISMMCLTPR_NodalOfficerContactNo" maxlength="10" minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d" disabled>
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_NodalOfficerContactNo)" ng-messages="myForm.ISMMCLTPR_NodalOfficerContactNo.$error">
+                                                <div ng-message="required">Please Enter Nodal Officer Contact number</div>
+                                                <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                                <div ng-message="pattern"> Enter Valid Mobile Number </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Proposal Ref No: </label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" ng-disabled="true" type="text" placeholder="Proposal Ref No" name="ISMMCLTPR_ProposalRefNo" data-ng-model="ISMMCLTPR_ProposalRefNo" />
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_ProposalRefNo)" ng-messages="myForm.ISMMCLTPR_ProposalRefNo.$error">
+                                                <div ng-message="required">Please Enter Proposal Ref No.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Proposal Sent Date:</label>
+                                        <div class="col-sm-8 input-group">
+                                            <md-datepicker name="ISMMCLTPR_ProposalSentDate" onkeypress="return false" data-ng-model="ISMMCLTPR_ProposalSentDate" placeholder="Enter date"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_ProposalSentDate)" ng-messages="myForm.ISMMCLTPR_ProposalSentDate.$error">
+                                                <div ng-message="required">Select Proposal Sent Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Deal Closure Date:</label>
+                                        <div class="col-sm-8 input-group">
+                                            <md-datepicker name="ISMMCLTPR_DealClosureDate" onkeypress="return false" data-ng-model="ISMMCLTPR_DealClosureDate" placeholder="Enter date"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_DealClosureDate)" ng-messages="myForm.ISMMCLTPR_DealClosureDate.$error">
+                                                <div ng-message="required">Select Deal Closure Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">MOU Ref No: </label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" placeholder="MOU Ref No" type="text" name="ISMMCLTPR_MOURefNo" data-ng-model="ISMMCLTPR_MOURefNo" />
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_MOURefNo)" ng-messages="myForm.ISMMCLTPR_MOURefNo.$error">
+                                                <div ng-message="required">Please Enter MOU Ref No.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">MOU Represented By:</label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" placeholder="MOU Represented By" type="text" name="ISMMCLTPR_MOURepresentedBy" data-ng-model="ISMMCLTPR_MOURepresentedBy" allow-pattern="[0-9]" />
+                                            <div class="error-messages" ng-if="interacted(myForm.ISMMCLTPR_MOURepresentedBy)" ng-messages="myForm.ISMMCLTPR_MOURepresentedBy.$error">
+                                                <div ng-message="required">Please Enter MOU Represented By.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4"> Template: <span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" name="templatess" ng-model="Template" ng-change="loadtemplate()" required>
+                                                <option value="">--Select--</option>
+                                                <option value="MET">MOU Elite  Template</option>
+                                                <option value="MSP">MOU  Science Park Template</option>
+                                                <option value="MCP">MOU Channel Partner</option>
+                                                <option value="MDTTV">MOU  Delite Template With Trial Version</option>
+                                                <option value="MDTWTV">MOU  Delite Template Without Trial Version</option>
+                                                <option value="MDPTV">MOU Delite Plus Template With Trial Version</option>
+                                                <option value="MDPWTV">MOU Delite Plus Template Without Trial Version</option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.templatess)" ng-messages="myForm.templatess.$error">
+                                                <div ng-message="required">Please Select Template</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" ng-model="checked" />
+                                            <span class="lbl padding-8"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <h5 style="color:red !important;">Note: Optional Services on Additional Charges</h5>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">IE Charges: </label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" placeholder="IE Charges" type="text" name="ISMMCLTPR_IEcharge" data-ng-model="ISMMCLTPR_IEcharge" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Operator Cost: </label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" placeholder="Operator Cost" type="text" name="ISMMCLTPR_OperatorCost" data-ng-model="ISMMCLTPR_OperatorCost" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Customized Percentage : </label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" placeholder=" Enter Percentage" type="text" name="ISMMCLTPR_Percentage" data-ng-model="ISMMCLTPR_Percentage" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="text-center">
+                            <input type="hidden" ng-model="ismmcltpR_Id" value="{{ismmcltpR_Id}}" />
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedataLead(obj)" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" data-ng-click="print()">
+                                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                                print
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> MASTER CLIENT PROJECT </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="box-body">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{leaddata.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="search!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <!--<th>Lead Name</th>-->
+                                    <th>Client Name</th>
+                                    <th>Contact No </th>
+                                    <th>Email Id</th>
+                                    <th>Package Name </th>
+                                    <th>Status</th>
+                                    <!--<th>Remarks</th>-->
+                                    <th>View MOU</th>
+                                    <th>View NDA</th>
+                                    <th>order acceptance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="sales in filterValue=(leaddata | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <!--<td class="text-center">{{sales.ISMSLE_LeadName}}</td>-->
+                                    <td class="text-center">{{sales.ClientName}}</td>
+                                    <td class="text-center">{{sales.LeadContactNo}}</td>
+                                    <td class="text-center">{{sales.LeadEMailID}}</td>
+                                    <td class="text-center">{{sales.Template}}</td>
+                                    <td>
+                                        <span ng-if="sales.OrderConfirm_Flg == null">Pending</span>
+                                        <span ng-if="sales.OrderConfirm_Flg != null">MOU has been {{sales.OrderConfirm_Flg}}</span>
+                                    </td>
+                                    <!--<td>
+                                        <span ng-if="sales.ISMOC__Remark == null">Pending</span>
+                                        <span ng-if="sales.ISMOC__Remark != null">{{sales.OrderConfirm_Flg}}</span>
+                                    </td>-->
+
+                                    <!--<td>{{sales.ISMOC__Remark}}</td>-->
+                                    <td class="text-center">
+                                        <span ng-click="Viewtemplateone(sales)">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-click="Viewtemplateone1(sales)">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-click="Viewtemplateone2(sales)">
+                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+    </form>
+</section>
+
+
+<!--==================== Image Preview Model ===========================-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{filenames}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+         
+            <embed id="idpdf" ng-src="{{content}}" onload="refreshDialer();" style="width: 100%;" height="1000" />
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+      
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-center">
+                    <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                    <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                </div>
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Close
+                </md-button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="templatemodel" class="modal fade modal-medium" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-sm-4">
+                    <h4 class="modal-title text-white"></h4>
+                </div>
+                <div class="col-sm-4">
+                    <md-button type="button" class="md-raised" data-ng-click="printDatas()">
+                        <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                        PRINT
+                    </md-button>
+                </div>
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times text-white"
+                       aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <div id="MoutempEmail">
+                    <div class="row">
+                        <div id="bindtemplate" >
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <md-button class="md-raised md-primary" data-dismiss="modal">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                       Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="OrderAcceptance" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true" ng-click="closemodal(); clearFunction()"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Order Acceptance
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printOrderAcceptance()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <md-button type="button" class="md-raised md-accent" ng-click="SendDataview()">
+                    SEND MAIL
+                </md-button>
+            </div>
+            <div>
+
+                <div class="col-sm-12" id="asdfMou" style="background-color: white; color: black; ">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-12" id="asdfMou" style="background-color: white; color: black; ">
+                                <div class="col-sm-12">
+                                    <div class="row">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pdf-page size-a4">
+                                <div class="col-sm-12" style="page-break-after: always!important; ">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="pdf-page size-a4">
+
+                                                <div class="col-sm-12" style="page-break-after: always!important; ">
+                                                    <div class="col-sm-12">
+                                                        <img src="https://dcampusstrg.blob.core.windows.net/files/17/NAACDocumentsUpload/3f9ee45a-d35e-4890-9740-96ac2e9bdc93.jpg" style="height:150px;width:102%; margin-left:-1%;" />
+                                                        <br />
+                                                        <br />
+                                                    </div>
+                                                    <br />
+                                                    <div>
+                                                        <p> <strong>Ref : {{ISMMCLTPR_MOURefNo}}</strong></p>
+                                                        <p>
+                                                            <strong>Date : {{ currentDate | date:'dd-MM-yyyy' }}</strong>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <p>
+                                                            To<br />
+                                                            <strong>The &nbsp; {{ISMSLE_ContactDesignation}}  </strong><br />
+                                                            <strong>Mr. / Ms. &nbsp; {{ISMMCLTPR_NodalOfficerName}}</strong><br />
+                                                            <strong>{{ISMSLE_LeadName}}</strong><br />
+
+                                                            <strong>­{{ISMSLE_LeadAddress1}}</strong>
+                                                            <br />
+                                                            <strong>{{ISMSLE_LeadAddress2}}</strong>
+                                                            <br />
+                                                            <strong>{{ISMSLE_LeadAddress3}}</strong>
+                                                            <strong>{{ISMSLE_Pincode}}</strong>
+                                                            <br />
+                                                            <strong>Contact No:  {{ISMMCLTPR_NodalOfficerContactNo}}</strong>
+                                                            <br />
+                                                            <strong>Email : {{ ISMMCLTPR_NodalOfficerEmailId}}</strong>
+                                                            <br />
+                                                            <br />
+                                                            <strong>Kind Attn : Mr. / Ms. {{ISMMCLTPR_NodalOfficerName}}</strong>
+                                                        </p>
+                                                    </div>
+                                                    <p>Dear Sir/Madam,</p>
+                                                    <p>
+                                                        <strong>
+                                                            Sub :  Order Acceptance towards implementation of VAPS Digital Campus project in your esteemed institution.
+                                                        </strong>
+                                                    </p>
+                                                    <p>
+                                                        <strong>Ref :	Memorandum of Understanding No. {{ISMMCLTPR_MOURefNo}} dated {{ currentDate | date:'dd-MM-yyyy' }}.</strong>
+                                                    </p>
+                                                    <p>
+                                                        We thank you for giving us an opportunity to serve your esteemed organization through our prestigious Digital Campus Project.  It is our privilege to welcome you to our growing list of clients who have benefited from associating with VAPS Technosoft with a legacy of our contributions to education domain for 25 years. 
+                                                    </p>
+                                                    <p>1.We hereby accept your order and implement VAPS Digital Campus Project as per the following schedule :</p><br />
+                                                    <table class="table table-bordered ">
+                                                        <tr>
+                                                            <td><strong>Sl. No.</strong></td>
+                                                            <td><strong>Name of the Module </strong></td>
+                                                            <td><strong>Implementation Done by Date </strong></td>
+                                                        </tr>
+                                                        <tr ng-repeat="module in ModuleName">
+                                                            <td>{{$index+1}}</td>
+                                                            <td>{{module.IVRMM_ModuleName}}</td>
+                                                            <td>{{module.ImplementationDate | date:'dd-MM-yyyy'}}</td>
+                                                        </tr>
+                                                    </table>
+                                                    <br />      <br />
+                                                </div>
+                                                <p>2.We confirm we will provide the following services as per the MOU:</p>
+
+                                                <ol ng-repeat="data in services">
+                                                    {{data.POAD_Name}}
+                                                </ol>
+                                                <p>3.We will provide Shared Hosting Servicer on cloud - 1 license, which consists of the following:</p>
+
+                                                <p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2 Core - 2GB RAM, 50GB Storage</p>
+                                                <p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;OS Windows - 2012</p>
+                                                <p>  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SQL Data - 250 GB - 50 DTUs</p>
+                                                <p>  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SAAS Storage - 1000 GB</p>
+                                                <p>
+                                                    4.Open Bandwidth for data transfer - 100 GB, (Beyond 100 GB - Rs.7.93/- per GB additional will be
+                                                    charged for data transfer)
+                                                </p>
+                                                <p>5.Depending on the load on the server the above configuration parameters can vary, which could lead to revised costing.</p>
+                                                <p>6.Please note that, if services are discontinued due to delay in payment from you, then the additional cost of Rs. 75,000/- will be payable by you to reactivate the services again on AZURE Server.</p>
+
+                                                <p>7.Kindly note that <b> Mr. Nithin Kumar Y, Implementation Engineer </b> would be the Nodal point of contact for this project.</p>
+                                                <p>8 :Given below are the commercials agreed as per clause No.<strong>G</strong> of the MOU:</p>
+
+                                                <table class="table table-bordered">
+                                                    <tr>
+                                                        <td>SL No</td>
+                                                        <td>Description</td>
+                                                        <td>Package</td>
+                                                        <td>Minimum Student Strength</td>
+                                                        <td>Academic Year</td>
+                                                        <td>Amount in Rs. Per Student Per Year</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{ISMSMOUA_ProductName}}</td>
+                                                        <td>{{ISMSMOU_PackageName}}</td>
+                                                        <td>{{ISMMCLTPR_TotalStudent}}</td>
+                                                        <td>{{Contract_Year_From}}</td>
+                                                        <td>{{ISMMCLTPR_CostPerStudent * 12}}</td>
+                                                    </tr>
+
+
+                                                </table>
+                                                <p><strong>Note: GST will be charged extra @ 18%.</strong></p>
+                                                <p>9.We confirm that the following <b>payment terms</b> have been agreed:</p>
+
+                                                <ol ng-repeat="data in groupedData" ng-if="data.YearFlag==1">
+                                                    <li>
+                                                        <b ng-repeat="data1 in data.records" ng-if="$index == 0"> {{data1.PaymentTerm}} </b>
+                                                        <ol style="list-style-type:lower-alpha">
+                                                            <li ng-repeat="data1 in data.records" ng-if="$index == 0">{{data1.ISMCLTPRPL_Per}} % of total value shall be paid along with MOU </li>
+                                                            <li ng-repeat="data1 in data.records" ng-if="$index == 1">{{data1.ISMCLTPRPL_Per}} % of total value before {{data1.ISMCLTPRP_PaymentDate | date:'dd-MM-yyyy'}} </li>
+                                                            <li ng-repeat="data1 in data.records" ng-if="$index == 2">{{data1.ISMCLTPRPL_Per}} % of total value before {{data1.ISMCLTPRP_PaymentDate | date:'dd-MM-yyyy'}} </li>
+                                                            <li ng-repeat="data1 in data.records" ng-if="$index == 3">{{data1.ISMCLTPRPL_Per}} % of total value before {{data1.ISMCLTPRP_PaymentDate | date:'dd-MM-yyyy'}} </li>
+                                                        </ol>
+                                                    </li>
+                                                </ol>
+                                                <ol start="2" ng-repeat="data in groupedData" ng-if="data.YearFlag!=1">
+                                                    <li>
+                                                        <b ng-repeat="data1 in data.records" ng-if="$index == 1"> {{data1.PaymentTerm}} </b>
+                                                        <ol style="list-style-type:lower-alpha">
+                                                            <li ng-repeat="data1 in data.records">{{data1.ISMCLTPRPL_Per}} % of total value before {{data1.ISMCLTPRP_PaymentDate | date:'dd-MMMM'}} every year </li>
+                                                        </ol>
+                                                    </li>
+                                                </ol>
+                                                <p>10.Given below is our bank details for release of payments:</p>
+                                                <p>
+                                                    <strong>
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Bank of India<br />
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Basaveshwaranagar Branch  <br />
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;A/c No. 840620100002174 <br />
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;IFSC Code: BKID0008492 <br />
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Our GST No. is 29AACCV0756H1Z6 <br />
+                                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Our PAN No. AACCV0756H
+                                                    </strong>
+                                                </p>
+                                                <p>11.The contract duration is for {{ISMMCLTPR_ProjectDuration}} years from the date of signing the MOU.</p>
+                                                <p>12.From the second year onwards the rate enhancement shall be {{ISMMCLTPR_EnhancementPerYr}}% every year on the previous year price.</p>
+                                                <p>13.<strong>Exit Policy Settlement</strong> </p>
+                                                <p>The Digital Campus project includes two types of investments a) one time investment of High end Softwares products & Azure cloud Data Centre, as per the Bill of Material mentioned in <strong>Clause No. J </strong>of MOU, Periodical investment of project Manpower service and maintenance of the software supplied; refer Bill of Material mentioned in Clause No. J, (Data Entry and Maintenance of the project).</p>
+                                                <p><strong>High end Software Products:</strong>   As per your requirement we are building High end IT software Infrastructure along with Azure cloud Data Centre exclusively for your institution in the beginning of the contract itself at our cost.  Hence in the contract 80% of the project cost is invested only for High end Software Products & Azure Data Centre, the payment recovery is planned over the {{ISMMCLTPR_ProjectDuration}} year contract period.  If the you opts for exiting the contract during the contract period, then the you shall pay us, 80% due of the remaining  period of the contract value and retain the infrastructure of the high-end products and software and SMS.  </p>
+                                                <p>14.<strong>JURISDICTION</strong> - The subject matter of the MOU is within the jurisdiction of the Bangalore Civil Court and the company is carrying the business at Bangalore, the cause of action arises at Bangalore within the jurisdiction of Bangalore city. </p>
+
+                                                <p>15.We request you to kindly share the contact details of the <b>Nodal Officer</b> from your end, who will be a single point of contact for us till we complete the implementation.</p>
+                                                <p>16.In case of any issues in the implementation, we request you to register your queries through any one of the following options:</p>
+                                                <ol type="a">
+                                                    <li>Log the issues through URL: https://vapsmanagementsoftware.azurewebsites.net</li>
+                                                    <li>Register complaint through our call centre toll free number<strong> &nbsp; 01206901888</strong> </li>
+                                                    <li><strong>You can register your feedback through URL :<a href="https://vapsmanagementsoftware.azurewebsites.net"></a> https://vapsmanagementsoftware.azurewebsites.net </strong></li>
+                                                    <li>You can also send email to your implementation engineer email id : <strong><a href="nithinkumar.y@vapstech.com"></a> nithinkumar.y@vapstech.com </strong></li>
+                                                </ol>
+                                                <p>17.Kindy note that we will be requesting for feedback once in every 45 days.  We request you to kindly provide your feedback about our product, services and support.  Kindly note that your feedback will greatly help us to improve our services and work towards customer satisfaction. </p>
+                                                <p>
+                                                    18.  Further, please note that any additional requirements / customization is not allowed as per <b> clause No. 3 </b> of the MOU.  In case you need any customization, then the same will be taken up for development at an additional cost of Rs. 4,500/- per man-day.
+                                                </p>
+                                                <p>We assure you of our best services at all times and trust we will have a long cordial relationship. </p>
+                                                <p>Thanking you and assuring you of our best services at all times,</p>
+                                                <div class="col-sm-12 margin-top-20">
+                                                    <div class="col-sm-6">
+                                                        Yours faithfully,
+                                                        <p>for <strong>VAPS Technosoft Pvt. Ltd.</strong></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 margin-top-100">
+                                                    <div class="col-sm-6">
+                                                        <p>
+                                                            <b>
+                                                                Ramesh Babu A <br />
+                                                                Project Manager
+                                                            </b>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <img src="https://dcampusstrg.blob.core.windows.net/files/17/NAACDocumentsUpload/896ad2a2-3a9e-4055-a93a-cf7eda34fe5e.jpg" style="height:150px;width:100%; " />
+
+                                                </div>
+                                                <br />
+                                            </div>
+                                        </div>
+                                    </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closemodal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true" ng-click="closemodal(); clearFunction()"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Non-Disclosure Agreement
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printData11()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="col-sm-12" id="asdf" style="background-color: white; color: black; ">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="pdf-page size-a4">
+                            <div class="col-sm-12" style="page-break-after: always!important; ">
+                                <style>
+                                    .lineheight {
+                                        line-height: 1.5;
+                                    }
+                                </style>
+                                <div class="col-sm-12">
+                                    <img src="https://dcampusstrg.blob.core.windows.net/files/17/NAACDocumentsUpload/3f9ee45a-d35e-4890-9740-96ac2e9bdc93.jpg" style="height:150px;width:102%; margin-left:-1%;" />
+                                    <br />
+                                    <br />
+                                </div>
+                                <div class="col-sm-12 lineheight newpage">
+                                    <h5 style="text-align:center;">
+                                        <u>AGREEMENT FOR EXCHANGE OF CONFIDENTIAL INFORMATION</u>
+                                    </h5>
+                                    <p style="text-align:center;">Ref: {{ISMMCLTPR_MOURefNo}} dated {{ISMMCLTPR_MOUStartDate | date:'dd/MM/yyyy'}}</p>
+                                    <p>This agreement for Exchange of confidential information (the “Agreement”) is entered as of {{ISMMCLTPR_MOUStartDate | date:'dd/MM/yyyy'}} (the “Effective Date”) by and between VAPS Technosoft Pvt Ltd.,   a company incorporated under the (Indian Companies Act, 1956) with Registration No.CIN-U72200KA2001PTC028429 having its registered office at #No.58, Old No. 20, 1st Main, KHB 1st Stage, Kamakshipalya, Basaveshwaranagar, Bangalore 560079 and {{ISMSLE_LeadName}}, {{ISMSLE_LeadAddress1}},{{ISMSLE_LeadAddress2}},{{ISMSLE_LeadAddress3}} - {{ISMSLE_Pincode}} Contact No: {{ISMMCLTPR_NodalOfficerContactNo}}, Email: {{ISMMCLTPR_NodalOfficerEmailId}} hereinafter referred to individually as a “Party” and collectively as the “Parties”.</p>
+                                    <ol class="lineheight" type="1" start="1">
+                                        <li class="lineheight"><strong>Term:</strong> This Agreement shall have a term of {{ISMMCLTPR_ProjectDuration}} years from the effective Date of {{ISMMCLTPR_MOUStartDate | date:'dd/MM/yyyy'}} to {{ISMMCLTPR_MOUEndDate | date:'dd/MM/yyyy'}} </li>
+                                        <br />
+                                        <li class="lineheight"><strong>Purpose:</strong>  The Parties intended to share confidential Information for potential business relationship (“Purpose”) wherein VAPS Technosoft Pvt Ltd will share proprietary architecture design to seek advice on the appropriateness of the said design.</li>
+                                        <br />
+                                        <li class="lineheight"><strong>Discloser & Recipient:</strong>  Either Party, including its Affiliates and subsidiaries, may disclose confidential information under this Agreement for the “Purpose” and shall be referred to as “Discloser” hereunder.  The other Party, including its affiliates and subsidiaries receiving Confidential Information hereunder shall be referred to as “Recipient”.  For the purpose of this Agreement, “Affiliates” shall mean any legal entity which, is directly or indirectly controlling, controlled by or under the common control of the recipient.  Subsidiaries are the branches or other entities of the recipient.</li>
+                                        <br />
+                                        <li class="lineheight">The institution should not employ the company employee and the company vendors directly or indirectly during the contract period and for a period of 3 years after completion of the contract period.</li>
+                                        <br />
+                                        <li class="lineheight"><strong>Confidential Information :</strong> The Information disclosed by the Discloser to the Recipient hereunder relating the Discloser’s business including without limitations, computer programs, technical drawings, algorithms, know-how, process, designs, reports, specifications, ideas, inventions, schematics, pricing information and other technical business, financial, customer and product developmental plans, database, setup files, EXEs, strategies and such information is hereunder referred to as “Confidential Information” of the Discloser.  The Discloser shall observe reasonable care while disclosing any Confidential Information to the Recipient. Information which is orally or visually disclosed to the recipient by the Discloser, or is disclosed in writing without being marked as confidential, are deemed confidential, unless specifically indicated in writing as “not confidential”, by the recipient with suitable reference about the place and of such oral or visual disclosure and the names of the employees or officers of the Recipient to whom such discloser was made.   </li>
+                                        <br />
+                                        <li class="lineheight"><strong>Confidentiality Obligation :</strong> The Recipient agrees: (i) to hold the Confidential Information in confident and to take reasonable precautions to protect such confidential Information from unauthorized discloser including all precautions the Recipient employs with respect to its own confidential material, (ii) not to divulge any such confidential information to any third person, (iii) not to make any use whatsoever at any time of such Confidential Information except for the Purpose, and (iv) not to copy or reverse engineer any such Confidential Information.  The recipient shall permit access top Confidential Information to its employees, consultants, agents or those employees, consultants or agents of its Affiliates for the Purpose on a need to know basis only, and shall ensure that they are bound to maintain confidentiality of such Confidential Information to the extent as provided under this agreement.</li>
+                                        <br />
+                                        <li class="lineheight">The company shall not disclose institution’s data / records to any third party without obtaining permission from the institution.  Similarly the institution shall not reveal company’s commercials, statement of work, MOU or any other documents, and shall not demonstrate Company’s product to third party without obtaining permission from the company.</li>
+                                        <br />
+                                        <li class="lineheight"><strong>Survival Exceptions Return:</strong> The confidentiality obligations hereunder shall survive with respect to any confidential information for a period of Five (5) years following the expiry of this agreement provided that the obligations shall be perpetual with regard to any source code or trade secret that may be disclosed hereunder.  The confidentiality obligations shall not be applicable with respect to any information that the Recipient can document: (1) is or has become (through no improper action or inaction by the recipient or any affiliate, agent, consult or employee) generally available to the public, or (2) was properly in its possessions or know by it, without restriction, prior to receipt form the Discloser, or (3) was rightfully disclosed to it by a third party without restriction, or (4) was independently developed by the Recipient without use of or reference to the Discloser’s confidential information, or (5) was authorized to be disclosed in writing by the discloser.  The Recipient may also make disclosers as may by and to the extent required by law or court order provided the recipient promptly notifies the Disclose in writing about such requirement to disclose. Immediately upon request by the Discloser, which may be made at any time, the 8.Recipient will return to the Discloser all of its Confidential Information and/or destroy all documents or media containing any such Confidential information and upon request will have an officer of the Recipient certify compliance with this provision, provided that the Recipient may retain copy of Confidential Information to the extent necessary to meet any statutory requirements. </li>
+                                        <br />
+                                        <li class="lineheight"><strong>Disclaimer:</strong> The Recipient understands that nothing herein requires the Discloser to proceed with any transactions.  The Confidential Information is disclosed hereunder as is without any express or implied warranty and in particular without any limitations as to fitness of such warranty and in particular without any limitation as to fitness of such information for the intend purpose or claim by third parties relating to intellectual property rights. For the avoidance of any doubt, the ownership of all intellectual property rights in the confidential Information disclosed hereunder remains with its original owner and no grant of license or conveyance of any intellectual property rights in such Confidential Information is to be implied from the mere sharing of such information under this Agreement.</li>
+                                        <br />
+                                        <li class="lineheight"><strong>Injunctive Relief :</strong> The Recipient Acknowledges that due to the unique nature of the Discloser’s Confidential Information, any breach of its obligations hereunder will result in irreparable harm to the Discloser shall be entitled to appropriate equitable relief, including the relief of 10.injunction and/or specific performance, in addition to any other remedies available at law. </li>
+                                        <br />
+                                        <li class="lineheight"><strong>General:</strong> This Agreement shall be governed by the laws of Karnataka and shall be subject to the exclusive jurisdiction of courts at Bangalore.  The Parties agree to be information hereunder. Any notice under this Agreement shall be in writing and shall be deemed given if delivered personally or mailed by registered or certified mail (return receipt requested) to the Parties at their address specified in this Agreement, or at any other address that a Party specifies in writing.  This Agreement shall not be assigned by either Party except with the prior written consent of the other Party. No failure or delay in enforcing any right will be deemed a waiver unless made in writing and signed by a duly authorized representative of such Party.  This Agreement constitutes the entire agreement between the Parties and supersedes all prior discussions or agreements relating to the subject matter hereof. This Agreement may be modified only by an amendment executed in writing by a duly authorized representative of both Parties.</li>
+                                        <br />
+                                        <div>
+                                            <p>
+                                                for <b> VAPS Technosoft Pvt. Ltd.</b>
+                                            </p>
+                                            <p>
+                                                <b>Signature : __________________________________________________</b>
+                                            </p>
+                                            <p>
+                                                <b>Name : Mr. R. Siddesh Kumar</b>
+                                            </p>
+                                            <p>
+                                                <b>Designation : Managing Director</b>
+                                            </p>
+                                            <p>
+                                                <b>Date : {{ISMMCLTPR_MOUDate |  date:'dd/MM/yyyy'}}</b>
+                                            </p>
+                                            <br />
+                                            <br />
+                                            <div>
+                                                <p>
+                                                    <b>&nbsp;for {{ISMSLE_LeadName}}</b>
+                                                </p>
+                                                <p>
+                                                    <b>Signature : __________________________________________________</b>
+                                                </p>
+                                                <p>
+                                                    <b>Name : Mr.{{ISMMCLTPR_NodalOfficerName}}</b>
+                                                </p>
+                                                <p>
+                                                    <b>Designation : {{ISMSLE_ContactDesignation}}</b>
+                                                </p>
+                                                <p>
+                                                    <b>Date : {{ISMMCLTPR_MOUDate |  date:'dd/MM/yyyy'}}</b>
+                                                </p>
+                                                <br />
+                                            </div>
+                                            <div>
+                                                <p>
+                                                    <b>
+                                                        <u>WITNESS</u>
+                                                    </b>
+                                                </p>
+                                                <p>
+                                                    <b>A)</b>
+                                                </p>
+                                                <p>
+                                                    <b>B)</b>
+                                                </p>
+                                            </div>
+                                    </ol>
+                                </div>
+                                <div>
+                                    <img src="https://dcampusstrg.blob.core.windows.net/files/17/NAACDocumentsUpload/896ad2a2-3a9e-4055-a93a-cf7eda34fe5e.jpg" style="height:150px;width:100%; " />
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closemodal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="OrderAcceptancedocumentscanner" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true" ng-click="closemodal(); clearFunction()"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    Order Acceptance
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printOrderAcceptance()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <md-button type="button" class="md-raised md-accent" ng-click="SendDataview()">
+                    SEND MAIL
+                </md-button>
+            </div>
+            <div>
+                
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closemodal()">Close</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

@@ -1,0 +1,153 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+
+<section class="content" ng-init="Loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Email Department Mapping </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+
+            </div>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="frmmodule" novalidate>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Department Name: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="stuclass" data-ng-model="HRMD_Id" required
+                                        ng-change="onchangedept();">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="dept in deptartmentlist" value="{{dept.hrmD_Id}}" ng-selected="{{dept.Selected == true}}">
+                                        {{dept.hrmD_DepartmentName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages text-center" ng-if="interacted2(frmmodule.stuclass)" ng-messages="frmmodule.stuclass.$error">
+                                    <div ng-message="required">Select the Department Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" data-ng-repeat="emailstd in emailsstd track by $index" ng-form="myForm1">
+                            <label class="control-label col-sm-4">
+                                Email-ID:<strong style="color:red;">*</strong>
+                            </label>
+                            <div class="col-sm-8 input-group" style="">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-envelope-o"></i>
+                                </div>
+                                <input name="stuemailid" type="email" id="reservation" class="form-control" data-ng-model="emailsstd[$index].emaild"
+                                       ng-pattern="/^[A-Za-z0-9]+[A-Za-z0-9._-]+@[A-Za-z0-9]+\.[A-Za-z.]{2,5}$/" 
+                                       ng-blur="addtopdays(emailsstd[$index],$index)" required>
+                                <span ng-show="$last" class="input-group-addon" ng-hide="emailsstd.length > 4">
+                                    <a href="" ng-show="showAddEmail1std(emailstd)" ng-click="addNewEmail1std()" style="color:#000;">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </span>
+                                <span class="input-group-addon" id="remove" ng-hide="emailsstd.length ==1">
+                                    <a href="" ng-click="removeNewEmail1std($index)" style="color:#000;">
+                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="error-messages text-center" ng-if="interacted2(myForm1.stuemailid)" ng-messages="myForm1.stuemailid.$error">
+                                <div ng-message="pattern">Enter Valid email-id</div>
+                                <div ng-message="required">Enter Email -Id</div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ismmclT_Id" value="{{ismmclT_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="newuser.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Email Department Mapping Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{newuser.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">SL NO</th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Department Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleDesc')">Email Ids </a></th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="userU in lengthval = (newuser | filter : searchValueU)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPageU"
+                            current-page="currentPageU" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                            <td class="text-left">{{userU.departmentname}}</td>
+                            <td class="text-left">{{userU.emailids}}</td>
+                            <td class="text-center">
+                                <a class="text-aqua" href="" ng-click="Editdata(userU)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                            <td hidden="hidden">{{newuser.ivrmM_Id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+
+
+</section>

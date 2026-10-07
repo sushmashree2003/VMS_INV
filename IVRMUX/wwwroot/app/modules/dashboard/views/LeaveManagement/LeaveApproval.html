@@ -1,0 +1,730 @@
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Leave Approval Status</h3>
+                <div class="box-tools pull-right">
+                    <!--<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>-->
+                    <!--<button type="button" class="btn btn-primary" data-toggle="modal" ng-click="redirectpage()">
+                        <i class="fa fa-cart-plus" aria-hidden="true"></i> &nbsp; ON DUTY / COMP OFF APPROVAL
+                    </button>-->
+                </div>
+
+                <div class="box-body" ng-hide="get_leavestatus.length==0">
+                    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                        <div style="overflow:auto;">
+                            <div class="col-sm-12 row">
+                                <table class="table table-responsive table-bordered" style="height:100px;">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label>
+                                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </th>
+                                            <th style="width:27%">Name</th>
+                                            <th style="width:20%">Leave Details</th>
+                                            <!--<th style="width:17%">Leave Balance</th>-->
+                                            <th style="width:25%">Leave Date</th>
+
+                                            <!--<th>Approved Days</th>-->
+                                            <!--<th>Document</th>
+                                            <th>Comments & Reason</th>-->
+                                            <th style="width:23%">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="leave in get_leavestatus |orderBy:sortKey:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" pagination-id="pagination2" ng-class-odd="'odd'">
+                                            <td class="text-left">
+                                                <label style="margin-left:5px;">
+                                                    <input type="checkbox" ng-model="leave.selected" ng-true-value="true" ng-false-value="false"
+                                                           ng-change="GetLeave(leave)" ng-required="isOptionsRequired()" name="adcheckt">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </td>
+
+                                            <td class="text-left">
+                                                <div class="row text-center">
+                                                    <div class="col-sm-12">
+                                                        <label style=" color: #3a5999 !important;font-weight: bolder;font-size: 20px;font-family:FontAwesome;">{{leave.HRME_EmployeeFirstName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-top-5" ng-if="leave.HRELAP_SupportingDocument != 0">
+                                                    <div class="col-sm-12">
+                                                        <b>
+                                                            Documents :
+                                                            <a href="javascript:void(0)" ng-if="leave.HRELAP_SupportingDocument != 0"
+                                                               ng-model="leave.HRELAP_SupportingDocument" ng-click="viewdocument(leave);" title="View Document">
+                                                                <i class="fa fa-eye text-blue"></i>
+                                                            </a>
+                                                        </b>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-top-10">
+                                                    <div class="col-sm-12">
+                                                        <b>
+                                                            View Deviation/Comments/Approved Details  :
+                                                            <a href="javascript:void(0)" ng-model="leave.Comments" data-toggle="modal" title="View Comments"
+                                                               data-target="#myModalgetclasslist" ng-click="viewcomment(leave)">
+                                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                            </a>
+                                                        </b>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-top-10">
+                                                    <div class="col-sm-12">
+                                                        <b>
+                                                            View Leave Balance/Leave History  :
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="View Leave Balance/History"
+                                                               data-target="#viewleavehistory" ng-click="Viewleavebalancehistory(leave)">
+                                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                            </a>
+                                                        </b>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row margin-top-10" ng-if="leave.ProxyName.length>0">
+                                                    <div class="col-sm-12">
+                                                        <b>
+                                                            Proxy Assigned Details  :
+                                                            <a href="javascript:void(0)" data-toggle="modal" title="Proxy Assigned Details"
+                                                               data-target="#proxydetails" ng-click="proxydetials(leave)">
+                                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                            </a>
+                                                        </b>
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row text-center" ng-if="leave.HRELAP_CompOffAdjestFlg==true">
+                                                    <span style="color:red;font-weight:700;font-size:medium">Comp Off Adjest For Lop</span>
+                                                </div>
+                                            </td>
+
+                                            <td class="text-left">
+                                                Leave Type :<b>{{leave.HRML_LeaveName}}</b><br />
+                                                Applied Date :<b>{{leave.HRELAP_ApplicationDate | date :'dd/MM/yyyy'}}</b><br />
+                                                Applied Days :<b>{{leave.HRELAP_TotalDays}}</b><br />
+                                                Reporting Date : <b>{{leave.HRELAP_ReportingDate | date :'dd/MM/yyyy'}}</b>
+                                            </td>
+
+                                            <!--<td class="text-left">
+
+                                                <table>
+                                                    <tr ng-repeat="hr in leavebalance">
+                                                        <td>
+                                                            {{hr.LeaveType}} :<b>{{hr.EmpBalanceLeaves}}</b>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>-->
+
+                                            <td style="padding: 11px;">
+                                                <div class="row">
+                                                    <label><b>From Date:</b></label><md-datepicker ng-model="leave.HRELAP_FromDate" md-min-date="leave.mindate" ng-change="todate(leave.HRELAP_ToDate,leave)"
+                                                                                                   md-max-date="leave.maxdate" md-placeholder="Enter date">
+                                                    </md-datepicker>
+                                                </div><br />
+                                                <div class="row">
+                                                    <label><b>To Date:</b></label>
+                                                    <md-datepicker ng-model="leave.HRELAP_ToDate" md-min-date="leave.mindate" md-max-date="leave.maxdate"
+                                                                   ng-change="todate(leave.HRELAP_ToDate,leave)" md-placeholder="Enter date">
+                                                    </md-datepicker>
+                                                </div>
+                                            </td>
+
+
+
+                                            <td class="text-center">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <b>
+                                                            No.Of Days : {{leave.HRELAP_TotalDaysapprv}}
+                                                        </b>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <textarea class="form-control" rows="3" style="resize:none" ng-model="leave.HRELAPA_Remarks" name="t1reason_{{$index}}"
+                                                                  ng-required="leave.selected"></textarea>
+                                                        <div class="error-messages" ng-if="interacted(myForm['t1reason_'+$index])"
+                                                             ng-messages="myForm['t1reason_'+$index].$error">
+                                                            <div ng-message="required">Enter Remark</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <dir-pagination-controls max-size="5" pagination-id="pagination2"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <!--<div class="form-group">
+                                    <label class="control-label col-sm-4">Remarks : <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" ng-model="remarkstxta" name="reason" required></textarea>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.reason)" ng-messages="myForm.reason.$error">
+                                        <div ng-message="required" style="padding-left: 30px;">Enter Remark</div>
+                                    </div>
+                                </div>-->
+                                <div class="form-group">
+                                    <div class="error-messages" ng-if="interacted(myForm.adcheckt)" ng-messages="myForm.adcheckt.$error">
+                                        <div ng-message="required" style="text-align:center;font-family:'Times New Roman';font-size:medium;">
+                                            <strong>Select Check Box  To {{approveorreject}} Leave Details</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center form-group">
+                                    <input type="hidden" ng-model="HRML_Id" />
+
+                                    <md-button type="submit" class="md-raised md-primary" ng-click="get_status('Approved')">
+                                        <i class="fa fa-check" aria-hidden="true"></i> Approve
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-in" style="background: darkgray;" ng-click="cancel()">
+                                        <i class="fa fa-refresh" aria-hidden="true"></i> Cancel
+                                    </md-button>
+                                    <md-button type="submit" class="md-raised md-warn" ng-click="get_status('Rejected')">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Reject
+                                    </md-button>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <md-subheader>Current Leave Status : </md-subheader>
+                                <div class="form-group">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Application ID</th>
+                                                <th>Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="rod in rowsSelected">
+                                                <td class="text-left">{{rod.HRELAP_ApplicationID}}</td>
+                                                <td class="text-left">{{rod.HRME_EmployeeFirstName}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div ng-show="get_leavestatus.length==0" class="text-center">
+                <p class="box-title" style="color:red">NO leaves pending for approval!!</p>
+            </div>
+        </div>
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Leave Approval Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-6 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 table-wrap">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Sl.No</th>
+                                <th rowspan="2">Employee Code</th>
+                                <th rowspan="2">Employee Name</th>
+                                <th rowspan="2">Leave Name</th>
+                                <th rowspan="2">From Date</th>
+                                <th rowspan="2">To Date</th>
+                                <th rowspan="2">Total Days</th>
+                                <!--<th rowspan="2">Leave Reason</th>-->
+                                <th rowspan="2">Leave Status</th>
+                                <th rowspan="2">Remark</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            <tr dir-paginate="employee in filterValue = (activityIds| filter : searchValue) |orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page1" ng-class-odd="'odd'">
+                                <!--<tr ng-repeat="employee in activityIds">-->
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left">{{employee.hrmE_EmployeeCode}}</td>
+                                <td class="text-left">{{employee.hrmE_EmployeeFirstName}}</td>
+                                <td class="text-left">{{employee.hrmL_LeaveName}}</td>
+                                <td class="text-left">{{employee.hrelT_FromDate|date:'dd-MM-yyyy'}}</td>
+                                <td class="text-left">{{employee.hrelT_ToDate|date:'dd-MM-yyyy'}}</td>
+                                <td class="text-left">{{employee.hrelT_TotDays}}</td>
+                                <!--<td class="text-left">{{employee.hrelaP_LeaveReason}}</td>-->
+                                <td class="text-left">{{employee.hrelT_Status}}</td>
+                                <!--<td class="text-left">{{employee.hrelapA_Remarks}}</td>-->
+                                <td class="text-center">
+                                    <span>
+                                        <a href="" ng-click="ViewRemarksLevelWise(employee)">
+                                            <i class="fa fa-eye text-primary" title="View Remarks"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="10" pagination-id="page1"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="viewremarksstatus" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="model-header custom-header">
+                <center><h4 class="modal-title custom">Leave Approved Details</h4></center>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Employee Name :{{HRME_EmployeeFirstName}}</b> </label>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Leave Reason :<p ng-bind-html="trustAsHtml(HRELAP_LeaveReason)"></p></b> </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Applyed Leave: {{HRML_LeaveName}}</b> , (<b>No Of Days:</b>{{HRELAP_TotalDays}})</label>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b></b></label>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Leave Name</th>
+                            <th>Approved By</th>
+                            <th>Approved Date</th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Approved Days</th>
+                            <th>Sanction Level</th>
+                            <th>Final Flag</th>
+                            <th>Remarks</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="cmnt in Getviewremarksdetails">
+                            <td>{{$index + 1}}</td>
+                            <td class="text-left">{{cmnt.hrmL_LeaveName}}</td>
+                            <td class="text-left">{{cmnt.hrmE_EmployeeFirstName}}</td>
+                            <td class="text-center">{{cmnt.createdDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_FromDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_ToDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_TotalDays}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_SanctioningLevel}}</td>
+                            <td class="text-center">
+                                <span ng-if="cmnt.hrelapA_FinalFlag==true">
+                                    <i class="fa fa-check text-green" title="Final Flag"></i>
+                                </span>
+                                <span ng-if="cmnt.hrelapA_FinalFlag!=true">
+                                    <i class="fa fa-times text-red" title=""></i>
+                                </span>
+                            </td>
+                            <td class="text-left">{{cmnt.hrelapA_Remarks}}</td>
+                            <td class="text-left">{{cmnt.hrelapA_LeaveStatus}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div id="proxydetails" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width:95%;" overflow:auto;">
+        <div class="modal-content" style="overflow:auto;">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h4 class="modal-title text-white">
+                    PROXY DETAILS
+                </h4>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Employee Name : {{HRME_EmployeeFirstName}}</b></label>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Leave Reason : <p ng-bind-html="trustAsHtml(HRELAP_LeaveReason)"></p></b></label>
+                        </div>
+                        <div class="form-group">
+
+                            <label class="control-label col-sm-4 "><b>Applied Leave:</b> {{HRML_LeaveName}} , (<b>No Of Days:</b>{{HRELAP_TotalDays}})</label>
+
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b></b></label>
+
+                        </div>
+                    </div>
+                </div>
+                <h4>Proxy Details</h4>
+                <div class="col-sm-12">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No.</th>
+                                <th>Proxy Name</th>
+                                <th>Designation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{$index + 1}}</td>
+                                <td class="text-left">{{ProxyName}}</td>
+                                <td class="text-center">{{HRMDES_DesignationName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-12" ng-if="proxytaskList.length>0">
+                    <div style="overflow:auto;width:100%;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No.</th>
+                                    <th>Employee Name</th>
+                                    <th>Proxy Emp. Name</th>                                  
+                                    <th>Task ID</th>
+                                    <th>Assigned Date</th>
+                                    <th>Task Priority</th>
+                                    <th>Task Title</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--<tr ng-repeat="proxy in proxytaskList">-->
+                                <tr dir-paginate="proxy in proxytaskList |orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage"
+                                    pagination-id="page1">
+                                    <td>{{$index + 1}}</td>
+                                    <td class="text-left">{{proxy.TransferredBy}}</td>
+                                    <td class="text-left">{{proxy.TransferredTo}}</td>
+                                    <td class="text-left">{{proxy.Task_No}}</td>
+                                    <td class="text-center">{{proxy.Assigned_Date | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">{{proxy.Task_Priority}}</td>
+                                    <td class="text-left">{{proxy.Task_Title}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <dir-pagination-controls max-size="5" pagination-id="page1"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="viewleavehistory" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width:95%;" overflow:auto;">
+        <div class="modal-content" style="overflow:auto;">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h4 class="modal-title text-white">Leave Balance/Applied Details</h4>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Employee Name : {{HRME_EmployeeFirstName}}</b></label>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Leave Reason :<p ng-bind-html="trustAsHtml(HRELAP_LeaveReason)"></p></b></label>
+                        </div>
+                        <div class="form-group">
+
+                            <label class="control-label col-sm-4 "><b>Applied Leave:</b> {{HRML_LeaveName}} , (<b>No Of Days:</b>{{HRELAP_TotalDays}})</label>
+
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b></b></label>
+
+                        </div>
+                    </div>
+                </div>
+                <h4>Leave Balance Details</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Leave Name</th>
+                            <th>Total Leaves Credited</th>
+                            <th>Consumed Leaves</th>
+                            <th>Balance Leaves</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="cmnt in getemployeeleavedetails">
+                            <td>{{$index + 1}}</td>
+                            <td class="text-left">{{cmnt.EmpLeaveType}}</td>
+                            <td class="text-center">{{cmnt.EmpCreatedLeaves}}</td>
+                            <td class="text-center">{{cmnt.EmpUsedLeaves}}</td>
+                            <td class="text-center">{{cmnt.EmpBalanceLeaves}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <h4>Leave Applied Details</h4>
+                <table class="table table-bordered" ng-if="getemployeehistroyleavedetails.length>0">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Application No.</th>
+                            <th>Leave Name</th>
+                            <th>Applied Date</th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Total Days</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="cmnt in  (getemployeehistroyleavedetails| filter : searchValue) |orderBy:propertyName:reverse
+                                |itemsPerPage:itemsPerPage10" current-page="currentPage10" pagination-id="page10" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPage10 *(currentPage10-1)+$index+1}}</td>
+                            <td class="text-left">{{cmnt.HRELAP_ApplicationID}}</td>
+                            <td class="text-left">{{cmnt.LeaveType}}</td>
+                            <td class="text-center">{{cmnt.AppliedDate}}</td>
+                            <td class="text-center">{{cmnt.Fromdate}}</td>
+                            <td class="text-center">{{cmnt.Todate}}</td>
+                            <td class="text-center">{{cmnt.HRELAP_TotalDays}}</td>
+                            <td class="text-left"><p ng-bind-html="trustAsHtml(cmnt.HRELAP_LeaveReason)"></p></td>
+                            <td class="text-left">{{cmnt.HRELAP_ApplicationStatus}}</td>
+                            <td class="text-center">
+                                <a href="javascript:void(0)" ng-model="cmnt.Comments" data-toggle="modal" title="View Comments"
+                                   data-target="#myModalgetclasslist" ng-click="viewcomment(cmnt)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="10" pagination-id="page10"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="myModalgetclasslist" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg" style="width:95%;" overflow:auto;">
+        <div class="modal-content" style="overflow:auto;">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h4 class="modal-title text-white">Leave Comment List</h4>
+            </div>
+
+
+            <div class="box-body">
+                <!--<div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Employee Name :</b> {{HRME_EmployeeFirstName}}</label>
+
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Leave Reason :</b> {{HRELAP_LeaveReason}}</label>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">                           
+                            <label class="control-label col-sm-4 "><b>Employee Name : {{HRME_EmployeeFirstName}}</b></label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b>Leave Reason : <p ng-bind-html="trustAsHtml(HRELAP_LeaveReason)"></p></b></label>
+                        </div>
+                        <div class="form-group">
+
+                            <label class="control-label col-sm-4 "><b>Applied Leave:</b> {{HRML_LeaveName}} , (<b>No Of Days:</b>{{HRELAP_TotalDays}})</label>
+
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 "><b></b></label>
+
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Deviation Details</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Department</th>
+                            <th>Month - Year</th>
+                            <th>Effort</th>
+                            <th>Completed</th>
+                            <th>Deviation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="cmnt in deviationlist">
+                            <td>{{$index + 1}}</td>
+                            <td class="text-left">{{cmnt.hrmdC_Name}}</td>
+                            <td class="text-left">{{cmnt.monthYear}}</td>
+                            <td class="text-center">100</td>
+                            <td class="text-center">{{cmnt.compPer}}</td>
+                            <td class="text-center">{{cmnt.devPer}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Leave Comment Details</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Approved By</th>
+                            <th>Approved Level</th>
+                            <th>Approved Date</th>
+                            <th>Approved Days</th>
+                            <th>Approved From Date</th>
+                            <th>Approved To Date</th>
+                            <th>Status</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="cmnt in commentlist" ng-if="commentlist.length>0">
+                            <td>{{$index + 1}}</td>
+                            <td class="text-left">{{cmnt.hrmE_EmployeeFirstName}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_SanctioningLevel}}</td>
+                            <td class="text-center">{{cmnt.createdDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_TotalDays}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_FromDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{cmnt.hrelapA_ToDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-left">{{cmnt.hrelapA_LeaveStatus}}</td>
+                            <td class="text-left">{{cmnt.hrelapA_Remarks}}</td>
+                        </tr>
+
+                        <tr ng-if="commentlist.length==0">
+                            <td colspan="9"><b style="color:red !important">No Records Found</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+        <div class="modal-footer custom-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <!--<div id="pdfId"></div>-->
+            <embed id="idpdf" ng-src="{{content}}" onload="refreshDialer();" style="width: 100%;" height="1000" />
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                        <!--ng-init="zoomWidth = 100;imgStyle = {width:'100px'}" ng-style="imgStyle"
+                        ng-mouse-wheel-up="zoomWidth = zoomWidth + 20; imgStyle.width = zoomWidth +'px'; "
+                        ng-mouse-wheel-down="zoomWidth = zoomWidth - 20;imgStyle.width = zoomWidth  +'px'; " />-->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-center">
+                    <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                    <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                </div>
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Close
+                </md-button>
+            </div>
+        </div>
+    </div>
+</div>

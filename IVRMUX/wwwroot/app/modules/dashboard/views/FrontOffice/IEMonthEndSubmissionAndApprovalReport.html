@@ -1,0 +1,532 @@
+﻿<link href="/css/print/Fees/MonthEndReport.css" rel="stylesheet" />
+
+<style>
+    .lateinearly {
+        background-color: #c535359c;
+        color: white;
+    }
+
+    .tscroll {
+        width: 100%;
+        overflow-x: scroll;
+        margin-bottom: 10px;
+        border: solid black 1px;
+    }
+
+    .myBtn:hover {
+        background-color: #555;
+    }
+
+    #scrollToTop, #scrollToBottom {
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    #myBtn {
+        display: none;
+        position: fixed;
+        top: 60px;
+        right: 15px;
+        z-index: 99;
+        outline: none;
+        color: black;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: x-large;
+        font-weight: bold;
+        border: red 1px solid;
+    }
+
+    #myBtntop {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 15px;
+        z-index: 99;
+        border: none;
+        outline: none;
+        color: black;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: x-large;
+        font-weight: bold;
+        border: red 1px solid;
+    }
+
+    #myBtn:hover {
+        background-color: #555;
+    }
+
+    .paddtab1 {
+        padding-right: 1px !important;
+        padding-left: 0px !important;
+    }
+
+    .paddtab2 {
+        padding-right: 1px !important;
+        padding-left: 1px !important;
+    }
+
+    .control-label1 {
+        padding-top: 0px !important;
+    }
+
+    .multiselect {
+        text-align: left
+    }
+</style>
+
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loadData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">IE MONTH END SUBMISSION AND APPROVAL REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well text-center" data-ng-init="allind ='IE'">
+                            <input type="radio" value="IE" name="allind" data-ng-model="allind">
+                            <span class="lbl padding-8">IE Wise</span>
+                            <input type="radio" value="Client" name="allind" data-ng-model="allind">
+                            <span class="lbl padding-8">Client Wise</span>
+                            <input type="radio" value="All" name="allind" data-ng-model="allind">
+                            <span class="lbl padding-8">All Client Wise</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='IE'">
+                    <div class="col-sm-6 text-center col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Client Name:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control " id="sel2556" name="clientt" ng-model="ismmclT_Id" ng-change="getIEDetails()" required>
+                                    <option value="" label="--Select Clint Name--"> </option>
+                                    <option ng-repeat="inti in intistutename" value="{{inti.ismmclT_Id}}" ng-selected="{{inti.ismmclT_Id == ismmclT_Id}}">
+                                        {{inti.ismmclT_ClientName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.clientt)" ng-messages="myForm.clientt.$error">
+                                <div ng-message="required">Select Client Name</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">IE Name:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control " id="sel2556" name="iename" ng-model="IE_Id" ng-required="allind==IE">
+                                    <option value="" label="--Select IE Name--"> </option>
+                                    <option ng-repeat="ie in ielist" value="{{ie.hrmE_Id}}" ng-selected="{{ie.hrmE_Id == true}}">
+                                        {{ie.hrmE_EmployeeFirstName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.iename)" ng-messages="myForm.iename.$error">
+                                <div ng-message="required">Select IE Name</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel255" name="year1" ng-model="ASMAY_Id" required>
+                                    <option value="">--Select Year--</option>
+                                    <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.hrmlY_LeaveYear == true}}">
+                                        {{option.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                    <div ng-message="required">Select Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month:<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="ivrM_Month_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC4()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+
+                                <label ng-repeat="month in fillmonth | filter:searchchkbx1" value="{{month.ivrM_Month_Id}}">
+                                    <input type="checkbox" data-ng-model="month.selected" ng-click="togchkbxC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired4() && allind==All" name="monthname" />
+                                    <span class="lbl padding-8">{{month.ivrM_Month_Name}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-offset-1 error-messages" ng-if="interacted(myForm.monthname)" ng-messages="myForm.monthname.$error">
+                                <div ng-message="required" class="col-sm-12"> Select  Month </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='Client'">
+                    <div class="col-sm-6 text-center col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Client Name:<span style="color:red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control " id="sel2556" name="clientt" ng-model="ismmclT_Id" ng-required="allind==Client">
+                                    <option value="" label="--Select Clint Name--"> </option>
+                                    <option ng-repeat="inti in intistutename" value="{{inti.ismmclT_Id}}" ng-selected="{{inti.ismmclT_Id == ismmclT_Id}}">
+                                        {{inti.ismmclT_ClientName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.clientt)" ng-messages="myForm.clientt.$error">
+                                <div ng-message="required">Select Client Name</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel255" name="year1" ng-model="ASMAY_Id" required>
+                                    <option value="">--Select Year--</option>
+                                    <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.hrmlY_LeaveYear == true}}">
+                                        {{option.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                    <div ng-message="required">Select Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="control-label col-sm-4">Month:<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="ivrM_Month_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC4()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+
+                                <label ng-repeat="month in fillmonth | filter:searchchkbx1" value="{{month.ivrM_Month_Id}}">
+                                    <input type="checkbox" data-ng-model="month.selected" ng-click="togchkbxC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired4() && allind==All" name="monthnam" />
+                                    <span class="lbl padding-8">{{month.ivrM_Month_Name}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-offset-1 error-messages" ng-if="interacted(myForm.monthnam)" ng-messages="myForm.monthnam.$error">
+                                <div ng-message="required" class="col-sm-12"> Select  Month </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='All'">
+                    <div class="col-sm-6 text-center col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Client Name:<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" ng-model="ismmclT_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+
+                                <label ng-repeat="inti in intistutename | filter:searchchkbx1" value="{{inti.ismmclT_Id}}">
+                                    <input type="checkbox" data-ng-model="inti.selected" ng-click="togchkbxC1()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired() && allind==All" name="client" />
+                                    <span class="lbl padding-8">{{inti.ismmclT_ClientName}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-offset-1 error-messages" ng-if="interacted(myForm.clsoption)" ng-messages="myForm.clsoption.$error">
+                                <div ng-message="required" class="col-sm-12"> Select  Client </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel255" name="year1" ng-model="ASMAY_Id" required>
+                                    <option value="">--Select Year--</option>
+                                    <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.hrmlY_LeaveYear == obj.ASMAY_Id}}">
+                                        {{option.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                    <div ng-message="required">Select Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="month1" ng-model="ivrM_Month_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in fillmonth" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.ivrM_Month_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                    <div ng-message="required">Please Select the month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="ShowReportdata()" id="save-btn">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-click="Clear_Details();" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+                        <md-button type="button" ng-if="iemonthendReport.length>0" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#printDeviation')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" ng-if="iemonthendReport.length>0" class="md-raised md-primary" id="print-btn" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="iemonthendReport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">IE Month End Submission And Approval Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group margin-left-none">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr class="text-center">
+                            <th>SL NO</th>
+                            <th>Client Name</th>
+                            <th>Submitted By</th>
+                            <th>Year</th>
+                            <th>Month</th>
+                            <th>Date Of Submission</th>
+                            <th>View Document</th>
+                            <th>Approval Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="indl in filterValue = (iemonthendReport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center">{{indl.ISMMCLT_ClientName}}</td>
+                            <td class="text-center">{{indl.Employee_Name}}</td>
+                            <td class="text-center">{{indl.Year}}</td>
+                            <td class="text-center">{{indl.IVRM_Month_Name}}</td>
+                            <td class="text-center">{{indl.submission_date|date:'dd/MM/yyyy'}}</td>
+                            <td hidden>
+                                {{indl.ISMCLMER_Id}}
+                                <input type="hidden" ng-model="indl.ISMCLMER_Id" value="{{indl.ISMCLMER_Id}}" />
+                            </td>
+                            <td style="text-align:center">
+                                <span>
+                                    <a href="" ng-click="ApprovalView(indl)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i class="fa fa-eye  text-blue" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span ng-if="indl.ApprovedFlag === true">
+                                    <a class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Approve">
+                                        <i class="fa fa-check-square text-green" aria-hidden="true" title="Deactive Record"></i>
+                                    </a>
+                                </span>
+                                <span ng-if="indl.ApprovedFlag === false">
+                                    <a class="text-green" data-placement="bottom" data-toggle="tooltip" title="Pending">
+                                        <i class="fa fa-close text-red" aria-hidden="true" itle="Activate Record"></i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="page1">
+                </dir-pagination-controls>
+            </div>
+        
+
+        <div ng-show="false" id="printDeviation">
+            <div class="box-body">
+                <h1 style="text-align:center">IE Submission and Approval Report</h1>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr class="text-center">
+                            <th>SL NO</th>
+                            <th>Client Name</th>
+                            <th>Submitted By</th>
+                            <th>Year</th>
+                            <th>Month</th>
+                            <th>Date Of Submission</th>
+                            <th>Approval Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="indl in filterValue = (iemonthendReport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center">{{indl.ISMMCLT_ClientName}}</td>
+                            <td class="text-center">{{indl.Employee_Name}}</td>
+                            <td class="text-center">{{indl.Year}}</td>
+                            <td class="text-center">{{indl.IVRM_Month_Name}}</td>
+                            <td class="text-center">{{indl.submission_date|date:'dd/MM/yyyy'}}</td>
+                            <td class="text-center">
+                                <span ng-if="indl.ApprovedFlag === true">
+                                    <a class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Approve">
+                                        <span>Approved</span>
+                                    </a>
+                                </span>
+                                <span ng-if="indl.ApprovedFlag === false">
+                                    <a class="text-green" data-placement="bottom" data-toggle="tooltip" title="Pending">
+                                        <span>Not Approved</span>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="page1">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--==================== Image Preview Model ===========================-->
+<div id="MultiDocumentView" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title ng-binding" style="color:#fff !important;">Approved Document Detail</h5>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>SL NO</th>
+                                    <th>Document Name</th>
+                                    <th>Discription</th>
+                                    <th>Approved By</th>
+                                    <th>Approved Remark</th>
+                                    <th>Approved Date</th>
+                                    <th>View Document</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="indl1 in filterValue = (multidocView | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-center">{{indl1.ISMCLMERFL_FileName}}</td>
+                                    <td class="text-center">{{indl1.ISMCLMERFL_FileDesc}}</td>
+                                    <td class="text-center">{{indl1.Employee_Name}}</td>
+                                    <td class="text-center">{{indl1.ISMCLMERFL_ApproverRemarks}}</td>
+                                    <td class="text-center">{{indl1.ISMCLMERFL_ApprovedDate|date:'dd/MM/yyyy'}}</td>
+                                    <td style="text-align:center">
+                                        <span>
+                                            <a href="" data-ng-click="previewimg_new(indl1.ISMCLMERFL_FilePath)"
+                                               class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                <i class="fa fa-eye  text-blue" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--==================== Image Preview Model ===========================-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{filenames}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--====================PDF view========-->
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+
+
+                <div id="pdfIdzz">
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

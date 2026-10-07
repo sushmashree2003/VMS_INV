@@ -1,0 +1,771 @@
+﻿<style>
+    .multiselect {
+        width: 19.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 1.6%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content">
+    <div data-ng-init="onpageload()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TOUR PLAN  REPORT </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-3 padding-left-2px">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 8px;width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueDeptd" type="text" placeholder="Search Department here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+                                        <label>
+                                            <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Department</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue5=(departmentdropdown  | filter:filterValue4) ">
+                                            <input name="dept" ng-model="user.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.HRMDC_Name}} <span ng-if="user.HRMDC_Name.length<=19"> Department</span></b>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 padding-left-none">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 10px;/* width: 25.0em; */width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueDesgd" type="text" placeholder="Search Designation here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                        <label>
+                                            <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdesg(designationselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Designation</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue1=(designationdropdown  | filter:filterValue) ">
+                                            <input name="desg" ng-model="user.selected" type="checkbox" ng-disabled="roleflag==true" ng-click="togchkbxdesg(user);" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.HRMDES_DesignationName}}</b> : {{user.MI_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 padding-left-none">
+                                <div class="form-group">
+                                    <label class="control-label" style="padding-left: 12px;/* width: 25.0em; */width: 93%;">
+                                        <span>
+                                            <input class="form-control" ng-model="obj.searchValueUEMd" type="text" placeholder="Search Employee here...">
+                                        </span>
+                                    </label>
+                                    <div class="multiselect col-sm-8" style="width: 90% !important;">
+
+                                        <label>
+                                            <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                            <span class="lbl padding-8">
+                                                <b>  All Employees</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:filterValue2) ">
+                                            <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Tour Name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <ui-select id="sel1" name="stdnamere" ng-model="$parent.IER_ID" theme="bootstrap" title=" Select Name" required>
+                                        <ui-select-match ng-trim="false" style="outline: 0;font-weight: 100 !important;" placeholder="Select/Search Tour Name">{{$select.selected.IER_PlanName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in tasklist | filter: $select.search" value="{{name.IER_ID}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.IER_PlanName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stdnamere)" ng-messages="myForm.stdnamere.$error">
+                                        <div ng-message="required">Please Select Any One Tour Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br />
+                <!--------Inserting Items-------->
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="getReport()">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i> GET
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <!--<md-button type="button" ng-if="ApprovalSubmission.length > 0" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>-->
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--ng-if="rdopunch=='TADAAdavance'"-->
+    <div class="box box-primary" ng-show="ApprovalSubmission.length > 0">
+
+        <div class="box-body">
+            <div class="col-sm-12 box-content clearfix">
+                <h4 class="text-center" ng-show="ApprovalSubmission.length > 0" ng-hide="true">FINAL SUBMISSION  LIST </h4>
+                <hr />
+                <div class="row" ng-repeat="tour in TourPlanDetails">
+                    <div class="col-sm-5">
+                        <h5>COMPANY NAME: <span style="color:#444 !important">&nbsp;{{tour.MI_Name |uppercase}} </span> </h5>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5>APPLIED DATE: <span style="color:#444 !important">&nbsp;{{tour.VTADAAA_AppliedDate |date:'dd-MM-yyyy'}}</span> </h5>
+                    </div>
+                    <div class="col-sm-3">
+                        <h5>STAFF NAME: <span style="color:#444 !important">&nbsp;{{tour.HRME_EmployeeFirstName |uppercase}} </span> </h5>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div>
+                            <h5 ng-show="getArrayDc.length > 0">DC List </h5>
+                            <hr />
+                            
+
+                            <h5 ng-show="employeeidNew.length > 0">Lead Status List</h5>
+                            <hr />
+                            <table class="table table-bordered table-condensed" ng-show="employeeidNew.length > 0">
+                                <thead>
+                                    <tr>
+
+                                        <th>
+                                            Category Name
+                                        </th>
+                                        <th>
+                                            Lead name
+                                        </th>
+
+
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            Source Name
+                                        </th>
+                                        <!--<th>
+                                            State Name
+                                        </th>-->
+                                        <th>
+                                            Cost
+                                        </th>
+                                        <th>
+                                            Lead Created By
+                                        </th>
+                                        <th>
+                                            Demo Given By
+                                        </th>
+                                        <th>
+                                            Lead Status
+                                        </th>
+                                        <th>
+                                            Lead Comment
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="user in employeeidNew">
+                                    <tr>
+
+                                        <td class="text-left" rowspan="{{user.Datacategorynew.length+1}}"><b>{{user.IMRC_CategoryName}}</b></td>
+                                    </tr>
+                                    <tr ng-repeat="emplist in user.Datacategorynew">
+
+
+                                        <td>
+                                            {{emplist.ISMSLE_LeadName}}
+                                        </td>
+
+                                        <td>
+                                            {{emplist.ISMSMPR_ProductName}}
+                                        </td>
+                                        <td>
+                                            {{emplist.ISMSMSO_SourceName}}
+                                        </td>
+                                        <!--<td>
+                                            {{emplist.IVRMMS_Name}}
+                                        </td>-->
+                                        <td>
+                                            {{emplist.TotalCost}}
+                                        </td>
+                                        <td>
+                                            {{emplist.HRME_EmployeeFirstName}}
+                                        </td>
+                                        <td>
+                                            {{emplist.Demo_EmployeeFirstName}}
+                                        </td>
+                                        <td>
+                                            {{emplist.LeadStatus}}
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" data-target="#myModal_Lead" ng-click="LeadsData(emplist)">
+                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h5 ng-show="materaldocuuploadNew.length > 0">File List </h5>
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;" ng-show="materaldocuuploadNew.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+
+                                        <th>View</th>
+                                        <th>Amount</th>
+                                        <th>Remark</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="materal in materaldocuuploadNew">
+                                        <td class="text-center">
+                                            {{$index+1}}
+                                        </td>
+
+                                        <td>
+                                            <span ng-show="materal.ILRT_FilePath!=null && materal.ILRT_FilePath!=''">
+                                                <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.ILRT_FilePath  !=null && materal.ILRT_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.ILRT_FilePath)">
+                                                    view
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{materal.ILRT_Cost}}
+
+                                        </td>
+                                        <td>
+                                            {{materal.ILRT_Filedesc}}
+
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!-----Inside ----->
+                            <h5 ng-show="FinalSumbmission.length > 0">Lead  Executed List </h5>
+                            <hr />
+                            <table class="table table-bordered table-condensed" ng-show="FinalSumbmission.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>
+                                            Category Name
+                                        </th>
+                                        <th>
+                                            Percentage
+                                        </th>
+                                        <th>
+                                            Lead Count
+                                        </th>
+                                        <th>
+                                            Execution Lead count
+                                        </th>
+                                        <th>
+                                            Applied Amount
+                                        </th>
+                                        <th>
+                                            Total Sanction Amount
+                                        </th>
+                                        <th>
+                                            Total Eligibale amount
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="lead in  FinalSumbmission">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{lead.IMRC_CategoryName}}
+                                        </td>
+                                        <td>
+                                            <span style="color:red !important">
+                                                {{lead.IERPC_Percentage}} %
+                                            </span>
+
+                                        </td>
+                                        <td>
+                                            {{lead.LeadCount}}
+                                        </td>
+                                        <td>
+                                            {{lead.ExecutionLeadCount}}
+                                        </td>
+                                        <td>
+                                            {{lead.VTADAAA_TotalAppliedAmount}}
+                                        </td>
+                                        <td>
+                                            {{lead.VTADAAA_TotalSactionedAmount}}
+                                        </td>
+                                        <td>
+                                            {{lead.VTADAAA_TotalEligbleAmount}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5">
+                                            Total
+                                        </td>
+                                        <td>
+                                            <strong>  {{ TotalAppliedAmount}} </strong>
+                                        </td>
+                                        <td>
+                                            <strong>{{ TotalSactionedAmount}}  </strong>
+                                        </td>
+                                        <td>
+                                            <strong>  {{ TotalEligbleAmount}} </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="form-horizontal">
+
+                                    <div class="col-sm-12">
+                                        <div class="row" ng-repeat="final in ApprovalSubmission" ng-show="ApprovalSubmission.length > 0">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Route Plan Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.TotalAmt" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Eligible Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.EligibleAmt" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="final.CreditWalletAmount > 0">
+                                                    <label class="control-label col-sm-4">Balance Debit Amount :</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.CreditWalletAmount" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Bill Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="ILRT_BillCost" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-sm-6">
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Route Plan Advance Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="final.SactionedAmt" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="VTADAA_BalanceHRMS > 0">
+                                                    <label class="control-label col-sm-4">Total Salary Deducted Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="VTADAA_BalanceHRMS" ng-disabled="true" class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" ng-show="VTADAA_TotalAppliedAmount > 0">
+                                                    <label class="control-label col-sm-4">Total Applied Amount:</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" ng-model="VTADAA_TotalAppliedAmount" ng-disabled="true"  class="form-control" placeholder="Amount" autocomplete="off" maxlength="50" />
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Extra Amount (Add):</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" class="form-control active" ng-model="obj.VTADAA_TotalExtra" ng-change="OnchageExtraAmount()"  placeholder="Amount" autocomplete="off" maxlength="50" allow-pattern="[0-9.]"  />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4">Total Amount Is  :</label>
+                                                    <div class="col-sm-8">
+                                                        <h4> {{VTADAA_TotalOverall}}</h4>  
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">From Date:<span style="color:red;">*</span></label>
+                                                <div class="col-sm-8" style="padding-left: 0px !important;">
+                                                    <md-datepicker ng-model="startdate" name="startdate" id="date1" ng-disabled="true" md-placeholder="Enter date" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">To Date (Extend) :<span style="color:red;">*</span></label>
+                                                <div class="col-sm-8" style="padding-left: 0px !important;">
+                                                    <md-datepicker ng-model="enddate" name="endatediff" ng-disabled="!startdate" md-min-date="startdate" md-placeholder="Enter Date" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-4 pull-right" >
+                                            <h4>
+                                                <strong style="color:red !important">
+                                                    ADD TO LEAD  <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Views" data-target="#salesView">
+                                                        <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                    </a>
+                                                </strong>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="" ng-if="Datacategory.length > 0">
+                                           
+                                            <table class="table table-bordered table-condensed">
+                                                <thead>
+                                                    <tr>
+
+                                                        <th>
+                                                            Category Name
+                                                        </th>
+                                                        <th>
+                                                            Lead name
+                                                        </th>
+                                                        <td>
+                                                            Student Strength
+                                                        </td>
+                                                  
+
+                                                        <td>
+                                                            Product Name
+                                                        </td>
+                                                        <td>
+                                                            Source Name
+                                                        </td>
+                                                        <th>
+                                                            State Name
+                                                        </th>
+                                                        <td>
+                                                            Remove
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="emplist  in  Datacategory">
+
+                                                        <td>
+                                                            {{emplist.IMRC_CategoryName}}
+                                                        </td>
+
+                                                        <td>
+                                                            {{emplist.ISMSLE_LeadName}}
+                                                        </td>
+                                                        <td>
+                                                           
+                                                            {{emplist.ISMSLE_StudentStrength}}
+                                                        </td>
+                                                   
+                                                        <td>
+                                                            {{emplist.ISMSMPR_ProductName}}
+                                                        </td>
+                                                        <td>
+                                                            {{emplist.SourceName}}
+                                                        </td>
+                                                        <td>
+                                                            {{emplist.IVRMMS_Name}}
+                                                        </td>
+                                                        <td>
+                                                            <a class="text-danger" href="" ng-click="RemoveY($index,emplist)">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="text-center">
+                                            <md-button type="submit" class="md-accent md-raised" data-ng-click="SaveTada()">
+                                                <i class="fa fa-bar-chart" aria-hidden="true"></i> SAVE TOUR PLAN
+                                            </md-button>
+                                            <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                                <i class="fa fa-times" aria-hidden="true"></i>
+                                                CANCEL
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                     
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal_Lead" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+
+                <center><h4 class="modal-title custom">Lead Comments</h4></center>
+
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sl No
+                                        </th>
+                                        <th>
+                                            Lead Comments
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="lead in  LeadComments">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{lead.ISMSLECOM_Comments}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--======PRINT EXCEL REPORT======-->
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h5 class="modal-title" style="color:#fff !important;">IMAGE </h5>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h5 class="modal-title" style="color:#fff !important;">IMAGE </h5>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="salesView" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg" style="width:90% !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="col-sm-12">
+
+                        <hr />
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Category:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="Posdddd" ng-model="IMRC_CategoryId" ng-change="Onchangecategory()">
+                                        <option value="">--Select Category--</option>
+                                        <option ng-repeat="chk in GetCategoryArray" value="{{chk.IMRC_CategoryId}}" ng-selected="{{chk.IMRC_CategoryId == IMRC_CategoryId}}">
+                                            {{chk.IMRC_CategoryName}}
+                                        </option>
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"></label>
+                                <div class="pull-right col-sm-8" ng-show="LeadList.length > 0">
+                                    <input type="text" placeholder="Search Lead Name......" class="form-control" ng-model="searchtwo" />
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <br />
+                        <table class="table table-bordered table-responsive" ng-show="LeadList.length > 0">
+                            <thead>
+                                <tr>
+                                    <td>
+                                        All
+                                    </td>
+                                    <td>Sl No</td>
+                                    <td>
+                                        Lead name
+                                    </td>
+                                    <td>
+                                        Student Strength
+                                    </td>
+
+
+                                    <td>
+                                        Product Name
+                                    </td>
+                                    <td>
+                                        Source Name
+                                    </td>
+                                    <td>
+                                        State Name
+                                    </td>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="dd in filterValue1=(LeadList |filter:searchtwo) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage3"
+                                    current-page="currentPage3" pagination-id="page2">
+                                    <td>
+                                        <input type="checkbox" ng-model="dd.checked" />
+                                        <span class="lbl padding-8"></span>
+                                    </td>
+                                    <td style="width:1%;">{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+                                    <td>
+                                        {{dd.ISMSLE_LeadName}}
+                                    </td>
+                                    <td>
+                                        {{dd.ISMSLE_StudentStrength}}
+                                    </td>
+
+                                    <td>
+
+                                        {{dd.ISMSMPR_ProductName}}
+                                    </td>
+                                    <td>
+                                        {{dd.SourceName}}
+                                    </td>
+                                    <td>
+                                        {{dd.IVRMMS_Name}}
+                                    </td>
+
+
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                        <dir-pagination-controls max-size="10" pagination-id="page2"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                        <div class="col-sm-12 text-center" ng-show="LeadList.length > 0">
+                            <md-button class="md-accent md-raised md-button md-ink-ripple" data-ng-click="AddToCart()">
+                                <i class="fa fa-bar-chart" aria-hidden="true"></i> ADD TO LEAD
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

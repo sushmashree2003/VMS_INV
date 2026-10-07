@@ -1,0 +1,556 @@
+﻿<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    .img {
+        font-size: 15px;
+        font-weight: bold;
+        transition: 0.4s;
+    }
+
+    p {
+        text-align: center;
+    }
+
+    h4 {
+        text-align: center;
+    }
+
+    h5 {
+        text-align: center;
+    }
+
+    table, td {
+        text-align: left;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    EMPLOYEE MONTH END REPORT
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Employee Name:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="sel1" data-ng-model="hrmE_Id" name="empname" required>
+                                    <option value="">--Select Name--</option>
+                                    <option ng-repeat="cand in employeelist" value="{{cand.hrmE_Id}}" ng-selected="{{cand.Selected == true}}">
+                                        {{cand.hrmE_EmployeeFirstName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.empname)" ng-messages="myForm.empname.$error">
+                                    <div ng-message="required">Please Select Employee Name</div>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="month1" ng-model="month" required>
+                                    <option value="">--Select Month--</option>
+                                    <option ng-repeat="option in fillmonth" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.ivrM_Month_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                    <div ng-message="required">Please Select Month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="year1" ng-model="year" required>
+                                    <option value="">--Select Year--</option>
+                                    <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                    <div ng-message="required">Please Select Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="findreport()">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-if="grid_view" class="md-raised md-primary" id="print-btn" ng-click="printToCart();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="button" ng-click="cancel();" target="_blank" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-primary" ng-if="grid_view">
+                <div class="box-header with-border">
+                    <!--<h3 class="box-title">Monthend Report</h3>-->
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div id="printdata">
+                    <div class="bg-div" style="text-align:center">
+                        <table class="table table-hover table-responsive table-bordered" style="width:100%;text-align:center;">
+                            <tr>
+                                <td style="width:100%;text-align:center;"><img src="{{companydetails.mI_Logo}}" style="" /></td>
+                            </tr>
+                        </table>
+                        <table class="table table-hover table-responsive table-bordered" style="width:100%;text-align:center;">
+                            <tr>
+                                <td>
+                                    <h3 style="font-size: 24px;text-transform: uppercase;color: #3a5999 !important;font-weight: 700;text-align:center;">
+                                        MONTH END REPORT OF {{monthname}} {{year}}
+                                    </h3>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="table" style="padding-top:20px;">
+                        <table class="table table-hover table-responsive table-bordered" border="1" style="border-collapse:collapse;width:100%" id="table1">
+                            <tr>
+                                <td>Name</td>
+                                <td>{{candidateDetails.hrmE_EmployeeFirstName}}</td>
+                                <td>Date</td>
+                                <td>{{currentdate | date: 'dd/MM/yyyy'}}</td>
+                            </tr>
+                            <tr>
+                                <td>Client</td>
+                                <td>HO</td>
+                                <td>Department Head</td>
+                                <td>{{name}}</td>
+                            </tr>
+                            <tr>
+                                <td>Designation</td>
+                                <td>{{candidateDetails.hrmdeS_DesignationName}}</td>
+                                <td>Reporting Mgr :</td>
+                                <td>{{name}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="table" style="padding-top:20px;">
+                        <table class="table table-hover table-responsive table-bordered " border="1" style="border-collapse:collapse;text-align:center;width:100%" id="table2">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th>Activity</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tr>
+                                <td>1</td>
+                                <td style="background-color:yellowgreen;color:white;">R&D</td>
+                                <td>{{rndcount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfResDevRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfResDevRemarks" id="comismewmeD_NoOfResDevRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Planned Tasks as per planner</td>
+                                <td>{{plannedtaskcount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_PtsAsPerPlannerCountRemarks" rows="1" ng-model="ismewmeD_PtsAsPerPlannerCountRemarks" id="comismewmeD_PtsAsPerPlannerCountRemarks"> </textarea>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2</td>
+                                <td>No of Critical Tasks Open</td>
+                                <td>{{criticalCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfCriticalTasksOpenRemarks" rows="1" ng-model="ismewmeD_NoOfCriticalTasksOpenRemarks" id="comismewmeD_NoOfCriticalTasksOpenRemarks"> </textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>No of Major Tasks Open</td>
+                                <td>{{majortaskCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfMajorTasksOpenRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfMajorTasksOpenRemarks" id="comismewmeD_NoOfMajorTasksOpenRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>No of Minor Tasks Open</td>
+                                <td>{{minortaskCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfMinorTasksOpenRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfMinorTasksOpenRemarks" id="comismewmeD_NoOfMinorTasksOpenRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>No of Tasks Completed</td>
+                                <td>{{completedtaskCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfTasksCompletedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfTasksCompletedRemarks" id="comismewmeD_NoOfTasksCompletedRemarks"></textarea>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Total number of Issues</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>No of Issues Open</td>
+                                <td>{{issueOpenCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfIssuesOpenRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfIssuesOpenRemarks" id="comismewmeD_NoOfIssuesOpenRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>No of Issues Completed</td>
+                                <td>{{issuecompleteCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfIssuesCompletedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfIssuesCompletedRemarks" id="comismewmeD_NoOfIssuesCompletedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Total number of Enhancements</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>No of Enhancements Open</td>
+                                <td>{{enhancementOpenCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfEnhancementsOpenRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfEnhancementsOpenRemarks" id="comismewmeD_NoOfEnhancementsOpenRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>No of Enhancements Completed</td>
+                                <td>{{enhancementcompltCount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfEnhancementsCompletedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfEnhancementsCompletedRemarks" id="comismewmeD_NoOfEnhancementsCompletedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Deviation Report</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>Monthly Deviation</td>
+                                <td>{{monthlyDeviation}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_MonthlyDeviationRemarks" rows="1"
+                                              ng-model="ismewmeD_MonthlyDeviationRemarks" id="comismewmeD_MonthlyDeviationRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>No of days DR generated</td>
+                                <td>{{drgeneratedcount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfDaysDrGeneratedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfDaysDrGeneratedRemarks" id="comismewmeD_NoOfDaysDrGeneratedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>No of days DR not generated</td>
+                                <td>{{dailyreptnotsent}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfDaysDrNotGeneratedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfDaysDrNotGeneratedRemarks" id="comismewmeD_NoOfDaysDrNotGeneratedRemarks"></textarea>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>4</td>
+                                <td>No of weeks planner created</td>
+                                <td>{{drgeneratedcount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfWeeksPlCreatedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfWeeksPlCreatedRemarks" id="comismewmeD_NoOfWeeksPlCreatedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>No of weeks planner not created</td>
+                                <td>
+                                    {{drgeneratedcount}}
+                                </td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfWeeksPlNotCreatedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfWeeksPlNotCreatedRemarks" id="comismewmeD_NoOfWeeksPlNotCreatedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>No of actual hours planned</td>
+                                <td>{{drhoursplanned}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfActualhrsPlannedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfActualhrsPlannedRemarks" id="comismewmeD_NoOfActualhrsPlannedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>No of hours worked</td>
+                                <td>{{drhoursworked}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfHrsWorkedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfHrsWorkedRemarks" id="comismewmeD_NoOfHrsWorkedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>No of hours approved</td>
+                                <td>{{drhoursapproved}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfHrsApprovedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfHrsApprovedRemarks" id="comismewmeD_NoOfHrsApprovedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>No of hours rejected</td>
+                                <td>{{drhoursarejected}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfHrsRejectedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfHrsRejectedRemarks" id="comismewmeD_NoOfHrsRejectedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Attendance</td>
+                                <td></td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfWorkingDaysRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfWorkingDaysRemarks" id="comismewmeD_NoOfWorkingDaysRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>No of Working Days</td>
+                                <td>{{workingdayscount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfWorkingDaysRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfWorkingDaysRemarks" id="comismewmeD_NoOfWorkingDaysRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>No of days Present</td>
+                                <td>{{presentdayscount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfDaysPresentRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfDaysPresentRemarks" id="comismewmeD_NoOfDaysPresentRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>No of day Absent</td>
+                                <td></td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfDaysAbsentRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfDaysAbsentRemarks" id="comismewmeD_NoOfDaysAbsentRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Leave Report</td>
+                                <td></td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_TotalNoOfLeavesRemarks" rows="1"
+                                              ng-model="ismewmeD_TotalNoOfLeavesRemarks" id="comismewmeD_TotalNoOfLeavesRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>Total No of Leaves</td>
+                                <td>{{leavescount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_TotalNoOfLeavesRemarks" rows="1"
+                                              ng-model="ismewmeD_TotalNoOfLeavesRemarks" id="comismewmeD_TotalNoOfLeavesRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>No of leaves applied</td>
+                                <td>{{appliedleavescount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfLeavesAppliedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfLeavesAppliedRemarks" id="comismewmeD_NoOfLeavesAppliedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>No of leaves approved</td>
+                                <td>{{approvedleavescount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfLeavesApprovedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfLeavesApprovedRemarks" id="comismewmeD_NoOfLeavesApprovedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>No of leaves rejected</td>
+                                <td>{{rejectedleavescount}}</td>
+                                <td>
+                                    <textarea class="form-control textareaclass" name="hrrem_ismewmeD_NoOfLeavesRejectedRemarks" rows="1"
+                                              ng-model="ismewmeD_NoOfLeavesRejectedRemarks" id="comismewmeD_NoOfLeavesRejectedRemarks"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Training</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>No of SOD's</td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_NoOfSods" data-ng-model="ismewmeD_NoOfSods" class="form-control" maxlength="50" ng-paste="$event.preventDefault()"/>
+                                </td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_NoOfSodsRemarks" data-ng-model="ismewmeD_NoOfSodsRemarks" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Rating</td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_Rating" data-ng-model="ismewmeD_Rating" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_RatingRemarks" data-ng-model="ismewmeD_RatingRemarks" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Escalations from Client</td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_EscalationsFromClient" data-ng-model="ismewmeD_EscalationsFromClient" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_EscalationsFromClientRemarks" data-ng-model="ismewmeD_EscalationsFromClientRemarks" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">No Of Memo</td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_NoOfMemo" data-ng-model="ismewmeD_NoOfMemo" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_NoOfMemoRemarks" data-ng-model="ismewmeD_NoOfMemoRemarks" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">No of Notices</td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_NoOfNotices" data-ng-model="ismewmeD_NoOfNotices" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_NoOfNoticesRemarks" data-ng-model="ismewmeD_NoOfNoticesRemarks" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="background-color:yellowgreen;color:white;">Appeciation from client</td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_AppeciationsfromClients" data-ng-model="ismewmeD_AppeciationsfromClients" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                                <td>
+                                    <input type="text" name="nameismewmeD_AppeciationsfromClientsRemarks" data-ng-model="ismewmeD_AppeciationsfromClientsRemarks" class="form-control" maxlength="50" ng-paste="$event.preventDefault()" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="padding-top:20px;">
+                        <div class="col-sm-12">
+                            <label class="control-label col-sm-4">Remark :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <textarea style="resize:none;" class="form-control" name="hrrem_ismewmeD_Remarks" rows="5"
+                                          data-ng-model="obj.ismewmeD_Remarks"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding-top:20px;">
+                        <table class="table table-hover table-responsive table-bordered" style="width:100%;">
+                            <tr>
+                                <td style="width:50%;text-align:left;">
+                                    Verified By :
+                                </td>
+                                <td style="width:50%;text-align:left;">
+                                    Approved By :
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:50%;text-align:left;">
+                                    Designation : Team Leader
+                                </td>
+                                <td style="width:50%;text-align:left;">
+                                    Designation : Technical Director
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-center">
+                        <md-button class="md-raised md-primary" id="save-btns" ng-click="Savedata();" ng-if="grid_view">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" ng-click="cancel();" target="_blank" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</section>
+
+

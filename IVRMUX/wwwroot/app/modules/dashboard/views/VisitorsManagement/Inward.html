@@ -1,0 +1,638 @@
+﻿<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Inward Entry Form</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row" ng-show="institutionlist.length > 1">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="mI_Id" name="msint" required ng-change="loadgrid();" ng-disabled="institute_flag">
+                                    <option ng-repeat="val in institutionlist" value="{{val.mI_Id}}" ng-selected="val.mI_Id==mI_Id">
+                                        {{val.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.msint)" ng-messages="myForm.msint.$error">
+                                    <div ng-message="required">Select Institution</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Description:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="visname" ng-model="FOIN_Discription" allow-pattern="(\s|[a-zA-Z0-9])" placeholder="Enter Description." required ng-maxlength="200">
+                                <div class="error-messages" ng-if="interacted(myForm.visname)" ng-messages="myForm.visname.$error">
+                                    <div ng-message="required">Enter Description</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date :<span style="color:Red">*</span></label>
+                            <md-datepicker ng-model="FOIN_DateTime" name="date133" md-placeholder="Enter date" md-min-date="minDatemf" md-max-date="maxDatemf" onkeydown="return false" required></md-datepicker>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.date133)" ng-messages="myForm.date133.$error">
+                            <div ng-message="required">Select date</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="phno" ng-model="FOIN_From"allow-pattern="(\s|[a-zA-Z])" required placeholder="Enter From..">
+                                <div class="error-messages" ng-if="interacted(myForm.phno)" ng-messages="myForm.phno.$error">
+                                    <div ng-message="required">Enter From</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Contact Person:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="mail" ng-model="FOIN_ContactPerson" allow-pattern="(\s|[a-zA-Z])" required placeholder="Enter Contact Person..">
+                                <div class="error-messages" ng-if="interacted(myForm.mail)" ng-messages="myForm.mail.$error">
+                                    <div ng-message="required">Enter Contact Person</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Phone No:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" name="Phone" id="catgry2" type="text" ng-model="FOIN_PhoneNo" placeholder="Enter Phone No" maxlength="10" minlength="10" allow-pattern="\d" required>
+                                <div class="text-left error-messages" ng-if="interacted(myForm.Phone)" ng-messages="myForm.Phone.$error">
+                                    <div ng-message="required">Enter Phone number</div>
+                                    <div ng-message="minlength">Phone number must contain 10 digits</div>
+                                    <div ng-message="maxlength">Phone number must contain 10 digits</div>
+                                    <div ng-message="pattern"> Phone number will accept only numerics </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Email Id :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="email" class="form-control" name="emaisdf" ng-model="FOIN_EmailId" pattern="[^ @]*@[^ @]*" placeholder="Enter your email" required>
+                                <div class="text-left error-messages" ng-if="interacted(myForm.emaisdf)" ng-messages="myForm.emaisdf.$error">
+                                    <div ng-message="required">Enter an Email Id</div>
+                                    <div ng-message="pattern">Please enter valid Email which contains '@' and '.'</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Person To:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="empName" ng-model="$parent.emp1" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           ng-change="get_empdetails($parent.emp1)" title="Select emp" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select or search employee in the list...">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in emplist1 | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmE_EmployeeFirstName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.empName)" ng-messages="myForm.empName.$error">
+                                    <div ng-message="required">Select Person To</div>
+                                </div>
+                                <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+          
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">HandedOver To:</label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel11" name="studentname34" ng-model="$parent.hrmid1" theme="bootstrap" ng-keyup="searchfilter2($select);"
+                                           ng-change="get_empdetails2($parent.hrmid1)" title="Select emp">
+
+                                    <ui-select-match ng-trim="false" placeholder="Select or search employee in the list...">
+                                        {{$select.selected.employeename1}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="user in emplist2 | filter: $select.search " value="{{user.hrmid1}}" ng-selected="{{user.Selected ==true}}">
+                                        <div ng-bind-html="(user.employeename1) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <label id="upnme11" ng-show="updateshowlabel">{{updatename}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Dispatached By :</label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel11111" name="studentname3411" ng-model="$parent.hrmid12" theme="bootstrap" ng-keyup="searchfilter2($select);"
+                                           ng-change="get_empdetails2($parent.hrmid12)" title="Select emp">
+
+                                    <ui-select-match ng-trim="false" placeholder="Select or search employee in the list...">
+                                        {{$select.selected.employeename12}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in emplist3 | filter: $select.search " value="{{option.hrmid12}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.employeename12) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <label id="upnme1" ng-show="updateshowlabel">{{updatename}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Full Address:</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" data-ng-model="FOIN_Adddress" placeholder="Full Address" name="lowec" rows="3"></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.card)" ng-messages="myForm.card.$error">
+                                    <div ng-message="required">Enter Address</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--upload document-->
+                    <div class="col-sm-6">
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No.</th>
+                                    <th>Upload</th>
+                                    <th>View</th>
+                                    <th>Remark</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="materal in materaldocuupload">
+                                    <td class="text-center">
+                                        {{$index+1}}
+                                    </td>
+                                    <td>
+                                        <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                                            <input type="file" name="impfile" id="document" class="btn btn-success" value="Import" ng-model="ismclT_FilePath" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().materal)" style="padding-top: 1px;padding-bottom: 2px;" />
+
+                                        </label>
+
+                                    </td>
+                                    <td>
+                                        <span ng-show="materal.ismclT_FilePath!=null && materal.ismclT_FilePath!=''">
+                                            <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="materal.ismclT_FilePath  !=null && materal.ismclT_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(materal.ismclT_FilePath)">
+                                                view
+                                            </a>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <textarea maxlength="250" name="remark" ng-model="materal.VTADAAF_Remarks" class="form-control" resize: none; rows="2" placeholder="Remark" />
+                                    </td>
+                                    <td>
+                                        <span>
+                                            <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                            <a href="" ng-click="removegrnrows($index,objg)">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                  
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div><p style="color:#2e580e;margin-top: -4%"><b style="color:red">Accept File:</b> jpg, jpeg, png, doc, ppt, excel, mp3, mp4, wmv, pdf </p></div>
+                    </div>
+
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="FOIN_Id" value="{{foiN_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </form>
+
+
+
+    <div class="box box-primary" ng-show="sttud">
+        <div class="box-header with-border">
+            <h3 class="box-title">INWARD</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="border">
+            <br />
+            <center>
+                <table class="table" style="height: 300px;width: 450px;">
+                    <thead style="background-color:white;">
+                        <tr>
+                            <th colspan="3"> <img style="height: 100px;width: 100%;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                        </tr>
+                        <tr>
+                            <th colspan="3" style="color:black;text-align: center;">Inward</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="vss in Inwardss" style="padding-bottom: 100px;">
+                        <tr>
+                            <td align="left"><a href="">Sr. No.</a></td>
+                            <td align="left" colspan="2">{{vss.foiN_Id}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Description</a></td>
+                            <td align="left" colspan="2">{{vss.foiN_Discription}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">From</a></td>
+                            <td align="left" colspan="2">{{vss.foiN_From}}</td>
+                        </tr>
+                        <!--<tr>
+                            <td align="left"><a href="">To</a></td>
+                            <td align="left" colspan="2">{{inwrd.iW_To}}</td>
+                        </tr>-->
+                        <tr>
+                            <td align="left"><a href="">Person</a></td>
+                            <td align="left" colspan="2">{{vss.foiN_ContactPerson}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Date & Time</a></td>
+                            <td align="left" colspan="2">{{vss.foiN_DateTime|date:'dd-MM-yyyy'}} & {{time}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Inward No.</a></td>
+                            <td align="left" colspan="2">{{vss.foiN_InwardNo}}</td>
+                        </tr>
+                        <!--<tr>
+                            <td align="left"><a href="">Reason</a></td>
+                            <td align="left" colspan="2">{{inwrd.iW_Remarks}}</td>
+                        </tr>-->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td align="left">signature</td>
+                            <td align="left"></td>
+                            <td align="left"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </center>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="getdataall.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Inward Record</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+
+            <div class="input-group">
+                <md-button type="button" ng-click="exportToExcel('#table1')" target="_blank" class="md-raised md-primary" ng-if="getdataall.length > 0">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export to Excel
+                </md-button>
+            </div>
+
+        </div>
+        <div class="box-body" style="overflow-y:scroll;">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <!--<label ng-if="filterValue1.length>0" style="font-weight:bold;font-size:15px" class="control-label col-sm-3 font-weight-bold">
+                            Selected: <span style="color:blueviolet;font-size: large;">{{(filterValue1 | filter:{checkedvalue: true }).length}}</span>
+                        </label>-->
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{getdataall.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="printSectionId">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.NO.
+                            </th>
+                            <!--<th>
+                                <label>
+                                    <input name="all" ng-model="allRecords" type="checkbox" ng-click="all_task(allRecords)">
+                                    <span class="lbl padding-8">
+                                    </span>
+                                </label>
+                            </th>-->
+                            <th>
+                                <a href="" ng-click="sort('foiN_Discription')">Description </a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_ContactPerson')">Contact Person</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_InwardNo')">InWard No</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_From')">From</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_PhoneNo')">Phone No.</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_EmailId')">Email</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_DateTime')">Date</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_DateTime')">File</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_To')">Person To</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_HandedOverTo')">HandedOver To</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_ReceivedBy')">Dispatached By</a>
+                            </th>
+
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="obj in filterValue1 = (getdataall | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <!--<td class="text-center">
+                                <label>
+                                    <input type="checkbox" name="adcheckt" value="{{obj.editck}}" ng-model="obj.checkedvalue" ng-click="togchkbxtask(obj)"><span class="lbl padding-8"></span>
+                                </label>
+                            </td>-->
+                            <td>{{obj.foiN_Discription}}</td>
+                            <td>{{obj.foiN_ContactPerson}}</td>
+                            <td>{{obj.foiN_InwardNo}}</td>
+                            <td>{{obj.foiN_From}}</td>
+                            <td>{{obj.foiN_PhoneNo}}</td>
+                            <td>{{obj.foiN_EmailId}}</td>
+                            <td>{{obj.foiN_DateTime | date:'dd/MM/yyyy'}}</td>
+                            <td>
+                                <a href="javascript:void(0)"
+                                   ng-click="filedetails(obj);" title="View Document">
+                                    <i class="fa fa-eye text-blue"></i>
+                                </a>
+                            </td>
+                            <td>{{obj.hrmE_EmployeeFirstName}}</td>
+                            <td>{{obj.secnam1}} {{obj.secnam2}} {{obj.secnam3}}</td>
+                            <td>{{obj.firstName1}} {{obj.firstName2}} {{obj.firstName3}}</td>
+
+
+
+                            <td class="text-center">
+                                <a href="javascript:void(0)" ng-click="EditDetails(obj)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+
+                                <span ng-if="obj.foiN_ActiveFlag">
+                                    <a href="" ng-click="deactive(obj)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        Deactivate
+                                    </a>
+                                </span>
+                                <span ng-if="!obj.foiN_ActiveFlag">
+                                    <a href="" ng-click="deactive(obj)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        Activate
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+    <div>
+        <table ng-hide="true" class="table table-hover table-responsive table-bordered text-center" id="table1">
+            <thead>
+                <tr>
+                    <th>
+                        SL.NO.
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_Discription')">Description </a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_ContactPerson')">Contact Person</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_InwardNo')">InWard No</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_From')">From</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_PhoneNo')">Phone No.</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_EmailId')">Email</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_DateTime')">Date</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_To')">Person To</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_HandedOverTo')">HandedOver To</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_ReceivedBy')">Dispatached By</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="obj1 in getdataall">
+                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                    <td>{{obj1.foiN_Discription}}</td>
+                    <td>{{obj1.foiN_ContactPerson}}</td>
+                    <td>{{obj1.foiN_InwardNo}}</td>
+                    <td>{{obj1.foiN_From}}</td>
+                    <td>{{obj1.foiN_PhoneNo}}</td>
+                    <td>{{obj1.foiN_EmailId}}</td>
+                    <td>{{obj1.foiN_DateTime | date:'dd/MM/yyyy'}}</td>
+                    <td>{{obj1.hrmE_EmployeeFirstName}}</td>
+                    <td>{{obj1.secnam1}} {{obj1.secnam2}} {{obj1.secnam3}}</td>
+                    <td>{{obj1.firstName1}} {{obj1.firstName2}} {{obj1.firstName3}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="inwardfiles" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width:95%;" overflow:auto;">
+            <div class="modal-content" style="overflow:auto;">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                    <h4 class="modal-title text-white">
+                        Uploaded Files
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No.</th>
+                                <th>File Name</th>
+                                <th>File</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="itm in attachementlist">
+                                <td>{{$index + 1}}</td>
+                                <td class="text-center">
+                                    {{itm.foinfU_FileName}}
+                                </td>
+                                <td class="text-center">
+                                    <span ng-show="itm.foinfU_FilePath!=null && itm.foinfU_FilePath!=''">
+                                        <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="itm.foinfU_FilePath  !=null && itm.foinfU_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(itm.foinfU_FilePath)">
+                                            view
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!--==================== Image Preview Model ===========================-->
+    <div id="myimagePreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:55%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h3>{{filenames}}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--====================PDF view========-->
+    <div id="showpdf" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <form id="qqqq">
+                <div class="modal-content">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    <div id="pdfIdzz">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="img-zoom-in-out">
+        <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                    <div class="modal-footer">
+                        <div class="text-center">
+                            <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                            <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                        </div>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

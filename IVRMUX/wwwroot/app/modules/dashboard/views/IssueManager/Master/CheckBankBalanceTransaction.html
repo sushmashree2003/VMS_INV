@@ -1,0 +1,464 @@
+﻿<style>
+
+    .theadab-dark {
+        background-color: #797978;
+    }
+</style>
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">BankBalance Transaction</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Company Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamwwe" ng-model="MI_Id" ng-change="oncmpchange()" required ng-disabled="editflag==true">
+                                    <option value="">--Select Company--</option>
+                                    <option ng-repeat="option in allcompany" value="{{option.mI_Id}}"
+                                            ng-selected="{{option.mI_Id == MI_Id}}">
+                                        {{option.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamwwe)" ng-messages="myForm.yrnamwwe.$error">
+                                    <div ng-message="required">Select Company</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="MI_Id>0">
+                            <label class="control-label col-sm-4">Bank Name :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1ww" name="yrnamddwwe" ng-model="HRMBD_Id" ng-change="bankchange()" required>
+                                    <option value="">--Select Bank--</option>
+                                    <option ng-repeat="option in banklist" value="{{option.hrmbD_Id}}"
+                                            ng-selected="{{option.hrmbD_Id == HRMBD_Id}}">
+                                        {{option.hrmbD_BankName}}--{{option.hrmbD_BankAccountNo}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yrnamddwwe)" ng-messages="myForm.yrnamddwwe.$error">
+                                    <div ng-message="required">Select Bank</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="MI_Id>0">
+                            <label class="checkbox-inline" style="display:none;">
+                                <input type="checkbox" data-ng-model="VBABRS_sup">
+                                <span class="lbl padding-8">Suplier</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" data-ng-model="VBABRS_Dates">
+                                <span class="lbl padding-8">Between Date</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group" ng-show="MI_Id>0 && VBABRS_sup==true">
+                            <label class="control-label col-sm-4">Supplier:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="client" ng-model="$parent.INVMS_Id" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,ts.optradio);" title="Select Supplier"
+                                           ng-required="VBABRS_sup==true">
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Supplier">
+                                        {{$select.selected.invmS_SupplierName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="catgry in get_supplier | filter: $select.search" value="{{catgry.invmS_Id}}"
+                                                       ng-selected="{{catgry.Selected == true}}">
+                                        <div ng-bind-html="catgry.invmS_SupplierName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                    <div ng-message="required">Select Supplier Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="VBABRS_Dates==true">
+                            <div class="col-sm-12">
+                                <div class="col-sm-4">
+
+                                </div>
+                                <!--<label class="control-label col-sm-4"></label>-->
+                                <div class="col-sm-4">
+                                    <md-datepicker name="payment_datse" onkeypress="return false" data-ng-model="fromdate" md-placeholder=" From Date" ng-required="VBABRS_Dates==true"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.payment_datse)" ng-messages="myForm.payment_datse.$error">
+                                        <div ng-message="required">Select  Date</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <md-datepicker name="payment_datse" onkeypress="return false" data-ng-model="todate" md-placeholder="To Date" ng-required="VBABRS_Dates==true" md-min-date="fromdate"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.payment_datse)" ng-messages="myForm.payment_datse.$error">
+                                        <div ng-message="required">Select  Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Get Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+
+                            CANCEL
+                        </md-button>
+
+                        <md-button ng-if="trasactionReport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printExcel1')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                        <md-button ng-if="trasactionReport.length>0" type="button" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="trasactionReport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Bank Balance Transaction Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div>
+            <div class="box-body">
+                <div class="col-sm-12" style="overflow:scroll; max-height:600px;">
+                    <div class="row">
+                        <div class="col-md-12 text-center" ng-if="imagenew!=null && imagenew!=''">
+                            <img src="{{imagenew}}" class="img-responsive img-fluid" alt="vaps" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <h4>Bank Name :  {{BankName}} / {{AccountNumber}}</h4>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Bank Balance : {{BanKBalance}}</h4>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-condensed">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL No
+                                </th>
+                                <th>
+                                    Payment  Date
+                                </th>
+                                <th>
+                                    Narration
+                                </th>
+                                <th>
+                                    Particular
+                                </th>
+                                <th>
+                                    Payment Mode
+                                </th>
+                                <th>
+                                    Payment Reference
+
+                                </th>
+                                <th>
+                                    Clear Date
+                                </th>
+                                <th>
+                                    Debit
+                                </th>
+                                <th>
+                                    Credit
+
+                                </th>
+                                <th>
+                                    Tds
+
+                                </th>
+                                <th>
+                                    Penalty
+
+                                </th>
+                                <th>
+                                    ESIC
+
+                                </th>
+                                <th>
+                                    Other
+
+                                </th>
+
+                                <th>
+                                    Balance
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="trs in trasactionReport">
+                                <td>
+                                    {{$index+1}}
+                                </td>
+                                <td>
+                                    {{trs.VBABRS_Date |date:'dd/MM/yyyy'}}
+                                </td>
+                                <td style="text-align:left !important">
+                                    {{trs.VBABRS_Remarks}}
+                                </td>
+                                <td style="text-align:left !important">
+                                    <span ng-if="trs.INVMS_SupplierName!=null && trs.INVMS_SupplierName!=''">
+                                        {{trs.INVMS_SupplierName}}
+                                    </span>
+                                    <span ng-if="trs.VPAYVOU_PaymentTo!=null && trs.VPAYVOU_PaymentTo!=''">
+                                        {{trs.VPAYVOU_PaymentTo}}
+                                    </span>
+                                    <span ng-if="trs.VCBSRC_SourceName!=null && trs.VCBSRC_SourceName!=''">
+                                        {{trs.VCBSRC_SourceName}}
+                                    </span>
+                                    <span ng-if="trs.ISMMCLT_ClientName!=null && trs.ISMMCLT_ClientName!=''">
+                                        {{trs.ISMMCLT_ClientName}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span ng-if="trs.VPAYVOU_PaymentMode!=null && trs.VPAYVOU_PaymentMode!=''">
+                                        {{trs.VPAYVOU_PaymentMode}}
+                                    </span>
+                                    <span ng-if="trs.VRECVOU_ReceiptMode!=null && trs.VRECVOU_ReceiptMode!=''">
+                                        {{trs.VRECVOU_ReceiptMode}}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span ng-if="trs.VBABRS_RefrenceId!=null && trs.VBABRS_RefrenceId!=''">
+                                        {{trs.VBABRS_RefrenceId}}
+                                    </span>
+
+                                </td>
+                                <td>
+                                    {{trs.VBABRS_ClearedDate |date:'dd/MM/yyyy'}}
+                                </td>
+                                <td style="color:red">
+                                    <span ng-if="trs.VBABRS_CRDRFlg=='DR'">
+                                        {{trs.VBABRS_Amount}}
+                                    </span>
+                                </td>
+                                <td style="color:blue">
+                                    <span ng-if="trs.VBABRS_CRDRFlg=='CR'">
+                                        {{trs.VBABRS_Amount}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span ng-if="trs.VPAYVOU_TDS  > 0">
+                                        {{trs.VPAYVOU_TDS}}
+                                    </span>
+
+                                </td>
+                                <td>
+                                    <span ng-if="trs.VPAYVOU_Penalty  > 0">
+                                        {{trs.VPAYVOU_Penalty}}
+                                    </span>
+
+                                </td>
+                                <td>
+                                    <span ng-if="trs.VPAYVOU_ESICAmount  > 0">
+                                        {{trs.VPAYVOU_ESICAmount}}
+                                    </span>
+
+                                </td>
+                                <td>
+                                    <span ng-if="trs.VPAYVOU_OtherAmount  > 0">
+                                        {{trs.VPAYVOU_OtherAmount}}
+                                    </span>
+
+                                </td>
+
+                                <td style="color:blue">
+                                    {{trs.VBABRS_ActualBankBalance}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+</section>
+<div id="printExcel" ng-hide="true">
+    <div class="box-body">
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-md-12 text-center" ng-if="imagenew!=null && imagenew!=''"  style="text-align:center;margin-top:-35px">
+                    <img src="{{imagenew}}" class="img-responsive img-fluid" alt="vaps" style="border:none;height:120px;width:600px;text-align:center" />
+                </div>
+            </div>
+            <div id="printExcel1">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h4>Bank Name :  {{BankName}} / {{AccountNumber}}</h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <h4>Bank Balance : {{BanKBalance}}</h4>
+                    </div>
+                </div>
+                <table class="table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL No
+                            </th>
+                            <th>
+                                Payment Date
+                            </th>
+
+                            <th>
+                                Narration
+                            </th>
+                            <th>
+                                Particular
+                            </th>
+                            <th>
+                                Payment Mode
+                            </th>
+                            <th>
+                                Payment Reference
+
+                            </th>
+                            <th>
+                                Debit
+                            </th>
+                            <th>
+                                Credit
+
+                            </th>
+                            <th>
+                                Tds
+
+                            </th>
+                            <th>
+                                Penalty
+
+                            </th>
+                            <th>
+                                ESIC
+
+                            </th>
+                            <th>
+                                Other
+
+                            </th>
+                            <th>
+                                Clear Date
+                            </th>
+                            <th>
+                                Balance
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="trs in trasactionReport">
+                            <td>
+                                {{$index+1}}
+                            </td>
+                            <td>
+                                {{trs.VBABRS_Date |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td style="text-align:left !important">
+                                {{trs.VBABRS_Remarks}}
+                            </td>
+                            <td style="text-align:left !important">
+                                <span ng-if="trs.INVMS_SupplierName!=null && trs.INVMS_SupplierName!=''">
+                                    {{trs.INVMS_SupplierName}}
+                                </span>
+                                <span ng-if="trs.VPAYVOU_PaymentTo!=null && trs.VPAYVOU_PaymentTo!=''">
+                                    {{trs.VPAYVOU_PaymentTo}}
+                                </span>
+                                <span ng-if="trs.VCBSRC_SourceName!=null && trs.VCBSRC_SourceName!=''">
+                                    {{trs.VCBSRC_SourceName}}
+                                </span>
+                                <span ng-if="trs.ISMMCLT_ClientName!=null && trs.ISMMCLT_ClientName!=''">
+                                    {{trs.ISMMCLT_ClientName}}
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-if="trs.VPAYVOU_PaymentMode!=null && trs.VPAYVOU_PaymentMode!=''">
+                                    {{trs.VPAYVOU_PaymentMode}}
+                                </span>
+                                <span ng-if="trs.VRECVOU_ReceiptMode!=null && trs.VRECVOU_ReceiptMode!=''">
+                                    {{trs.VRECVOU_ReceiptMode}}
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-if="trs.VBABRS_RefrenceId!=null && trs.VBABRS_RefrenceId!=''">
+                                    {{trs.VBABRS_RefrenceId}}
+                                </span>
+
+                            </td>
+                            <td style="color:red">
+                                <span ng-if="trs.VBABRS_CRDRFlg=='DR'">
+                                    {{trs.VBABRS_Amount}}
+                                </span>
+                            </td>
+                            <td style="color:blue">
+                                <span ng-if="trs.VBABRS_CRDRFlg=='CR'">
+                                    {{trs.VBABRS_Amount}}
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-if="trs.VPAYVOU_TDS  > 0">
+                                    {{trs.VPAYVOU_TDS}}
+                                </span>
+
+                            </td>
+                            <td>
+                                <span ng-if="trs.VPAYVOU_Penalty  > 0">
+                                    {{trs.VPAYVOU_Penalty}}
+                                </span>
+
+                            </td>
+                            <td>
+                                <span ng-if="trs.VPAYVOU_ESICAmount  > 0">
+                                    {{trs.VPAYVOU_ESICAmount}}
+                                </span>
+
+                            </td>
+                            <td>
+                                <span ng-if="trs.VPAYVOU_OtherAmount  > 0">
+                                    {{trs.VPAYVOU_OtherAmount}}
+                                </span>
+
+                            </td>
+                            <td>
+                                {{trs.VBABRS_ClearedDate |date:'dd/MM/yyyy'}}
+                            </td>
+                            <td style="color:blue">
+                                {{trs.VBABRS_ActualBankBalance}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+           
+        </div>
+
+
+    </div>
+</div>
+<!-- =======================Transcation Tax Model ====================================-->

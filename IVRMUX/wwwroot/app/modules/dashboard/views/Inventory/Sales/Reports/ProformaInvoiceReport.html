@@ -1,0 +1,811 @@
+﻿
+<section class="content twocoloumn">
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Pro forma Invoice Report </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-5">
+                        <div class="col-sm-8">
+                            <!--ng-hide="staffcheck=='Staff'"-->
+                            <label for="sel2" class="control-label col-sm-4 inst">Company: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div class="multiselect col-sm-8 mul">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search Item here...">
+                                    <label>
+                                        <input name="alitem" value="1" ng-model="allmi" type="checkbox" ng-click="all_miid(allmi)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-model="MI_Id" ng-repeat="mi in get_mi_list | filter : searchValue">
+                                        <input name="mi" ng-model="mi.miid" type="checkbox" ng-click="mi_click();" ng-required="isRequiredmi()">
+                                        <span class="lbl padding-8">
+                                            {{mi.MI_Name}}
+                                        </span>
+                                    </label>
+
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.mi)" ng-messages="myForm.mi.$error">
+                                    <div ng-message="required"> Select  checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-7">
+                        <div class="form-group">
+                            <div class="col-sm-8">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                    <span class="lbl padding-4">Between Dates </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-12" ng-show="bw_dates">
+                                <div class="col-sm-5">
+
+                                    <md-datepicker ng-model="startdate" name="sdate" ng-paste="$event.preventDefault()" onkeydown="return false" md-max-date="plMaxdate" md-placeholder="From Date" ng-required="bw_dates"  required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <md-datepicker ng-model="enddate" name="ddate" ng-paste="$event.preventDefault()" onkeydown="return false" md-max-date="plMaxdate" md-placeholder="To Date" md-min-date="startdate" ng-required="bw_dates" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--<br />
+                        <br />
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='OUT'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="OUT" name="PRno" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> CHECK OUT </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="IN" name="PRno" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> CHECK IN</span>
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="getreport()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-list-alt" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                    <md-button ng-show="get_salesdetails.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <!--<md-button ng-show="get_AssetsReport.length>0 && selectionflag=='Location'" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printARL')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>-->
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box box-primary" ng-show="get_salesdetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Pro forma Invoice Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" style="overflow:scroll">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{get_salesdetails.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>
+                            Print
+                        </th>
+                        <th><a href="" ng-click="sort('ISMPRINC_PrInviceNo')">Company Name</a></th>
+                        <th><a href="" ng-click="sort('ISMPRINC_PrInviceNo')">Invoice No.</a></th>
+                        <th><a href="" ng-click="sort('ISMPRINC_Date')">Date</a></th>
+                        <th><a href="" ng-click="sort('ISMMCLT_ClientName')">Client Name </a></th>
+                        <th><a href="" ng-click="sort('ismmpR_ProjectName')">Project Name </a></th>
+
+                        <th><a href="" ng-click="sort('ismcltprP_InstallmentName')">Total Tax</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_InstallmentAmt')">Total Amount</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_InstallmentAmt')">Advance %</a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_InstallmentAmt')">Advance Amount </a></th>
+                        <th><a href="" ng-click="sort('ismcltprP_ReceivedAmt')">Remarks</a></th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1=(get_salesdetails |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage"
+                        current-page="currentPage" pagination-id="page1">
+                        <td style="width:1%;">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="reschedule(user);"> <i class="fa fa-print" aria-hidden="true"></i></a>
+                        </td>
+                        <td style="text-align:left">{{user.MI_Name}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_PrInviceNo}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_Date |date:'dd/MM/yyyy'}}</td>
+                        <td style="text-align:left">{{user.ISMMCLT_ClientName}}</td>
+                        <td style="text-align:left">{{user.ISMMPR_ProjectName}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_TotalTaxAmount}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_TotalAmount}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_AdvPer}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_AdvanceAmount}}</td>
+                       
+                        <td style="text-align:left">{{user.ISMPRINC_Remarks}}</td>
+                       
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+
+    <div ng-hide="true">
+        <div id="printARL">
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="table" >
+                <thead>
+                    <tr>
+                        <th colspan="11" style="text-align:center">
+                            PRO FORMA INVOICE REPORT
+                        </th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Company Name </th>
+                        <th>Invoice No.</th>
+                        <th>Date</th>
+                        <th>Client Name </th>
+                        <th>Project Name </th>
+
+                        <th>Total Tax</th>
+                        <th>Total Amount</th>
+                        <th>Advance %</th>
+                        <th>Advance Amount </th>
+                        <th>Remarks</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in get_salesdetails">
+                        <td>{{$index+1}}</td>
+                        <td style="text-align:left">{{user.MI_Name}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_PrInviceNo}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_Date |date:'dd/MM/yyyy'}}</td>
+                        <td style="text-align:left">{{user.ISMMCLT_ClientName}}</td>
+                        <td style="text-align:left">{{user.ISMMPR_ProjectName}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_TotalTaxAmount}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_TotalAmount}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_AdvPer}}</td>
+                        <td style="text-align:left">{{user.ISMPRINC_AdvanceAmount}}</td>
+
+                        <td style="text-align:left">{{user.ISMPRINC_Remarks}}</td>
+
+                    </tr>
+                </tbody>
+           
+            </table>
+
+
+        </div>
+    </div>
+
+  
+
+
+
+</section>
+<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true" ng-click="closemodal()"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">
+                    PROFORMA INVOICE  DETAILS
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printData()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div style="text-align:center">
+                                <h4>PROFORMA INVOICE  </h4>
+                            </div>
+                            <div class="col-sm-12" style="text-align:center;margin-top:-35px">
+                                <img src="{{imagename}}" style="border:none;height:120px;width:600px;text-align:center" />
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive" style="border:none !important" width="100%">
+                                        <tr>
+                                            <td>CONTACT NO:&nbsp; 08068112900/2925</td>
+                                            <td>EMAIL:&nbsp; accounts@vapstech.com</td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:40%;text-align:left">TO</td>
+                                            <td style="width:60%;text-align:left"> <span>PROFORMA INVOICE NO:&nbsp;{{INVMSL_SalesNo}}</span>&nbsp;<span style="float:right">DATE:&nbsp;{{INVMSL_SalesDate |date:'dd/MM/yyyy'}}&nbsp;</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:40%;text-align:left" rowspan="2">
+                                                <span>
+                                                    {{ISMMCLT_Desc}}<br />
+                                                    {{client}}<br />
+                                                    {{ISMMCLT_Address}}<br />
+                                                    PHONE NO  : {{clmobile}}<br />
+                                                    EMAIL    :{{clemail}}<br />
+                                                    CLIENT  GST NO :&nbsp; {{clientgst}}
+                                                </span>
+                                            </td>
+                                            <td style="width:60%;text-align:left">GST NO:&nbsp; {{cgst}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:50%;text-align:left">
+                                                MOU REF. NO:    &nbsp;{{mno}}
+                                                &nbsp; &nbsp; DATE:&nbsp;{{mdate|date:'dd/MM/yyyy'}}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:65px"><b>NO</b></td>
+                                            <td><b>DESCRIPTION</b></td>
+                                            <td><b>HSN/SAC </b></td>
+                                            <!--<td><b>SAC CODE</b></td>-->
+                                            <td><b>QTY</b> </td>
+                                            <td><b>RATE/UNIT</b> </td>
+                                            <td><b>AMOUNT</b> </td>
+                                        </tr>
+                                        <tr ng-repeat="it in get_SaleItemDetails">
+                                            <td>{{$index+1}}</td>
+                                            <td style="text-align:left">{{it.ismprincD_ItemDesc}}</td>
+                                            <td style="text-align:left">
+
+                                                <span ng-if="it.ismprincD_HSNCode  !=null && it.ismprincD_HSNCode !=''">
+                                                    {{it.ismprincD_HSNCode}}
+                                                </span>
+                                                <span ng-if="it.ismprincD_SACCode  !=null && it.ismprincD_SACCode !=''">
+                                                    {{it.ismprincD_SACCode}}
+
+                                                </span>
+
+                                            </td>
+                                            <!--<td>{{it.ismprincD_SACCode}}</td>-->
+                                            <td>{{it.ismprincD_Qty}}</td>
+                                            <td>{{it.ismprincD_UnitRate |number:2}}</td>
+                                            <td><span style="float:right">{{it.ismprincD_Amount |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">TOTAL (Before Tax)</b></td>
+                                            <td><span style="float:right">{{ttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">Instalment</b></td>
+                                            <td><span style="float:right"><strong>{{prinC_InstallmentName}}</strong> </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">Advance({{per1}}%)</b></td>
+                                            <td><span style="float:right">{{roundoffttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr ng-repeat="ss in masterTax">
+                                            <td colspan="5"><span style="float:right">{{ss.invmT_TaxName}}</span></td>
+                                            <td colspan="5"><span style="float:right">{{ss.taxamount |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">Roundoff</b></td>
+                                            <td><span style="float:right">{{roundoffttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">TOTAL</b></td>
+                                            <td><span style="float:right">{{roundoffttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                <b style="text-align:left">AMOUNT IN WORDS :&nbsp;&nbsp;{{words}}  &nbsp;Only</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                TERMS AND CONDITION :
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="Remarks!=null && Remarks!=''">
+                                            <td colspan="6" style="text-align:left">
+                                                {{Remarks}}
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="Remarks==null || Remarks==''">
+                                            <td colspan="7" style="text-align:left;height:30px">
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                MODE OF PAYMENT: &nbsp;&nbsp;{{mof}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                BANK DETAILS:
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                <span ng-repeat="bb in bankarray">
+                                                    Name:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BankName}}<br />
+                                                    Account No.:&nbsp;&nbsp;{{bb.hrmbD_BankAccountNo}}<br />
+                                                    Branch:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BranchName}}<br />
+                                                    IFSC Code:&nbsp;&nbsp;&nbsp;{{bb.hrmbD_IFSCCode}}<br />
+                                                    Address:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BankAddress}}<br />
+                                                </span>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <h5>&nbsp; </h5>
+                                </div>
+                                <div class="col-sm-4">
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <h5> For &nbsp; {{miname}} </h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Receiver's signature </h5>
+                                </div>
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Authorised Signatory </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closemodal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">
+                    PROFORMA INVOICE
+                    DETAILS
+                </h4>
+                <md-button type="button" class="md-raised" data-ng-click="printDataout()">
+                    <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+                    <div class="row" style="border: black 1px solid;border-radius: 5px;padding:6px">
+                        <div class="box-content clearfix">
+                            <div style="text-align:center">
+                                <h4>PROFORMA INVOICE  </h4>
+                            </div>
+                            <div class="row" style="padding-left:19% !important">
+                                <img src="{{imagename}}" class="img-responsive img-fluid" />
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive" style="border:none !important" width="100%">
+                                        <tr>
+                                            <td>CONTACT NO:&nbsp; 08068112900/2925</td>
+                                            <td>EMAIL:&nbsp; accounts@vapstech.com</td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:40%;text-align:left">TO</td>
+                                            <td style="width:60%;text-align:left"> <span>PROFORMA INVOICE NO:&nbsp;{{INVMSL_SalesNo}}</span>&nbsp;<span style="float:right">DATE:&nbsp;{{INVMSL_SalesDate |date:'dd/MM/yyyy'}}&nbsp;</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:40%;text-align:left" rowspan="2">
+                                                <span>
+                                                    {{ISMMCLT_Desc}}<br />
+                                                    {{client}}<br />
+                                                    {{ISMMCLT_Address}}<br />
+                                                    PHONE NO  : {{clmobile}}<br />
+                                                    EMAIL    :{{clemail}}<br />
+                                                    CLIENT  GST NO :&nbsp; {{clientgst}}
+                                                </span>
+                                            </td>
+                                            <td style="width:60%;text-align:left">GST NO:&nbsp; {{cgst}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:50%;text-align:left">
+                                                MOU REF. NO:    &nbsp;{{mno}}
+                                                &nbsp; &nbsp; DATE:&nbsp;{{mdate|date:'dd/MM/yyyy'}}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="table table-responsive table-bordered" width="100%">
+                                        <tr>
+                                            <td style="width:65px"><b>NO</b></td>
+                                            <td><b>DESCRIPTION</b></td>
+                                            <td><b>HSN/SAC </b></td>
+                                         
+                                            <td><b>QTY</b> </td>
+                                            <td><b>RATE/UNIT</b> </td>
+                                            <td><b>AMOUNT</b> </td>
+                                        </tr>
+                                        <tr ng-repeat="it in get_SaleItemDetails">
+                                            <td>{{$index+1}}</td>
+                                            <td style="text-align:left">{{it.ismprincD_ItemDesc}}</td>
+                                            <td style="text-align:left">
+
+                                                <span ng-if="it.ismprincD_HSNCode  !=null && it.ismprincD_HSNCode !=''">
+                                                    {{it.ismprincD_HSNCode}}
+                                                </span>
+                                                <span ng-if="it.ismprincD_SACCode  !=null && it.ismprincD_SACCode !=''">
+                                                    {{it.ismprincD_SACCode}}
+
+                                                </span>
+
+                                            </td>
+                                          
+                                            <td>{{it.ismprincD_Qty}}</td>
+                                            <td>{{it.ismprincD_UnitRate |number:2}}</td>
+                                            <td><span style="float:right">{{it.ismprincD_Amount |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">TOTAL (Before Tax)</b></td>
+                                            <td><span style="float:right">{{ttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">Instalment</b></td>
+                                            <td><span style="float:right"><strong>{{prinC_InstallmentName}}</strong> </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">Advance({{per1}}%)</b></td>
+                                            <td><span style="float:right">{{ttln1 |number:2}}</span></td>
+                                        </tr>
+                                        <tr ng-repeat="ss in masterTax">
+                                            <td colspan="5"><span style="float:right">{{ss.invmT_TaxName}}</span></td>
+                                            <td colspan="5"><span style="float:right">{{ss.taxamount |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">Roundoff</b></td>
+                                            <td><span style="float:right">{{roundoffttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><b style="float:right">TOTAL</b></td>
+                                            <td><span style="float:right">{{roundoffttl |number:2}}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                <b style="text-align:left">AMOUNT IN WORDS :&nbsp;&nbsp;{{words}}  &nbsp;Only</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                TERMS AND CONDITION :
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="Remarks!=null && Remarks!=''">
+                                            <td colspan="6" style="text-align:left">
+                                                {{Remarks}}
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="Remarks==null || Remarks==''">
+                                            <td colspan="7" style="text-align:left;height:30px">
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                MODE OF PAYMENT: &nbsp;&nbsp;{{mof}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                BANK DETAILS:
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align:left">
+                                                <span ng-repeat="bb in bankarray">
+                                                    Name:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BankName}}<br />
+                                                    Account No.:&nbsp;&nbsp;{{bb.hrmbD_BankAccountNo}}<br />
+                                                    Branch:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BranchName}}<br />
+                                                    IFSC Code:&nbsp;&nbsp;&nbsp;{{bb.hrmbD_IFSCCode}}<br />
+                                                    Address:&nbsp;&nbsp;&nbsp;&nbsp;{{bb.hrmbD_BankAddress}}<br />
+                                                </span>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <h5>&nbsp; </h5>
+                                </div>
+                                <div class="col-sm-4">
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <h5> For &nbsp; {{miname}} </h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5>Receiver's signature </h5>
+                                </div>
+                                <div class="col-sm-4">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    &nbsp;
+                                </div>
+                                <div class="col-sm-4" style="text-align:right">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <h5> Authorised Signatory </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="box-content clearfix">
+        <div class="row">
+            <div style="text-align:center">
+                <h4>PROFORMA INVOICE  </h4>
+            </div>
+            <div class="row" style="padding-left:19% !important">
+                <img src="{{imagename}}" class="img-responsive img-fluid" />
+            </div>
+
+        </div>
+        <div class="row">
+            <br />
+            <div class="col-sm-12">
+                <table class="table table-responsive table-bordered" width="100%">
+                    <tr>
+                        <td style="width:50%;text-align:left">TO</td>
+                        <td style="width:50%;text-align:left"> PROFORMA INVOICE NO:&nbsp;{{INVMSL_SalesNo}}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:50%;text-align:left" rowspan="2">
+                            <span>
+                                {{ISMMCLT_Desc}}<br />
+                                {{client}}<br />
+                                {{ISMMCLT_Address}}
+                            </span>
+
+                        </td>
+                        <td style="width:50%;text-align:left">DATE:&nbsp;{{INVMSL_SalesDate |date:'dd/MM/yyyy'}}</td>
+                    </tr>
+                    <tr>
+                        <td style="width:50%;text-align:left">
+                            VAT TIN: &nbsp;29950803765  <br />
+
+                            GST No :&nbsp; 29AACCV7691K1Z J
+                        </td>
+                    </tr>
+                </table>
+                <table class="table table-responsive table-bordered" width="100%">
+                    <tr>
+                        <td style="width:65px"><b>SL. NO.</b></td>
+                        <td><b>DESCRIPTION</b></td>
+                        <td><b>HSN/SAC </b></td>
+                        <td><b>QTY.</b> </td>
+                        <td><b>RATE/UNIT.</b> </td>
+                        <td><b>AMOUNT</b> </td>
+                    </tr>
+                    <tr ng-repeat="it in get_SaleItemDetails">
+                        <td>{{$index+1}}</td>
+                        <td>{{it.ismprincD_ItemDesc}}</td>
+                        <td style="text-align:left">
+
+                            <span ng-if="it.ismprincD_HSNCode  !=null && it.ismprincD_HSNCode !=''">
+                                {{it.ismprincD_HSNCode}}
+                            </span>
+                            <span ng-if="it.ismprincD_SACCode  !=null && it.ismprincD_SACCode !=''">
+                                {{it.ismprincD_SACCode}}
+
+                            </span>
+
+                        </td>
+                        <td>{{it.ismprincD_Qty}}</td>
+                        <td>{{it.ismprincD_UnitRate}}</td>
+                        <td><span style="float:right">{{it.ismprincD_Amount |number:2}}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"><b>TOTAL</b></td>
+                        <td>{{ttl}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"><b>Advance({{per1}}%)</b></td>
+                        <td>{{ttln1}}</td>
+                    </tr>
+                    <tr ng-repeat="ss in appliedtax1">
+                        <td colspan="5">{{ss.invmT_TaxName}}</td>
+                        <td colspan="5">{{ss.taxamount}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"><b>TOTAL</b></td>
+                        <td>{{mainttl |number:2}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><b>Roundoff</b></td>
+                        <td>{{roundoffttl}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="text-align:left">
+                            TERMS OF PAYMENT:
+                        </td>
+                    </tr>
+                    <tr ng-if="Remarks!=null && Remarks!=''">
+                        <td colspan="5" style="text-align:left">
+                            {{Remarks}}
+                        </td>
+                    </tr>
+                    <tr ng-if="Remarks==null || Remarks==''">
+                        <td colspan="6" style="text-align:left;height:30px">
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="text-align:left">
+                            <b>{{words}}  &nbsp;Only</b>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <h5>&nbsp; </h5>
+            </div>
+
+            <div class="col-sm-4">
+                &nbsp;
+            </div>
+            <div class="col-sm-4" style="text-align:right">
+                <h5> For &nbsp; {{miname}} </h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <br />
+                <br />
+                <br />
+                <h5>Receiver's signature </h5>
+            </div>
+
+            <div class="col-sm-4">
+                <br />
+                <br />
+                <br />
+                &nbsp;
+            </div>
+            <div class="col-sm-4" style="text-align:right">
+                <br />
+                <br />
+                <br />
+                <h5> Authorised Signatory </h5>
+            </div>
+        </div>
+
+
+
+    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>-->

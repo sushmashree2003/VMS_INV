@@ -1,0 +1,380 @@
+﻿<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Meeting Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <br />
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well text-center" data-ng-init="allind ='Monthwise'">
+                            <input type="radio" value="Monthwise" name="allind" ng-disabled="disablemonth" ng-change="optionchange()" data-ng-model="allind">
+                            <span class="lbl padding-8">Month Wise</span>
+                            <input type="radio" value="Datewise" name="allind" ng-disabled="disablemonth" ng-change="optionchange()" data-ng-model="allind">
+                            <span class="lbl padding-8">Date Wise</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='Monthwise'">
+                    <div class="col-sm-6 text-center">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="year1" ng-disabled="disablemonth" ng-model="year" ng-change="getchanged(year,month);" ng-required="allind=='Monthwise'">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.hrmlY_LeaveYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                    <div ng-message="required">Please Select the Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 text-center">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month :<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="month1" ng-disabled="disablemonth" ng-model="month" ng-change="getchanged(year,month);" ng-required="allind=='Monthwise'">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in fillmonth" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.monthname}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                    <div ng-message="required">Please Select the month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="allind=='Datewise'">
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="fromdate" onkeydown="return false" ng-disabled="disablemonth" name="From_Date" ng-change="gettodate()" id="date1" md-placeholder="From Date" ng-required="allind=='Datewise'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required">Please Select From date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="todate" onkeydown="return false" ng-disabled="disablemonth" name="To_Date" md-min-date="minDatemf" id="date2" md-placeholder="To Date" ng-required="allind=='Datewise'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required">Please Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="submit" ng-click="ShowReportdata()" class="md-raised md-primary" id="save-btn">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-click="cancel();" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+                        <md-button type="button" ng-if="allind=='Datewise' || hrcommentflag==true" ng-show="report" class="md-raised md-primary" id="excel-btn" ng-click="exptoex()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" ng-if="allind=='Datewise' || hrcommentflag==true" ng-show="report" class="md-raised md-primary" id="print-btn" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="momdetailreport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Meeting Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{momdetailreport.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered text-center" id="datatable1">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th style="text-align:center"><a href="" ng-click="sort('MOM_Agenda')"> Agenda</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sort('MOM_Date')">Date</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sort('MOM_Venue')"> Venue</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sort('MOM_StartTime ')"> Meeting StartTime</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sort('MOM_EndTime')"> Meeting EndTime</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sort('tA_Minutes')"> Minutes</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sort('tA_Participants')"> Participants</a></th>
+
+                        <th style="text-align:center"><a href="" ng-click="sort('tA_Files')"> Files</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="obj in filterValue1 = (momdetailreport | filter : searchValue) |orderBy:sortKey:sortReverse  | itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">
+                            <span>
+                                <a class="text-primary" data-placement="bottom" data-toggle="modal" data-target="#agendadetails" data- title="VIEW Details" ng-click="agendadetails(obj)">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </td>
+                        <td class="text-left">{{ obj.MOM_Date | date: dd-MM-yyyy}}</td>
+                        <td class="text-left">{{ obj.MOM_Venue }}</td>
+                        <td class="text-left">{{ obj.MOM_StartTime }}</td>
+                        <td class="text-left">{{ obj.MOM_EndTime }}</td>
+                        <td class="text-left">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#minutesdetails" data-backdrop="static" ng-click="minutesdetails(obj)">
+                                <i class="fa fa-eye text-purple">
+                                </i>
+                            </a>
+                        </td>
+                        <td class="text-left">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#participants" data-backdrop="static" ng-click="ViewDetails(obj)">
+                                <i class="fa fa-eye text-purple">
+                                </i>
+                            </a>
+                        </td>
+
+                        <td class="text-left">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#popup3" data-backdrop="static" ng-click="viewdocument(obj)">
+                                <i class="fa fa-eye text-purple">
+                                </i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" id="currentPage">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="agendadetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">Agenda</h5>
+            </div>
+            <div class="modal-body">
+                <p id="ada">
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="minutesdetails" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">MINUTES DETAILS</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <textarea name="mindetails" ng-model="MOM_Minutes" style="color:#444 !important; width: 1115px; height: 230px;" rows="5" cols="50"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="participants" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">PARTICIPANTS COUNT : {{getParticipentsdetails.length}}</h5>
+            </div>
+            <div class="modal-body">
+                <table class="table  table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Task/Group</th>
+                            <th>Participants</th>
+                            <th> ActionPlans</th>
+                            <th> TargetDate</th>
+                            <th>Designation</th>
+                            <th> CONTACT NO</th>
+                            <th> EMAIL</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="dd in  getParticipentsdetails">
+                            <td>{{ dd.momprT_EXTINTFlag}}</td>
+                            <td>{{ dd.mommnT_Names}}</td>
+                            <td>{{dd.momprT_ParticipantsName}}</td>
+                            <td>{{dd.mommnT_ActionPlans}} </td>
+                            <td>{{dd.mommnT_TargetDate|date : dd-MM-yyyy}} </td>
+                            <td>{{dd.momprT_Designation}}</td>
+                            <td>{{dd.momprT_MobileNo}}</td>
+                            <td>{{dd.momprT_Email}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="popup3" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">VIEW UPLOADED FILE</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>FILE NAME</th>
+                                <th>VIEW</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documents in uploaddocfiles">
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-left">{{documents.momfL_FileName}}</td>
+                                <td class="text-center">
+                                    <span ng-if="documents.momfL_FilePath !=null && documents.momfL_FilePath !=''">
+                                        <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                           style="color:red;display:inline; font-weight: bolder;"
+                                           ng-click="previewimg_new(documents.momfL_FilePath,documents.momfL_FileName)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" style="width:40px" /> view
+                                        </a>
+                                        <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                           style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                           ng-click="previewimg_new(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                           ng-click="previewimg_new(documents.momfL_FilePath,documents.momfL_FileName)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                           style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" style="width:40px" />
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="myimagePreview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h3>{{momfL_FileName}}</h3>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-body">
+                        <img id="preview" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form id="qqqq">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div id="pdfIdzz">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,232 @@
+﻿<section class="content twocoloumn">
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Employee Module and Client Wise Report </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+
+                            <div class="well text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" value="Institution" name="Institution" data-ng-model="allind" ng-change="All_Individual()">
+                                    <span class="lbl padding-8">Institution</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Individual" name="Individual" data-ng-model="allind" ng-change="All_Individual()">
+                                    <span class="lbl padding-8">Individual</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Company Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="multiselect col-sm-8" style="width:65%">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="desgcheck" type="checkbox" data-ng-click="all_check()">
+                                        <span class="lbl padding-8" style="margin-top:2%">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-model="mI_Id" ng-repeat="com in institutionlist |filter:searchchkbx" value="{{com.mI_Id}}">
+                                        <input name="com" value="1" data-ng-model="com.select" type="checkbox" ng-click="get_employee()">
+                                        <span class="lbl padding-8">
+                                            {{com.mI_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.com)" ng-messages="myForm.com.$error">
+                                    <div ng-message="required" style="color:red">Select Company Name</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-if="allind == 'Individual'">
+                                <label class="control-label col-sm-4">Employee Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <div>
+                                        <ui-select id="sel2" name="employee" ng-model="obj.hrmE_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Employee" required>
+                                            <ui-select-match placeholder="Select OR Search Employee in the list...">
+                                                {{$select.selected.hrmE_EmployeeFirstName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="option in Employeelst | propsFilter: {hrmE_EmployeeFirstName: $select.search}"
+                                                               value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                    </div>
+                                    <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                        <div ng-message="required" style="color:red">Select Employee Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="report()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData()" ng-show="GetReport.length > 0">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel('#BankCash')" ng-show="GetReport.length > 0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+
+
+                </div>
+
+            </div>
+        </form>
+
+        <div class="box box-primary" ng-show="GetReport.length > 0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee wise List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{GetReport.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th>Company Name</th>
+                                <th>Employee Name</th>
+                                <th>Department</th>
+                                <th>Designantion</th>
+                                <th>Department Head</th>
+                                <th>Module Handling</th>
+                                <th>Client</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in lengthval = (GetReport | filter : searchValueU)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPageU" current-page="currentPageU" ng-class-odd="'odd'">
+                                <td>{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                                <td style="text-align:left">{{ user.MI_Name}}</td>
+                                <td style="text-align:left">{{ user.EmployeeName}}</td>
+                                <td style="text-align:left">{{ user.HRMD_DepartmentName}}</td>
+                                <td style="text-align:left">{{ user.HRMDES_DesignationName}}</td>
+                                <td style="text-align:left">{{ user.Departmentheadname}}</td>
+                                <td style="text-align:left">
+                                    <span ng-if="user.IVRMM_ModuleName == user.IVRMM_ModuleName && user.ISMMMDDE_Id > 0" style="color:black">
+                                        {{user.IVRMM_ModuleName}}
+                                    </span>
+
+                                    <span ng-if="user.IVRMM_ModuleName != user.IVRMM_ModuleName && user.ISMMMDDE_Id < 0" style="color:black">
+                                        -----
+                                    </span>
+                                </td>
+                                <td style="text-align:left">
+                                    <span ng-if="user.IVRMM_ModuleName == user.IVRMM_ModuleName && user.ISMMMDDE_Id == 0" style="color:black">
+                                        {{user.IVRMM_ModuleName}}
+                                    </span>
+
+                                    <span ng-if="user.IVRMM_ModuleName != user.IVRMM_ModuleName && user.ISMMMDDE_Id != 0" style="color:black">
+                                        -----
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                </div>
+
+                <div id="BankCash" hidden>
+                    <div id="printDeviation">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.No.</th>
+                                    <th>Company Name</th>
+                                    <th>Employee Name</th>
+                                    <th>Department</th>
+                                    <th>Designantion</th>
+                                    <th>Department Head</th>
+                                    <th>Module Handling</th>
+                                    <th>Client</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in GetReport |orderBy:sortKey:reverse">
+                                    <td>{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                                    <td style="text-align:left">{{ user.MI_Name}}</td>
+                                    <td style="text-align:left">{{ user.EmployeeName}}</td>
+                                    <td style="text-align:left">{{ user.HRMD_DepartmentName}}</td>
+                                    <td style="text-align:left">{{ user.HRMDES_DesignationName}}</td>
+                                    <td style="text-align:left">{{ user.Departmentheadname}}</td>
+                                    <td style="text-align:left">
+                                        <span ng-if="user.IVRMM_ModuleName == user.IVRMM_ModuleName && user.ISMMMDDE_Id > 0" style="color:black">
+                                            {{user.IVRMM_ModuleName}}
+                                        </span>
+                                        <span ng-if="user.IVRMM_ModuleName === null || user.IVRMM_ModuleName === false || user.IVRMM_ModuleName === 0 ||  user.IVRMM_ModuleName(/^ *$/) === null" style="color:black">
+                                            -----
+                                        </span>
+                                    </td>
+                                    <td style="text-align:left">
+                                        <span ng-if="user.IVRMM_ModuleName == user.IVRMM_ModuleName && user.ISMMMDDE_Id == 0" style="color:black">
+                                            {{user.IVRMM_ModuleName}}
+                                        </span>
+                                        <span ng-if="user.IVRMM_ModuleName == null || user.IVRMM_ModuleName == false || user.IVRMM_ModuleName == 0 " style="color:black">
+                                            -----
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+

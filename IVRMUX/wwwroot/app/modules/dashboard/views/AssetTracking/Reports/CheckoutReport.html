@@ -1,0 +1,328 @@
+﻿<style>
+    .twocoloumn .multiselect {
+        width: 23.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 29px !important;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+    .form-horizontal .control-label {
+        padding-top: 5px;
+        margin-bottom: 0;
+        text-align: center;
+        font-size: 14px;
+    }
+    .sss{
+        margin-left:10px;
+    }
+    .s1 {
+       
+    }
+</style>
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Check-Out</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-offset-2" ng-hide="staffcheck=='Staff'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Company Name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel112" ng-model="MI_Id" ng-change="onclickchange()" name="yr" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="mi1 in get_mi_list" value="{{mi1.MI_Id}}" ng-selected="{{mi1.Selected==true}}"> {{mi1.MI_Name}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yr)" ng-messages="myForm.yr.$error">
+                                        <div ng-message="required">Select Company</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-sm-offset-4">
+                            <div class="form-group">
+                                <div class="well">
+                                    <div class="text-center" ng-init="selectionflag='All'">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="All" name="all" ng-model="selectionflag" ng-change="selectiondata(selectionflag)">
+                                            <span class="lbl padding-8"> All </span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Item" name="item" ng-model="selectionflag" ng-change="selectiondata(selectionflag)">
+                                            <span class="lbl padding-8">Item Wise</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Location" name="location" ng-model="selectionflag" ng-change="selectiondata(selectionflag)">
+                                            <span class="lbl padding-8">Location Wise</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-sm-offset-4">
+                            <div class="form-group sss">
+                                <div class="col-sm-2">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwyear" data-ng-model="bw_year" ng-change="changeyear()">
+                                        <span class="lbl padding-4">Year </span>
+                                    </label>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates" ng-change="changedate()">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group s1" ng-show="bw_year">
+                                <label class="control-label col-sm-3">Financial Year :<span style="color:red;">*</span></label>
+                                <div class="col-sm-3">
+                                    <select class="form-control" ng-model="imfY_Id" name="fyear" ng-required="bw_year">
+                                        <option value="">--Select Year-- </option>
+                                        <option ng-repeat="option in get_Financialyear" value="{{option.imfY_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.imfY_FinancialYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.fyear)" ng-messages="myForm.fyear.$error">
+                                        <div ng-message="required">Please Select Year </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group s1">
+                                <div class="col-sm-8 col-sm-offset-0"ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" onkeydown="return false" ng-paste="$event.preventDefault()" name="sdate" md-placeholder="Start Date" md-max-date="enddate" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" onkeydown="return false" ng-paste="$event.preventDefault()" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-2">
+                            <div class="form-group" ng-show="selectionflag=='Item'">
+                                <label for="sel2" class="control-label col-sm-3"> Item : <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search Item here...">
+                                        <label>
+                                            <input name="alitem" value="1" ng-model="allitem" type="checkbox" ng-click="all_item(allitem)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-model="invmI_Id" ng-repeat="item in get_items | filter : searchValue">
+                                            <input name="item" ng-model="item.itemck" type="checkbox" ng-click="item_click();" ng-required="isRequireditem()">
+                                            <span class="lbl padding-8">
+                                                {{item.invmI_ItemName}}
+                                            </span>
+                                        </label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="selectionflag=='Location'">
+                                <label for="sel2" class="control-label col-sm-3"> Location : <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search location here...">
+                                        <label>
+                                            <input name="allocation" value="1" ng-model="alllocation" type="checkbox" ng-click="all_location(alllocation)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-model="invmlO_Id" ng-repeat="loctn in get_locations | filter : searchValue">
+                                            <input name="location" ng-model="loctn.locationck" type="checkbox" ng-click="location_click();" ng-required="isRequiredlocation()">
+                                            <span class="lbl padding-8">
+                                                {{loctn.invmlO_LocationRoomName}}
+                                            </span>
+                                        </label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.location)" ng-messages="myForm.location.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="invmsI_Id" value="{{invmsI_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-click="getreport()" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-list-alt" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Clear
+                        </md-button>
+                        <md-button ng-show="get_checkoutreport.length>0"  class="md-raised md-primary"  ng-click="printData('#printcout')">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+
+                        <md-button ng-show="get_checkoutreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printcout1')">
+
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="box box-primary" ng-show="get_checkoutreport.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">CHECK-OUT Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('invmS_StoreName')">From Store</a> </th>
+                            <th><a href="" ng-click="sortBy('invmI_ItemName')">Item</a> </th>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">To Location </a></th>
+                            <th><a href="" ng-click="sortBy('invacO_CheckoutDate')">Check-out Date </a> </th>
+                            <th><a href="" ng-click="sortBy('invacO_CheckOutQty')">Check-out Quantity </a> </th>
+                            <th><a href="" ng-click="sortBy('invacO_ReceivedBy')">Received By </a> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_checkoutreport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td> {{user.INVMS_StoreName}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVMLO_LocationRoomName}}</td>
+                            <td>{{user.INVACO_CheckoutDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.INVACO_CheckOutQty}}</td>
+                            <td>{{user.INVACO_ReceivedBy}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+
+        <div ng-hide="true">
+            <div id="printcout">
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                </div>
+                <h4 class="text-center">ASSET CHECK-OUT REPORT</h4>
+                <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('invmS_StoreName')">From Store</a> </th>
+                            <th><a href="" ng-click="sortBy('invmI_ItemName')">Item</a> </th>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">To Location </a></th>
+                            <th><a href="" ng-click="sortBy('invacO_CheckoutDate')">Check-out Date </a> </th>
+                            <th><a href="" ng-click="sortBy('invacO_CheckOutQty')">Check-out Quantity </a> </th>
+                            <th><a href="" ng-click="sortBy('invacO_ReceivedBy')">Received By </a> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_checkoutreport">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td> {{user.INVMS_StoreName}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVMLO_LocationRoomName}}</td>
+                            <td>{{user.INVACO_CheckoutDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.INVACO_CheckOutQty}}</td>
+                            <td>{{user.INVACO_ReceivedBy}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+<div ng-hide="true">
+    <div id="printcout1">
+        
+        <h4 class="text-center">ASSET CHECK-OUT REPORT</h4>
+        <table class="table table-hover table-responsive table-bordered text-center" id="table">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                    </th>
+                    <th><a href="" ng-click="sortBy('invmS_StoreName')">From Store</a> </th>
+                    <th><a href="" ng-click="sortBy('invmI_ItemName')">Item</a> </th>
+                    <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">To Location </a></th>
+                    <th><a href="" ng-click="sortBy('invacO_CheckoutDate')">Check-out Date </a> </th>
+                    <th><a href="" ng-click="sortBy('invacO_CheckOutQty')">Check-out Quantity </a> </th>
+                    <th><a href="" ng-click="sortBy('invacO_ReceivedBy')">Received By </a> </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in get_checkoutreport">
+                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                    <td> {{user.INVMS_StoreName}}</td>
+                    <td>{{user.INVMI_ItemName}}</td>
+                    <td>{{user.INVMLO_LocationRoomName}}</td>
+                    <td>{{user.INVACO_CheckoutDate | date:'dd/MM/yyyy'}}</td>
+                    <td>{{user.INVACO_CheckOutQty}}</td>
+                    <td>{{user.INVACO_ReceivedBy}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,249 @@
+﻿<style>
+    .multiselect {
+        width: 22.1em;
+        height: 12.7em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 34.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+        margin-top: -3%;
+    }
+    .form-horizontal .control-label {
+        padding-top: 0px;
+        margin-bottom: 0;
+        text-align: left;
+        font-size: 14px;
+    }
+    .empgt {
+       
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" ng-init="BindData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    VMS Live Meeting SCHEDULE
+
+                </h3>
+
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Meeting Topic : <strong style="color:red;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <input class="form-control" placeholder="Meeting Topic" name="sch_name" id="usr" ng-model="VMSLMEET_MeetingTopic" type="text" maxlength="50" required>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_name)" ng-messages="myForm.sch_name.$error">
+                                    <div ng-message="required">Enter Schedule Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Employee :</label>
+                            <label class="control-label" style="padding-left: 12px;width: 92%;">
+                                <span ng-show="get_userEmplist.length>0">
+                                    <input class="form-control" style="width: 68.8%;margin-left: 36%; margin-bottom: 3%;" ng-model="searchValueUEM" type="text" placeholder="search Employee here...">
+                                </span>
+                            </label>
+                            <div class="multiselect col-sm-8">
+
+                                <label>
+                                    <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="user in get_userEmplist | filter : searchValueUEM">
+                                    <input name="emp" ng-model="user.empck" type="checkbox" ng-click="togchkbx();" title="Select Employee" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        <b>  {{user.employeeName}}</b> : {{user.HRMD_DepartmentName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages " ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                <div ng-message="required" class="col-sm-8 empgt">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-5">
+                        <div ng-init="hrs='12hr'">
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" name="12hur" value="12hr" data-ng-model="hrs">
+                                    <span class="lbl padding-8">12 Hours</span>
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" name="24Hur" value="24hr" data-ng-model="hrs">
+                                    <span class="lbl padding-8">24 Hours</span>
+                                </label>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Planne Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8 input-group">
+                                <md-datepicker name="sch_date" onkeydown="return false" ng-model="VMSLMEET_PlannedDate" md-placeholder="Planne Date" md-min-date="minDate" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                    <div ng-message="required">Select Date</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-top: 7%;">Schedule Time From: <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-4 input-group">
+                                <div ng-show="hrs=='12hr'">
+                                    <div uib-timepicker name="sch_time" ng-model="ScheduleTime_12" ng-change="validateTomintime_12(ScheduleTime_12)" ng-disabled="NoOfStud!= null" show-meridian="true" ng-required="hrs=='12hr'"></div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_time)" ng-messages="myForm.sch_time.$error">
+                                        <div ng-message="required">Select Schedule Time From</div>
+                                    </div>
+                                </div>
+                                <div ng-show="hrs=='24hr'">
+                                    <div uib-timepicker name="sch_time24" ng-model="ScheduleTime_24" ng-change="validateTomintime_24(ScheduleTime_24)" ng-disabled="NoOfStud!= null" show-meridian="false" ng-required="hrs=='24hr'"></div>
+                                    <!--<input type="time" placeholder="00:00:00" class="form-control" name="sch_time" ng-model="ScheduleTime" required>-->
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_time24)" ng-messages="myForm.sch_time24.$error">
+                                        <div ng-message="required">Select Schedule Time From</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-top: 7%;">Schedule Time To: <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-4 input-group">
+                                <div ng-show="hrs=='12hr'">
+                                    <div uib-timepicker name="sch_time_to" ng-model="ScheduleTimeTo_12" min="min" ng-change="validatefromtime_12()" ng-disabled="NoOfStud!= null" show-meridian="true" ng-required="hrs=='12hr'"></div>
+                                    <!--<input type="time" placeholder="00:00:00" class="form-control" name="sch_time" ng-model="ScheduleTime" required>-->
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_time_to)" ng-messages="myForm.sch_time_to.$error">
+                                        <div ng-message="required">Select Schedule Time To</div>
+                                    </div>
+                                </div>
+                                <div ng-show="hrs=='24hr'">
+                                    <div uib-timepicker name="sch_time_to24" ng-model="ScheduleTimeTo_24" min="min" ng-change="validatefromtime_24()" ng-disabled="NoOfStud!= null" show-meridian="false" ng-required="hrs=='24hr'"></div>
+                                    <!--<input type="time" placeholder="00:00:00" class="form-control" name="sch_time" ng-model="ScheduleTime" required>-->
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_time_to24)" ng-messages="myForm.sch_time_to24.$error">
+                                        <div ng-message="required">Select Schedule Time To</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="text-center">
+                <span>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="savemeeting()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                </span>
+                <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+
+        <!-- /.box-header -->
+        <div class="box box-primary" ng-show="vmslivemeetinglist.length>0">
+            <div class="box-body">
+                <div class="">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{vmslivemeetinglist.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group" ng-if="filterValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filter2.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <!--<div class="col-sm-3" ng-init="hrsrt='12hrrt'">
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="12hurrt" value="12hrrt" data-ng-model="hrsrt">
+                        <span class="lbl">12 Hours</span>
+                    </label>
+                </div>
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="24Hurrt" value="24hrrt" data-ng-model="hrsrt">
+                        <span class="lbl padding-8">24 Hours</span>
+                    </label>
+                </div>
+            </div>-->
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="filterValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL No</th>
+                            <th>Meeting Id</th>
+                            <th>Meeting Topic</th>
+                            <th>Planned Date</th>
+                            <th>Planned Start Time</th>
+                            <th>Planned End Time</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="newuser in filter2=(vmslivemeetinglist | filter:filterValue )  |orderBy:sortKey3:reverse3  | itemsPerPage: itemsPerPage4" pagination-id="page4" current-page="currentPage4" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage4 *(currentPage4-1)+$index+1}}</td>
+                            <td style="text-align: left;" class="text-uppercase">{{ newuser.VMSLMEET_MeetingId}}</td>
+                            <td style="text-align: left;" class="text-uppercase">{{ newuser.VMSLMEET_MeetingTopic}}</td>
+                            <td>{{ newuser.VMSLMEET_PlannedDate | date:"dd-MM-yyyy"}}</td>
+                            <td >{{ newuser.VMSLMEET_PlannedStartTime | date:'h:mm a'}}</td>
+                            <td>{{ newuser.VMSLMEET_PlannedEndTime | date:'h:mm a'}}</td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls pagination-id="page4" max-size="8"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+            <!--------------End ---------------->
+    </form>
+</section>

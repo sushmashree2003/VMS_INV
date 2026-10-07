@@ -1,0 +1,192 @@
+﻿<style>
+    .textclass {
+        resize: none !important
+    }
+</style>
+
+<div data-ng-init="Loaddata()">
+    <section class="content">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box-body">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">CLIENT LIST</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{get_clentlist.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="search!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="overflow:auto !important">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="hdTH">
+                                            <label>
+                                                <input type="checkbox" value="" ng-model="checkall" ng-click="toggleAllgrp()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>
+                                        <th>SL.No.</th>
+                                        <th><a href="" ng-click="sort('ISMMCLT_ClientName')">Client Name</a></th>
+                                        <th><a href="" ng-click="sort('ISMMCLT_CordinatorId')">Coordinator/IE</a></th>
+                                        <th><a href="" ng-click="sort('ISMMCLT_NOName')">Nodal Officer/Enduser:Number</a></th>
+                                        <th>Remark's</th>
+                                        <th>NEGATIVE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="user in filterValue=(get_clentlist | filter : search) | orderBy:sortKey:reverse
+                                                    |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page1">
+                                        <td class="text-center  hdTD">
+                                            <label>
+                                                <input type="checkbox" ng-model="user.checkselected" ng-change="optionToggledcheckall()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-left">{{user.ISMMCLT_ClientName}}</td>
+                                        <td class="text-left">{{user.cordinatorFirstName}} {{user.cordinatorMiddleName}} {{user.cordinatorLastName}}</td>
+                                        <td class="text-left">{{user.ISMMCLT_NOName}}:{{user.ISMMCLT_ContactNo}}</td>
+                                        <td>
+                                            <div>
+                                                <textarea maxlength="250" name="muliclient_remarks" ng-model="user.ISMMCF_Remarks" class="form-control" resize: none; rows="3" placeholder="Remark" ng-required="user.checkselected==true" />
+                                                <div class="error-messages" ng-if="interacted(myForm.muliclient_remarks)" ng-messages="myForm.muliclient_remarks.$error">
+                                                    <div ng-message="required">Enter Remark's</div>
+                                                </div>
+                                            </div>
+                                        </td>  
+                                        <td class="text-center">
+                                            <label class="control-label">
+                                                <input type="checkbox" name="negative" ng-model="user.ISMMCF_Negative" ng-true-value="1" ng-false-value="0" ng-disabled="user.ISMMCF_Negative" class="ng-valid ng-dirty ng-valid-parse ng-touched" aria-checked="false" aria-invalid="false"><span class="lbl padding-16"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5" pagination-id="page1" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                        </div>
+
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-click="saveClientfeedback(user)" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="box box-primary" ng-show="clientgrid.length > 0">
+            <!--ng-show="clientgrid.length > 0"-->
+            <div class="box-header with-border">
+                <h3 class="box-title">CLIENT FEEDBACK DETAILS</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{clientgrid.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search2!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search2" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Client Name</th>
+                            <th>Coordinator/IE</th>.
+                            <th>Nodal Officer/Enderser:Number</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Remarks</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--ng-repeat="user1 in clientgrid"-->
+                        <tr dir-paginate="user1 in filterValue2=(clientgrid | filter : search2) | orderBy:sortKey2:reverse2 | itemsPerPage:itemsPerPage2" current-page="currentPage2" pagination-id="page2">
+                            <td>{{$index+1}}</td>
+                            <td>{{user1.ISMMCLT_ClientName}}</td>
+                            <td>{{user1.HRME_EmployeeFirstName}}</td>
+                            <td>{{user1.ISMMCLT_NOName}}:{{user1.ISMMCLT_ContactNo}}</td>
+                            <td>{{user1.ISMMCF_Date | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user1.ISMMCF_Time}}</td>
+                            <td>{{user1.ISMMCF_Remarks}}</td>
+                            <td style="text-align:center">
+                                <a href="javascript:void(0)" ng-click="editdata(user1)" class="text-aqua" data-placement="bottom"
+                                   data-toggle="tooltip" title="Edit Client Data">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="10" pagination-id="page2"
+                                         direction-links="true"
+                                         boundary-links="true" id="currentPage2">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </section>
+</div>

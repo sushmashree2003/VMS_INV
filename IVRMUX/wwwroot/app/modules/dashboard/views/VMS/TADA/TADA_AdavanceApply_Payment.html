@@ -1,0 +1,708 @@
+﻿
+<style>
+    .padding {
+        padding-bottom: 8px !important;
+    }
+    .vl {
+        border-left: 1px solid #ff9800;
+        height: 340px;
+    }
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        
+        border-radius: 5px;
+    }
+</style>
+<section class="content">
+    <div data-ng-init="onpageload()">
+
+        <form class="form-horizontal" method="post" role="form" ng-show="editflag==true" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TA-DA Adavance Payment</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12 box-content clearfix">
+                        <h5>Adavance Payment Details</h5>
+                        <hr />
+                        <div class="col-md-5">
+
+                            <table class="table table-bordered table-condensed text-left">
+                                <tr>
+                                    <td>Employee Name</td>
+                                    <td>
+                                        {{emplYoeeName |uppercase}}
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Employee Code
+                                    </td>
+                                    <td>
+                                        {{hrmE_EmployeeCodeee}}
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>Applied Amount</td>
+                                    <td>
+                                        {{applieamt}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Sanctioned Amount</td>
+                                    <td>
+                                        {{sanction}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td> City Name</td>
+                                    <td>{{cityname|uppercase}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        From date
+                                    </td>
+                                    <td>
+                                        {{fromdate |date:'dd/MM/yyyy'}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Departure Time</td>
+                                    <td style="text-align:center">
+                                        {{departuretime | date : 'shortTime' }}
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>To Date</td>
+                                    <td>
+                                        {{todate |date:'dd/MM/yyyy'}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Arrival time
+                                    </td>
+                                    <td style="text-align:center">
+
+                                        {{ ArrivalTime | date : 'shortTime' }}
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Days</td>
+                                    <td>
+                                        {{datediff}}
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                        </div>
+
+                        <div class="col-sm-1">
+                            <div class="vl"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 form-horizontal">
+                                    <div class="form-group padding">
+                                        <label class="control-label col-sm-4">PaymentMode :<span style="color:red;">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select class="form-control" id="sel2" name="pMode" ng-model="VTADAAAP_PaymentMode" ng-change="payament();" required>
+                                                <option value="">--Select-</option>
+                                                <option value="cash">Cash</option>
+                                                <option value="Bank">BankTransfer</option>
+                                                <option value="Cheque">Cheque</option>
+                                                <option value="Online">OnlineTransfer</option>
+                                                <option value="Rejected">Rejected</option>
+                                            </select>
+                                            <div class="error-messages" ng-if="interacted(myForm.pMode)" ng-messages="myForm.pMode.$error">
+                                                <div ng-message="required"> Please select PaymentMode </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group padding" ng-show="Ecashcard==true">
+                                        <label class="control-label col-sm-4">Payment ReferenceNo:</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" ng-model="VTADAAAP_PaymentRefNo" name="refno" class="form-control" placeholder="PaymentReferenceNo" autocomplete="off" maxlength="20" />
+                                            <div class="error-messages" ng-if="interacted(myForm.refno)" ng-messages="myForm.refno.$error">
+                                                <div ng-message="required">Enter PaymentReference No </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group padding">
+                                        <label class="control-label col-sm-4">Total Amount :<span style="color:red;">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" ng-model="VTADAAAP_AmountPaid" name="amount" ng-disabled="VTADAAAP_PaymentMode=='Rejected'" class="form-control active" ng-change="totalAmountcal()" placeholder="Total Amount" allow-pattern="[0-9.]" autocomplete="off" maxlength="8" required />
+                                            <div class="error-messages" ng-if="interacted(myForm.amount)" ng-messages="myForm.amount.$error">
+                                                <div ng-message="required">Enter Amount</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group padding">
+                                        <label class="control-label col-sm-4">Remark:</label>
+                                        <div class="col-sm-7">
+                                            <textarea maxlength="250" name="remarks" ng-model="VTADAAAP_Remarks" class="form-control" resize: none; rows="5" placeholder="Remark" />
+                                            <div class="error-messages" ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                                <div ng-message="required">Enter "></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group padding">
+                                        <label class="control-label col-sm-4"> Date:<span style="color:red;">*</span></label>
+                                        <div class="col-sm-7" style="padding-left: 0px !important;">
+                                            <md-datepicker ng-model="VTADAAAP_Date" name="startdate" id="date1" md-placeholder="Enter date" md-min-date="plMaxdate" md-max-date="newdate" required></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                                <div ng-message="required">Select Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <br />
+                                <div class="text-center">
+                                    <input type="text" value="{{vtadaaaP_Id}}" class="hidden" ng-model="VTADAAAP_Id" />
+                                    <input type="text" value="{{vtadaaA_Id}}" class="hidden" ng-model="VTADAAA_Id" />
+                                    <md-button type="submit" class="md-raised md-primary" data-ng-click="savedata()">
+                                        <i class="fa fa-bar-chart" aria-hidden="true"></i> SAVE
+                                    </md-button>
+
+                                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 box-content clearfix">
+                        <h4>TADA Adavance  Apply Details </h4>
+                        <hr />
+                        <div ng-repeat="level in Getsancationed_List">
+                            <div class="row">
+                                <div class="text-center">
+                                    <h5>{{level.VTADAAA_SanctioningLevel}} level Approved By - {{level.ApprovedBy}}</h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-bordered" ng-if="flagone==true">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No</th>
+                                                <th>Expenditure Head</th>
+                                                <th>Amount</th>
+                                                <th>Total Slots</th>
+                                                <th> Slots</th>
+                                                <th>Applied Amount</th>
+                                                <th>Approved Amount</th>
+                                                <th>Approved Date</th>
+                                                <th>Remark</th>
+                                                <td> ExpenditureHead Status</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                <td class="text-center">{{$index+1}}</td>
+                                                <td>{{leveldetails.VTADAAAD_ExpenditureHead}}</td>
+                                                <td>
+                                                    <span ng-show="leveldetails.VTADAAAD_ExpenditureHead=='Accommodation'">
+                                                        {{leveldetails.VTADACM_AccommodationAmt}}
+                                                    </span>
+                                                    <span ng-show="leveldetails.VTADAAAD_ExpenditureHead=='Travel'">
+                                                        {{leveldetails.VTADACM_TransportAmt}}
+                                                    </span>
+                                                    <span ng-show="leveldetails.VTADAAAD_ExpenditureHead=='Food'">
+                                                        {{leveldetails.VTADACM_FoodAmt}}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAD_TotalSlots}}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAD_Slots}}
+                                                </td>
+                                                <td class="text-left">{{leveldetails.HeadWiseAppliedAmount}}</td>
+                                                <td class="text-left">{{leveldetails.HeadWiseSactionedAmount}}</td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_Date |date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td>{{leveldetails.VTADAAAAH_Remarks}}</td>
+                                                <td class="text-left">{{leveldetails.VTADAAAAH_StatusFlg}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-12" ng-if="flagtwo==true">
+                                    <table class="table table-bordered table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No.</th>
+                                                <th>AppliedDate</th>
+                                                <th> Total AppliedAmount</th>
+                                                <th>Head Wise Sanction Amount</th>
+                                                <th>Approved Date</th>
+                                                <th>Approval Remark</th>
+                                                <th>Staus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                <td class="text-center">{{$index+1}}</td>
+                                                <td>
+                                                    {{leveldetails.AdvancedAppliedAmount}}
+                                                </td>
+                                                <td>{{leveldetails.VTADAAA_AppliedDate |date:'dd/MM/yyyy'}}</td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_SactionedAmount}}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_Date |date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_Remarks }}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_StatusFlg}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="box box-primary" ng-show="editflagtwo==true">
+        <div class="box-header with-border">
+            <h3 class="box-title">TA-DA Adavance Payment</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <!---->
+        <!--ng-show="get_Report.length>0"-->
+        <div class="box-body">
+            <div class="row" ng-show="pppfl==true">
+                <div class="text-center"><b style="color:red">TADA ADAVANCE APPROVAL REQUEST IS NOT AVAILABLE FOR PAYMENT </b></div>
+            </div>
+            <div>
+                <div class="row" ng-show="get_Report.length > 0">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center" ng-show="get_Report.length > 0">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No
+                            </th>
+                            <th>
+                                Emplyee Name
+                            </th>
+                            <th>
+                                City
+                            </th>
+                            <th>FromDate</th>
+                            <th>To Date</th>
+                            <th>Total Applied Amount</th>
+                            <th>Total Sanctioned Amount</th>
+                            <th>
+                                Action
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_Report | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="xyz">
+                            <td class="hidden">
+                                {{user.vtadaaA_Id}}
+                            </td>                            
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>
+                                {{user.hrmE_EmployeeFirstName}}
+                            </td>
+                            <td>
+                                {{user.ivrmmcT_Name}}
+                            </td>
+                            <td class="text-left">{{user.vtadaaA_FromDate|date:'dd/MM/yyyy'}}</td>
+
+                            <td class="text-left">{{user.vtadaaA_ToDate|date:'dd/MM/yyyy'}}</td>
+
+                            <td>
+                                {{user.vtadaaA_TotalAppliedAmount}}
+                            </td>
+                            <td>
+                                {{user.vtadaaA_TotalSactionedAmount}}
+                            </td>
+                            <td class="text-center">
+                                <span ng-if="user.vtadaaA_StatusFlg=='Approved'">
+                                    <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="PageUp">
+
+                                        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                            </td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="xyz">
+            </dir-pagination-controls>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="Adavance.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">TA-DA Adavance Payment</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgridf}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValuee!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue11.length}}
+
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValuee" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.No
+                        </th>
+                        <th>
+                            Emplyee Name
+                        </th>
+                        <th>Employee Code</th>
+                        <th>
+                            City
+                        </th>
+                        <th>Paid Date</th>
+
+                        <th>Total Paid Amount</th>
+                        <th>Mode Payment</th>
+                        <th>
+                            Action
+                        </th>
+                        <th>
+                            View
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="userone in filterValue11 = (Adavance | filter : searchValuee)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage1" ng-class-odd="'odd'" pagination-id="pqr">
+
+                        <td class="hidden">
+                            {{"userone.vtadaaA_Id"}}
+                        </td>
+                        <td class="hidden">
+                            {{userone.vtadaaaP_Id}}
+                            <span>
+                                {{userone.vtadaaA_Id}}
+                            </span>
+                        </td>
+                        <td class="hidden">
+                            {{user.vtadaaaP_Remarks}}
+                        </td>
+                        <td>{{itemsPerPage *(currentPage1-1)+$index+1}}</td>
+                        <td>
+                            {{userone.hrmE_EmployeeFirstName}}
+                        </td>
+                        <td>
+                            {{userone.hrmE_EmployeeCode}}
+                        </td>
+                        <td>
+                            {{userone.ivrmmcT_Name}}
+                        </td>
+                        <td class="text-left">{{userone.vtadaaaP_Date|date:'dd/MM/yyyy'}}</td>
+                        <td>
+                            {{userone.vtadaaaP_AmountPaid}}
+                        </td>
+                        <td>
+                            {{userone.vtadaaaP_PaymentMode}}
+                        </td>
+                        <td class="text-center">                            <!--vtadaaaP_ActiveFlg-->
+                            <span ng-if="userone.vtadaaaP_ActiveFlg == true">
+                                <a class="text-aqua" href="" ng-click="edittt(userone)" data-placement="bottom" data-toggle="tooltip" title="PageUp">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                <a href="" ng-click="Deletedata(userone)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactive
+                                </a>
+                            </span>
+                            <span ng-if="userone.vtadaaaP_ActiveFlg == false">
+                                <a href="" ng-click="Deletedata(userone)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Active
+                                </a>
+                            </span>
+                        </td>
+                        <td>
+                            <span>
+                                <a title="View Allowence Details" class="fa fa-eye text-black" ng-click="getView(userone)">
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+           <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="pqr">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="viewDeatils" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                <h5 class="modal-title" style="color:#fff !important;">TADA  Authurization details</h5>
+            </div>
+            <div class="modal-body">
+                
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="box-header with-border">
+                            <h6 class="box-title">  Travel  Details </h6>
+                        </div>
+                        <br />
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Employee Code</th>
+                                    <th>Days</th>
+                                    <th>From Date</th>
+                                    <th>Departure Time</th>
+                                    <th>To Date</th>
+                                    <th>Arrival Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+
+                                    <td>
+                                        {{emplYoeeName}}
+                                    </td>
+                                    <td>
+                                        {{hrmE_EmployeeCodeee}}
+                                    </td>
+                                    <td>
+                                        {{datediff}}
+                                    </td>
+                                    <td>
+                                        {{fromdate |date:'dd/MM/yyyy'}}
+                                    </td>
+                                    <td style="text-align:center">
+                                        {{departuretime | date : 'shortTime' }}
+
+                                    </td>
+                                    <td>
+                                        {{todate |date:'dd/MM/yyyy'}}
+                                    </td>
+                                    <td style="text-align:center">
+
+                                        {{ ArrivalTime | date : 'shortTime' }}
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="box-header with-border">
+                        <h6 class="box-title">TADA Adavance  Apply Details </h6>
+                    </div>
+
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div ng-repeat="level in Getsancationed_List">
+                            <div class="row">
+                                <div class="text-center">
+                                    <h5>{{level.VTADAAA_SanctioningLevel}} level Approved By - {{level.ApprovedBy}}</h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-bordered" ng-if="flagone==true">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No</th>
+                                                <th>Expenditure Head</th>
+                                                <th>Amount</th>
+                                                <th>Total Slots</th>
+                                                <th> Slots</th>
+                                                <th>Applied Amount</th>
+                                                <th>Approved Amount</th>
+                                                <th>Approved Date</th>
+                                                <th>Approval Remark</th>
+                                                <td> ExpenditureHead Status</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                <td class="text-center">{{$index+1}}</td>
+                                                <td>{{leveldetails.VTADAAAD_ExpenditureHead}}</td>
+                                                <td>
+                                                    <span ng-show="leveldetails.VTADAAAD_ExpenditureHead=='Accommodation'">
+                                                        {{leveldetails.VTADACM_AccommodationAmt}}
+                                                    </span>
+                                                    <span ng-show="leveldetails.VTADAAAD_ExpenditureHead=='Travel'">
+                                                        {{leveldetails.VTADACM_TransportAmt}}
+                                                    </span>
+                                                    <span ng-show="leveldetails.VTADAAAD_ExpenditureHead=='Food'">
+                                                        {{leveldetails.VTADACM_FoodAmt}}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAD_TotalSlots}}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAD_Slots}}
+                                                </td>
+                                                <td class="text-left">{{leveldetails.HeadWiseAppliedAmount}}</td>
+                                                <td class="text-left">{{leveldetails.HeadWiseSactionedAmount}}</td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_Date |date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td>{{leveldetails.VTADAAAAH_Remarks}}</td>
+                                                <td class="text-left">{{leveldetails.VTADAAAAH_StatusFlg}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-12" ng-if="flagtwo==true">
+                                    <table class="table table-bordered table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No.</th>
+                                                <th>AppliedDate</th>
+                                                <th> Total AppliedAmount</th>
+                                                <th>Head Wise Sanction Amount</th>
+                                                <th>Approved Date</th>
+                                                <th>Remark</th>
+                                                <th>Staus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="leveldetails in  level.reportdetails">
+                                                <td class="text-center">{{$index+1}}</td>
+                                                <td>
+                                                    {{leveldetails.AdvancedAppliedAmount}}
+                                                </td>
+                                                <td>{{leveldetails.VTADAAA_AppliedDate |date:'dd/MM/yyyy'}}</td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_SactionedAmount}}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_Date |date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_Remarks }}
+                                                </td>
+                                                <td>
+                                                    {{leveldetails.VTADAAAA_StatusFlg}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

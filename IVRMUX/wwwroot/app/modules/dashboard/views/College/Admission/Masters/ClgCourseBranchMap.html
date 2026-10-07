@@ -1,0 +1,219 @@
+﻿
+<section class="content" data-ng-init="getAllDetails()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savetmpldata()" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Course Branch Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Course Name:<span style="color:red;">*</span></label>
+                            <div class="col-sm-9">
+                                <select class="form-control" name="gtname" ng-model="AMCO_Id" ng-disabled="editflag1" ng-change="chkcurslst(AMCO_Id)"> required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in MasterCourseList" value="{{option.amcO_Id}}" ng-selected="{{option.Selected===true}}">
+                                        {{option.amcO_CourseName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.gtname)" ng-messages="myForm.gtname.$error">
+                                <div ng-message="required" class="text-center">Please Course Name</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Branch Name:</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" name="gtnameee" ng-model="AMB_Id" ng-disabled="editflag1" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in Masterbranch" value="{{option.amB_Id}}" ng-selected="{{option.Selected===true}}">
+                                        {{option.amB_BranchName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.gtnameee)" ng-messages="myForm.gtnameee.$error">
+                                <div ng-message="required" class="text-center">Please Select Branch Name</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-3">Semester Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="sec in mastersemesterlist">
+                                        <input value="{{sec.amsE_Id}}" data-ng-model="sec.Selected1" type="checkbox" ng-required="isOptionsRequired1()"
+                                               name="secoption" ng-change="chksemlsst(sec.amsE_Id);"> <!--ng-disabled="sec.editflag"-->
+                                        <span class="lbl padding-8">{{sec.amsE_SEMName}}</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.secoption)" ng-messages="myForm.secoption.$error">
+                                    <div ng-message="required">Select Semester Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="AMCOCM_Id" value="{{AMCOBM_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Course Category</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue123.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sort('sno')">SL.No.</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('amcO_CourseName')">Course Name</a>
+                        </th>
+
+                        <th><a href="" ng-click="sortBy('amB_BranchName')">Branch Name</a> </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (griddetails | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.amcO_CourseName}}</td>
+
+                        <td>{{user.amB_BranchName}}</td>
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            |
+                            &nbsp;
+                            <a href="javascript:void(0)" class="text-primary padding-right-5" data-placement="bottom" data-toggle="modal" title="Print Receipt" 
+                               data-target="#myModal" data-ng-click="showmodaldetails(user)">                             
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+</section>
+
+<div class="modal fade modal-medium" id="myModal" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-md">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="getAllDetails()" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">Course Branch Semester List </h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                SLNO
+                            </th>
+                            <th>
+                                Course Name
+                            </th>
+                            <th>
+                               Branch Name
+                            </th>
+                            <th>
+                              Semester Name
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="usersem in semesterbrancklist">
+                            <td>{{$index+1}}</td>
+                            <td>{{ usersem.amcO_CourseName}}</td>
+                            <td>{{ usersem.amB_BranchName}}</td>
+                            <td>{{ usersem.amsE_SEMName}}</td>
+                            <td class="text-center">
+                                <span ng-if="usersem.amcobmS_ActiveFlg==false">
+                                    <a href="" ng-click="deactivesem(usersem)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        Activate
+                                    </a>
+                                </span>
+                                <span ng-if="usersem.amcobmS_ActiveFlg==true">
+                                    <a href="" ng-click="deactivesem(usersem)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        Deactivate
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>          
+        </div>
+
+    </div>
+</div>

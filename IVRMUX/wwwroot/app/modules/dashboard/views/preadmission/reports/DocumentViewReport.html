@@ -1,0 +1,499 @@
+﻿<style>
+    .img-zoom-in-out .modal {
+        text-align: center;
+    }
+
+        .img-zoom-in-out .modal .modal-dialog {
+            display: inline-block;
+            width: auto;
+        }
+
+            .img-zoom-in-out .modal .modal-dialog .img-responsive {
+                max-height: calc(100vh - 225px);
+            }
+
+    .img-style {
+        width: 110px;
+        height: 100px;
+        border: 1px solid #ddd;
+        float: right;
+    }
+
+    .office-use-box {
+        width: 400px;
+        margin: auto;
+        border: 1px solid #000;
+        padding: 10px;
+    }
+
+    .inlineTable1 {
+        display: inline-block;
+        float: left;
+        width: 30% !important;
+        padding-top: 15px !important;
+    }
+
+    .inlineTable .border-bottom {
+        width: 160px;
+    }
+
+    .inlineTable2 {
+        display: inline-block;
+        float: left;
+        width: 48% !important;
+        padding-top: 10px !important;
+    }
+
+    .inlineTable3 {
+        display: inline-block;
+        float: right;
+        width: 21% !important;
+    }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+<section class="content">
+    <div class="box box-primary" data-ng-init="BindData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Document View Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" ng-click="ShowHide1()" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+
+        <form class="form-horizontal" role="form" name="myForm" data-ng-submit="regformfour()" novalidate>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel" name="acd" ng-model="asmaY_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="year in year_list" value="{{year.asmaY_Id}}" ng-selected="{{year.Selected == true}}">
+                                        {{year.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd)" ng-messages="myForm.acd.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="happlygg" data-ng-model="ASMCL_Id" required>
+                                    <option value="">--Select Class--</option>
+                                    <option value="0">All Class</option>
+                                    <option ng-repeat="option in classlists" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">{{option.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.happlygg)" ng-messages="myForm.happlygg.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span>
+                                <md-button type="submit" class="md-raised md-primary" style="margin-left: 50px;">
+                                    <i class="fa fa-file" aria-hidden="true"></i> Report
+                                </md-button>
+                            </span>
+                            <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                            </md-button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary tt" ng-show="reportgrid">
+        <div class="box-header with-border">
+            <h3 class="box-title">STudentS Document List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="table">
+
+
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">
+                                SL.NO
+
+                            </th>
+                            <th style="text-align:center"><a href="" hi ng-click="order('pasR_Student_Pic_Path')">Photo</a> </th>
+                            <th style="text-align:center">
+                                <a href="" hi ng-click="order('name')">Name</a>
+                            </th>
+                            <th style="text-align:center"><a href="" hi ng-click="order('pasR_RegistrationNo')">Registration No</a> </th>
+                            <th style="text-align:center"><a href="" hi ng-click="order('classname')">Class</a> </th>
+
+
+                            <th style="text-align:center" ng-show="prosH">Application Form</th>
+
+                            <th style="text-align:center">View</th>
+                            <th style="text-align:center">Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr dir-paginate="user in filterValue1=(pages | filter:filterValue )|orderBy:sortKey:reverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td><img height="70" width="70" ng-src="{{user.pasR_Student_Pic_Path}}" /></td>
+                            <td style="text-align: left;" class="text-uppercase">
+                                {{user.name}}
+                                <!--{{user.pasR_FirstName + " " }}<span ng-if="user.pasR_MiddleName !== null">
+            {{ user.pasR_MiddleName }}
+        </span>{{user.pasR_LastName}}-->
+                            </td>
+                            <td>{{ user.pasR_RegistrationNo}}</td>
+                            <td style="text-align: left;width:100px">{{ user.classname}}</td>
+
+                            <td ng-repeat="pay in prospectusPaymentlist" ng-if="ispaC_ApplFeeFlag == 1 && user.pasr_id == pay.pasA_Id">
+                                <span>
+                                    <a href="javascript:void(0)" class="text-primary" style="display:inline;" data-placement="bottom" data-toggle="modal" title="Print Application Form" data-ng-model="receiptdetails" data-target="#myModal1" data-ng-click="showprintdata(user.pasr_id)">
+                                        <i class="fa fa-eye" aria-hidden="true">View Application</i>
+                                    </a>
+                                </span>
+                                
+                            </td>
+
+                            <td ng-show="prosL" ng-if="ispaC_ApplFeeFlag==0">
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Print Application Form" data-ng-model="receiptdetails" data-target="#myModal1" data-ng-click="showprintdata(user.pasr_id)">
+                                    <i class="fa fa-eye" aria-hidden="true">View Application</i>
+                                </a>
+                            </td>
+                            <td style="text-align: left;">
+                                <span ng-if="user.pasR_Student_Pic_Path!=null">
+                                    <a style="color:blue;display:inline;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsimage(user.pasR_Student_Pic_Path,user.pasr_id,'Student Photo')"> Student Photo</a>
+                                </span><br />
+                                <span ng-if="user.pasR_FatherPhoto!=null">
+                                    <a style="color:blue;display:inline;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsimage(user.pasR_FatherPhoto,user.pasr_id,'Father Photo')"> Father Photo</a>
+                                </span><br />
+                                <span ng-if="user.pasR_MotherPhoto!=null">
+                                    <a style="color:blue;display:inline;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsimage(user.pasR_MotherPhoto,user.pasr_id,'Mother Photo')"> Mother Photo</a>
+                                </span>
+                                <div ng-repeat="doclst in doclist" ng-if="user.pasr_id == doclst.pasr_id">
+                                    <!--<a style="color:blue;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetails(doclst)"> {{doclst.amsmD_DocumentName}}</a>-->
+
+                                    <span ng-if="doclst.filetype=='jpg'">
+                                        <a style="color:blue;display:inline;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetails(doclst)"> {{doclst.amsmD_DocumentName}}</a>
+                                    </span>
+
+                                    <span ng-if="doclst.filetype=='pdf'">
+                                        <!--<a style="color:blue;display:inline; " href="{{doclst.document_Path}}" target="_blank" full-frame="">{{doclst.amsmD_DocumentName}} <b style="color:orangered;display:inline; ">(Download pdf)</b> </a>-->
+
+                                        <a style="color:blue;display:inline; " data-ng-click="downloadpdf(doclst)" full-frame="">{{doclst.amsmD_DocumentName}} <b style="color:orangered;display:inline; ">(pdf)</b> </a>
+
+
+                                    </span>
+
+                                </div>
+
+
+                            </td>
+                            <td style="text-align: left;">
+                                <span ng-if="user.pasR_Student_Pic_Path!=null">
+                                    <i class="fa fa-cloud-download" aria-hidden="true" ng-click="downloaddirectimage(user.pasR_Student_Pic_Path,user.pasr_id,'Student Photo')" style="margin-left: 15px;font-size:small;color:#007ad1;">&nbsp;&nbsp;Download</i>
+                                </span><br />
+                                <span ng-if="user.pasR_FatherPhoto!=null">
+                                    <i class="fa fa-cloud-download" aria-hidden="true" ng-click="downloaddirectimage(user.pasR_FatherPhoto,user.pasr_id,'Father Photo')" style="margin-left: 15px;font-size:small;color:#007ad1;">&nbsp;&nbsp;Download</i>
+                                </span><br />
+                                <span ng-if="user.pasR_MotherPhoto!=null">
+                                    <i class="fa fa-cloud-download" aria-hidden="true" ng-click="downloaddirectimage(user.pasR_MotherPhoto,user.pasr_id,'Mother Photo')" style="margin-left: 15px;font-size:small;color:#007ad1;">&nbsp;&nbsp;Download</i>
+                                </span>
+                                <div ng-repeat="doclst in doclist" ng-if="user.pasr_id == doclst.pasr_id">
+                                    <!--<a style="color:blue;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetails(doclst)"> {{doclst.amsmD_DocumentName}}</a>-->
+
+                                    <span ng-if="doclst.filetype=='jpg'">
+                                        <i class="fa fa-cloud-download" aria-hidden="true" ng-click="downloaddirect(doclst,user.pasr_id)" style="margin-left: 15px;font-size:small;color:#007ad1;">&nbsp;&nbsp;Download</i>
+                                    </span>
+
+                                    <span ng-if="doclst.filetype=='pdf'">
+                                        <i class="fa fa-cloud-download" aria-hidden="true" data-ng-click="downloadpdf(doclst)" style="margin-left: 15px;font-size:small;color:#007ad1;">&nbsp;&nbsp;Download</i>
+                                    </span>
+
+                                </div>
+
+
+                            </td>
+                            <!--<td ng-repeat="doclst in doclist" ng-if="user.pasr_id == doclst.pasr_id">
+        <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetails(doclst)"> {{doclst.amsmD_DocumentName}}</a>
+    </td>-->
+                        </tr>
+                    </tbody>
+
+                </table>
+
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"></dir-pagination-controls>
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal1" class="modal fade feetransaction" role="dialog" data-backdrop="static">
+        <div id="test">
+
+        </div>
+    </div>
+
+    <div id="printhelthmodel" class="modal fade feetransaction" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="box-body">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printstuhelth();">Print</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    <div class="BGHSAPP" id="BGHSHealthCertReport">
+                        <div class="header text-center">
+                            <h2 class="text-uppercase">Baldwin Girls' High school, Bengaluru-25</h2>
+                            <h4 class="text-uppercase">
+                                <u> HEALTH CERTIFICATE </u>
+                            </h4>
+                            <h5>
+                                (To be Completed, signed by the parent or guardian and <br />
+                                attached to the application for admission)
+                            </h5>
+                        </div>
+                        <hr />
+                        <section class="margin-top-50">
+                            <table class="table margin-bottom-none">
+                                <tr>
+                                    <td width="150">Name of the Pupil </td>
+                                    <td class="border-bottom-dotted text-center">{{Hstuname}}</td>
+                                    <td width="50">Age</td>
+                                    <td class="border-bottom-dotted text-center">{{Hstuage}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="110">Father's Name </td>
+                                    <td class="border-bottom-dotted text-center">{{HFirstName}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="240">1. When was the child vaccinated ?</td>
+                                    <td class="border-bottom-dotted text-center">{{VaccinationDate | date:'dd/MM/yyyy'}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="220">2. Has the child ever had fits ?</td>
+                                    <td class="border-bottom-dotted text-center">{{FitsFlag}}</td>
+                                    <td width="150">if so, when?</td>
+                                    <td class="border-bottom-dotted text-center">{{FitsDate | date:'dd/MM/yyyy'}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="300">3. Is the child subject to any form of illness ?</td>
+                                    <td class="border-bottom-dotted text-center">{{Illness}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="350">4. When was she last injected against Hepatitis B ?</td>
+                                    <td class="border-bottom-dotted text-center">{{HepatitisB | date:'dd/MM/yyyy'}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="375">5. when was she last inoculated against Typhoid fever ? </td>
+                                    <td class="border-bottom-dotted text-center">{{TyphoidFever | date:'dd/MM/yyyy'}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="850">6. Does the child suffer from any other ailment or constitutional peculiarity affecting the general health, sigh or health etc. ?</td>
+                                    <!--<td class="border-bottom-dotted text-center">{{Ailment}}</td>-->
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="30"></td>
+                                    <td class="border-bottom-dotted text-center">{{Ailment}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="370">7. Is the child allergic to any medicines or injections ? </td>
+                                    <td class="border-bottom-dotted text-center">{{Allergy}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="810">8. Any other health problem you would like to share (any specific cardiac anomalies - Congenital heart disorders) ?</td>
+                                    <!--<td class="border-bottom-dotted text-center">{{HealthProblem}}</td>-->
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="30"></td>
+                                    <td class="border-bottom-dotted text-center">{{HealthProblem}}</td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td>
+                                        9. Blood Group :  {{BloodGroup}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td> I hereby certify that to the best of my knowledge and belief that the above information is right (including those already mentioned). I bind myself to abide by the rules of the school.</td>
+                                </tr>
+                            </table>
+                            <div class="row margin-top-50">
+                                <div class="col-sm-6">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100">
+                                                    Date :
+                                                </td>
+                                                <td class="border-bottom-dotted">{{Serial}} </td>
+                                                <td width="100"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-6 pull-right">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="200" class="pull-right">
+                                                    <label class="border-top-dotted">
+                                                        Signature of Parent / Guardian
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row margin-top-50">
+                                <div class="col-sm-2">
+                                    <h4 class="text-uppercase">NB :</h4>
+                                </div>
+                                <div class="col-sm-10">
+                                    <table class="table">
+                                        <tr>
+                                            <td>
+                                                If the child at any time within three weeks before date appointed for joining the school has been exposed to any infection, immediate notice of the facts should be send to the Principal and such a child on no account, should be sent to School, till certified medically fit.
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <h4 class="text-uppercase"><u>undertaking</u></h4>
+                            <table class="table">
+                                <tr>
+                                    <td>
+                                        The school will be sending you information through SMS/E-mail. We would like you to authorise deployment of the same.
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="row margin-top-50">
+                                <div class="col-sm-6">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="300" class="border-top">
+                                                    Father
+                                                </td>
+                                                <td width="100"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-6 pull-right">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="300" class="pull-right border-top">
+                                                    Mother
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <hr />
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--//modal-->
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <!--<a href="{{imagedownload}}" target="_blank" class="btn btn-default">Download</a>-->
+                    <button type="button" class="btn btn-default" ng-click="download()" data-dismiss="modal">Download</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+
+        </div>
+    </div>
+</section>

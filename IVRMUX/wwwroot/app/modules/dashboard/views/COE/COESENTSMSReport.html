@@ -1,0 +1,264 @@
+﻿<section class="content" ng-init="loaddata()">
+    <div data-ng-init="">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    COE Report
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+
+                    <div class="row">
+                        <div class="col-sm-5 col-sm-offset-3">
+                            <div class="form-group">
+                                <div class="well">
+                                    <div class="text-center" ng-init="typeflag='EMAIL'">
+                                        <input type="radio" ng-model="typeflag" ng-disabled="editflag==true" value="EMAIL" ng-click="All_Individual(typeflag)" />
+                                        <span class="lbl"> &nbsp; &nbsp;EMAIL   </span>
+                                        <input type="radio" ng-model="typeflag" ng-disabled="editflag==true" value="SMS" ng-click="All_Individual(typeflag)" />
+                                        <span class="lbl"> &nbsp; &nbsp;SMS &nbsp; &nbsp;</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+
+                                <label class="control-label col-sm-3"> Module :<strong style="color:red;">*</strong></label>
+
+                                <div class="multiselect col-sm-10">
+                                    <input class="form-control" data-ng-model="searchchkbx1" type="text" placeholder="Search here..." />
+                                    <label>
+                                        <input name="clsoption" value="all" data-ng-model="ivrmM_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+
+                                    <label ng-repeat="option1 in modulenames | filter:searchchkbx1" value="{{option1.ivrmM_Id}}">
+                                        <input type="checkbox" data-ng-model="option1.selected" ng-change="togchkbxC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired()" name="modules" />
+                                        <span class="lbl padding-8">{{option1.ivrmM_ModuleName}}</span>
+                                    </label>
+                                </div>
+
+                                <div class="error-messages" ng-if="interacted(myForm.modules)" ng-messages="myForm.modules.$error">
+                                    <div ng-message="required">Select Module</div>
+                                </div> <br /><br />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="fromdate" onkeypress="return false" data-ng-model="FromDate" md-placeholder="Enter Date" ng-paste="$event.preventDefault()" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.fromdate)" ng-messages="myForm.fromdate.$error">
+                                        <div ng-message="required">Select From  Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" style="padding-left:20%"> To Date<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8" style="padding-left:20%">
+                                    <md-datepicker name="todate" onkeypress="return false" data-ng-model="ToDate" md-placeholder="Enter Date" ng-paste="$event.preventDefault()" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.todate)" ng-messages="myForm.todate.$error">
+                                        <div ng-message="required">Select To  Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" id="submit" ng-click="getReport()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-primary"  id="exp-btn" ng-disabled="true">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="prnt-btn" ng-disabled="true">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                     Print
+                    </md-button>-->
+
+                    <md-button type="button" class="md-raised md-warn" ng-click="clear()" id="clr-btn">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="!grid_view" ng-click="printToCart()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="!grid_view" ng-click="exportToExcel('#printrcp')">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Export
+                    </md-button>
+
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="grid_view" ng-if="typeflag == 'SMS'">
+            <div class="box-header with-border">
+                <h3 class="box-title">COE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th> Mobile No </th>
+                        <th> Module Name </th>
+                        <th> Message </th>
+                        <th> Date </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--<tr ng-repeat="user in coereport">-->
+                    <tr dir-paginate="user in filterValue1 = (coereport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{ user.Mobile_no}}</td>
+                        <td>{{ user.Module_Name}}</td>
+                        <td>{{ user.Message}}</td>
+                        <td>{{ user.Datetime |date:'dd-MM-yyyy'}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+        <div class="box box-primary" ng-show="grid_view" ng-if="typeflag == 'EMAIL'">
+            <div class="box-header with-border">
+                <h3 class="box-title">COE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th> Email Id </th>
+                        <th> Module Name </th>
+                        <!--<th> Message </th>-->
+                        <th> Date </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--<tr ng-repeat="user in coereport">-->
+                    <tr dir-paginate="user in filterValue1 = (coereport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{ user.Email_Id}}</td>
+                        <td>{{ user.Module_Name}}</td>
+                        <!--<td>{{ user.Message}}</td>-->
+                        <td>{{ user.Datetime |date:'dd-MM-yyyy'}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+    </div>
+    <div id="printrcp" ng-show="printsection" ng-if="typeflag == 'SMS'">
+
+        <center> <h4><u>COE SMS AND MAIL SENT REPORT</u></h4></center>
+        <table class="table table-responsive" id="table">
+            <thead>
+                <!--<tr row-span="5" style="text-align:center">COE SMS AND MAIL SENT REPORT</tr>-->
+                <tr>
+                    <th>SL NO</th>
+                    <th> Mobile No </th>
+                    <th> Module Name </th>
+                    <th> Message </th>
+                    <th> Date </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in coereport">
+                    <td>{{$index+1}}</td>
+                    <td>{{ user.Mobile_no}}</td>
+                    <td>{{ user.Module_Name}}</td>
+                    <td>{{ user.Message}}</td>
+                    <td>{{ user.Datetime |date:'dd-MM-yyyy'}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+
+    <div id="printrcp" ng-show="printsection" ng-if="typeflag == 'EMAIL'">
+
+        <center> <h4><u>COE SMS AND MAIL SENT REPORT</u></h4></center>
+        <table class="table table-responsive" id="table">
+            <thead>
+                <!--<tr row-span="5" style="text-align:center">COE SMS AND MAIL SENT REPORT</tr>-->
+                <tr>
+                    <th>SL NO</th>
+                    <th> Email Id </th>
+                    <th> Module Name </th>
+                    <th> Date </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in coereport">
+                    <td>{{$index+1}}</td>
+                    <td>{{ user.Email_Id}}</td>
+                    <td>{{ user.Module_Name}}</td>
+                    <td>{{ user.Datetime |date:'dd-MM-yyyy'}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</section>
